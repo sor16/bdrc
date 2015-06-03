@@ -1,7 +1,6 @@
 library(stats)
-model1<-function(wq,RC)
+model1<-function(wq,RC){
 Nit=20000
-
 RC$y=as.matrix(log(wq[,2]));
 RC$w=0.01*wq[,1]; #to meters
 RC$w_tild=RC$w-RC$w[1];
@@ -108,4 +107,5 @@ DIC=Dhat+2*pd
 B=1/(mean(0.5*c(D1[seq],D2[seq],D3[seq],D4[seq])))
 
 return(list("RC"=RC,"ypo1"=ypo1,"ypo2"=ypo2,"ypo3"=ypo3,"ypo4"=ypo4,"l_m"=l_m,"t_m"=t_m,"wq"=wq,"fit"=X_m%*%mu))
+}
 
