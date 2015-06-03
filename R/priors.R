@@ -1,8 +1,8 @@
 priors <- function(country) {
 
+    RC=list()
 #Prior Parameters
 if(country=="Iceland"){
-    RC=list()
     RC$mu_a=3.20;
     RC$mu_b=2.29;
     RC$sig_a=sqrt(1.21);
@@ -18,5 +18,5 @@ RC$Sig_xinv=solve(RC$Sig_x);
 RC$Lx=chol(RC$Sig_x);
 RC$Sinvmu=RC$Sig_xinv%*%RC$mu_x;
 
-return(list("RC"=RC))
+return(RC)
 }
