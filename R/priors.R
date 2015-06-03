@@ -18,5 +18,5 @@ RC$Sig_xinv=solve(RC$Sig_x);
 RC$Lx=chol(RC$Sig_x);
 RC$Sinvmu=RC$Sig_xinv%*%RC$mu_x;
 
-return(RC)
+return(list("RC"=RC))
 }
