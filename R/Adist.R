@@ -5,26 +5,26 @@
 Adist <- function(w){
 
 library(Matrix)
-  # %Zdist creates the 
-  # 
+  # %Zdist creates the
+  #
   # %Input w: water level measurements
-  # 
+  #
   # %Outputs
   # %Z:     Matrix \mathbold{Z} linking unique water level measurements (mathbold{w}') to actual
   # %       water level measurements (w) such that \mathbold{w}=mathbold{Zw}'
   # %dist:  Matrix of distances between unique water level measurements
   # %       dist_{ij}=|w_{i}'-w_{j}'|
-  # %n:     Number of unique measurements 
+  # %n:     Number of unique measurements
   # %N:     Number of measurements
 
 
-w=as.matrix(w)  
+w=as.matrix(w)
 N=length(w[,1])
 O=unique(w[,1])
 
 n_e=length(O)
 
-  
+
 A=matrix(0,nrow=N,ncol=n_e)
 
 A[1,1]=1
@@ -32,7 +32,7 @@ A[1,1]=1
 e=1
 for(ee in 2:N){
   if( w[ee]==w[ee-1]){
-    
+
 A[ee,e]=1
 
   }else{

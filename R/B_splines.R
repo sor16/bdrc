@@ -1,7 +1,7 @@
 B_splines <- function(ZZ){
-  
+
 #A script to test the B-splines.
-  
+
 #The number of equally spaced interior knots.
 kx=2
 
@@ -13,7 +13,7 @@ M = 4
 
 #Determine the number of functions.
 Nx = kx + M
-# 
+#
 #The epsilon-knots
 # epsilon_x = dx*[0:(kx+1)];
 epsilon_x = dx*seq(0,kx+1,by=1)
@@ -31,7 +31,7 @@ tau_x[(kx+M+1):(kx+2*M)]=epsilon_x[kx+2]*matrix(1,nrow=1,ncol=M)
 
 #Vector with values of x and y.
 lx = length(ZZ)
- 
+
 #Compute the x-splines and the y-splines.
 #[XX] = spline_functions(ZZ,tau_x,dx,kx,M);
 XX <- spline_functions(ZZ,tau_x,dx,kx,M)
