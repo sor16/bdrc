@@ -15,9 +15,9 @@ Densevalm22 <- function(th,RC){
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
-  p=as.numeric(-0.5%*%t(w)%*%w-sum(log(diag(L)))-
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
                  (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-                 sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2)
+                 sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2
 
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
