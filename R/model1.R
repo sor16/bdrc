@@ -1,4 +1,5 @@
 library(stats)
+
 model1<-function(wq,RC){
 Nit=20000
 RC$y=as.matrix(log(wq[,2]));
@@ -25,7 +26,7 @@ varappr=as.matrix(diag(v_temp)+exp(t_m[2,]))
 
 confinterval= cbind(X_m%*%mu+qnorm(0.025,0,sqrt(varappr)),X_m%*%mu+qnorm(0.975,0,sqrt(varappr)))
 
-LH=t(chol(H))/(2.38/sqrt(2)) #Hvadan kemur thessi tala?? 2.38
+LH=t(chol(H))/(2.38/sqrt(2)) #Hvadan kemur thessi tala? 2.38 Hermun, fraedilega valinn fasti (skoda grein) Robert-
 
 t1=matrix(0,4,Nit)
 t2=matrix(0,4,Nit)
