@@ -56,5 +56,5 @@ for(ee in 2:n){
   W=rbind(W,O)
 }
   dist=abs(W-t(W))
-return(list("dist"=dist,"A"=A,"n"=n,"N"=N))
+return(list("dist"=dist,"A"=A,"n"=n,"N"=N,"O"=O))
 }

@@ -1,6 +1,6 @@
 #Model2BH
 library(stats)
-model1<-function(wq,RC){
+model2<-function(wq,RC){
     Nit=20000;
 
     RC$mu_a=3.20
@@ -33,8 +33,9 @@ model1<-function(wq,RC){
     RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
     RC$m1=matrix(0,nrow=2,ncol=RC$n)
     RC$m2=matrix(0,nrow=RC$n,ncol=2)
+    theta.init=rep(0,9)
 
-    Dens = function(th) {-Densevalm22fast(th,RC)$p}
+    Dens = function(th) {-Densevalm22(th,RC)$p}
 
     Densmin=optim(par=theta.init,Dens,method="BFGS",hessian=TRUE)
 
@@ -65,7 +66,7 @@ model1<-function(wq,RC){
 
 
 
-      Dens<-Densevalm22fast(t_old,RC)
+      Dens<-Densevalm22(t_old,RC)
       p_old=Dens$p
       x_old=Dens$x
       yp_old=Dens$yp
@@ -76,7 +77,7 @@ model1<-function(wq,RC){
       for(i in 1:Nit){
         t_new=t_old+solve(t(LH),as.matrix(rnorm(9,0,1)))
 
-        Densnew<-Densevalm22fast(t_new,RC)
+        Densnew<-Densevalm22(t_new,RC)
         p_new=Densnew$p
         x_new=Densnew$x
         yp_new=Densnew$yp
