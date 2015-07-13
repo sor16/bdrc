@@ -31,7 +31,7 @@ A[1,1]=1
 
 e=1
 for(ee in 2:N){
-  if( w[ee]==w[ee-1]){
+  if( abs(w[ee]-w[ee-1])<0.01){
 
 A[ee,e]=1
 
