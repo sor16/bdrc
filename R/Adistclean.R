@@ -6,16 +6,16 @@ Adistclean <- function(W){
     A=matrix(0,nrow=N,ncol=n)
     #Initialize A and add first value
     A[1,1]=1
-    e=1
-    for(i in 2:N){
-        if( W[i]==W[i-1]){
+    col=1
+    for(row in 2:N){
+        if( W[row]==W[row-1]){
 
-            A[i,e]=1
+            A[row,col]=1
 
         }
         else{
-            e=e+1
-            A[i,e]=1
+            col=col+1
+            A[row,col]=1
         }
     }
 
