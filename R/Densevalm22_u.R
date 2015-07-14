@@ -1,4 +1,4 @@
-Densevalm22_u <- function(param,RC,Wsim){
+Densevalm22_u <- function(param,RC){
     #collecting parameters from the MCMC sample
     th=param[1:9]
     x=param[10:length(param)]
