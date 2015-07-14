@@ -8,9 +8,9 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     distvect=abs(w-c(w[2:length(w)],1000))
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
-    distfilter=distwithdata[,distvect>0.02]
+    distfilter=distwithdata[,distvect>0.04]
 
-    if(!is.numeric(distfilter)){
+    if(!is.null(ncol(distfilter))){
         #remove dummy distance
         distfilter=distfilter[,-ncol(distfilter)]
         #make sequence from the ranges with length.out equal to corresponding elelement in distvect
