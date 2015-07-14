@@ -8,7 +8,7 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     distvect=abs(w-c(w[2:length(w)],1000))
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
-    distfilter=distwithdata[,distvect>0.04]
+    distfilter=distwithdata[,distvect>0.02]
 
     if(!is.numeric(distfilter)){
         #remove dummy distance
