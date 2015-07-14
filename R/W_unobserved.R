@@ -14,7 +14,7 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     }))
     if(!is.null(min)|!is.null(max)){
         minseq=setdiff(seq(min,min(W_unique),by=0.01),c(min(W_unique)))
-        maxseq=setdiff(seq(max(W_unique),max,by=0.01),c(max(W_unique)))
+        maxseq=setdiff(seq(round(max(W_unique)),max,by=0.01),c(round(max(W_unique))))
         W_spline=c(rep(min(W_unique),length(minseq)),W_u,rep(max(W_unique),length(maxseq)))
         W_u=c(minseq,W_u,maxseq)
         W_u_tild=W_spline-min(W_unique)
