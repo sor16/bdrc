@@ -8,10 +8,10 @@ Densevalm22_u <- function(param,RC){
     lambda = th[4:9]
     #calculate spline variance from B_splines
     varr = c(exp(RC$Bsim %*% lambda))
-    m=length(Wsim)
+    m=length(RC$W_u)
     n=RC$n
     #combine stages from data with unobserved stages
-    W_all=c(RC$O,Wsim)
+    W_all=c(RC$O,RC$W_u)
     #calculating distance matrix for W_all
     dist=abs(outer(W_all,W_all,FUN="-"))
     #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
@@ -28,7 +28,7 @@ Densevalm22_u <- function(param,RC){
     beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
     #buidling blocks of the explanatory matrix X calculated
     c=min(RC$O)-exp(zeta)
-    l=log(Wsim-c)
+    l=log(RC$W_u-c)
     X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
     #vector of parameters
     x=c(x,beta_u)
