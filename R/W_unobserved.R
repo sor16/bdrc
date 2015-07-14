@@ -4,11 +4,11 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     #distance between subsequent elements in vector with additional dummy point 1000
     min=round(min,2)
     max=round(max,2)
-    w=as.numeric(W_unique)
+    w=100*W_unique
     distvect=abs(w-c(w[2:length(w)],1000))
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
-    distfilter=distwithdata[,distvect>0.04]
+    distfilter=distwithdata[,distvect>4]
 
     if(!is.null(ncol(distfilter))){
         #remove dummy distance
@@ -27,5 +27,5 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     else{
         W_u_tild=W_u-min(W_unique)
     }
-return(list("W_u"=W_u,"W_u_tild"=W_u_tild))
+    return(list("W_u"=W_u,"W_u_tild"=W_u_tild))
 }
