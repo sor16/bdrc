@@ -34,5 +34,5 @@ Densevalm22_u <- function(param,RC){
     x=c(x,beta_u)
     #sample from the posterior of discharge y
     ypo = X%*%x + as.matrix(rnorm(m)) * sqrt(varr)
-    return(rbind(ypo,x))
+    return(c(ypo,x))
 }
