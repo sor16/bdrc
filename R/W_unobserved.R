@@ -23,8 +23,7 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
         W_spline=c(rep(min(W_unique),length(minseq)),W_u,rep(max(W_unique),length(maxseq)))
         W_u=c(minseq,W_u,maxseq)
         W_u_tild=W_spline-min(W_unique)
-    }
-    else{
+    }else{
         W_u_tild=W_u-min(W_unique)
     }
     return(list("W_u"=W_u,"W_u_tild"=W_u_tild))
