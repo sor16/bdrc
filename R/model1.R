@@ -1,112 +1,74 @@
-library(stats)
+model1BH <- function(clean,country="Iceland",Wmax=NA){
+    require(RCmodels)
+    list2env(clean,environment())
+    RC=priors(country)
 
-model1<-function(wq,RC){
-Nit=20000
-RC$y=as.matrix(log(wq[,2]));
-RC$w=0.01*wq[,1]; #to meters
-RC$w_tild=RC$w-RC$w[1];
-RC$n=length(RC$y);
-
-Dens <- function(th){ Denseval11(th,RC)$pmin}
-Densmin=optim(par=c(0,0),Dens,hessian=TRUE)
-t_m=as.matrix(Densmin$par)
-H=Densmin$hessian
-
-l_m=as.matrix(log(RC$w_tild+exp(t_m[1,])))
-
-X_m=cbind(matrix(1,nrow(l_m),ncol(l_m)),l_m)
-
-L=t(chol(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,])))
-
-mu=solve(t(L),(solve(L,(RC$Sinvmu+t(X_m)%*%RC$y/exp(t_m[2,])))))
-
-v_temp=X_m%*%solve(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,]))%*%t(X_m)
-
-varappr=as.matrix(diag(v_temp)+exp(t_m[2,]))
-
-confinterval= cbind(X_m%*%mu+qnorm(0.025,0,sqrt(varappr)),X_m%*%mu+qnorm(0.975,0,sqrt(varappr)))
-
-LH=t(chol(H))/(2.38/sqrt(2)) #Hvadan kemur thessi tala? 2.38 Hermun, fraedilega valinn fasti (skoda grein) Robert-
-
-t1=matrix(0,4,Nit)
-t2=matrix(0,4,Nit)
-t3=matrix(0,4,Nit)
-t4=matrix(0,4,Nit)
-
-for(j in 1:4){
-  t_old=t_m
-  t=matrix(0,nrow=4,ncol=Nit)
-  yp=matrix(0,nrow=nrow(wq),ncol=Nit)
-  ypo=matrix(0,nrow=nrow(wq),ncol=Nit)
-
-  D=c()
+    RC$y=as.matrix(log(wq[,2]));
+    RC$w=0.01*wq[,1]; #to meters
+    RC$w_tild=RC$w-min(RC$w);
+    RC$n=length(RC$y);
 
 
-  Dens<-Denseval11(t_old,RC)
-  p_old=Dens$p
-  x_old=Dens$x
-  yp_old=Dens$yp
-  ypo_old=Dens$ypo
-  D_old=Dens$D
+    Dens <- function(th){ Densevalm11(th,RC)$pmin}
+    Densmin=optim(par=c(0,0),Dens,hessian=TRUE)
+    t_m=as.matrix(Densmin$par)
+    H=Densmin$hessian
 
-  for(i in 1:Nit){
-    t_new=t_old+solve(t(LH),as.matrix(rnorm(2,0,1)))
 
-    Densnew<-Denseval11(t_new,RC)
-    p_new=Densnew$p
-    x_new=Densnew$x
-    yp_new=Densnew$yp
-    ypo_new=Densnew$ypo
-    D_new=Densnew$D
+    l_m=as.matrix(log(RC$w_tild+exp(t_m[1,])))
 
-    logR=p_new-p_old
-    if (logR>log(runif(1))){
-        t_old=t_new
-        x_old=x_new
-        p_old=p_new
-        yp_old=yp_new
-        ypo_old=ypo_new
-        D_old=D_new
+    X_m=cbind(matrix(1,nrow(l_m),ncol(l_m)),l_m)
+
+    L=t(chol(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,])))
+
+    mu=solve(t(L),(solve(L,(RC$Sinvmu+t(X_m)%*%RC$y/exp(t_m[2,])))))
+
+    v_temp=X_m%*%solve(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,]))%*%t(X_m)
+
+    varappr=mean(as.matrix(diag(v_temp)+exp(t_m[2,])))
+
+    RC$fit=X_m%*%mu
+
+    RC$confinterval= cbind(X_m%*%mu+qnorm(0.025,0,sqrt(varappr)),X_m%*%mu+qnorm(0.975,0,sqrt(varappr)))
+
+    realdata=data.frame(W=RC$w,Q=RC$y)
+    realdata$l_m=l_m
+    realdata$fit=RC$fit
+    realdata$upper=RC$confinterval[,2]
+    realdata$lower=RC$confinterval[,1]
+    c_hat=min(realdata$W)-exp(t_m[1,])
+    Wmax=as.numeric(Wmax)
+    if(is.na(Wmax)){
+        Wmax=max(RC$w)
     }
+    simdata=data.frame(W=seq(ceiling(c_hat*10)/10,ceiling(Wmax*10)/10,length.out=1000))
+    simdata$l_m = log(simdata$W-c_hat)
+    simdata$fit=mu[1,]+mu[2,]*simdata$l_m
+    simdata$upper=simdata$fit+qnorm(0.975,0,sqrt(varappr))
+    simdata$lower=simdata$fit+qnorm(0.025,0,sqrt(varappr))
+    realdata$residraun=(exp(realdata$Q)-exp(realdata$fit))
+    realdata$residupper=exp(realdata$upper)-exp(realdata$fit)
+    realdata$residlower=exp(realdata$lower)-exp(realdata$fit)
+    realdata$residlog=(realdata$Q-realdata$fit)/sqrt(exp(t_m[2,]))
 
-    t[,i]=rbind(t_m,x_old)
-     yp[,i]=yp_old
-     ypo[,i]=ypo_old
+    tafla=qvdata
+    tafla$W=0.01*tafla$W
+    tafla$Q=round(tafla$Q,1)
+    tafla$Qfit=as.numeric(round(exp(realdata$fit),3))
+    tafla$lower=round(exp(realdata$lower),3)
+    tafla$upper=round(exp(realdata$upper),3)
+    tafla$diffQ=tafla$Q-tafla$Qfit
+    names(tafla)=c("Date","Time","W","Q", "Q fit","Lower", "Upper","Q diff")
+    tafla=tafla[with(tafla,order(Date)),]
 
-    D[i]=D_old
-  }
+    xout=seq(ceiling(c_hat*10)/10,-0.01+ceiling(Wmax*10)/10,by=0.01)
+    interpol=approx(simdata$W,simdata$fit,xout=xout)
+    rctafla=t(as.data.frame(split(x=interpol$y, f=ceiling(seq_along(interpol$y)/10))))
+    colnames(rctafla)=0:9
+    rctafla=round(exp(rctafla),3)
+    Stage=seq(min(interpol$x),max(interpol$x),by=0.1)*100
+    rctafla=cbind(Stage,rctafla)
 
-  if(j==1){
-    t1=t
-    yp1=yp
-    ypo1=ypo
-    D1=D
-  } else if(j==2){
-    t2=t
-    yp2=yp
-    ypo2=ypo
-    D2=D
-  } else if(j==3){
-    t3=t
-    yp3=yp
-    ypo3=ypo
-    D3=D
-  } else if(j==4){
-    t4=t
-    yp4=yp
-    ypo4=ypo
-    D4=D
-  }
+    return(list("varappr"=varappr,"qvdata"=qvdata,"simdata"=simdata,"realdata"=realdata,
+                "tafla"=tafla,"mu"=mu,"c_hat"=c_hat,"rctafla"=rctafla))
 }
-
-
-Dhat=-2*sum(log(dlnorm(exp(RC$y),X_m%*%mu,sqrt(exp(t_m[2]))))) #Skoda hvort output?
-seq=seq(2000,20000,5)
-Davg=mean(c(D1[seq],D2[seq],D3[seq],D4[seq]))
-pd=Davg-Dhat
-DIC=Dhat+2*pd
-B=1/(mean(0.5*c(D1[seq],D2[seq],D3[seq],D4[seq])))
-
-return(list("RC"=RC,"ypo1"=ypo1,"ypo2"=ypo2,"ypo3"=ypo3,"ypo4"=ypo4,"l_m"=l_m,"t_m"=t_m,"wq"=wq,"fit"=X_m%*%mu))
-}
-
