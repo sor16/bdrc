@@ -1,4 +1,4 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,toggle=NULL){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
     if (is.null(file)){
         return(NULL)
     }
@@ -11,6 +11,11 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,toggle=NULL){
         qvdata$Time=as.character(qvdata$Time)
         qvdata$Date=as.Date(gsub("\\.","-",qvdata$Date),"%d-%m-%Y")
         qvdata$Quality=gsub('\\s+', '',qvdata$Quality)
+        qvdata$W=0.01*qvdata$W
+        qvdata=qvdata[with(qvdata,order(W)),]
+        if(!is.null(keeprows)){
+            qvdata=qvdata[keeprows,]
+        }
         if(advanced==TRUE){
             years=as.numeric(format(qvdata$Date, "%Y"))
             qvdata=qvdata[which(years<=slider[2] & years >= slider[1]),]
@@ -18,17 +23,15 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,toggle=NULL){
         }
         if(!is.null(dummy)){
             dummydata=as.data.frame(dummy)
+            dummydata=round(dummydata,3)
             dummydata$Date=Sys.Date()
             dummydata$Time=format(Sys.time(),"%H:%M:%S")
             dummydata$Quality="dummy"
-            dummydata=dummydata[,c(3,4,5,1,2)]
+            dummydata=dummydata[,c("Date","Time","Quality","W","Q")]
             qvdata=rbind(qvdata,dummydata)
 
         }
-        if(!is.null(toggle)){
-            toggle=as.data.frame(toggle)
-            qvdata=qvdata[-which(rowSums(toggle)==rowSums(qvdata[,c("W","Q")])),]
-        }
+        #order again with new data from dummy or force
         qvdata=qvdata[with(qvdata,order(W)),]
         wq=as.matrix(qvdata[,c("W","Q")])
     }

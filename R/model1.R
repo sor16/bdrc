@@ -3,10 +3,10 @@ model1BH <- function(clean,country="Iceland",Wmax=NA){
     list2env(clean,environment())
     RC=priors(country)
 
-    RC$y=as.matrix(log(wq[,2]));
-    RC$w=0.01*wq[,1]; #to meters
-    RC$w_tild=RC$w-min(RC$w);
-    RC$n=length(RC$y);
+    RC$y=as.matrix(log(wq[,2]))
+    RC$w=wq[,1]
+    RC$w_tild=RC$w-min(RC$w)
+    RC$n=length(RC$y)
 
 
     Dens <- function(th){ Densevalm11(th,RC)$pmin}
@@ -52,23 +52,43 @@ model1BH <- function(clean,country="Iceland",Wmax=NA){
     realdata$residlog=(realdata$Q-realdata$fit)/sqrt(exp(t_m[2,]))
 
     tafla=qvdata
-    tafla$W=0.01*tafla$W
+    tafla$W=tafla$W
     tafla$Q=round(tafla$Q,1)
     tafla$Qfit=as.numeric(round(exp(realdata$fit),3))
     tafla$lower=round(exp(realdata$lower),3)
     tafla$upper=round(exp(realdata$upper),3)
     tafla$diffQ=tafla$Q-tafla$Qfit
-    names(tafla)=c("Date","Time","W","Q", "Q fit","Lower", "Upper","Q diff")
+    names(tafla)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
     tafla=tafla[with(tafla,order(Date)),]
 
     xout=seq(ceiling(c_hat*10)/10,-0.01+ceiling(Wmax*10)/10,by=0.01)
-    interpol=approx(simdata$W,simdata$fit,xout=xout)
-    rctafla=t(as.data.frame(split(x=interpol$y, f=ceiling(seq_along(interpol$y)/10))))
-    colnames(rctafla)=0:9
-    rctafla=round(exp(rctafla),3)
-    Stage=seq(min(interpol$x),max(interpol$x),by=0.1)*100
-    rctafla=cbind(Stage,rctafla)
+
+    fitinterpol=approx(simdata$W,simdata$fit,xout=xout)
+    fitrctafla=t(as.data.frame(split(x=fitinterpol$y, f=ceiling(seq_along(fitinterpol$y)/10))))
+    colnames(fitrctafla)=0:9
+    fitrctafla=round(exp(fitrctafla),3)
+    Stage=seq(min(fitinterpol$x),max(fitinterpol$x),by=0.1)*100
+    fitrctafla=as.data.frame(cbind(Stage,fitrctafla))
+
+    lowerinterpol=approx(simdata$W,simdata$lower,xout=xout)
+    lowerrctafla=t(as.data.frame(split(x=lowerinterpol$y, f=ceiling(seq_along(lowerinterpol$y)/10))))
+    colnames(lowerrctafla)=0:9
+    lowerrctafla=round(exp(lowerrctafla),3)
+    Stage=seq(min(lowerinterpol$x),max(lowerinterpol$x),by=0.1)*100
+    lowerrctafla=as.data.frame(cbind(Stage,lowerrctafla))
+
+    upperinterpol=approx(simdata$W,simdata$upper,xout=xout)
+    upperrctafla=t(as.data.frame(split(x=upperinterpol$y, f=ceiling(seq_along(upperinterpol$y)/10))))
+    colnames(upperrctafla)=0:9
+    upperrctafla=round(exp(upperrctafla),3)
+    Stage=seq(min(upperinterpol$x),max(upperinterpol$x),by=0.1)*100
+    upperrctafla=as.data.frame(cbind(Stage,upperrctafla))
+
+    plottafla=as.data.frame(cbind(lowerinterpol$y,fitinterpol$y,upperinterpol$y))
+    plottafla=exp(plottafla)
+    names(plottafla)=c("Lower","Fit","Upper")
+    plottafla$W=xout
 
     return(list("varappr"=varappr,"qvdata"=qvdata,"simdata"=simdata,"realdata"=realdata,
-                "tafla"=tafla,"mu"=mu,"c_hat"=c_hat,"rctafla"=rctafla))
+                "tafla"=tafla,"mu"=mu,"c_hat"=c_hat,"fitrctafla"=fitrctafla,"lowerrctafla"=lowerrctafla,"upperrctafla"=upperrctafla,"plottafla"=plottafla))
 }

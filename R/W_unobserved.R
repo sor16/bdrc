@@ -4,7 +4,7 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     #distance between subsequent elements in vector with additional dummy point 1000
     min=round(min,2)
     max=round(max,2)
-    w=100*W_unique
+    w=100*W_unique #work in cm
     distvect=abs(w-c(w[2:length(w)],1000))
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
