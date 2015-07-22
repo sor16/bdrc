@@ -1,4 +1,4 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL){
     if (is.null(file)){
         return(NULL)
     }
@@ -30,6 +30,15 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
             dummydata=dummydata[,c("Date","Time","Quality","W","Q")]
             qvdata=rbind(qvdata,dummydata)
 
+        }
+        if(sum(unlist(lapply(force,length)))!=0){
+            forcedata=as.data.frame(force)
+            forcedata=round(forcedata,3)
+            forcedata$Date=Sys.Date()
+            forcedata$Time=format(Sys.time(),"%H:%M:%S")
+            forcedata$Quality="forcepoint"
+            forcedata=forcedata[,c("Date","Time","Quality","W","Q")]
+            qvdata=rbind(qvdata,forcedata)
         }
         #order again with new data from dummy or force
         qvdata=qvdata[with(qvdata,order(W)),]

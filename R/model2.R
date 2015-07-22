@@ -1,4 +1,4 @@
-model2BH <- function(clean,country="Iceland",Wmax=NA){
+model2BH <- function(clean,country="Iceland",Wmax=""){
     require(doParallel)
     require(RCmodels)
     list2env(clean,envir=environment())
@@ -61,7 +61,7 @@ model2BH <- function(clean,country="Iceland",Wmax=NA){
     cl <- makeCluster(4)
     registerDoParallel(cl)
 
-    if(is.na(Wmax)){
+    if(nchar(Wmax)==0){
         Wmax=ceiling(max(RC$O)*10)/10
     }
     WFill=W_unobserved(RC$O,min=ceiling((min(RC$O)-exp(t_m[1]))*10)/10,max=Wmax)
