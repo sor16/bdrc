@@ -21,7 +21,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
             qvdata=qvdata[which(years<=slider[2] & years >= slider[1]),]
 
         }
-        if(!is.null(length(dummy))){
+        if(sum(unlist(lapply(dummy,length)))!=0){
             dummydata=as.data.frame(dummy)
             dummydata=round(dummydata,3)
             dummydata$Date=Sys.Date()
