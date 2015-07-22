@@ -1,4 +1,4 @@
-model2BH <- function(clean,country="Iceland",Wmax=""){
+model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     require(doParallel)
     require(RCmodels)
     list2env(clean,envir=environment())
@@ -62,9 +62,16 @@ model2BH <- function(clean,country="Iceland",Wmax=""){
     registerDoParallel(cl)
     Wmax=as.numeric(Wmax)
     if(is.na(Wmax)){
-        Wmax=ceiling(max(RC$O)*10)/10
+        Wmax=ceiling(max(RC$w)*10)/10
     }
-    WFill=W_unobserved(RC$O,min=ceiling((min(RC$O)-exp(t_m[1]))*10)/10,max=Wmax)
+    Wmin=as.numeric(Wmin)
+    if(is.na(Wmin)){
+        Wmin=min(RC$w)-exp(t_m[1])
+    }
+    #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m does not becom negative
+    Wmax=ceiling(Wmax*10)/10
+    Wmin=ceiling(Wmin*10)/10
+    WFill=W_unobserved(RC$O,min=Wmin,max=Wmax)
     RC$W_u=WFill$W_u
     RC$W_u_tild=WFill$W_u_tild
     RC$Bsim=B_splines(t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)])
@@ -100,7 +107,6 @@ model2BH <- function(clean,country="Iceland",Wmax=""){
         ypo_obs=ypo_obs[,seq]
         param=param[,seq]
         unobserved=apply(param,2,FUN=function(x) Densevalm22_u(x,RC))
-        #x_obs=param[10:nrow(param),]
         output=rbind(ypo_obs,unobserved)
 
         return(output)
@@ -134,7 +140,7 @@ model2BH <- function(clean,country="Iceland",Wmax=""){
     names(tafla)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
     tafla=tafla[with(tafla,order(Date)),]
 
-    xout=seq(ceiling((min(RC$w)-exp(t_m[1]))*10)/10,-0.01+ceiling(Wmax*10)/10,by=0.01)
+    xout=seq(Wmin,-0.01+Wmax,by=0.01)
 
     fitinterpol=approx(ypodata$W,ypodata$fit,xout=xout)
     fitrctafla=t(as.data.frame(split(x=fitinterpol$y, f=ceiling(seq_along(fitinterpol$y)/10))))

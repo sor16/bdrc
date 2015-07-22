@@ -1,4 +1,4 @@
-model1BH <- function(clean,country="Iceland",Wmax=NA){
+model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     require(RCmodels)
     list2env(clean,environment())
     RC=priors(country)
@@ -41,7 +41,13 @@ model1BH <- function(clean,country="Iceland",Wmax=NA){
     if(is.na(Wmax)){
         Wmax=max(RC$w)
     }
-    simdata=data.frame(W=seq(ceiling(c_hat*10)/10,ceiling(Wmax*10)/10,length.out=1000))
+    Wmin=as.numeric(Wmin)
+    if(is.na(Wmin)){
+        Wmin=c_hat
+    }
+    Wmax=ceiling(Wmax*10)/10
+    Wmin=ceiling(Wmin*10)/10
+    simdata=data.frame(W=seq(Wmin,Wmax,length.out=1000))
     simdata$l_m = log(simdata$W-c_hat)
     simdata$fit=mu[1,]+mu[2,]*simdata$l_m
     simdata$upper=simdata$fit+qnorm(0.975,0,sqrt(varappr))
@@ -61,7 +67,8 @@ model1BH <- function(clean,country="Iceland",Wmax=NA){
     names(tafla)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
     tafla=tafla[with(tafla,order(Date)),]
 
-    xout=seq(ceiling(c_hat*10)/10,-0.01+ceiling(Wmax*10)/10,by=0.01)
+    #-0.01 inorder for rctafla to be of the right length
+    xout=seq(Wmin,-0.01+Wmax,by=0.01)
 
     fitinterpol=approx(simdata$W,simdata$fit,xout=xout)
     fitrctafla=t(as.data.frame(split(x=fitinterpol$y, f=ceiling(seq_along(fitinterpol$y)/10))))
