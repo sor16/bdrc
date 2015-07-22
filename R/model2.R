@@ -60,8 +60,8 @@ model2BH <- function(clean,country="Iceland",Wmax=""){
 
     cl <- makeCluster(4)
     registerDoParallel(cl)
-
-    if(nchar(Wmax)==0){
+    Wmax=as.numeric(Wmax)
+    if(is.na(Wmax)){
         Wmax=ceiling(max(RC$O)*10)/10
     }
     WFill=W_unobserved(RC$O,min=ceiling((min(RC$O)-exp(t_m[1]))*10)/10,max=Wmax)
