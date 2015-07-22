@@ -13,7 +13,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
         qvdata$Quality=gsub('\\s+', '',qvdata$Quality)
         qvdata$W=0.01*qvdata$W
         qvdata=qvdata[with(qvdata,order(W)),]
-        if(length(keeprows)!=0){
+        if(sum(unlist(lapply(keeprows,length)))!=0){
             qvdata=qvdata[keeprows,]
         }
         if(advanced==TRUE){
