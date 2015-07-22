@@ -13,7 +13,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
         qvdata$Quality=gsub('\\s+', '',qvdata$Quality)
         qvdata$W=0.01*qvdata$W
         qvdata=qvdata[with(qvdata,order(W)),]
-        if(!is.null(keeprows)){
+        if(!is.null(length(keeprows))){
             qvdata=qvdata[keeprows,]
         }
         if(advanced==TRUE){
@@ -21,7 +21,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL){
             qvdata=qvdata[which(years<=slider[2] & years >= slider[1]),]
 
         }
-        if(!is.null(dummy)){
+        if(!is.null(length(dummy))){
             dummydata=as.data.frame(dummy)
             dummydata=round(dummydata,3)
             dummydata$Date=Sys.Date()
