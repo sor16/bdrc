@@ -7,7 +7,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         list2env(file,envir=environment())
         qvdata=read.table(datapath,skip=3,sep="|",dec=",")
     }else{
-        qvdata=read.table(file,skip=3,sep="|",dec=",")
+        qvdata=read.table(file,skip=2,sep="|",dec=",")
     }
         qvdata=qvdata[,c(2,3,5,7,4)]
         names(qvdata)=c("Date","Time","Quality","W","Q")
