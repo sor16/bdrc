@@ -1,4 +1,4 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA){
     if (is.null(file)){
         return(NULL)
     }
@@ -45,6 +45,9 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         }
         #order again with new data from dummy or force
         qvdata=qvdata[with(qvdata,order(W)),]
+        if(is.na(Wmin)) Wmin=min(qvdata$W)
+        if(is.na(Wmax)) Wmax=max(qvdata$W)
+        qvdata=subset(qvdata,W >= Wmin & W <=Wmax )
         wq=as.matrix(qvdata[,c("W","Q")])
 
     return(list("wq"=wq,"qvdata"=qvdata))
