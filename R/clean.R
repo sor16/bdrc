@@ -1,11 +1,14 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE){
     if (is.null(file)){
         return(NULL)
     }
-    file=data.frame(file, stringsAsFactors = FALSE)
-    list2env(file,envir=environment())
-    if (type =="text/plain"){
+    if(shiny==TRUE){
+        file=data.frame(file, stringsAsFactors = FALSE)
+        list2env(file,envir=environment())
         qvdata=read.table(datapath,skip=3,sep="|",dec=",")
+    }else{
+        qvdata=read.table(file,skip=3,sep="|",dec=",")
+    }
         qvdata=qvdata[,c(2,3,5,7,4)]
         names(qvdata)=c("Date","Time","Quality","W","Q")
         qvdata$Time=as.character(qvdata$Time)
@@ -43,6 +46,6 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         #order again with new data from dummy or force
         qvdata=qvdata[with(qvdata,order(W)),]
         wq=as.matrix(qvdata[,c("W","Q")])
-    }
+
     return(list("wq"=wq,"qvdata"=qvdata))
 }

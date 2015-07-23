@@ -131,7 +131,6 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     realdata$residlog=(realdata$Q-realdata$fit)/sqrt(varr_m)
 
     tafla=qvdata
-    tafla$W=tafla$W
     tafla$Q=round(tafla$Q,1)
     tafla$Qfit=round(exp(realdata$fit),3)
     tafla$lower=round(exp(realdata$lower),3)
