@@ -26,8 +26,8 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         }
 
         if(dates==TRUE){
-            datesA=as.Date(qvdata$Date)
-            experiod=as.Date(experiod)
+            datesA=as.numeric(qvdata$Date)
+            experiod=as.numeric(experiod)
             qvdata=qvdata[which(datesA<=experiod[1] & datesA >= experiod[2]),]
 
 
