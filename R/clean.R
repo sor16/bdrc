@@ -24,9 +24,10 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
             qvdata=qvdata[which(years<=slider[2] & years >= slider[1]),]
 
         }
+
         if(dates==TRUE){
             datesA=qvdata$Date
-            qvdata=qvdata[which(datesA<=experiod[2] & datesA >= experiod[1]),]
+            qvdata=qvdata[which(datesA<=experiod[1] & datesA >= experiod[2]),]
 
 
         }
