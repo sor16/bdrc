@@ -1,4 +1,4 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA,experiod=0,dates=FALSE){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA,experiod=NULL,dates=FALSE){
     if (is.null(file)){
         return(NULL)
     }
@@ -28,7 +28,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         if(dates==TRUE){
             datesA=as.numeric(qvdata$Date)
             experiod=as.numeric(experiod)
-            qvdata=qvdata[which(datesA<=experiod[1] & datesA >= experiod[2]),]
+            qvdata=qvdata[which(datesA<=experiod[2] & datesA >= experiod[1]),]
 
 
         }
