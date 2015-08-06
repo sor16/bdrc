@@ -1,3 +1,5 @@
+library(roxygen2)
+#'This function takes in the data if the advanced checkbox has bin checked, what values the slider has ec.
 clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA){
     if (is.null(file)){
         return(NULL)
