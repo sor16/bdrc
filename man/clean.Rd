@@ -2,12 +2,12 @@
 % Please edit documentation in R/clean.R
 \name{clean}
 \alias{clean}
-\title{This function takes in the data if the advanced checkbox has bin checked, what values the slider has ec.}
+\title{Clean data}
 \usage{
 clean(file, advanced = FALSE, slider = 0, dummy = NULL, keeprows = NULL,
   force = NULL, shiny = FALSE, Wmin = NA, Wmax = NA)
 }
 \description{
-This function takes in the data if the advanced checkbox has bin checked, what values the slider has ec.
+This function takes in the data and cleans it, if the advanced checkbox has bin checked it conditions and fixes the data depending on the input of the user ec.
 }
 
