@@ -1,6 +1,4 @@
 library(roxygen2)
-
-
 #' Clean data
 #'
 #' This function takes in the data and cleans it, if the advanced checkbox has bin checked it conditions and fixes the data depending on the input of the user ec.
