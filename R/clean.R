@@ -1,4 +1,4 @@
-clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA,experiod=NULL,dates=FALSE){
+clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA){
     if (is.null(file)){
         return(NULL)
     }
@@ -25,14 +25,16 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
 
         }
 
-        if(experiod==TRUE){
-            datesA=as.numeric(format(qvdata$Date, "%Y"))
-            #datesA=as.numeric(qvdata$Date)
-            #dates=as.numeric(experiod)
-            qvdata=qvdata[which(datesA<=dates[1] & datesA >= dates[2]),]
 
 
-        }
+#default input: experiod=FALSE,dates=0
+#         if(experiod==TRUE){
+#             datesA=as.numeric(format(qvdata$Date, "%Y"))
+#             #datesA=as.numeric(qvdata$Date)
+#             #dates=as.numeric(experiod)
+#             qvdata=qvdata[which(datesA<=dates[1] & datesA >= dates[2]),]
+#        }
+
         if(sum(unlist(lapply(dummy,length)))!=0){
             dummydata=as.data.frame(dummy)
             dummydata=round(dummydata,3)
