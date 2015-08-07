@@ -5,7 +5,8 @@
 \title{Clean data}
 \usage{
 clean(file, advanced = FALSE, slider = 0, dummy = NULL, keeprows = NULL,
-  force = NULL, shiny = FALSE, Wmin = NA, Wmax = NA)
+  force = NULL, shiny = FALSE, Wmin = NA, Wmax = NA, experiod = FALSE,
+  dates = 0)
 }
 \description{
 This function takes in the data and cleans it, if the advanced checkbox has bin checked it conditions and fixes the data depending on the input of the user ec.
