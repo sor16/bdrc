@@ -29,14 +29,8 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
 
         }
 
-
-
-#default input: experiod=FALSE,dates=0
         if(experiod==TRUE){
-            #datesA=as.numeric(format(qvdata$Date, "%Y"))
-            datesA=as.numeric(qvdata$Date)
-            dates=as.numeric(dates)
-            qvdata=qvdata[which(datesA<=dates[1] & datesA >= dates[2]),]
+            qvdata=qvdata[which(qvdata$Date<=dates[1] | qvdata$Date >= dates[2]),]
        }
 
         if(sum(unlist(lapply(dummy,length)))!=0){
