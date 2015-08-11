@@ -9,7 +9,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
     if(shiny==TRUE){
         file=data.frame(file, stringsAsFactors = FALSE)
         list2env(file,envir=environment())
-        qvdata=read.table(datapath,skip=3,sep="|",dec=",")
+        qvdata=read.table(datapath,skip=2,sep="|",dec=",")
     }else{
         qvdata=read.table(file,skip=2,sep="|",dec=",")
     }
