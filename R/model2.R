@@ -34,7 +34,6 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
     RC$epsilon=rep(1,RC$N)
     if(any('forcepoint'== qvdata$Quality)){
-        RC$B[forceindex,]=epsilon*RC$B[forceindex,]
         RC$epsilon[forceindex]=1/RC$N
     }
 
