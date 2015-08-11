@@ -7,25 +7,35 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     RC$w=wq[,1]
     RC$w_tild=RC$w-min(RC$w)
     RC$n=length(RC$y)
+    epsilon=0.00001
 
+    forceindex=which('forcepoint'== qvdata$Quality)
+    forcepoint=wq[forceindex,]
 
     Dens <- function(th){ Densevalm11(th,RC)$pmin}
     Densmin=optim(par=c(0,0),Dens,hessian=TRUE)
     t_m=as.matrix(Densmin$par)
     H=Densmin$hessian
 
+    sigma=rep(exp(t_m[2,]),nrow(wq))
+
+    if(any('forcepoint'== qvdata$Quality)){
+    sigma[forceindex]=epsilon
+    }
 
     l_m=as.matrix(log(RC$w_tild+exp(t_m[1,])))
 
-    X_m=cbind(matrix(1,nrow(l_m),ncol(l_m)),l_m)
+    X_m=cbind(rep(1,nrow(l_m)),l_m)
 
-    L=t(chol(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,])))
+    L=t(chol(RC$Sig_xinv+t(X_m)%*%(X_m/sigma)))
 
-    mu=solve(t(L),(solve(L,(RC$Sinvmu+t(X_m)%*%RC$y/exp(t_m[2,])))))
+    mu=solve(t(L),(solve(L,(RC$Sinvmu+t(X_m)%*%(RC$y/sigma)))))
 
-    v_temp=X_m%*%solve(RC$Sig_xinv+t(X_m)%*%X_m/exp(t_m[2,]))%*%t(X_m)
+    v_temp=X_m%*%solve(RC$Sig_xinv+t(X_m)%*%(X_m/sigma))%*%t(X_m)
 
-    varappr=mean(as.matrix(diag(v_temp)+exp(t_m[2,])))
+    varappr=as.matrix(diag(v_temp)+sigma)
+
+    constvar=mean(as.matrix(diag(v_temp)+exp(t_m[2,])))
 
     RC$fit=X_m%*%mu
 
@@ -47,11 +57,19 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     }
     Wmax=ceiling(Wmax*10)/10
     Wmin=ceiling(Wmin*10)/10
-    simdata=data.frame(W=seq(Wmin,Wmax,length.out=1000))
+
+    W_grid=sort(c(seq(Wmin,Wmax,length.out=1000),forcepoint[1]))
+    forcesimindex=which(forcepoint[1]==W_grid)
+
+    simdata=data.frame(W=W_grid)
     simdata$l_m = log(simdata$W-c_hat)
     simdata$fit=mu[1,]+mu[2,]*simdata$l_m
-    simdata$upper=simdata$fit+qnorm(0.975,0,sqrt(varappr))
-    simdata$lower=simdata$fit+qnorm(0.025,0,sqrt(varappr))
+
+    simvar=rep(constvar,nrow(simdata))
+    simvar[forcesimindex]=epsilon
+
+    simdata$upper=simdata$fit+qnorm(0.975,0,sqrt(simvar))
+    simdata$lower=simdata$fit+qnorm(0.025,0,sqrt(simvar))
     realdata$residraun=(exp(realdata$Q)-exp(realdata$fit))
     realdata$residupper=exp(realdata$upper)-exp(realdata$fit)
     realdata$residlower=exp(realdata$lower)-exp(realdata$fit)
@@ -96,6 +114,6 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     names(plottafla)=c("Lower","Fit","Upper")
     plottafla$W=xout
 
-    return(list("varappr"=varappr,"qvdata"=qvdata,"simdata"=simdata,"realdata"=realdata,
+    return(list("varappr"=constvar,"qvdata"=qvdata,"simdata"=simdata,"realdata"=realdata,
                 "tafla"=tafla,"mu"=mu,"c_hat"=c_hat,"fitrctafla"=fitrctafla,"lowerrctafla"=lowerrctafla,"upperrctafla"=upperrctafla,"plottafla"=plottafla))
 }
