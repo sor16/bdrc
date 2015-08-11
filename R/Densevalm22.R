@@ -7,7 +7,7 @@ Densevalm22 <- function(th,RC){
   f=lambda[1:5]-lambda[6]
   l=c(log(RC$w_tild+exp(th[1])))
 
-  varr=c(exp(RC$B%*%lambda))
+  varr=c(RC$epsilon*exp(RC$B%*%lambda))
   Sig_eps=diag(c(varr,0))
   R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))

@@ -13,6 +13,9 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     RC$s=3
     RC$v=5
 
+    forceindex=which('forcepoint'== qvdata$Quality)
+    forcepoint=wq[forceindex,]
+
     RC$y=rbind(as.matrix(log(wq[,2])),0)
     RC$w=as.matrix(wq[,1])
     RC$w_tild=RC$w-min(RC$w)
@@ -29,6 +32,12 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n))) #Setja i RC
 
     RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
+    RC$epsilon=rep(1,RC$N)
+    if(any('forcepoint'== qvdata$Quality)){
+        RC$B[forceindex,]=epsilon*RC$B[forceindex,]
+        RC$epsilon[forceindex]=1/RC$N
+    }
+
     RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
 
     RC$m1=matrix(0,nrow=2,ncol=RC$n)
