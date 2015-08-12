@@ -1,7 +1,3 @@
-library(roxygen2)
-    #' Clean data
-    #'
-    #' This function takes in the data and cleans it, if the advanced checkbox has bin checked it conditions and fixes the data depending on the input of the user ec.
 clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA, experiod=FALSE,dates=0){
     if (is.null(file)){
         return(NULL)
