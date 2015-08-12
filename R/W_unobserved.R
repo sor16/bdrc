@@ -10,7 +10,7 @@ W_unobserved <- function(W_unique,min=NULL,max=NULL){
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
     distfilter=distwithdata[,distvect>4]
 
-    if(!is.null(ncol(distfilter))){
+    if(ncol(distfilter)!=0){
         #remove dummy distance
         distfilter=distfilter[,-ncol(distfilter)]
         #make sequence from the ranges with length.out equal to corresponding elelement in distvect
