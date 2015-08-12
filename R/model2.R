@@ -120,6 +120,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
         return(output)
     }
     stopCluster(cl)
+    MCMC[is.na(MCMC)]=0
     betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
     yposamples=MCMC[1:(RC$N+length(RC$W_u)),]
     ypodata=as.data.frame(t(apply(yposamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
