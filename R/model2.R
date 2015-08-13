@@ -82,7 +82,10 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     WFill=W_unobserved(RC$O,min=Wmin,max=Wmax)
     RC$W_u=WFill$W_u
     RC$W_u_tild=WFill$W_u_tild
-    RC$Bsim=B_splines(t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)])
+    Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
+    Bsiminput[is.na(Bsiminput)]=0
+    RC$Bsim=B_splines(Bsiminput)
+
     MCMC <- foreach(i=1:4,.combine=cbind,.export=c("Densevalm22","Densevalm22_u")) %dopar% {
         ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
         param=matrix(0,nrow=9+RC$n+2,ncol=Nit)
