@@ -11,12 +11,15 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
     }
         qvdata=qvdata[,c(2,3,5,7,4)]
         names(qvdata)=c("Date","Time","Quality","W","Q")
+
         qvdata$Time=as.character(qvdata$Time)
         qvdata$Date=as.Date(gsub("\\.","-",qvdata$Date),"%d-%m-%Y")
-        qvdata$Quality=gsub('\\s+', '',qvdata$Quality)
+        qvdata$Q=gsub('\\s+', '',qvdata$Q)
+        qvdata=qvdata[qvdata$W!=0,]
+        qvdata$Q=as.numeric(as.character(gsub(",",".",qvdata$Q)))
         qvdata$W=0.01*qvdata$W
         qvdata=qvdata[with(qvdata,order(W)),]
-        qvdata=qvdata[qvdata$W!=0,]
+
 
         if(length(keeprows)!=0){
             qvdata=qvdata[keeprows,]
