@@ -1,3 +1,21 @@
+library(roxygen2)
+#'Cleans the input file
+#'
+#'@param file Is a string that contains the name of a txt file that contains stage and flow data from a certain river
+#'@param advanced TRUE or FALSE depending if you want to use the advanced settings
+#'@param slider Input should be a vector with two integers. The integers span the date constrainment for the data.
+#'So every datapoint that is not inside that date range will be discarded.
+#'@param dummy
+#'@param keeprows
+#'@param force
+#'@param shiny
+#'@param Wmin
+#'@param Wmax
+#'@param experiod TRUE or FALSE depending on whether you want to exclude a date range from the data
+#'@param dates Input is a vector with two Date values. The dates span the range that you want to exclude from the data
+#'@return If all the parameters are either default or used as described the output will be a matrix with the clean stage
+#'and flow values as well as a data frame with the clean data values. That is cointaining date, time, quality, stage and flow.
+
 clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA, experiod=FALSE,dates=0){
     if (is.null(file)){
         return(NULL)
