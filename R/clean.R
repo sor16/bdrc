@@ -1,6 +1,8 @@
 library(roxygen2)
 #'Cleans the input file
 #'
+#'This function takes in the data and cleans it, if advanced is TRUE and experiod is TRUE it conditions and fixes
+#'the data depending on the input of the user.
 #'@param file Is a string that contains the name of a txt file that contains stage and flow data from a certain river
 #'@param advanced TRUE or FALSE depending if you want to use the advanced settings
 #'@param slider Input should be a vector with two integers. The integers span the date constrainment for the data.

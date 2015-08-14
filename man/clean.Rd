@@ -37,6 +37,7 @@ If all the parameters are either default or used as described the output will be
 and flow values as well as a data frame with the clean data values. That is cointaining date, time, quality, stage and flow.
 }
 \description{
-Cleans the input file
+This function takes in the data and cleans it, if advanced is TRUE and experiod is TRUE it conditions and fixes
+the data depending on the input of the user.
 }
 
