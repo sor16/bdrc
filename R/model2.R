@@ -76,7 +76,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     if(is.na(Wmin)){
         Wmin=min(RC$w)-exp(t_m[1])
     }
-    #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m does not becom negative
+    #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
     Wmax=ceiling(Wmax*10)/10
     Wmin=ceiling(Wmin*10)/10
     WFill=W_unobserved(RC$O,min=Wmin,max=Wmax)
