@@ -21,12 +21,11 @@ W_unobserved <- function(W_unique,min=NA,max=NA){
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
     distfilter=distwithdata[,distvect>filter]
-
+    #remove dummy distance
+    distfilter=as.matrix(distfilter[,-ncol(distfilter)])
     if(ncol(distfilter)!=0){
-        #remove dummy distance
-        distfilter=distfilter[,-ncol(distfilter)]
         #make sequence from the ranges with length.out equal to corresponding elelement in distvect
-        W_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=ceiling(x[2]/filter)),c(x[1],x[3]))
+        W_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+round(x[2]/filter)),c(x[1],x[3]))
         }))
     }
     if(!is.na(min)|!is.na(max)){
