@@ -39,7 +39,7 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         qvdata$Q=as.numeric(as.character(gsub(",",".",qvdata$Q)))
         qvdata$W=0.01*qvdata$W
         qvdata=qvdata[with(qvdata,order(W)),]
-
+        qvdata_before=qvdata
 
         if(length(keeprows)!=0){
             qvdata=qvdata[keeprows,]
@@ -80,5 +80,5 @@ clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NU
         qvdata=subset(qvdata,W >= Wmin & W <=Wmax )
         wq=as.matrix(qvdata[,c("W","Q")])
 
-    return(list("wq"=wq,"qvdata"=qvdata))
+    return(list("wq"=wq,"qvdata"=qvdata,"qvdata_before"=qvdata_before))
 }
