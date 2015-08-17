@@ -31,4 +31,10 @@ The output is a list which contains the ggplots the user has chosen to plot.
 This function takes in the filename of the data that is used to calculate the ratingcurve It uses the \code{\link{clean}} function
 and the \code{\link{model2BH}} function to calculate the rating curve and then plot it.
 }
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+}
+\seealso{
+\code{\link{clean}} , \code{\link{model2BH}}
+}
 

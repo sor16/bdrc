@@ -16,17 +16,17 @@ clean(file, advanced = FALSE, slider = 0, dummy = NULL, keeprows = NULL,
 \item{slider}{Input should be a vector with two integers. The integers span the date constrainment for the data.
 So every datapoint that is not inside that date range will be discarded.}
 
-\item{dummy}{}
+\item{dummy}{Is a list with information on the dummy point}
 
-\item{keeprows}{}
+\item{keeprows}{Is a logical vector which indicates whether to keep a datapoint or not}
 
-\item{force}{}
+\item{force}{Is a list with information on the force point}
 
-\item{shiny}{}
+\item{shiny}{Logical, if the shiny version is running or not.}
 
-\item{Wmin}{}
+\item{Wmin}{numeric, minimum stage of rating curve.}
 
-\item{Wmax}{}
+\item{Wmax}{numeric, maximum stage of rating curve.}
 
 \item{experiod}{TRUE or FALSE depending on whether you want to exclude a date range from the data}
 
@@ -39,5 +39,8 @@ and flow values as well as a data frame with the cleaned data cointaining date, 
 \description{
 This function takes in the data and cleans it, if advanced is TRUE and experiod is TRUE it conditions and fixes
 the data depending on the input of the user.
+}
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 }
 

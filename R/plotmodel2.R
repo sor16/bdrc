@@ -11,6 +11,8 @@
 #'@param realresiduals Logical constant, whether or not to plot the residuals for the real scale.
 #'@param beta Logical constant, whether or not to plot the beta image.
 #'@return The output is a list which contains the ggplots the user has chosen to plot.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+#'@seealso \code{\link{clean}} , \code{\link{model2BH}}
 plotmodel2 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=T,realresiduals=T,beta=T){
 
     library(ggplot2)

@@ -26,4 +26,10 @@ the data frames qvdata, betadata, ypodata, realdata , tafla, fitrctafla, lowerrc
 This function takes in the cleaned data from the \code{\link{clean}} function
 and calculates the rating curve using model 2.
 }
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+}
+\seealso{
+\code{\link{clean}}
+}
 

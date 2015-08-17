@@ -11,6 +11,8 @@
 #'automatically set to the maximum stage of the data.
 #'@return If all the parameters are used as described the output will be a list containing the integers varappr and c_hat, the matrix mu and
 #'the data frames qvdata, simdata, realdata , tafla, fitrctafla, lowerrctafla, upperrctafla, plottafla.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+#'@seealso \code{\link{clean}}
 model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     require(RCmodels)
     list2env(clean,environment())
