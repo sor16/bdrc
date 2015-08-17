@@ -33,8 +33,8 @@ So every datapoint that is not inside that date range will be discarded.}
 \item{dates}{Input is a vector with two Date values. The dates span the range that you want to exclude from the data}
 }
 \value{
-If all the parameters are either default or used as described the output will be a matrix with the clean stage
-and flow values as well as a data frame with the clean data values. That is cointaining date, time, quality, stage and flow.
+If all the parameters are either default or used as described the output will be a list containing a matrix with the cleaned stage
+and flow values as well as a data frame with the cleaned data cointaining date, time, quality, stage and flow.
 }
 \description{
 This function takes in the data and cleans it, if advanced is TRUE and experiod is TRUE it conditions and fixes

@@ -15,8 +15,8 @@ library(roxygen2)
 #'@param Wmax
 #'@param experiod TRUE or FALSE depending on whether you want to exclude a date range from the data
 #'@param dates Input is a vector with two Date values. The dates span the range that you want to exclude from the data
-#'@return If all the parameters are either default or used as described the output will be a matrix with the clean stage
-#'and flow values as well as a data frame with the clean data values. That is cointaining date, time, quality, stage and flow.
+#'@return If all the parameters are either default or used as described the output will be a list containing a matrix with the cleaned stage
+#'and flow values as well as a data frame with the cleaned data cointaining date, time, quality, stage and flow.
 
 clean <- function(file,advanced=FALSE,slider=0,dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA, experiod=FALSE,dates=0){
     if (is.null(file)){

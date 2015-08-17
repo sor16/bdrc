@@ -1,3 +1,16 @@
+#'Calculates the rating curve using model1
+#'
+#'This function takes in the cleaned data from the \code{\link{clean}} function
+#'and calculates the rating curve using model 1.
+#'@param clean Is the output from the \code{\link{clean}} function. That is a list containg a matrix and a data frame.
+#'The matrix containing the stage(in meters) and flow values and the data frame containing date, time, quality, stage and flow values.
+#'@param country The input is a string with the name of the country you want to use the prior parameters from, e.g. country='Iceland'.
+#'@param Wmin The input is either the default empty string or an integer for the lowest stage level. If you set as.numeric("") you get Na and then Wmin will be
+#'automatically set to c_hat.
+#'@param Wmax The input is either the default empty string or an integer for the highest stage level. If you set as.numeric("") you get Na and then Wmax will be
+#'automatically set to the maximum stage of the data.
+#'@return If all the parameters are used as described the output will be a list containing the integers varappr and c_hat, the matrix mu and
+#'the data frames qvdata, simdata, realdata , tafla, fitrctafla, lowerrctafla, upperrctafla, plottafla.
 model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     require(RCmodels)
     list2env(clean,environment())

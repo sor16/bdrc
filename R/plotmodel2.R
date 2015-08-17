@@ -1,4 +1,16 @@
-
+#'Plots the rating curve for model 2
+#'
+#'This function takes in the filename of the data that is used to calculate the ratingcurve It uses the \code{\link{clean}} function
+#'and the \code{\link{model2BH}} function to calculate the rating curve and then plot it.
+#'@param filename Input is a string with the name of the txt file containing the stage and flow data. See also input in \code{\link{clean}}.
+#'@param eps TRUE or FALSE whether or not to save the plots as eps files or not.
+#'@param png TRUE or FALSE whether or not to save the plots as png files or not.
+#'@param realscale Logical constant, whether or not to plot the real scale image.
+#'@param logscale Logical constant, whether or not to plot the log scale image.
+#'@param logresiduals Logical constant, whether or not to plot the residuals for the log scale.
+#'@param realresiduals Logical constant, whether or not to plot the residuals for the real scale.
+#'@param beta Logical constant, whether or not to plot the beta image.
+#'@return The output is a list which contains the ggplots the user has chosen to plot.
 plotmodel2 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=T,realresiduals=T,beta=T){
 
     library(ggplot2)
