@@ -1,3 +1,10 @@
+#'Evaluates the log density p at t for model 2
+#'
+#'Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
+#'so x is set x=c(0 0).
+#'@param th A vector with length 9 containing parameters
+#'@param RC RC is a list containing prior parameters, matrices and the data.
+#'@return Returns a list containing p,x,yp,ypo which are drawn out of the evaluated density and varr is a variance numeric vector.
 Densevalm22 <- function(th,RC){
   phi_b=th[3]
   sig_b2=th[2]
