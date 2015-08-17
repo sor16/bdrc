@@ -101,7 +101,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     Bsiminput[is.na(Bsiminput)]=0
     RC$Bsim=B_splines(Bsiminput)
 
-    MCMC <- foreach(i=1:4,.combine=cbind,.export=c("Densevalm22","Densevalm22_u")) %dopar% {
+    MCMC <- foreach(i=1:4,.combine=cbind,.export=c("Densevalm22","predict_u")) %dopar% {
         ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
         param=matrix(0,nrow=9+RC$n+2,ncol=Nit)
         t_old=as.matrix(t_m)
@@ -132,7 +132,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
         seq=seq(2000,Nit,5)
         ypo_obs=ypo_obs[,seq]
         param=param[,seq]
-        unobserved=apply(param,2,FUN=function(x) Densevalm22_u(x,RC))
+        unobserved=apply(param,2,FUN=function(x) predict_u(x,RC))
         output=rbind(ypo_obs,unobserved)
 
         return(output)

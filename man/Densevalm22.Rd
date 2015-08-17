@@ -18,4 +18,7 @@ Returns a list containing p,x,yp,ypo which are drawn out of the evaluated densit
 Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
 so x is set x=c(0 0).
 }
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+}
 

@@ -1,4 +1,16 @@
-Densevalm22_u <- function(param,RC){
+#' Predictive values for unoberved stages
+#'
+#'Calculates predictive values for unobserved stages
+#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
+#'and six lambda parameters that affect the variance through the Bspline functions.
+#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
+#'
+#'@return
+#'\itemize{
+#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
+#'}
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+predict_u <- function(param,RC){
     #collecting parameters from the MCMC sample
     th=param[1:9]
     x=param[10:length(param)]

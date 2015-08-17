@@ -22,4 +22,7 @@ data respectively. This is done to ensure constant variance below and above obse
 \description{
 W_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
 }
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+}
 

@@ -3,6 +3,7 @@
 #' Takes in the country as a string and chooses which priors to use and then makes the prior calculations
 #'@param country Is a string with the name of the country the data is from.
 #'@return The output is the RC list which contains the priors and the outcomes of the prior calculations.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 priors <- function(country) {
 
     RC=list()

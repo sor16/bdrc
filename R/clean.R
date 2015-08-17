@@ -1,4 +1,3 @@
-library(roxygen2)
 #'Cleans the input file
 #'
 #'This function takes in the data and cleans it, if advanced is TRUE and exclude is TRUE it conditions and fixes

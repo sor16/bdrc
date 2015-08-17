@@ -4,40 +4,41 @@
 \alias{clean}
 \title{Cleans the input file}
 \usage{
-clean(file, advanced = FALSE, slider = 0, dummy = NULL, keeprows = NULL,
-  force = NULL, shiny = FALSE, Wmin = NA, Wmax = NA, experiod = FALSE,
-  dates = 0)
+clean(file, advanced = TRUE, includedates = c(1950,
+  as.numeric(format(Sys.Date(), "\%Y"))), dummy = NULL, keeprows = NULL,
+  force = NULL, shiny = FALSE, Wmin = NA, Wmax = NA, exclude = TRUE,
+  excludedates = c(Sys.Date() - 1, Sys.Date() - 1))
 }
 \arguments{
 \item{file}{Is a string that contains the name of a txt file that contains stage and flow data from a certain river}
 
-\item{advanced}{TRUE or FALSE depending if you want to use the advanced settings}
+\item{advanced}{Logical,depending if you want to use the advanced settings}
 
-\item{slider}{Input should be a vector with two integers. The integers span the date constrainment for the data.
+\item{includedates}{A vector with two integers. The integers represent the year range the user wants to extract from the data. Parameter advanced needs to be true.
 So every datapoint that is not inside that date range will be discarded.}
 
-\item{dummy}{Is a list with information on the dummy point}
+\item{dummy}{A list with information on the dummy point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be true.}
 
-\item{keeprows}{Is a logical vector which indicates whether to keep a datapoint or not}
+\item{keeprows}{A logical vector which indicates whether to keep a datapoint or not. Parameter advanced needs to be true.}
 
-\item{force}{Is a list with information on the force point}
+\item{force}{A list with information on the force point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be true.}
 
-\item{shiny}{Logical, if the shiny version is running or not.}
+\item{shiny}{Logical, whether the function should read the data as done in shiny or not.}
 
-\item{Wmin}{numeric, minimum stage of rating curve.}
+\item{Wmin}{Numeric, minimum stage of rating curve.}
 
-\item{Wmax}{numeric, maximum stage of rating curve.}
+\item{Wmax}{Numeric, maximum stage of rating curve.}
 
-\item{experiod}{TRUE or FALSE depending on whether you want to exclude a date range from the data}
+\item{exclude}{Logical depending on whether the user wants to exclude a date range from the data or not.}
 
-\item{dates}{Input is a vector with two Date values. The dates span the range that you want to exclude from the data}
+\item{excludedates}{Vector with two Date values of the form %Y-%m-%d. The dates span the range which to exclude from the data. Parameters advanced and exclude need to be true.}
 }
 \value{
 If all the parameters are either default or used as described the output will be a list containing a matrix with the cleaned stage
 and flow values as well as a data frame with the cleaned data cointaining date, time, quality, stage and flow.
 }
 \description{
-This function takes in the data and cleans it, if advanced is TRUE and experiod is TRUE it conditions and fixes
+This function takes in the data and cleans it, if advanced is TRUE and exclude is TRUE it conditions and fixes
 the data depending on the input of the user.
 }
 \references{

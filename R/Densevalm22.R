@@ -5,6 +5,7 @@
 #'@param th A vector with length 9 containing parameters
 #'@param RC RC is a list containing prior parameters, matrices and the data.
 #'@return Returns a list containing p,x,yp,ypo which are drawn out of the evaluated density and varr is a variance numeric vector.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 Densevalm22 <- function(th,RC){
   phi_b=th[3]
   sig_b2=th[2]

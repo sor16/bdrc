@@ -7,6 +7,7 @@ library(roxygen2)
 #'@param ZZ A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
 #'(w-min(w)) divided by last element of the resulting vector, where w is stage observations.
 #'@return The function returns a linear combination of scaled B-spline basis functions for every stage observation.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 B_splines <- function(ZZ){
 
 #A script to test the B-splines.

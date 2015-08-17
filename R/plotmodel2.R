@@ -15,14 +15,11 @@
 #'@seealso \code{\link{clean}} , \code{\link{model2BH}}
 plotmodel2 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=T,realresiduals=T,beta=T){
 
-    library(ggplot2)
+    require(ggplot2)
+    require(RCmodels)
     if (is.null(filename)){
         return(NULL)
     }
-
-    require(RCmodels)
-    list2env(clean,environment())
-
     data <- model2BH(clean(filename))
     betadata=data$betadata
     ypodata=data$ypodata

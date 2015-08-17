@@ -15,4 +15,7 @@ The output is the RC list which contains the priors and the outcomes of the prio
 \description{
 Takes in the country as a string and chooses which priors to use and then makes the prior calculations
 }
+\references{
+Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+}
 

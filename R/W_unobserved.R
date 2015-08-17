@@ -10,7 +10,7 @@ library(roxygen2)
 #' needed to make an equally spaced grid of stages. W_u_tild is a vector which is calculated by W_u-min(W_unique) needed to input into B_splines.
 #' The unobserved stages are lower or higher than that of the data, take the same value in W_u_tild as the minimum value and maximum value of the
 #' data respectively. This is done to ensure constant variance below and above observed data.
-#'
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 W_unobserved <- function(W_unique,min=NA,max=NA){
     W_u=NULL
     W_u_tild=NULL

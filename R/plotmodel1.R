@@ -13,14 +13,11 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}} , \code{\link{model1BH}}
 plotmodel1 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=T,realresiduals=T){
-
-    library(ggplot2)
+    require(RCmodels)
+    require(ggplot2)
     if (is.null(filename)){
         return(NULL)
     }
-
-    require(RCmodels)
-    list2env(clean,environment())
 
     data <- model1BH(clean(filename))
     simdata=data$simdata

@@ -3,8 +3,9 @@
 #'Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
 #'so x is set x=c(0 0).
 #'@param th A matrix with dim 2x1 containing parameters
-#'@param RC RC is a list containing prior parameters, matrices and the data.
+#'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing pmin, minimum p value, and p,x,yp,ypo which are drawn out of the evaluated density.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 Densevalm11 <- function(th,RC){
 
   #hugsanlega onnur breytunofn
