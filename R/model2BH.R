@@ -20,7 +20,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
 
     #MCMC parameters added, number of iterations,burnin and thin
     Nit=20000
-    burnin=4000
+    burnin=2000
     thin=5
 
     RC=priors(country)
