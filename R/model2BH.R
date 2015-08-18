@@ -17,10 +17,13 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     require(doParallel)
     require(RCmodels)
     list2env(clean,envir=environment())
-    Nit=20000
+
+    #MCMC parameters added, number of iterations,burnin and thin
+    Nit=50000
+    burnin=5000
+    thin=5
 
     RC=priors(country)
-
     RC$nugget=10^-8
     RC$mu_sb=0.5
     RC$mu_pb=0.5
@@ -129,7 +132,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
             ypo_obs[,j]=ypo_old
             param[,j]=rbind(t_old,x_old)
         }
-        seq=seq(2000,Nit,5)
+        seq=seq(burnin,Nit,thin)
         ypo_obs=ypo_obs[,seq]
         param=param[,seq]
         unobserved=apply(param,2,FUN=function(x) predict_u(x,RC))
