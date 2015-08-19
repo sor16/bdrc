@@ -29,10 +29,10 @@ W_unobserved <- function(W_unique,min=NA,max=NA){
         }))
     }
     if(!is.na(min)|!is.na(max)){
-        min=round(min,2)
-        max=round(max,2)
+        min=ceiling(min*10)/10
+        max=ceiling(max*10)/10
         minseq=setdiff(seq(min,min(W_unique),by=0.05),c(min(W_unique)))
-        maxseq=setdiff(seq(round(max(W_unique),2),max,by=0.05),c(round(max(W_unique),2)))
+        maxseq=setdiff(seq(max(W_unique),max,length.out=2+ceiling(20*(max-max(W_unique)))),max(W_unique))
         W_spline=c(rep(min(W_unique),length(minseq)),W_u,rep(max(W_unique),length(maxseq)))
         W_u=c(minseq,W_u,maxseq)
         W_u_tild=W_spline-min(W_unique)
