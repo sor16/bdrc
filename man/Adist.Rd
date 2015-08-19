@@ -2,7 +2,8 @@
 % Please edit documentation in R/Adist.R
 \name{Adist}
 \alias{Adist}
-\title{Distance matrix for unique water level measurements}
+\title{Linking unique water level measurements to actual
+water level measurements}
 \usage{
 Adist(w)
 }
@@ -19,7 +20,8 @@ water level measurements (w) such that \strong{w}=\strong{Aw'}
 }
 }
 \description{
-Adist extracts unique elements of water level measurements and creates a distance matrix
+Adist links unique water level measurements (\strong{w'}) to actual
+water level measurements (w) such that \strong{w}=\strong{Aw'}.
 from the measurements.
 }
 \references{
