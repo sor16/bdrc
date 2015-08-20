@@ -44,9 +44,15 @@ plotmodel2 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=
         plotlist$rclog=rclog
     }
     if(logresiduals==TRUE){
+        max=max(abs(realdata$residlog))
+        if(max>4){
+            ylim=c(-(max+0.2),max+0.2)
+        }else{
+            ylim=c(-4,4)
+        }
         rcrealresid=ggplot(realdata)+geom_point(aes(W,residraun),color="red")+theme_bw()+geom_abline(intercept = 0, slope = 0)+
             geom_path(aes(W,residupper),linetype="dashed")+geom_path(aes(W,residlower),linetype="dashed")+ylab(expression(paste("Q - ",hat(Q) ,"  [",m^3,'/s]',sep='')))+
-            ggtitle("Residual plot")+xlab("W  [cm]")+theme(plot.title = element_text(vjust=2))
+            ggtitle("Residual plot")+xlab("W  [cm]")+theme(plot.title = element_text(vjust=2))+ylim(ylim)
 
         plotlist$rcrealresid=rcrealresid
     }
