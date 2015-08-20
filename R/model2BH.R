@@ -97,7 +97,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
     Wmax=ceiling(Wmax*10)/10
     Wmin=ceiling(Wmin*10)/10
-    WFill=W_unobserved(RC$O,min=Wmin,max=Wmax)
+    WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
     RC$W_u=WFill$W_u
     RC$W_u_tild=WFill$W_u_tild
     Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
