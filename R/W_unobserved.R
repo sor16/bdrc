@@ -1,4 +1,3 @@
-library(roxygen2)
 #'Unobserved stages
 #'
 #'W_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
