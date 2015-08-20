@@ -20,7 +20,7 @@
 
 
 clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.Date(), "%Y"))),dummy=NULL,keeprows=NULL,force=NULL,shiny=FALSE,Wmin=NA,Wmax=NA, exclude=TRUE,excludedates=c(Sys.Date()-1,Sys.Date()-1)){
-    require(xlsx)
+    suppressPackageStartupMessages(require(xlsx))
 
     if (is.null(file)){
         return(NULL)

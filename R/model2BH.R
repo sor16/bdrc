@@ -14,7 +14,7 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
-    require(doParallel)
+    suppressPackageStartupMessages(require(doParallel))
     require(RCmodels)
     list2env(clean,envir=environment())
 
