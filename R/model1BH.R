@@ -109,6 +109,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     fitrctafla=round(exp(fitrctafla),3)
     Stage=seq(min(fitinterpol$x),max(fitinterpol$x),by=0.1)*100
     fitrctafla=as.data.frame(cbind(Stage,fitrctafla))
+    names(fitrctafla)[1]="Stage (cm)"
 
     lowerinterpol=approx(simdata$W,simdata$lower,xout=xout)
     lowerrctafla=t(as.data.frame(split(x=lowerinterpol$y, f=ceiling(seq_along(lowerinterpol$y)/10))))
@@ -116,6 +117,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     lowerrctafla=round(exp(lowerrctafla),3)
     Stage=seq(min(lowerinterpol$x),max(lowerinterpol$x),by=0.1)*100
     lowerrctafla=as.data.frame(cbind(Stage,lowerrctafla))
+    names(lowerrctafla)[1]="Stage (cm)"
 
     upperinterpol=approx(simdata$W,simdata$upper,xout=xout)
     upperrctafla=t(as.data.frame(split(x=upperinterpol$y, f=ceiling(seq_along(upperinterpol$y)/10))))
@@ -123,6 +125,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     upperrctafla=round(exp(upperrctafla),3)
     Stage=seq(min(upperinterpol$x),max(upperinterpol$x),by=0.1)*100
     upperrctafla=as.data.frame(cbind(Stage,upperrctafla))
+    names(upperrctafla)[1]="Stage (cm)"
 
     plottafla=as.data.frame(cbind(lowerinterpol$y,fitinterpol$y,upperinterpol$y))
     plottafla=exp(plottafla)
