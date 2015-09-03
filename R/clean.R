@@ -48,7 +48,6 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         }else{return(NULL)}
     }
         names(qvdata)=c("Date","Time","Quality","W","Q")
-
         qvdata$Time=as.character(qvdata$Time)
         qvdata$Date=as.Date(gsub("\\.","-",qvdata$Date),"%d-%m-%Y")
         qvdata$Q=gsub('\\s+', '',qvdata$Q)
@@ -56,18 +55,20 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         qvdata$Q=as.numeric(as.character(gsub(",",".",qvdata$Q)))
         qvdata$W=0.01*qvdata$W
         qvdata=qvdata[with(qvdata,order(W)),]
+
+        years=as.numeric(format(qvdata$Date, "%Y"))
+        qvdata=qvdata[which(years<=includedates[2] & years >= includedates[1]),]
+
+        if(exclude==TRUE){
+                qvdata=qvdata[which(qvdata$Date<=excludedates[1] | qvdata$Date >= excludedates[2]),]
+        }
+
         qvdata_before=qvdata
 
         if(length(keeprows)!=0){
             qvdata=qvdata[keeprows,]
         }
-        if(advanced==TRUE){
-            years=as.numeric(format(qvdata$Date, "%Y"))
-            qvdata=qvdata[which(years<=includedates[2] & years >= includedates[1]),]
 
-            if(exclude==TRUE){
-                qvdata=qvdata[which(qvdata$Date<=excludedates[1] | qvdata$Date >= excludedates[2]),]
-           }
 
             if(sum(unlist(lapply(dummy,length)))!=0){
                 dummydata=as.data.frame(dummy)
@@ -88,7 +89,6 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
                 forcedata=forcedata[,c("Date","Time","Quality","W","Q")]
                 qvdata=rbind(qvdata,forcedata)
             }
-        }
         #order again with new data from dummy or force
         qvdata=qvdata[with(qvdata,order(W)),]
         if(is.na(Wmin)) Wmin=min(qvdata$W)

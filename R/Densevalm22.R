@@ -35,9 +35,9 @@ Densevalm22 <- function(th,RC){
   yp2=yp[1:RC$N,] #7 micro
   ypo=yp2+as.matrix(rnorm(RC$N))*sqrt(varr)#60 micro
 
-  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$N,]),yp,sqrt(varr))))#45.04
+  #D=-2*sum(log(dlnorm(exp(RC$y[1:RC$N,]),yp,sqrt(varr))))#45.04
 
-  return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"D"=D,"varr"=varr))
+  return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
 
 
 }
