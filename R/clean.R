@@ -57,11 +57,6 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         qvdata=qvdata[with(qvdata,order(W)),]
         qvdata_before=qvdata
 
-
-#         includeindex=years<=includedates[2] & years >= includedates[1]
-#         excludeindex=qvdata$Date<=excludedates[1] | qvdata$Date >= excludedates[2]
-#         keep=keeprows & exclude & include
-
         if(advanced==TRUE){
             if(length(keeprows)!=0){
                 qvdata=qvdata[keeprows,]
