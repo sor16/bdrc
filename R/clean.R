@@ -28,7 +28,6 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
     name=file
     if(shiny==TRUE){
         list2env(file,envir=environment())
-        #file=data.frame(file, stringsAsFactors = FALSE)
 
         if(type=='text/plain'){
             qvdata=read.table(datapath,skip=2,sep="|",dec=",")
