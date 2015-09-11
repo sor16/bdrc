@@ -154,10 +154,10 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     betaData$W=c(RC$O,RC$W_u)
     betaData=betaData[with(betaData,order(W)),]
     observedPrediction$Q=RC$y[1:RC$N,]
-    observedPrediction$residraun=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
+    observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
     observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
     observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
-    observedPrediction$residlog=(observedPrediction$Q-observedPrediction$fit)/sqrt(varr_m)
+    observedPrediction$standardResiduals=(observedPrediction$Q-observedPrediction$fit)/sqrt(varr_m)
 
     TableOfData=observedData
     TableOfData$Q=round(TableOfData$Q,1)
