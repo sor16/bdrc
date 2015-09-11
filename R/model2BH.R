@@ -178,8 +178,8 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     FitTable=as.data.frame(cbind(Stage,FitTable))
     names(FitTable)[1]="Stage (cm)"
 
-    lowerInterpolationation=approx(completePrediction$W,completePrediction$lower,xout=xout)
-    LowerTable=t(as.data.frame(split(x=lowerInterpolationation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
+    lowerInterpolation=approx(completePrediction$W,completePrediction$lower,xout=xout)
+    LowerTable=t(as.data.frame(split(x=lowerInterpolation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
     colnames(LowerTable)=0:9
     LowerTable=round(exp(LowerTable),3)
     Stage=seq(min(lowerInterpolation$x),max(lowerInterpolation$x),by=0.1)*100
