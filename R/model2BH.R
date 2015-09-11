@@ -1,16 +1,15 @@
 #'Calculates the rating curve using model2
 #'
-#'This function takes in the cleaned data from the \code{\link{clean}} function
+#'This function takes in clean data from the \code{\link{clean}} function
 #'and calculates the rating curve using model 2.
-#'@param clean Is the output from the \code{\link{clean}} function. That is a list containg a matrix and a data frame.
-#'The matrix containing the stage(in meters) and flow values and the data frame containing date, time, quality, stage and flow values.
-#'@param country The input is a string with the name of the country you want to use the prior parameters from, e.g. country='Iceland'.
-#'@param Wmin The input is either the default empty string or an integer for the lowest stage level. If you set as.numeric("") you get Na and then Wmin will be
-#'automatically set to c_hat.
-#'@param Wmax The input is either the default empty string or an integer for the highest stage level. If you set as.numeric("") you get Na and then Wmax will be
-#'automatically set to the maximum stage of the data.
-#'@return If all the parameters are used as described the output will be a list containing
-#'the data frames qvdata, betadata, ypodata, realdata , tafla, fitrctafla, lowerrctafla, upperrctafla, plottafla.
+#'@param clean List that is the output of \code{\link{clean}} function.
+#'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
+#'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
+#'automatically be set to c_hat.
+#'@param Wmax Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
+#'automatically be set to the maximum stage of the data.
+#'@return List containing information on the calculated rating curve,
+#'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
@@ -31,7 +30,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     RC$s=3
     RC$v=5
 
-    forceindex=which('forcepoint'== qvdata$Quality)
+    forceindex=which('forcepoint'== observedData$Quality)
     forcepoint=wq[forceindex,]
 
     RC$y=rbind(as.matrix(log(wq[,2])),0)
@@ -51,7 +50,7 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
 
     RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
     RC$epsilon=rep(1,RC$N)
-    if(any('forcepoint'== qvdata$Quality)){
+    if(any('forcepoint'== observedData$Quality)){
         RC$epsilon[forceindex]=1/RC$N
     }
 
@@ -144,62 +143,62 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     MCMC[is.na(MCMC)]=-1000
     betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
     yposamples=MCMC[1:(RC$N+length(RC$W_u)),]
-    ypodata=as.data.frame(t(apply(yposamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(ypodata)=c("lower","fit","upper")
-    ypodata$W=c(RC$w,RC$W_u)
-    ypodata$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
-    realdata=ypodata[1:RC$N,]
-    ypodata=ypodata[with(ypodata,order(W)),]
-    betadata=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(betadata)=c("lower","fit","upper")
-    betadata$W=c(RC$O,RC$W_u)
-    betadata=betadata[with(betadata,order(W)),]
-    realdata$Q=RC$y[1:RC$N,]
-    realdata$residraun=(exp(realdata$Q)-exp(realdata$fit))
-    realdata$residupper=exp(realdata$upper)-exp(realdata$fit)
-    realdata$residlower=exp(realdata$lower)-exp(realdata$fit)
-    realdata$residlog=(realdata$Q-realdata$fit)/sqrt(varr_m)
+    completePrediction=as.data.frame(t(apply(yposamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(completePrediction)=c("lower","fit","upper")
+    completePrediction$W=c(RC$w,RC$W_u)
+    completePrediction$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
+    observedPrediction=completePrediction[1:RC$N,]
+    completePrediction=completePrediction[with(completePrediction,order(W)),]
+    betaData=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(betaData)=c("lower","fit","upper")
+    betaData$W=c(RC$O,RC$W_u)
+    betaData=betaData[with(betaData,order(W)),]
+    observedPrediction$Q=RC$y[1:RC$N,]
+    observedPrediction$residraun=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
+    observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
+    observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
+    observedPrediction$residlog=(observedPrediction$Q-observedPrediction$fit)/sqrt(varr_m)
 
-    tafla=qvdata
-    tafla$Q=round(tafla$Q,1)
-    tafla$Qfit=round(exp(realdata$fit),3)
-    tafla$lower=round(exp(realdata$lower),3)
-    tafla$upper=round(exp(realdata$upper),3)
-    tafla$diffQ=tafla$Q-tafla$Qfit
-    names(tafla)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
-    tafla=tafla[with(tafla,order(Date)),]
+    TableOfData=observedData
+    TableOfData$Q=round(TableOfData$Q,1)
+    TableOfData$Qfit=round(exp(observedPrediction$fit),3)
+    TableOfData$lower=round(exp(observedPrediction$lower),3)
+    TableOfData$upper=round(exp(observedPrediction$upper),3)
+    TableOfData$diffQ=TableOfData$Q-TableOfData$Qfit
+    names(TableOfData)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
+    TableOfData=TableOfData[with(TableOfData,order(Date)),]
 
     xout=seq(Wmin,-0.01+Wmax,by=0.01)
 
-    fitinterpol=approx(ypodata$W,ypodata$fit,xout=xout)
-    fitrctafla=t(as.data.frame(split(x=fitinterpol$y, f=ceiling(seq_along(fitinterpol$y)/10))))
-    colnames(fitrctafla)=0:9
-    fitrctafla=round(exp(fitrctafla),3)
-    Stage=seq(min(fitinterpol$x),max(fitinterpol$x),by=0.1)*100
-    fitrctafla=as.data.frame(cbind(Stage,fitrctafla))
-    names(fitrctafla)[1]="Stage (cm)"
+    fitInterpolation=approx(completePrediction$W,completePrediction$fit,xout=xout)
+    FitTable=t(as.data.frame(split(x=fitInterpolation$y, f=ceiling(seq_along(fitInterpolation$y)/10))))
+    colnames(FitTable)=0:9
+    FitTable=round(exp(FitTable),3)
+    Stage=seq(min(fitInterpolation$x),max(fitInterpolation$x),by=0.1)*100
+    FitTable=as.data.frame(cbind(Stage,FitTable))
+    names(FitTable)[1]="Stage (cm)"
 
-    lowerinterpol=approx(ypodata$W,ypodata$lower,xout=xout)
-    lowerrctafla=t(as.data.frame(split(x=lowerinterpol$y, f=ceiling(seq_along(lowerinterpol$y)/10))))
-    colnames(lowerrctafla)=0:9
-    lowerrctafla=round(exp(lowerrctafla),3)
-    Stage=seq(min(lowerinterpol$x),max(lowerinterpol$x),by=0.1)*100
-    lowerrctafla=as.data.frame(cbind(Stage,lowerrctafla))
-    names(lowerrctafla)[1]="Stage (cm)"
+    lowerInterpolationation=approx(completePrediction$W,completePrediction$lower,xout=xout)
+    LowerTable=t(as.data.frame(split(x=lowerInterpolationation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
+    colnames(LowerTable)=0:9
+    LowerTable=round(exp(LowerTable),3)
+    Stage=seq(min(lowerInterpolation$x),max(lowerInterpolation$x),by=0.1)*100
+    LowerTable=as.data.frame(cbind(Stage,LowerTable))
+    names(LowerTable)[1]="Stage (cm)"
 
-    upperinterpol=approx(ypodata$W,ypodata$upper,xout=xout)
-    upperrctafla=t(as.data.frame(split(x=upperinterpol$y, f=ceiling(seq_along(upperinterpol$y)/10))))
-    colnames(upperrctafla)=0:9
-    upperrctafla=round(exp(upperrctafla),3)
-    Stage=seq(min(upperinterpol$x),max(upperinterpol$x),by=0.1)*100
-    upperrctafla=as.data.frame(cbind(Stage,upperrctafla))
-    names(upperrctafla)[1]="Stage (cm)"
+    upperInterpolation=approx(completePrediction$W,completePrediction$upper,xout=xout)
+    UpperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
+    colnames(UpperTable)=0:9
+    UpperTable=round(exp(UpperTable),3)
+    Stage=seq(min(upperInterpolation$x),max(upperInterpolation$x),by=0.1)*100
+    UpperTable=as.data.frame(cbind(Stage,UpperTable))
+    names(UpperTable)[1]="Stage (cm)"
 
-    plottafla=as.data.frame(cbind(lowerinterpol$y,fitinterpol$y,upperinterpol$y))
-    plottafla=exp(plottafla)
-    names(plottafla)=c("Lower","Fit","Upper")
-    plottafla$W=xout
+    plotTable=as.data.frame(cbind(lowerInterpolation$y,fitInterpolation$y,upperInterpolation$y))
+    plotTable=exp(plotTable)
+    names(plotTable)=c("Lower","Fit","Upper")
+    plotTable$W=xout
 
-    return(list("qvdata"=qvdata,"betadata"=betadata,"ypodata"=ypodata,"realdata"=realdata,"tafla"=tafla,
-                "fitrctafla"=fitrctafla,"lowerrctafla"=lowerrctafla,"upperrctafla"=upperrctafla,"plottafla"=plottafla))
+    return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
+                "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
 }

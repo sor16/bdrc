@@ -30,41 +30,41 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         list2env(file,envir=environment())
 
         if(type=='text/plain'){
-            qvdata=read.table(datapath,skip=2,sep="|",dec=",")
-            qvdata=qvdata[,c(2,3,5,7,4)]
+            observedData=read.table(datapath,skip=2,sep="|",dec=",")
+            observedData=observedData[,c(2,3,5,7,4)]
 
         }else if(type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
-            qvdata=read.xlsx(datapath,sheetIndex=1)
+            observedData=read.xlsx(datapath,sheetIndex=1)
 
         }else{return(NULL)}
 
     }else{
         if(gsub(".*\\.", "",file)=='txt'){
-        qvdata=read.table(file,skip=2,sep="|",dec=",")
-        qvdata=qvdata[,c(2,3,5,7,4)]
+        observedData=read.table(file,skip=2,sep="|",dec=",")
+        observedData=observedData[,c(2,3,5,7,4)]
         }else if(gsub(".*\\.", "",file)=='xlsx'){
-            qvdata=read.xlsx(file,sheetIndex=1)
+            observedData=read.xlsx(file,sheetIndex=1)
         }else{return(NULL)}
     }
-        names(qvdata)=c("Date","Time","Quality","W","Q")
-        qvdata$Time=as.character(qvdata$Time)
-        qvdata$Date=as.Date(gsub("\\.","-",qvdata$Date),"%d-%m-%Y")
-        qvdata$Q=gsub('\\s+', '',qvdata$Q)
-        qvdata=qvdata[qvdata$W!=0,]
-        qvdata$Q=as.numeric(as.character(gsub(",",".",qvdata$Q)))
-        qvdata$W=0.01*qvdata$W
-        qvdata=qvdata[with(qvdata,order(W)),]
-        qvdata_before=qvdata
+        names(observedData)=c("Date","Time","Quality","W","Q")
+        observedData$Time=as.character(observedData$Time)
+        observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
+        observedData$Q=gsub('\\s+', '',observedData$Q)
+        observedData=observedData[observedData$W!=0,]
+        observedData$Q=as.numeric(as.character(gsub(",",".",observedData$Q)))
+        observedData$W=0.01*observedData$W
+        observedData=observedData[with(observedData,order(W)),]
+        observedData_before=observedData
 
         if(advanced==TRUE){
             if(length(keeprows)!=0){
-                qvdata=qvdata[keeprows,]
+                observedData=observedData[keeprows,]
             }
-            years=as.numeric(format(qvdata$Date, "%Y"))
-            qvdata=qvdata[which(years<=includedates[2] & years >= includedates[1]),]
+            years=as.numeric(format(observedData$Date, "%Y"))
+            observedData=observedData[which(years<=includedates[2] & years >= includedates[1]),]
 
             if(exclude==TRUE){
-                qvdata=qvdata[which(qvdata$Date<=excludedates[1] | qvdata$Date >= excludedates[2]),]
+                observedData=observedData[which(observedData$Date<=excludedates[1] | observedData$Date >= excludedates[2]),]
             }
 
 
@@ -75,7 +75,7 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
                 dummydata$Time=format(Sys.time(),"%H:%M:%S")
                 dummydata$Quality="dummy"
                 dummydata=dummydata[,c("Date","Time","Quality","W","Q")]
-                qvdata=rbind(qvdata,dummydata)
+                observedData=rbind(observedData,dummydata)
 
             }
             if(sum(unlist(lapply(force,length)))!=0){
@@ -85,15 +85,15 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
                 forcedata$Time=format(Sys.time(),"%H:%M:%S")
                 forcedata$Quality="forcepoint"
                 forcedata=forcedata[,c("Date","Time","Quality","W","Q")]
-                qvdata=rbind(qvdata,forcedata)
+                observedData=rbind(observedData,forcedata)
             }
         }
         #order again with new data from dummy or force
-        qvdata=qvdata[with(qvdata,order(W)),]
-        if(is.na(Wmin)) Wmin=min(qvdata$W)
-        if(is.na(Wmax)) Wmax=max(qvdata$W)
-        qvdata=subset(qvdata,W >= Wmin & W <=Wmax )
-        wq=as.matrix(qvdata[,c("W","Q")])
+        observedData=observedData[with(observedData,order(W)),]
+        if(is.na(Wmin)) Wmin=min(observedData$W)
+        if(is.na(Wmax)) Wmax=max(observedData$W)
+        observedData=subset(observedData,W >= Wmin & W <=Wmax )
+        wq=as.matrix(observedData[,c("W","Q")])
 
-    return(list("wq"=wq,"qvdata"=qvdata,"qvdata_before"=qvdata_before))
+    return(list("wq"=wq,"observedData"=observedData,"observedData_before"=observedData_before))
 }
