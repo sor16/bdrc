@@ -9,7 +9,7 @@
 #'@param Wmax positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
 #'automatically be set to the maximum stage of the data.
 #'@return List containing information on the calculated rating curve, parameters varappr and c_hat, the matrix mu and
-#'the data frames observedData, CompletePrediction, observedPrediction , TableOfData, FitTable, LowerTable, UpperTable, plotTable.
+#'the data frames observedData, completePrediction, observedPrediction , TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
@@ -73,15 +73,15 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     W_grid=sort(c(seq(Wmin,Wmax,length.out=1000),forcepoint[1]))
     indexOfForcepoint=which(forcepoint[1]==W_grid)
 
-    CompletePrediction=data.frame(W=W_grid)
-    CompletePrediction$l_m = log(CompletePrediction$W-c_hat)
-    CompletePrediction$fit=mu[1,]+mu[2,]*CompletePrediction$l_m
+    completePrediction=data.frame(W=W_grid)
+    completePrediction$l_m = log(completePrediction$W-c_hat)
+    completePrediction$fit=mu[1,]+mu[2,]*completePrediction$l_m
 
-    completeVariance=rep(constvar,nrow(CompletePrediction))
+    completeVariance=rep(constvar,nrow(completePrediction))
     completeVariance[indexOfForcepoint]=epsilon
 
-    CompletePrediction$upper=CompletePrediction$fit+qnorm(0.975,0,sqrt(completeVariance))
-    CompletePrediction$lower=CompletePrediction$fit+qnorm(0.025,0,sqrt(completeVariance))
+    completePrediction$upper=completePrediction$fit+qnorm(0.975,0,sqrt(completeVariance))
+    completePrediction$lower=completePrediction$fit+qnorm(0.025,0,sqrt(completeVariance))
     observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
     observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
     observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
@@ -100,7 +100,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     #-0.01 in order to fix the length of the interpolation tables
     xout=seq(Wmin,-0.01+Wmax,by=0.01)
 
-    fitInterpolation=approx(CompletePrediction$W,CompletePrediction$fit,xout=xout)
+    fitInterpolation=approx(completePrediction$W,completePrediction$fit,xout=xout)
     FitTable=t(as.data.frame(split(x=fitInterpolation$y, f=ceiling(seq_along(fitInterpolation$y)/10))))
     colnames(FitTable)=0:9
     FitTable=round(exp(FitTable),3)
@@ -108,7 +108,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     FitTable=as.data.frame(cbind(Stage,FitTable))
     names(FitTable)[1]="Stage (cm)"
 
-    lowerInterpolation=approx(CompletePrediction$W,CompletePrediction$lower,xout=xout)
+    lowerInterpolation=approx(completePrediction$W,completePrediction$lower,xout=xout)
     LowerTable=t(as.data.frame(split(x=lowerInterpolation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
     colnames(LowerTable)=0:9
     LowerTable=round(exp(LowerTable),3)
@@ -116,7 +116,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     LowerTable=as.data.frame(cbind(Stage,LowerTable))
     names(LowerTable)[1]="Stage (cm)"
 
-    upperInterpolation=approx(CompletePrediction$W,CompletePrediction$upper,xout=xout)
+    upperInterpolation=approx(completePrediction$W,completePrediction$upper,xout=xout)
     UpperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
     colnames(UpperTable)=0:9
     UpperTable=round(exp(UpperTable),3)
@@ -129,6 +129,6 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     names(plotTable)=c("Lower","Fit","Upper")
     plotTable$W=xout
 
-    return(list("varappr"=constvar,"observedData"=observedData,"CompletePrediction"=CompletePrediction,"observedPrediction"=observedPrediction,
+    return(list("varappr"=constvar,"observedData"=observedData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,
                 "TableOfData"=TableOfData,"mu"=mu,"c_hat"=c_hat,"FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
 }
