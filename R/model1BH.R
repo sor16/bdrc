@@ -24,7 +24,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     epsilon=0.00001
 
     forceIndex=which('forcepoint'== observedData$Quality)
-    forcepoint=wq[forceindex,]
+    forcepoint=wq[forceIndex,]
 
     Dens <- function(th){ Densevalm11(th,RC)$pmin}
     Densmin=optim(par=c(0,0),Dens,hessian=TRUE)
