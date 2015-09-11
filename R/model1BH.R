@@ -9,7 +9,7 @@
 #'@param Wmax positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
 #'automatically be set to the maximum stage of the data.
 #'@return List containing information on the calculated rating curve, parameters varappr and c_hat, the matrix mu and
-#'the data frames observedData, CompletePrediction, observedPrediction , TableOfData, FitTable, LowerTable, upperTable, plotTable.
+#'the data frames observedData, CompletePrediction, observedPrediction , TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
@@ -117,12 +117,12 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     names(LowerTable)[1]="Stage (cm)"
 
     upperInterpolation=approx(CompletePrediction$W,CompletePrediction$upper,xout=xout)
-    upperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
-    colnames(upperTable)=0:9
-    upperTable=round(exp(upperTable),3)
+    UpperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
+    colnames(UpperTable)=0:9
+    UpperTable=round(exp(UpperTable),3)
     Stage=seq(min(upperInterpolation$x),max(upperInterpolation$x),by=0.1)*100
-    upperTable=as.data.frame(cbind(Stage,upperTable))
-    names(upperTable)[1]="Stage (cm)"
+    UpperTable=as.data.frame(cbind(Stage,UpperTable))
+    names(UpperTable)[1]="Stage (cm)"
 
     plotTable=as.data.frame(cbind(lowerInterpolation$y,fitInterpolation$y,upperInterpolation$y))
     plotTable=exp(plotTable)
@@ -130,5 +130,5 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     plotTable$W=xout
 
     return(list("varappr"=constvar,"observedData"=observedData,"CompletePrediction"=CompletePrediction,"observedPrediction"=observedPrediction,
-                "TableOfData"=TableOfData,"mu"=mu,"c_hat"=c_hat,"FitTable"=FitTable,"LowerTable"=LowerTable,"upperTable"=upperTable,"plotTable"=plotTable))
+                "TableOfData"=TableOfData,"mu"=mu,"c_hat"=c_hat,"FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
 }
