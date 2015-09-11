@@ -85,7 +85,7 @@ model1BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
     observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
     observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
-    observedPrediction$standardResid=(observedPrediction$Q-observedPrediction$fit)/sqrt(exp(t_m[2,]))
+    observedPrediction$standardResiduals=(observedPrediction$Q-observedPrediction$fit)/sqrt(exp(t_m[2,]))
 
     TableOfData=observedData
     TableOfData$W=TableOfData$W
