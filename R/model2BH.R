@@ -165,7 +165,8 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
     TableOfData$lower=round(exp(observedPrediction$lower),3)
     TableOfData$upper=round(exp(observedPrediction$upper),3)
     TableOfData$diffQ=TableOfData$Q-TableOfData$Qfit
-    names(TableOfData)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff")
+    TableOfData$Qpercentage=round(format(TableOfData$Lower,nsmall=3)TableOfData$diffQ/TableOfData$Q,1)
+    names(TableOfData)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff","Q%")
     TableOfData=TableOfData[with(TableOfData,order(Date)),]
 
     xout=seq(Wmin,-0.01+Wmax,by=0.01)
