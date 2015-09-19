@@ -32,9 +32,11 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         if(type=='text/plain'){
             observedData=read.table(datapath,skip=2,sep="|",dec=",")
             observedData=observedData[,c(2,3,5,7,4)]
-
+            names(observedData)=c("Date","Time","Quality","W","Q")
+            observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
         }else if(type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
             observedData=read.xlsx(datapath,sheetIndex=1)
+            names(observedData)=c("Date","Time","Quality","W","Q")
 
         }else{return(NULL)}
 
@@ -46,9 +48,7 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
             observedData=read.xlsx(file,sheetIndex=1)
         }else{return(NULL)}
     }
-        names(observedData)=c("Date","Time","Quality","W","Q")
         observedData$Time=as.character(observedData$Time)
-        observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
         observedData$Q=gsub('\\s+', '',observedData$Q)
         observedData=observedData[observedData$W!=0,]
         observedData$Q=as.numeric(as.character(gsub(",",".",observedData$Q)))
