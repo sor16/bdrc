@@ -5,29 +5,28 @@
 \title{Plots the rating curve for model 1}
 \usage{
 plotmodel1(filename, eps = F, png = F, realscale = T, logscale = T,
-  logresiduals = T, realresiduals = T)
+  standardResiduals = T, realresiduals = T)
 }
 \arguments{
-\item{filename}{Input is a string with the name of the txt file containing the stage and flow data. See also input in \code{\link{clean}}.}
+\item{filename}{Input is a string with the name of the txt file containing data. See also input in \code{\link{clean}}.}
 
 \item{eps}{TRUE or FALSE whether or not to save the plots as eps files or not.}
 
 \item{png}{TRUE or FALSE whether or not to save the plots as png files or not.}
 
-\item{realscale}{Logical constant, whether or not to plot the real scale image.}
+\item{realscale}{Logical, whether or not to plot the real scale rating curve.}
 
-\item{logscale}{Logical constant, whether or not to plot the log scale image.}
+\item{logscale}{Logical, whether or not to plot the log scale rating curve.}
 
-\item{logresiduals}{Logical constant, whether or not to plot the residuals for the log scale.}
+\item{standardResiduals}{Logical, whether or not to plot the standardized residuals.}
 
-\item{realresiduals}{Logical constant, whether or not to plot the residuals for the real scale.}
+\item{realresiduals}{Logical , whether or not to plot the real scale residuals.}
 }
 \value{
-The output is a list which contains the ggplots the user has chosen to plot.
+Returns a list of ggplot objects that the user chose to plot.
 }
 \description{
-This function takes in the filename of the data that is used to calculate the ratingcurve It uses the \code{\link{clean}} function
-and the \code{\link{model1BH}} function to calculate the rating curve and then plot it.
+Takes in name of a stage-discharge file, calculates a rating curve using \code{\link{model1BH}} and returns ggplot figures of custom outputs
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

@@ -2,18 +2,20 @@
 % Please edit documentation in R/priors.R
 \name{priors}
 \alias{priors}
-\title{Chooses priors for the model}
+\title{Prior parameter specification}
 \usage{
 priors(country)
 }
 \arguments{
-\item{country}{Is a string with the name of the country the data is from.}
+\item{country}{A string with the name of the country of which the prior parameters into the models should be specified for}
 }
 \value{
-The output is the RC list which contains the priors and the outcomes of the prior calculations.
+Returns a list of prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}.
+The priors are based from data from rivers of a given country.If you want to add your country to this function,
+please contact the developers at sor16@hi.is or aoj8@hi.is.
 }
 \description{
-Takes in the country as a string and chooses which priors to use and then makes the prior calculations
+Specifies the prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

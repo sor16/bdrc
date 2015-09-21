@@ -1,8 +1,10 @@
-#' Chooses priors for the model
+#' Prior parameter specification
 #'
-#' Takes in the country as a string and chooses which priors to use and then makes the prior calculations
-#'@param country Is a string with the name of the country the data is from.
-#'@return The output is the RC list which contains the priors and the outcomes of the prior calculations.
+#' Specifies the prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}
+#'@param country A string with the name of the country of which the prior parameters into the models should be specified for
+#'@return Returns a list of prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}.
+#'The priors are based from data from rivers of a given country.If you want to add your country to this function,
+#' please contact the developers at sor16@@hi.is or aoj8@@hi.is.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 priors <- function(country) {
 

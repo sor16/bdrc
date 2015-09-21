@@ -68,7 +68,7 @@ XX[3,] = (1/2/dx^3)*(ZZ-tau_x[3])*(ZZ-tau_x[3])*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(
 #       (1/6/dx^3)*(tau_x[kk+4]-ZZ)*(tau_x[kk+4]-ZZ)*(ZZ-tau_x[kk+2])*(tau_x[kk+2]<=ZZ)*(ZZ<tau_x[kk+3])+
 #       (1/6/dx^3)*(tau_x[kk+4]-ZZ)*(tau_x[kk+4]-ZZ)*(tau_x[kk+4]-ZZ)*(tau_x[kk+3]<=ZZ)*(ZZ<tau_x[kk+4])
 #   }
-#
+
 #Axel/check-spline-algorithm, in Matlab this for loop does not run. Change to 4:-1:3 in Matlab?
 # i = kx + 2
 XX[kx+2,] =  -(1/6/dx^3)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]<=ZZ)*(ZZ<tau_x[kx+3])-

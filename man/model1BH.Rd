@@ -7,20 +7,19 @@
 model1BH(clean, country = "Iceland", Wmin = "", Wmax = "")
 }
 \arguments{
-\item{clean}{Is the output from the \code{\link{clean}} function. That is a list containg a matrix and a data frame.
-The matrix containing the stage(in meters) and flow values and the data frame containing date, time, quality, stage and flow values.}
+\item{clean}{List that is the output of \code{\link{clean}} function.}
 
-\item{country}{The input is a string with the name of the country you want to use the prior parameters from, e.g. country='Iceland'.}
+\item{country}{A string of t the country the prior parameters should be defined, default value is Iceland.}
 
-\item{Wmin}{The input is either the default empty string or an integer for the lowest stage level. If you set as.numeric("") you get Na and then Wmin will be
-automatically set to c_hat.}
+\item{Wmin}{positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
+automatically be set to c_hat.}
 
-\item{Wmax}{The input is either the default empty string or an integer for the highest stage level. If you set as.numeric("") you get Na and then Wmax will be
-automatically set to the maximum stage of the data.}
+\item{Wmax}{positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
+automatically be set to the maximum stage of the data.}
 }
 \value{
-If all the parameters are used as described the output will be a list containing the integers varappr and c_hat, the matrix mu and
-the data frames qvdata, simdata, realdata , tafla, fitrctafla, lowerrctafla, upperrctafla, plottafla.
+List containing information on the calculated rating curve, parameters varappr and c_hat, the matrix mu and
+the data frames observedData, completePrediction, observedPrediction , TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 }
 \description{
 This function takes in the cleaned data from the \code{\link{clean}} function

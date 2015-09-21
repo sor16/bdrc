@@ -1,18 +1,17 @@
 #'Plots the rating curve for model 1
 #'
-#'This function takes in the filename of the data that is used to calculate the ratingcurve It uses the \code{\link{clean}} function
-#'and the \code{\link{model1BH}} function to calculate the rating curve and then plot it.
-#'@param filename Input is a string with the name of the txt file containing the stage and flow data. See also input in \code{\link{clean}}.
+#'Takes in name of a stage-discharge file, calculates a rating curve using \code{\link{model1BH}} and returns ggplot figures of custom outputs
+#'@param filename Input is a string with the name of the txt file containing data. See also input in \code{\link{clean}}.
 #'@param eps TRUE or FALSE whether or not to save the plots as eps files or not.
 #'@param png TRUE or FALSE whether or not to save the plots as png files or not.
-#'@param realscale Logical constant, whether or not to plot the real scale image.
-#'@param logscale Logical constant, whether or not to plot the log scale image.
-#'@param logresiduals Logical constant, whether or not to plot the residuals for the log scale.
-#'@param realresiduals Logical constant, whether or not to plot the residuals for the real scale.
-#'@return The output is a list which contains the ggplots the user has chosen to plot.
+#'@param realscale Logical, whether or not to plot the real scale rating curve.
+#'@param logscale Logical, whether or not to plot the log scale rating curve.
+#'@param standardResiduals Logical, whether or not to plot the standardized residuals.
+#'@param realresiduals Logical , whether or not to plot the real scale residuals.
+#'@return Returns a list of ggplot objects that the user chose to plot.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}} , \code{\link{model1BH}}
-plotmodel1 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=T,realresiduals=T){
+plotmodel1 <- function(filename,eps=F,png=F,realscale=T,logscale=T,standardResiduals=T,realresiduals=T){
     require(RCmodels)
     require(ggplot2)
     if (is.null(filename)){
@@ -41,7 +40,7 @@ plotmodel1 <- function(filename,eps=F,png=F,realscale=T,logscale=T,logresiduals=
 
         plotlist$rclog=rclog
     }
-    if(logresiduals==TRUE){
+    if(standardResiduals==TRUE){
         max=max(abs(realdata$residlog))
         if(max>4){
             ylim=c(-(max+0.2),max+0.2)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean.R
 \name{clean}
 \alias{clean}
-\title{Cleans the input file}
+\title{Data cleaning}
 \usage{
 clean(file, advanced = TRUE, includedates = c(1950,
   as.numeric(format(Sys.Date(), "\%Y"))), dummy = NULL, keeprows = NULL,
@@ -10,20 +10,20 @@ clean(file, advanced = TRUE, includedates = c(1950,
   excludedates = c(Sys.Date() - 1, Sys.Date() - 1))
 }
 \arguments{
-\item{file}{Is a string that contains the name of a txt file that contains stage and flow data from a certain river}
+\item{file}{A string that contains the name of a txt file that contains stage and flow data from a certain river}
 
 \item{advanced}{Logical,depending if you want to use the advanced settings}
 
-\item{includedates}{A vector with two integers. The integers represent the year range the user wants to extract from the data. Parameter advanced needs to be true.
-So every datapoint that is not inside that date range will be discarded.}
+\item{includedates}{A vector with two integers. The integers represent the year range the user wants to extract from the data.
+Every datapoint that is not inside that date range will be discarded. Parameter advanced needs to be TRUE.}
 
-\item{dummy}{A list with information on the dummy point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be true.}
+\item{dummy}{A list with information on the dummy point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be TRUE.}
 
-\item{keeprows}{A logical vector which indicates whether to keep a datapoint or not. Parameter advanced needs to be true.}
+\item{keeprows}{A logical vector of the same length as the data which indicates whether to keep a datapoint or not. Parameter advanced needs to be TRUE.}
 
-\item{force}{A list with information on the force point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be true.}
+\item{force}{A list with information on the force point, with elements W and Q, stage and discharge respectively. Parameter advanced needs to be TRUE.}
 
-\item{shiny}{Logical, whether the function should read the data as done in shiny or not.}
+\item{shiny}{Logical, whether the function should read the data as done in shiny or not. Only TRUE when used in a shiny interface.}
 
 \item{Wmin}{Numeric, minimum stage of rating curve.}
 
@@ -34,8 +34,8 @@ So every datapoint that is not inside that date range will be discarded.}
 \item{excludedates}{Vector with two Date values of the form %Y-%m-%d. The dates span the range which to exclude from the data. Parameters advanced and exclude need to be true.}
 }
 \value{
-If all the parameters are either default or used as described the output will be a list containing a matrix with the cleaned stage
-and flow values as well as a data frame with the cleaned data cointaining date, time, quality, stage and flow.
+Returns a list of objects that ar the input to model1BH and model1BH, especially the cleaned input data. Other outputs are a matrix of stage and discharge values
+and the cleaned data before it changes due to the interactive elements such as dummypoint,forcepoint,keeprows etc.
 }
 \description{
 This function takes in the data and cleans it, if advanced is TRUE and exclude is TRUE it conditions and fixes
