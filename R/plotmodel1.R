@@ -1,4 +1,4 @@
-#'Plots the rating curve for model 1
+#'Graphical rating curve for model 1
 #'
 #'Takes in name of a stage-discharge file, calculates a rating curve using \code{\link{model1BH}} and returns ggplot figures of custom outputs
 #'@param filename Input is a string with the name of the txt file containing data. See also input in \code{\link{clean}}.

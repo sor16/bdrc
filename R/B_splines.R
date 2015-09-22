@@ -1,4 +1,4 @@
-#'Bsplines in a rating curve
+#'Bsplines in a generalized rating curve
 #'
 #'A function to test the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
 #'with 2 interior knots and 6 basis functions.

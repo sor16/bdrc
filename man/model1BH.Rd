@@ -2,7 +2,7 @@
 % Please edit documentation in R/model1BH.R
 \name{model1BH}
 \alias{model1BH}
-\title{Calculates the rating curve using model1}
+\title{Rating curve model1}
 \usage{
 model1BH(clean, country = "Iceland", Wmin = "", Wmax = "")
 }
@@ -22,8 +22,8 @@ List containing information on the calculated rating curve, parameters varappr a
 the data frames observedData, completePrediction, observedPrediction , TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 }
 \description{
-This function takes in the cleaned data from the \code{\link{clean}} function
-and calculates the rating curve using model 1.
+Takes in the cleaned data from the \code{\link{clean}} function
+and calculates a rating curve using model 1.
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

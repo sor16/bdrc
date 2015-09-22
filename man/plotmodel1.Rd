@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotmodel1.R
 \name{plotmodel1}
 \alias{plotmodel1}
-\title{Plots the rating curve for model 1}
+\title{Graphical rating curve for model 1}
 \usage{
 plotmodel1(filename, eps = F, png = F, realscale = T, logscale = T,
   standardResiduals = T, realresiduals = T)

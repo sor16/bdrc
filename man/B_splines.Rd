@@ -2,7 +2,7 @@
 % Please edit documentation in R/B_splines.R
 \name{B_splines}
 \alias{B_splines}
-\title{Bsplines in a rating curve}
+\title{Bsplines in a generalized rating curve}
 \usage{
 B_splines(ZZ)
 }

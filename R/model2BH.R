@@ -1,7 +1,7 @@
-#'Calculates the rating curve using model2
+#'Rating curve model2
 #'
-#'This function takes in clean data from the \code{\link{clean}} function
-#'and calculates the rating curve using model 2.
+#'Takes in clean data from the \code{\link{clean}} function
+#'and calculates a rating curve using model 2.
 #'@param clean List that is the output of \code{\link{clean}} function.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
 #'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will

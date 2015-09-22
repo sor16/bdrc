@@ -2,21 +2,20 @@
 % Please edit documentation in R/Densevalm11.R
 \name{Densevalm11}
 \alias{Densevalm11}
-\title{Evaluates the log density p at t for model 1}
+\title{Density evaluation for model1}
 \usage{
 Densevalm11(th, RC)
 }
 \arguments{
-\item{th}{A matrix with dim 2x1 containing parameters}
+\item{th}{A vector with length 9 containing parameters}
 
 \item{RC}{A list containing prior parameters, matrices and the data.}
 }
 \value{
-Returns a list containing pmin, minimum p value, and p,x,yp,ypo which are drawn out of the evaluated density.
+Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 }
 \description{
-Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
-so x is set x=c(0 0).
+Evaluates the log density of the posterior distribution of the parameters of model2BH.
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

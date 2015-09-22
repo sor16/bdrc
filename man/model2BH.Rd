@@ -2,7 +2,7 @@
 % Please edit documentation in R/model2BH.R
 \name{model2BH}
 \alias{model2BH}
-\title{Calculates the rating curve using model2}
+\title{Rating curve model2}
 \usage{
 model2BH(clean, country = "Iceland", Wmin = "", Wmax = "")
 }
@@ -22,8 +22,8 @@ List containing information on the calculated rating curve,
 the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 }
 \description{
-This function takes in clean data from the \code{\link{clean}} function
-and calculates the rating curve using model 2.
+Takes in clean data from the \code{\link{clean}} function
+and calculates a rating curve using model 2.
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

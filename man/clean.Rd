@@ -38,8 +38,7 @@ Returns a list of objects that ar the input to model1BH and model1BH, especially
 and the cleaned data before it changes due to the interactive elements such as dummypoint,forcepoint,keeprows etc.
 }
 \description{
-This function takes in the data and cleans it, if advanced is TRUE and exclude is TRUE it conditions and fixes
-the data depending on the input of the user.
+Takes in stage-discharge data and cleans it, and subsets it according to user inputs.
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

@@ -1,7 +1,6 @@
 #'Data cleaning
 #'
-#'This function takes in the data and cleans it, if advanced is TRUE and exclude is TRUE it conditions and fixes
-#'the data depending on the input of the user.
+#'Takes in stage-discharge data and cleans it, and subsets it according to user inputs.
 #'@param file A string that contains the name of a txt file that contains stage and flow data from a certain river
 #'@param advanced Logical,depending if you want to use the advanced settings
 #'@param includedates A vector with two integers. The integers represent the year range the user wants to extract from the data.

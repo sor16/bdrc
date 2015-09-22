@@ -2,21 +2,20 @@
 % Please edit documentation in R/Densevalm22.R
 \name{Densevalm22}
 \alias{Densevalm22}
-\title{Evaluates the log density p at t for model 2}
+\title{Density evaluation for model2}
 \usage{
 Densevalm22(th, RC)
 }
 \arguments{
 \item{th}{A vector with length 9 containing parameters}
 
-\item{RC}{RC is a list containing prior parameters, matrices and the data.}
+\item{RC}{A list containing prior parameters, matrices and the data.}
 }
 \value{
-Returns a list containing p,x,yp,ypo which are drawn out of the evaluated density and varr is a variance numeric vector.
+Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 }
 \description{
-Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
-so x is set x=c(0 0).
+Evaluates the log density of the posterior distribution of the parameters of model2BH.
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

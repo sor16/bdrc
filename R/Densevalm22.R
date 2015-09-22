@@ -1,10 +1,9 @@
-#'Evaluates the log density p at t for model 2
+#'Density evaluation for model2
 #'
-#'Evaluates the log density log(p(t|y)) using p(t|y) propper to p(y|x,t)p(x|t)p(t)/p(x|y,t), which is independent of x
-#'so x is set x=c(0 0).
+#'Evaluates the log density of the posterior distribution of the parameters of model2BH.
 #'@param th A vector with length 9 containing parameters
-#'@param RC RC is a list containing prior parameters, matrices and the data.
-#'@return Returns a list containing p,x,yp,ypo which are drawn out of the evaluated density and varr is a variance numeric vector.
+#'@param RC A list containing prior parameters, matrices and the data.
+#'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 Densevalm22 <- function(th,RC){
   phi_b=th[3]
