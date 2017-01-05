@@ -43,8 +43,14 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
         if(gsub(".*\\.", "",file)=='txt'){
         observedData=read.table(file,skip=2,sep="|",dec=",")
         observedData=observedData[,c(2,3,5,7,4)]
+        #added
+        names(observedData)=c("Date","Time","Quality","W","Q")
+        observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
         }else if(gsub(".*\\.", "",file)=='xlsx'){
             observedData=read.xlsx(file,sheetIndex=1)
+            #added
+            names(observedData)=c("Date","Time","Quality","W","Q")
+            observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
         }else{return(NULL)}
     }
         observedData$Time=as.character(observedData$Time)
