@@ -64,9 +64,12 @@ gbplm <- function(formula,data,c=NULL,w_limits=,country="Iceland"){
     LH=t(chol(H))/0.8
 
     #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
-    if(!is.null(W_limits)){
+    if(is.null(W_limits)){
         Wmax=ceiling(max(RC$w)*10)/10
         Wmin=ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
+    }else{
+        Wmin=W_limits[1]
+        Wmax=W_limits[2]
     }
     WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
     RC$W_u=WFill$W_u
@@ -92,7 +95,7 @@ gbplm <- function(formula,data,c=NULL,w_limits=,country="Iceland"){
 
         for(j in 1:Nit){
             t_new=t_old+solve(t(LH),rnorm(9,0,1))
-            Densnew<-Densevalm22(t_new,RC)
+            Densnew <- density_fun(t_new,RC)
             x_new=Densnew$x
             ypo_new=Densnew$ypo
             p_new=Densnew$p
@@ -117,6 +120,7 @@ gbplm <- function(formula,data,c=NULL,w_limits=,country="Iceland"){
 
         return(output)
     }
+    #TODO: create S3 object to store results from MCMC chain
     stopCluster(cl)
     MCMC[is.na(MCMC)]=-1000
     betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
@@ -257,8 +261,6 @@ density_evaluation_unknown_c <- function(th,RC){
     yp=(X %*% x)[1:RC$N,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$N))*sqrt(varr)
-    #scale=10^7
-    #x_post <- RC$mu_x +t(W)%*%w + t(chol(scale*Sig_x-t(W) %*% W)/sqrt(scale))*rnorm(RC$n+2)
 
     #D=-2*sum(log(dlnorm(exp(RC$y[1:RC$N,]),yp,sqrt(varr))))#45.04
 
