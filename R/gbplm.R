@@ -188,7 +188,7 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     
     print.gbplm <- function(x,...){
       cat("\nCall:\n",
-              paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = ""))
+              paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
     }
     
     
