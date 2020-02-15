@@ -33,7 +33,10 @@ clean <- function(file,advanced=TRUE,includedates=c(1950,as.numeric(format(Sys.D
             observedData=observedData[,c(2,3,5,7,4)]
             names(observedData)=c("Date","Time","Quality","W","Q")
             observedData$Date=as.Date(gsub("\\.","-",observedData$Date),"%d-%m-%Y")
-        }else if(type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"){
+            #else if(type=="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            #TODO skoða hvernig read_excel breytti clean fallinu
+            #Notum readxl pakkann
+        }else if(type=="list"){
             observedData=read.xlsx(datapath,sheetIndex=1)
             names(observedData)=c("Date","Time","Quality","W","Q")
 
