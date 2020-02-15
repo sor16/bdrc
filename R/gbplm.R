@@ -17,6 +17,7 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     suppressPackageStartupMessages(require(doParallel))
     #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
     model_dat <- data[,all.vars(formula)]
+    RC$formula = formula
     RC=priors(country)
     RC$nugget=10^-8
     RC$mu_sb=0.5
@@ -181,7 +182,17 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     plotTable=exp(plotTable)
     names(plotTable)=c("Lower","Fit","Upper")
     plotTable$W=xout
-
+    
+    
+    #S3 object gbplm Test
+    
+    print.gbplm <- function(x,...){
+      cat("\nCall:\n",
+              paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = ""))
+    }
+    
+    
+    
     return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
                 "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
 }
