@@ -122,18 +122,21 @@ gbplm <- function(formula,data,c=NULL,w_limits=,country="Iceland"){
     }
     #TODO: create S3 object to store results from MCMC chain
     stopCluster(cl)
+    #why don't we remove na values?
     MCMC[is.na(MCMC)]=-1000
-    betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
-    yposamples=MCMC[1:(RC$N+length(RC$W_u)),]
-    completePrediction=as.data.frame(t(apply(yposamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    rating_curve=as.data.frame(t(apply(MCMC[1:(RC$N+length(RC$W_u)),],1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(completePrediction)=c("lower","fit","upper")
+    betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
+    betaData=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(betaData)=c("lower","fit","upper")
+    W=c(RC$O,RC$W_u)
     completePrediction$W=c(RC$w,RC$W_u)
     completePrediction$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
     observedPrediction=completePrediction[1:RC$N,]
     completePrediction=completePrediction[with(completePrediction,order(W)),]
-    betaData=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(betaData)=c("lower","fit","upper")
-    betaData$W=c(RC$O,RC$W_u)
+
+
+    W=c(RC$O,RC$W_u)
     betaData=betaData[with(betaData,order(W)),]
     observedPrediction$Q=RC$y[1:RC$N,]
     observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
