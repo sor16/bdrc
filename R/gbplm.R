@@ -3,7 +3,7 @@
 #' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
 #'@param data data.frame containing the columns in formula
-#'@param W_limits vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
+#'@param W_limits vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c_param) and maximum stage value in data as upper bound.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
 #'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
 #'automatically be set to c_hat.
@@ -13,7 +13,7 @@
 #'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
-gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
+gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data))){
     suppressPackageStartupMessages(require(doParallel))
     #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
     model_dat <- data[,all.vars(formula)]
@@ -41,17 +41,15 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     RC$P=diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
     RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
     RC$epsilon=rep(1,RC$N)
-    forceIndex=which('forcepoint'== observedData$Quality)
-    forcepoint=model_dat[forceIndex,]
-    if(any('forcepoint'== observedData$Quality)){
-        RC$epsilon[forceIndex]=1/RC$N
-    }
+    #Spyrja Bigga út í varíans hér
+    forcepoint=model_dat[forcepoint,]
+    RC$epsilon[forcepoint]=1/RC$N
 
     RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
     RC$m1=matrix(0,nrow=2,ncol=RC$n)
     RC$m2=matrix(0,nrow=RC$n,ncol=2)
-    if(!is.null(c)){
-        RC$c=c
+    RC$c=c_param
+    if(!is.null(RC$c)){
         density_fun=density_evaluation_known_c
     }else{
         density_fun=density_evaluation_unknown_c
@@ -107,8 +105,6 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
                 p_old=p_new
                 ypo_old=ypo_new
                 x_old=x_new
-
-
             }
             ypo_obs[,j]=ypo_old
             param[,j]=rbind(t_old,x_old)
@@ -116,8 +112,10 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
         seq=seq(burnin,Nit,thin)
         ypo_obs=ypo_obs[,seq]
         param=param[,seq]
+        #predict_u should return beta_u and ypo_u
         unobserved=apply(param,2,FUN=function(x) predict_u(x,RC))
         output=rbind(ypo_obs,unobserved)
+        #output=rbind(ypo_obs,ypo_u,x (which is log(a),b,beta),beta_u,theta)
 
         return(output)
     }
@@ -127,9 +125,12 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     MCMC[is.na(MCMC)]=-1000
     rating_curve=as.data.frame(t(apply(MCMC[1:(RC$N+length(RC$W_u)),],1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(completePrediction)=c("lower","fit","upper")
+    #TODO change with new design
+    #betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):(nrow(MCMC)-length(t_m),],2,FUN=function(x){x[2]+x[3:length(x)]})
     betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
-    betaData=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    beta_data=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(betaData)=c("lower","fit","upper")
+    #theta_data=data.frame(t(apply(MCMC[(2*RC$N+2*length(RC$W_u)+1):nrow(MCMC),],2,quantile,probs = c(0.025,0.5, 0.975),na.rm=T)))
     W=c(RC$O,RC$W_u)
     completePrediction$W=c(RC$w,RC$W_u)
     completePrediction$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
@@ -185,17 +186,17 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     plotTable=exp(plotTable)
     names(plotTable)=c("Lower","Fit","Upper")
     plotTable$W=xout
-    
-    
+
+
     #S3 object gbplm Test
-    
+
     print.gbplm <- function(x,...){
       cat("\nCall:\n",
               paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
     }
-    
-    
-    
+
+
+
     return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
                 "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
 }
