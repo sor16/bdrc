@@ -50,9 +50,11 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
     RC$m2=matrix(0,nrow=RC$n,ncol=2)
     RC$c=c_param
     if(!is.null(RC$c)){
-        density_fun=density_evaluation_known_c
+        density_fun <- density_evaluation_known_c
+        unobserved_prediction_fun <- predict_u_known_c
     }else{
-        density_fun=density_evaluation_unknown_c
+        density_fun <- density_evaluation_unknown_c
+        unobserved_prediction_fun <- predict_u_unknown_c
     }
     #determine proposal density
     theta_init=rep(0,9)
@@ -83,7 +85,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
     thin=5
     cl <- makeCluster(4)
     registerDoParallel(cl)
-    MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","predict_u")) %dopar% {
+    MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
         ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
         param=matrix(0,nrow=length(t_m)+RC$n+2,ncol=Nit)
         t_old=as.matrix(t_m)
@@ -93,7 +95,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
         x_old=Dens$x
 
         for(j in 1:Nit){
-            t_new=t_old+solve(t(LH),rnorm(9,0,1))
+            t_new=t_old+solve(t(LH),rnorm(length(t_m),0,1))
             Densnew <- density_fun(t_new,RC)
             x_new=Densnew$x
             ypo_new=Densnew$ypo
@@ -112,93 +114,67 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
         seq=seq(burnin,Nit,thin)
         ypo_obs=ypo_obs[,seq]
         param=param[,seq]
-        #predict_u should return beta_u and ypo_u
-        unobserved=apply(param,2,FUN=function(x) predict_u(x,RC))
-        output=rbind(ypo_obs,unobserved)
-        #output=rbind(ypo_obs,ypo_u,x (which is log(a),b,beta),beta_u,theta)
+        unobserved=apply(param,2,FUN=function(x) unobserved_prediction_fun(x,RC))
+        output=rbind(param,unobserved[1:RC$n,],ypo_obs,unobserved[(RC$n+1):nrow(unobserved),])
+        output=list('theta'=param[1:length(t_m),],'a'=exp(param[length(t_m)+1,]),
+                    'b'=param[length(t_m)+2,],'beta'=rbind(param[(length(t_m)+3):nrow(param)],unobserved[1:length(RC$W_u),]),
+                    'ypo'=exp(rbind(ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])))
+        if(!is.null(RC$c)){
+          output$theta[1,] <- min(RC$O)-exp(output$theta[1,])
+          output$theta[2,] <- exp(output$theta[2,])
+          output$theta[3,] <- exp(output$theta[3,])
+        }else{
+          output$theta[1,] <- exp(output$theta[1,])
+          output$theta[2,] <- exp(output$theta[2,])
+        }
 
         return(output)
     }
     #TODO: create S3 object to store results from MCMC chain
     stopCluster(cl)
-    #why don't we remove na values?
-    MCMC[is.na(MCMC)]=-1000
-    rating_curve=as.data.frame(t(apply(MCMC[1:(RC$N+length(RC$W_u)),],1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(completePrediction)=c("lower","fit","upper")
-    #TODO change with new design
-    #betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):(nrow(MCMC)-length(t_m),],2,FUN=function(x){x[2]+x[3:length(x)]})
-    betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
-    beta_data=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(betaData)=c("lower","fit","upper")
-    #theta_data=data.frame(t(apply(MCMC[(2*RC$N+2*length(RC$W_u)+1):nrow(MCMC),],2,quantile,probs = c(0.025,0.5, 0.975),na.rm=T)))
+    rating_curve <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(rating_curve) <- c('lower','median','upper')
+    param_summary <- as.data.frame(t(apply(rbind(MCMC$a,MCMC$b,MCMC$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(param_summary) <- c('lower','median','upper')
+    beta_summary <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    names(beta_summary) <- c('lower','median','upper')
     W=c(RC$O,RC$W_u)
-    completePrediction$W=c(RC$w,RC$W_u)
-    completePrediction$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
-    observedPrediction=completePrediction[1:RC$N,]
-    completePrediction=completePrediction[with(completePrediction,order(W)),]
-
-
-    W=c(RC$O,RC$W_u)
-    betaData=betaData[with(betaData,order(W)),]
-    observedPrediction$Q=RC$y[1:RC$N,]
-    observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
-    observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
-    observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
-    observedPrediction$standardResiduals=(observedPrediction$Q-observedPrediction$fit)/sqrt(varr_m)
-
-    TableOfData=observedData
-    TableOfData$Q=round(TableOfData$Q,1)
-    TableOfData$Qfit=round(exp(observedPrediction$fit),3)
-    TableOfData$lower=round(exp(observedPrediction$lower),3)
-    TableOfData$upper=round(exp(observedPrediction$upper),3)
-    TableOfData$diffQ=TableOfData$Q-TableOfData$Qfit
-    TableOfData$Qpercentage=round(100*TableOfData$diffQ/TableOfData$Q,1)
-    names(TableOfData)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff","Q%")
-    TableOfData=TableOfData[with(TableOfData,order(Date)),]
-
-    xout=seq(Wmin,-0.01+Wmax,by=0.01)
-
-    fitInterpolation=approx(completePrediction$W,completePrediction$fit,xout=xout)
-    FitTable=t(as.data.frame(split(x=fitInterpolation$y, f=ceiling(seq_along(fitInterpolation$y)/10))))
-    colnames(FitTable)=0:9
-    FitTable=round(exp(FitTable),3)
-    Stage=seq(min(fitInterpolation$x),max(fitInterpolation$x),by=0.1)*100
-    FitTable=as.data.frame(cbind(Stage,FitTable))
-    names(FitTable)[1]="Stage (cm)"
-
-    lowerInterpolation=approx(completePrediction$W,completePrediction$lower,xout=xout)
-    LowerTable=t(as.data.frame(split(x=lowerInterpolation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
-    colnames(LowerTable)=0:9
-    LowerTable=round(exp(LowerTable),3)
-    Stage=seq(min(lowerInterpolation$x),max(lowerInterpolation$x),by=0.1)*100
-    LowerTable=as.data.frame(cbind(Stage,LowerTable))
-    names(LowerTable)[1]="Stage (cm)"
-
-    upperInterpolation=approx(completePrediction$W,completePrediction$upper,xout=xout)
-    UpperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
-    colnames(UpperTable)=0:9
-    UpperTable=round(exp(UpperTable),3)
-    Stage=seq(min(upperInterpolation$x),max(upperInterpolation$x),by=0.1)*100
-    UpperTable=as.data.frame(cbind(Stage,UpperTable))
-    names(UpperTable)[1]="Stage (cm)"
-
-    plotTable=as.data.frame(cbind(lowerInterpolation$y,fitInterpolation$y,upperInterpolation$y))
-    plotTable=exp(plotTable)
-    names(plotTable)=c("Lower","Fit","Upper")
-    plotTable$W=xout
-
+    param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
+    if(is.null(RC$c)){
+      param_names <- c('c',param_names)
+    }
+    param_summary <- cbind(data.frame(parameter=param_names),param_summary)
+    rating_curve <- rating_curve[order(W),]
+    beta_summary <- beta_summary[order(W),]
 
     #S3 object gbplm Test
+    result_obj=list()
+    result_obj$formula <- formula
+    result_obj$data <- data
+    result_obj$W_full <- W
+    result_obj$post_a = MCMC$a
+    result_obj$post_b = MCMC$b
+    if(!is.null(RC$c)){
+      result_obj$post_c <- MCMC$theta[1,]
+      result_obj$post_var_beta <- MCMC$theta[2,]
+      result_obj$post_phi_beta <- MCMC$theta[3,]
+    }else{
+      result_obj$post_c <- NULL
+      result_obj$post_var_beta <- MCMC$theta[2,]
+      result_obj$post_phi_beta <- MCMC$theta[3,]
+    }
+    result_obj$param_summary <- param_summary
+    result_obj$beta <- beta_summary
+    result_obj$rating_curve <- rating_curve
 
+
+    attr(result_obj, "class") <- "gbplm"
     print.gbplm <- function(x,...){
       cat("\nCall:\n",
               paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
     }
 
-
-
-    return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
-                "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
+    return()
 }
 
 #'Density evaluation for model2
@@ -281,5 +257,107 @@ density_evaluation_unknown_c <- function(th,RC){
 
     return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
 }
+
+#' Predictive values for unoberved stages
+#'
+#'Calculates predictive values for unobserved stages
+#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
+#'and six lambda parameters that affect the variance through the Bspline functions.
+#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
+#'
+#'@return
+#'\itemize{
+#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
+#'}
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+predict_u_known_c <- function(param,RC){
+  #collecting parameters from the MCMC sample
+  th=param[1:8]
+  x=param[9:length(param)]
+  sig_b2=exp(th[1])
+  phi_b=exp(th[2])
+  lambda = th[3:length(th)]
+  #calculate spline variance from B_splines
+  varr = c(exp(RC$Bsim %*% lambda))
+  m=length(RC$W_u)
+  n=RC$n
+  #combine stages from data with unobserved stages
+  W_all=c(RC$O,RC$W_u)
+  #calculating distance matrix for W_all
+  dist=abs(outer(W_all,W_all,FUN="-"))
+  #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+  #Matern covariance formula used for v=5/2
+  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+  sigma_11=sigma_all[1:n,1:n]
+  sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
+  sigma_12=sigma_all[1:n,(n+1):(n+m)]
+  sigma_21=sigma_all[(n+1):(n+m),1:n]
+  #parameters for the posterior of beta_u
+  mu_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
+  Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  #a sample from posterior of beta_u drawn
+  beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+  #buidling blocks of the explanatory matrix X calculated
+  l=log(RC$W_u-RC$c)
+  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  #vector of parameters
+  x_extended=c(x,beta_u)
+  #sample from the posterior of discharge y
+  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
+  return(c(beta_u,ypo_extended[(RC$n+1):length(ypo_extended)]))
+}
+
+#' Predictive values for unoberved stages
+#'
+#'Calculates predictive values for unobserved stages
+#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
+#'and six lambda parameters that affect the variance through the Bspline functions.
+#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
+#'
+#'@return
+#'\itemize{
+#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
+#'}
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+predict_u_unknown_c <- function(param,RC){
+  #collecting parameters from the MCMC sample
+  th=param[1:9]
+  x=param[10:length(param)]
+  zeta=th[1]
+  phi_b=exp(th[3])
+  sig_b2=exp(th[2])
+  lambda = th[4:9]
+  #calculate spline variance from B_splines
+  varr = c(exp(RC$Bsim %*% lambda))
+  m=length(RC$W_u)
+  n=RC$n
+  #combine stages from data with unobserved stages
+  W_all=c(RC$O,RC$W_u)
+  #calculating distance matrix for W_all
+  dist=abs(outer(W_all,W_all,FUN="-"))
+  #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+  #Matern covariance formula used for v=5/2
+  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+  sigma_11=sigma_all[1:n,1:n]
+  sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
+  sigma_12=sigma_all[1:n,(n+1):(n+m)]
+  sigma_21=sigma_all[(n+1):(n+m),1:n]
+  #parameters for the posterior of beta_u
+  mu_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
+  Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  #a sample from posterior of beta_u drawn
+  beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+  #buidling blocks of the explanatory matrix X calculated
+  c=min(RC$O)-exp(zeta)
+  l=log(RC$W_u-c)
+  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  #vector of parameters
+  x_extended=c(x,beta_u)
+  #sample from the posterior of discharge y
+  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
+  return(c(beta_u,ypo_extended[(n+1):length(ypo_extended)]))
+}
+
+
 
 
