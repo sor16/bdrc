@@ -189,15 +189,52 @@ gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
     
     #S3 object gbplm Test
     
-    print.gbplm <- function(x,...){
-      cat("\nCall:\n",
-              paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
-    }
+  
+    
+    
     
     
     
     return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
                 "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
+}
+
+print.gbplm <- function(x,...){
+  cat("\nCall:\n",
+      paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
+}
+
+
+summary.gbplm <- function(x,...){
+  cat("\nFormula: \n",
+      paste(deparse(x$formula), sep = "\n", collapse = "\n"),
+      "\nParameters:\n", 
+      paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
+      "\na:", 
+      paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
+      "\nb:", 
+      paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
+      "\n\n", sep = "")
+  
+  
+  if(!is.null(RC$c)){
+    cat("\n c:",
+    paste(deparse(x$post_c), sep = "\n", collapse = "\n"),
+    "\nPosterior beta:", 
+    paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
+    "\nPosterior phi:", 
+    paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
+    "\n\n", sep = "")
+    
+  } else{
+    cat("\nPosterior beta:", 
+    paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
+    "\nPosterior phi:", 
+    paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
+    "\n\n", sep = "")
+    }
+
+
 }
 
 #'Density evaluation for model2
