@@ -131,7 +131,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
            'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$W_u)),],
            'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$W_u)+1):nrow(MCMC_output_mat),]))
   stopCluster(cl)
-  rating_curve <- as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  rating_curve <- as.data.frame(exp(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))))
   names(rating_curve) <- c('lower','median','upper')
   param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(param_summary) <- c('lower','median','upper')
