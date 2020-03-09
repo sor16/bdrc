@@ -86,20 +86,22 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   cl <- makeCluster(4)
   registerDoParallel(cl)
   MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
-    ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
-    param=matrix(0,nrow=length(t_m)+RC$n+2,ncol=Nit)
+    output=matrix(0,nrow=length(t_m)+RC$n+2+length(RC$W_u)+RC$n+length(RC$W_u),ncol=Nit)
     t_old=as.matrix(t_m)
     Dens<-density_fun(t_old,RC)
     p_old=Dens$p
     ypo_old=Dens$ypo
     x_old=Dens$x
+    unobserved_old=unobserved_prediction_fun(c(t_old,x_old),RC)
     print(i)
     for(j in 1:Nit){
+      print(j)
       t_new=t_old+solve(t(LH),rnorm(length(t_m),0,1))
       Densnew <- density_fun(t_new,RC)
       x_new=Densnew$x
       ypo_new=Densnew$ypo
       p_new=Densnew$p
+      unobserved_new=unobserved_prediction_fun(c(t_old,x_old),RC)
       logR=p_new-p_old
 
       if (logR>log(runif(1))){
@@ -107,15 +109,14 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
         p_old=p_new
         ypo_old=ypo_new
         x_old=x_new
+        unobserved_old=unobserved_new
       }
-      ypo_obs[,j]=ypo_old
-      param[,j]=rbind(t_old,x_old)
+      output[,j]=rbind(t_old,x_old,unobserved_old[1:length(RC$W_u)],ypo_old,unobserved_old[(length(RC$W_u)+1):length(unobserved_old)])
     }
     seq=seq(burnin,Nit,thin)
     ypo_obs=ypo_obs[,seq]
     param=param[,seq]
-    unobserved=apply(param,2,FUN=function(x) unobserved_prediction_fun(x,RC))
-    output=rbind(param,unobserved[1:RC$n,],ypo_obs,unobserved[(RC$n+1):nrow(unobserved),])
+    output=rbind(param,unobserved[1:length(RC$W_u)],ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])
     output=list('theta'=param[1:length(t_m),],'a'=exp(param[length(t_m)+1,]),
                 'b'=param[length(t_m)+2,],'beta'=rbind(param[(length(t_m)+3):nrow(param)],unobserved[1:length(RC$W_u),]),
                 'ypo'=exp(rbind(ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])))
@@ -381,12 +382,12 @@ predict_u_unknown_c <- function(param,RC){
   #buidling blocks of the explanatory matrix X calculated
   c=min(RC$O)-exp(zeta)
   l=log(RC$W_u-c)
-  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  X=cbind(rep(1,m),l,diag(l))
   #vector of parameters
-  x_extended=c(x,beta_u)
+  x_extended=c(x[1],x[2],beta_u)
   #sample from the posterior of discharge y
   ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
-  return(c(beta_u,ypo_extended[(n+1):length(ypo_extended)]))
+  return(as.matrix(c(beta_u,ypo_extended)))
 }
 
 
