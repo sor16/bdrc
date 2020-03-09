@@ -13,190 +13,161 @@
 #'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
-gbplm <- function(formula,data,c=NULL,W_limits=c(0,0),country="Iceland"){
-    suppressPackageStartupMessages(require(doParallel))
-    #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
-    model_dat <- data[,all.vars(formula)]
-    RC$formula = formula
-    RC=priors(country)
-    RC$nugget=10^-8
-    RC$mu_sb=0.5
-    RC$mu_pb=0.5
-    RC$tau_pb2=0.25^2
-    RC$s=3
-    RC$v=5
-    RC$y=rbind(as.matrix(log(model_dat[,1])),0)
-    RC$w=as.matrix(model_dat[,2])
-    RC$w_tild=RC$w-min(RC$w)
-    Adist1 <- Adist(RC$w)
-    RC$A=Adist1$A
-    RC$dist=Adist1$dist
-    RC$n=Adist1$n
-    RC$N=Adist1$N
-    RC$O=Adist1$O
+gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data))){
+  suppressPackageStartupMessages(require(doParallel))
+  #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
+  model_dat <- data[,all.vars(formula)]
+  RC$formula = formula
+  RC=priors(country)
+  RC$nugget=10^-8
+  RC$mu_sb=0.5
+  RC$mu_pb=0.5
+  RC$tau_pb2=0.25^2
+  RC$s=3
+  RC$v=5
+  RC$y=rbind(as.matrix(log(model_dat[,1])),0)
+  RC$w=as.matrix(model_dat[,2])
+  RC$w_tild=RC$w-min(RC$w)
+  Adist1 <- Adist(RC$w)
+  RC$A=Adist1$A
+  RC$dist=Adist1$dist
+  RC$n=Adist1$n
+  RC$N=Adist1$N
+  RC$O=Adist1$O
 
-    RC$Sig_ab= rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
-    RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
+  RC$Sig_ab= rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
+  RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
 
-    RC$P=diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
-    RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
-    RC$epsilon=rep(1,RC$N)
-    forceIndex=which('forcepoint'== observedData$Quality)
-    forcepoint=model_dat[forceIndex,]
-    if(any('forcepoint'== observedData$Quality)){
-        RC$epsilon[forceIndex]=1/RC$N
+  RC$P=diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
+  RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
+  RC$epsilon=rep(1,RC$N)
+  #Spyrja Bigga út í varíans hér
+  forcepoint=model_dat[forcepoint,]
+  RC$epsilon[forcepoint]=1/RC$N
+
+  RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
+  RC$m1=matrix(0,nrow=2,ncol=RC$n)
+  RC$m2=matrix(0,nrow=RC$n,ncol=2)
+  RC$c=c_param
+  if(!is.null(RC$c)){
+    density_fun <- density_evaluation_known_c
+    unobserved_prediction_fun <- predict_u_known_c
+  }else{
+    density_fun <- density_evaluation_unknown_c
+    unobserved_prediction_fun <- predict_u_unknown_c
+  }
+  #determine proposal density
+  theta_init=rep(0,9)
+  loss_fun = function(th) {-density_fun(th,RC)$p}
+  optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+  t_m =optim_obj$par
+  H=optim_obj$hessian
+  LH=t(chol(H))/0.8
+
+  #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
+  if(is.null(W_limits)){
+    Wmax=ceiling(max(RC$w)*10)/10
+    Wmin=ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
+  }else{
+    Wmin=W_limits[1]
+    Wmax=W_limits[2]
+  }
+  WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
+  RC$W_u=WFill$W_u
+  RC$W_u_tild=WFill$W_u_tild
+  Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
+  Bsiminput[is.na(Bsiminput)]=0
+  RC$Bsim=B_splines(Bsiminput)
+
+  #MCMC parameters added, number of iterations,burnin and thin
+  Nit=20000
+  burnin=2000
+  thin=5
+  cl <- makeCluster(4)
+  registerDoParallel(cl)
+  MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
+    ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
+    param=matrix(0,nrow=length(t_m)+RC$n+2,ncol=Nit)
+    t_old=as.matrix(t_m)
+    Dens<-density_fun(t_old,RC)
+    p_old=Dens$p
+    ypo_old=Dens$ypo
+    x_old=Dens$x
+
+    for(j in 1:Nit){
+      t_new=t_old+solve(t(LH),rnorm(length(t_m),0,1))
+      Densnew <- density_fun(t_new,RC)
+      x_new=Densnew$x
+      ypo_new=Densnew$ypo
+      p_new=Densnew$p
+      logR=p_new-p_old
+
+      if (logR>log(runif(1))){
+        t_old=t_new
+        p_old=p_new
+        ypo_old=ypo_new
+        x_old=x_new
+      }
+      ypo_obs[,j]=ypo_old
+      param[,j]=rbind(t_old,x_old)
     }
-
-    RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
-    RC$m1=matrix(0,nrow=2,ncol=RC$n)
-    RC$m2=matrix(0,nrow=RC$n,ncol=2)
-    if(!is.null(c)){
-        RC$c=c
-        density_fun=density_evaluation_known_c
+    seq=seq(burnin,Nit,thin)
+    ypo_obs=ypo_obs[,seq]
+    param=param[,seq]
+    unobserved=apply(param,2,FUN=function(x) unobserved_prediction_fun(x,RC))
+    output=rbind(param,unobserved[1:RC$n,],ypo_obs,unobserved[(RC$n+1):nrow(unobserved),])
+    output=list('theta'=param[1:length(t_m),],'a'=exp(param[length(t_m)+1,]),
+                'b'=param[length(t_m)+2,],'beta'=rbind(param[(length(t_m)+3):nrow(param)],unobserved[1:length(RC$W_u),]),
+                'ypo'=exp(rbind(ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])))
+    if(!is.null(RC$c)){
+      output$theta[1,] <- min(RC$O)-exp(output$theta[1,])
+      output$theta[2,] <- exp(output$theta[2,])
+      output$theta[3,] <- exp(output$theta[3,])
     }else{
-        density_fun=density_evaluation_unknown_c
+      output$theta[1,] <- exp(output$theta[1,])
+      output$theta[2,] <- exp(output$theta[2,])
     }
-    #determine proposal density
-    theta_init=rep(0,9)
-    loss_fun = function(th) {-density_fun(th,RC)$p}
-    optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
-    t_m =optim_obj$par
-    H=optim_obj$hessian
-    LH=t(chol(H))/0.8
 
-    #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
-    if(is.null(W_limits)){
-        Wmax=ceiling(max(RC$w)*10)/10
-        Wmin=ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
-    }else{
-        Wmin=W_limits[1]
-        Wmax=W_limits[2]
-    }
-    WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
-    RC$W_u=WFill$W_u
-    RC$W_u_tild=WFill$W_u_tild
-    Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
-    Bsiminput[is.na(Bsiminput)]=0
-    RC$Bsim=B_splines(Bsiminput)
+    return(output)
+  }
+  #TODO: create S3 object to store results from MCMC chain
+  stopCluster(cl)
+  rating_curve <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  names(rating_curve) <- c('lower','median','upper')
+  param_summary <- as.data.frame(t(apply(rbind(MCMC$a,MCMC$b,MCMC$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  names(param_summary) <- c('lower','median','upper')
+  beta_summary <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  names(beta_summary) <- c('lower','median','upper')
+  W=c(RC$O,RC$W_u)
+  param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
+  if(is.null(RC$c)){
+    param_names <- c('c',param_names)
+  }
+  param_summary <- cbind(data.frame(parameter=param_names),param_summary)
+  rating_curve <- rating_curve[order(W),]
+  beta_summary <- beta_summary[order(W),]
 
-    #MCMC parameters added, number of iterations,burnin and thin
-    Nit=20000
-    burnin=2000
-    thin=5
-    cl <- makeCluster(4)
-    registerDoParallel(cl)
-    MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","predict_u")) %dopar% {
-        ypo_obs=matrix(0,nrow=RC$N,ncol=Nit)
-        param=matrix(0,nrow=length(t_m)+RC$n+2,ncol=Nit)
-        t_old=as.matrix(t_m)
-        Dens<-density_fun(t_old,RC)
-        p_old=Dens$p
-        ypo_old=Dens$ypo
-        x_old=Dens$x
+  #S3 object gbplm Test
+  result_obj=list()
+  result_obj$formula <- formula
+  result_obj$data <- data
+  result_obj$W_full <- W
+  result_obj$post_a = MCMC$a
+  result_obj$post_b = MCMC$b
+  if(!is.null(RC$c)){
+    result_obj$post_c <- MCMC$theta[1,]
+    result_obj$post_var_beta <- MCMC$theta[2,]
+    result_obj$post_phi_beta <- MCMC$theta[3,]
+  }else{
+    result_obj$post_c <- NULL
+    result_obj$post_var_beta <- MCMC$theta[2,]
+    result_obj$post_phi_beta <- MCMC$theta[3,]
+  }
+  result_obj$param_summary <- param_summary
+  result_obj$beta <- beta_summary
+  result_obj$rating_curve <- rating_curve
 
-        for(j in 1:Nit){
-            t_new=t_old+solve(t(LH),rnorm(9,0,1))
-            Densnew <- density_fun(t_new,RC)
-            x_new=Densnew$x
-            ypo_new=Densnew$ypo
-            p_new=Densnew$p
-            logR=p_new-p_old
-
-            if (logR>log(runif(1))){
-                t_old=t_new
-                p_old=p_new
-                ypo_old=ypo_new
-                x_old=x_new
-
-
-            }
-            ypo_obs[,j]=ypo_old
-            param[,j]=rbind(t_old,x_old)
-        }
-        seq=seq(burnin,Nit,thin)
-        ypo_obs=ypo_obs[,seq]
-        param=param[,seq]
-        unobserved=apply(param,2,FUN=function(x) predict_u(x,RC))
-        output=rbind(ypo_obs,unobserved)
-
-        return(output)
-    }
-    #TODO: create S3 object to store results from MCMC chain
-    stopCluster(cl)
-    #why don't we remove na values?
-    MCMC[is.na(MCMC)]=-1000
-    rating_curve=as.data.frame(t(apply(MCMC[1:(RC$N+length(RC$W_u)),],1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(completePrediction)=c("lower","fit","upper")
-    betasamples=apply(MCMC[(RC$N+length(RC$W_u)+1):nrow(MCMC),],2,FUN=function(x){x[2]+x[3:length(x)]})
-    betaData=as.data.frame(t(apply(betasamples,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(betaData)=c("lower","fit","upper")
-    W=c(RC$O,RC$W_u)
-    completePrediction$W=c(RC$w,RC$W_u)
-    completePrediction$l_m=c(l,log(RC$W_u-min(RC$O)+exp(t_m[1])))
-    observedPrediction=completePrediction[1:RC$N,]
-    completePrediction=completePrediction[with(completePrediction,order(W)),]
-
-
-    W=c(RC$O,RC$W_u)
-    betaData=betaData[with(betaData,order(W)),]
-    observedPrediction$Q=RC$y[1:RC$N,]
-    observedPrediction$residuals=(exp(observedPrediction$Q)-exp(observedPrediction$fit))
-    observedPrediction$residupper=exp(observedPrediction$upper)-exp(observedPrediction$fit)
-    observedPrediction$residlower=exp(observedPrediction$lower)-exp(observedPrediction$fit)
-    observedPrediction$standardResiduals=(observedPrediction$Q-observedPrediction$fit)/sqrt(varr_m)
-
-    TableOfData=observedData
-    TableOfData$Q=round(TableOfData$Q,1)
-    TableOfData$Qfit=round(exp(observedPrediction$fit),3)
-    TableOfData$lower=round(exp(observedPrediction$lower),3)
-    TableOfData$upper=round(exp(observedPrediction$upper),3)
-    TableOfData$diffQ=TableOfData$Q-TableOfData$Qfit
-    TableOfData$Qpercentage=round(100*TableOfData$diffQ/TableOfData$Q,1)
-    names(TableOfData)=c("Date","Time","Quality","W","Q", "Q fit","Lower", "Upper","Q diff","Q%")
-    TableOfData=TableOfData[with(TableOfData,order(Date)),]
-
-    xout=seq(Wmin,-0.01+Wmax,by=0.01)
-
-    fitInterpolation=approx(completePrediction$W,completePrediction$fit,xout=xout)
-    FitTable=t(as.data.frame(split(x=fitInterpolation$y, f=ceiling(seq_along(fitInterpolation$y)/10))))
-    colnames(FitTable)=0:9
-    FitTable=round(exp(FitTable),3)
-    Stage=seq(min(fitInterpolation$x),max(fitInterpolation$x),by=0.1)*100
-    FitTable=as.data.frame(cbind(Stage,FitTable))
-    names(FitTable)[1]="Stage (cm)"
-
-    lowerInterpolation=approx(completePrediction$W,completePrediction$lower,xout=xout)
-    LowerTable=t(as.data.frame(split(x=lowerInterpolation$y, f=ceiling(seq_along(lowerInterpolation$y)/10))))
-    colnames(LowerTable)=0:9
-    LowerTable=round(exp(LowerTable),3)
-    Stage=seq(min(lowerInterpolation$x),max(lowerInterpolation$x),by=0.1)*100
-    LowerTable=as.data.frame(cbind(Stage,LowerTable))
-    names(LowerTable)[1]="Stage (cm)"
-
-    upperInterpolation=approx(completePrediction$W,completePrediction$upper,xout=xout)
-    UpperTable=t(as.data.frame(split(x=upperInterpolation$y, f=ceiling(seq_along(upperInterpolation$y)/10))))
-    colnames(UpperTable)=0:9
-    UpperTable=round(exp(UpperTable),3)
-    Stage=seq(min(upperInterpolation$x),max(upperInterpolation$x),by=0.1)*100
-    UpperTable=as.data.frame(cbind(Stage,UpperTable))
-    names(UpperTable)[1]="Stage (cm)"
-
-    plotTable=as.data.frame(cbind(lowerInterpolation$y,fitInterpolation$y,upperInterpolation$y))
-    plotTable=exp(plotTable)
-    names(plotTable)=c("Lower","Fit","Upper")
-    plotTable$W=xout
-    
-    
-    #S3 object gbplm Test
-    
-  
-    
-    
-    
-    
-    
-    return(list("observedData"=observedData,"betaData"=betaData,"completePrediction"=completePrediction,"observedPrediction"=observedPrediction,"TableOfData"=TableOfData,
-                "FitTable"=FitTable,"LowerTable"=LowerTable,"UpperTable"=UpperTable,"plotTable"=plotTable))
+  return(result_obj)
 }
 
 print.gbplm <- function(x,...){
@@ -208,28 +179,28 @@ print.gbplm <- function(x,...){
 summary.gbplm <- function(x,...){
   cat("\nFormula: \n",
       paste(deparse(x$formula), sep = "\n", collapse = "\n"),
-      "\nParameters:\n", 
+      "\nParameters:\n",
       paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-      "\na:", 
+      "\na:",
       paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-      "\nb:", 
+      "\nb:",
       paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
       "\n\n", sep = "")
-  
-  
+
+
   if(!is.null(RC$c)){
     cat("\n c:",
     paste(deparse(x$post_c), sep = "\n", collapse = "\n"),
-    "\nPosterior beta:", 
+    "\nPosterior beta:",
     paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-    "\nPosterior phi:", 
+    "\nPosterior phi:",
     paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
     "\n\n", sep = "")
-    
+
   } else{
-    cat("\nPosterior beta:", 
+    cat("\nPosterior beta:",
     paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-    "\nPosterior phi:", 
+    "\nPosterior phi:",
     paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
     "\n\n", sep = "")
     }
