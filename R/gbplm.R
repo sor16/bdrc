@@ -17,8 +17,8 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   suppressPackageStartupMessages(require(doParallel))
   #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   model_dat <- data[,all.vars(formula)]
-  RC$formula = formula
   RC=priors(country)
+  RC$formula = formula
   RC$nugget=10^-8
   RC$mu_sb=0.5
   RC$mu_pb=0.5
@@ -42,7 +42,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
   RC$epsilon=rep(1,RC$N)
   #Spyrja Bigga út í varíans hér
-  forcepoint=model_dat[forcepoint,]
+  forcepoint_dat=model_dat[forcepoint,]
   RC$epsilon[forcepoint]=1/RC$N
 
   RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
@@ -93,7 +93,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
     p_old=Dens$p
     ypo_old=Dens$ypo
     x_old=Dens$x
-
+    print(i)
     for(j in 1:Nit){
       t_new=t_old+solve(t(LH),rnorm(length(t_m),0,1))
       Densnew <- density_fun(t_new,RC)
@@ -216,35 +216,35 @@ summary.gbplm <- function(x,...){
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 density_evaluation_known_c <- function(th,RC){
-    phi_b=th[2]
-    sig_b2=th[1]
-    lambda=th[4:8]
+  phi_b=th[2]
+  sig_b2=th[1]
+  lambda=th[4:8]
 
-    f=lambda[1:5]-lambda[6]
-    l=log(RC$w-RC$c)
+  f=lambda[1:5]-lambda[6]
+  l=log(RC$w-RC$c)
 
-    varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    Sig_eps=diag(c(varr,0))
-    #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+  varr=c(RC$epsilon*exp(RC$B%*%lambda))
+  Sig_eps=diag(c(varr,0))
+  #Matern covariance
+  R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
 
-    X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)#1337 micro
-    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))#2521 micro
-    w=solve(L,RC$y-X%*%RC$mu_x)#754 micro
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-        sig_b2-exp(sig_b2)/RC$mu_sb-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
+  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)#1337 micro
+  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))#2521 micro
+  w=solve(L,RC$y-X%*%RC$mu_x)#754 micro
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
+    (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
+    sig_b2-exp(sig_b2)/RC$mu_sb-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
 
-    W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
-    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$N)),0)
-    x=as.matrix(x_u-t(W)%*%solve(L,sss))
-    yp=(X %*% x)[1:RC$N,]
-    #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$N))*sqrt(varr)
+  W=solve(L,X%*%Sig_x)
+  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$N)),0)
+  x=as.matrix(x_u-t(W)%*%solve(L,sss))
+  yp=(X %*% x)[1:RC$N,]
+  #posterior predictive draw
+  ypo=yp+as.matrix(rnorm(RC$N))*sqrt(varr)
 
-    return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
+  return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
 }
 
 #'Density evaluation for model2
@@ -255,38 +255,139 @@ density_evaluation_known_c <- function(th,RC){
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 density_evaluation_unknown_c <- function(th,RC){
-    phi_b=th[3]
-    sig_b2=th[2]
-    zeta=th[1]
-    lambda=th[4:9]
+  phi_b=th[3]
+  sig_b2=th[2]
+  zeta=th[1]
+  lambda=th[4:9]
 
-    f=lambda[1:5]-lambda[6]
-    l=c(log(RC$w_tild+exp(th[1])))
+  f=lambda[1:5]-lambda[6]
+  l=c(log(RC$w_tild+exp(th[1])))
 
-    varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    Sig_eps=diag(c(varr,0))
-    #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+  varr=c(RC$epsilon*exp(RC$B%*%lambda))
+  Sig_eps=diag(c(varr,0))
+  #Matern covariance
+  R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
 
-    X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)#1337 micro
-    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))#2521 micro
-    w=solve(L,RC$y-X%*%RC$mu_x)#754 micro
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-        sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
+  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)#1337 micro
+  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))#2521 micro
+  w=solve(L,RC$y-X%*%RC$mu_x)#754 micro
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
+    (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
+    sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
 
-    W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
-    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$N)),0)
-    x=as.matrix(x_u-t(W)%*%solve(L,sss))
-    yp=(X %*% x)[1:RC$N,]
-    #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$N))*sqrt(varr)
+  W=solve(L,X%*%Sig_x)
+  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$N)),0)
+  x=as.matrix(x_u-t(W)%*%solve(L,sss))
+  yp=(X %*% x)[1:RC$N,]
+  #posterior predictive draw
+  ypo=yp+as.matrix(rnorm(RC$N))*sqrt(varr)
 
-    #D=-2*sum(log(dlnorm(exp(RC$y[1:RC$N,]),yp,sqrt(varr))))#45.04
+  #D=-2*sum(log(dlnorm(exp(RC$y[1:RC$N,]),yp,sqrt(varr))))#45.04
 
-    return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
+  return(list("p"=p,"x"=x,"yp"=yp,"ypo"=ypo,"varr"=varr))
 }
+
+#' Predictive values for unoberved stages
+#'
+#'Calculates predictive values for unobserved stages
+#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
+#'and six lambda parameters that affect the variance through the Bspline functions.
+#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
+#'
+#'@return
+#'\itemize{
+#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
+#'}
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+predict_u_known_c <- function(param,RC){
+  #collecting parameters from the MCMC sample
+  th=param[1:8]
+  x=param[9:length(param)]
+  sig_b2=exp(th[1])
+  phi_b=exp(th[2])
+  lambda = th[3:length(th)]
+  #calculate spline variance from B_splines
+  varr = c(exp(RC$Bsim %*% lambda))
+  m=length(RC$W_u)
+  n=RC$n
+  #combine stages from data with unobserved stages
+  W_all=c(RC$O,RC$W_u)
+  #calculating distance matrix for W_all
+  dist=abs(outer(W_all,W_all,FUN="-"))
+  #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+  #Matern covariance formula used for v=5/2
+  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+  sigma_11=sigma_all[1:n,1:n]
+  sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
+  sigma_12=sigma_all[1:n,(n+1):(n+m)]
+  sigma_21=sigma_all[(n+1):(n+m),1:n]
+  #parameters for the posterior of beta_u
+  mu_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
+  Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  #a sample from posterior of beta_u drawn
+  beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+  #buidling blocks of the explanatory matrix X calculated
+  l=log(RC$W_u-RC$c)
+  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  #vector of parameters
+  x_extended=c(x,beta_u)
+  #sample from the posterior of discharge y
+  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
+  return(c(beta_u,ypo_extended[(RC$n+1):length(ypo_extended)]))
+}
+
+#' Predictive values for unoberved stages
+#'
+#'Calculates predictive values for unobserved stages
+#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
+#'and six lambda parameters that affect the variance through the Bspline functions.
+#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
+#'
+#'@return
+#'\itemize{
+#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
+#'}
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+predict_u_unknown_c <- function(param,RC){
+  #collecting parameters from the MCMC sample
+  th=param[1:9]
+  x=param[10:length(param)]
+  zeta=th[1]
+  phi_b=exp(th[3])
+  sig_b2=exp(th[2])
+  lambda = th[4:9]
+  #calculate spline variance from B_splines
+  varr = c(exp(RC$Bsim %*% lambda))
+  m=length(RC$W_u)
+  n=RC$n
+  #combine stages from data with unobserved stages
+  W_all=c(RC$O,RC$W_u)
+  #calculating distance matrix for W_all
+  dist=abs(outer(W_all,W_all,FUN="-"))
+  #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+  #Matern covariance formula used for v=5/2
+  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+  sigma_11=sigma_all[1:n,1:n]
+  sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
+  sigma_12=sigma_all[1:n,(n+1):(n+m)]
+  sigma_21=sigma_all[(n+1):(n+m),1:n]
+  #parameters for the posterior of beta_u
+  mu_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
+  Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  #a sample from posterior of beta_u drawn
+  beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+  #buidling blocks of the explanatory matrix X calculated
+  c=min(RC$O)-exp(zeta)
+  l=log(RC$W_u-c)
+  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  #vector of parameters
+  x_extended=c(x,beta_u)
+  #sample from the posterior of discharge y
+  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
+  return(c(beta_u,ypo_extended[(n+1):length(ypo_extended)]))
+}
+
 
 
