@@ -85,8 +85,8 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   thin=5
   cl <- makeCluster(4)
   registerDoParallel(cl)
-  MCMC <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
-    output=matrix(0,nrow=length(t_m)+RC$n+2+length(RC$W_u)+RC$n+length(RC$W_u),ncol=Nit)
+  MCMC_output_mat <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
+    output_mat=matrix(0,nrow=length(t_m)+RC$n+2+length(RC$W_u)+RC$N+length(RC$W_u),ncol=Nit)
     t_old=as.matrix(t_m)
     Dens<-density_fun(t_old,RC)
     p_old=Dens$p
@@ -111,40 +111,39 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
         x_old=x_new
         unobserved_old=unobserved_new
       }
-      output[,j]=rbind(t_old,x_old,unobserved_old[1:length(RC$W_u)],ypo_old,unobserved_old[(length(RC$W_u)+1):length(unobserved_old)])
+      output_mat[,j]=rbind(t_old,x_old,unobserved_old[1:length(RC$W_u),drop=FALSE,],ypo_old,unobserved_old[(length(RC$W_u)+1):length(unobserved_old),drop=FALSE,])
     }
     seq=seq(burnin,Nit,thin)
-    ypo_obs=ypo_obs[,seq]
-    param=param[,seq]
-    output=rbind(param,unobserved[1:length(RC$W_u)],ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])
-    output=list('theta'=param[1:length(t_m),],'a'=exp(param[length(t_m)+1,]),
-                'b'=param[length(t_m)+2,],'beta'=rbind(param[(length(t_m)+3):nrow(param)],unobserved[1:length(RC$W_u),]),
-                'ypo'=exp(rbind(ypo_obs,unobserved[(length(RC$W_u)+1):nrow(unobserved)])))
+    output_mat=output_mat[,seq]
     if(!is.null(RC$c)){
-      output$theta[1,] <- min(RC$O)-exp(output$theta[1,])
-      output$theta[2,] <- exp(output$theta[2,])
-      output$theta[3,] <- exp(output$theta[3,])
+      output_mat[1,] <- min(RC$O)-exp(output_mat[1,])
+      output_mat[2,] <- exp(output_mat[2,])
+      output_mat[3,] <- exp(output_mat[3,])
     }else{
-      output$theta[1,] <- exp(output$theta[1,])
-      output$theta[2,] <- exp(output$theta[2,])
+      output_mat[1,] <- exp(output_mat[1,])
+      output_mat[2,] <- exp(output_mat[2,])
     }
 
     return(output)
   }
   #TODO: create S3 object to store results from MCMC chain
+  MCMC_output_list=list('theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[length(t_m)+1,]),
+           'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$W_u)),],
+           'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$W_u)+1):nrow(MCMC_output_mat),]))
   stopCluster(cl)
-  rating_curve <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  rating_curve <- as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(rating_curve) <- c('lower','median','upper')
-  param_summary <- as.data.frame(t(apply(rbind(MCMC$a,MCMC$b,MCMC$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(param_summary) <- c('lower','median','upper')
-  beta_summary <- as.data.frame(t(apply(MCMC$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+  beta_summary <- as.data.frame(t(apply(MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(beta_summary) <- c('lower','median','upper')
   W=c(RC$O,RC$W_u)
   param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
   if(is.null(RC$c)){
     param_names <- c('c',param_names)
   }
-  param_summary <- cbind(data.frame(parameter=param_names),param_summary)
+  param_names <- c('log(a)','b',param_names)
+  param_summary <- cbind(data.frame(parameter=param_names),param_summary,level=c(rep('latent',2),rep('hyper',nrow(MCMC_output_list$theta))))
   rating_curve <- rating_curve[order(W),]
   beta_summary <- beta_summary[order(W),]
 
@@ -153,12 +152,12 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   result_obj$formula <- formula
   result_obj$data <- data
   result_obj$W_full <- W
-  result_obj$post_a = MCMC$a
-  result_obj$post_b = MCMC$b
+  result_obj$post_a = MCMC_output_list$a
+  result_obj$post_b = MCMC_output_list$b
   if(!is.null(RC$c)){
-    result_obj$post_c <- MCMC$theta[1,]
-    result_obj$post_var_beta <- MCMC$theta[2,]
-    result_obj$post_phi_beta <- MCMC$theta[3,]
+    result_obj$post_c <- MCMC_output_list$theta[1,]
+    result_obj$post_var_beta <- MCMC_output_list$theta[2,]
+    result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
   }else{
     result_obj$post_c <- NULL
     result_obj$post_var_beta <- MCMC$theta[2,]
@@ -168,6 +167,7 @@ gbplm <- function(formula,data,c_param=NULL,W_limits=NULL,country="Iceland",forc
   result_obj$beta <- beta_summary
   result_obj$rating_curve <- rating_curve
 
+  attr(result_obj, "class") <- "gbplm"
   return(result_obj)
 }
 
@@ -179,34 +179,9 @@ print.gbplm <- function(x,...){
 
 summary.gbplm <- function(x,...){
   cat("\nFormula: \n",
-      paste(deparse(x$formula), sep = "\n", collapse = "\n"),
-      "\nParameters:\n",
-      paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-      "\na:",
-      paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-      "\nb:",
-      paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
-      "\n\n", sep = "")
-
-
-  if(!is.null(RC$c)){
-    cat("\n c:",
-    paste(deparse(x$post_c), sep = "\n", collapse = "\n"),
-    "\nPosterior beta:",
-    paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-    "\nPosterior phi:",
-    paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
-    "\n\n", sep = "")
-
-  } else{
-    cat("\nPosterior beta:",
-    paste(deparse(x$post_a), sep = "\n", collapse = "\n"),
-    "\nPosterior phi:",
-    paste(deparse(x$post_b), sep = "\n", collapse = "\n"),
-    "\n\n", sep = "")
-    }
-
-
+  paste(deparse(x$formula), sep = "\n", collapse = "\n"))
+  cat("\nParameters:\n")
+  print(x$param_summary)
 }
 
 #'Density evaluation for model2
@@ -380,14 +355,13 @@ predict_u_unknown_c <- function(param,RC){
   #a sample from posterior of beta_u drawn
   beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
   #buidling blocks of the explanatory matrix X calculated
-  c=min(RC$O)-exp(zeta)
-  l=log(RC$W_u-c)
+  l=log(RC$W_u_tild+exp(zeta))
   X=cbind(rep(1,m),l,diag(l))
   #vector of parameters
-  x_extended=c(x[1],x[2],beta_u)
+  x_u=c(x[1],x[2],beta_u)
   #sample from the posterior of discharge y
-  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
-  return(as.matrix(c(beta_u,ypo_extended)))
+  ypo_u = X%*%x_u + as.matrix(rnorm(m)) * sqrt(varr)
+  return(as.matrix(c(beta_u,ypo_u)))
 }
 
 
