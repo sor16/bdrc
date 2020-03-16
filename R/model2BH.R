@@ -125,8 +125,6 @@ model2BH <- function(clean,country="Iceland",Wmin="",Wmax=""){
                 p_old=p_new
                 ypo_old=ypo_new
                 x_old=x_new
-
-
             }
             ypo_obs[,j]=ypo_old
             param[,j]=rbind(t_old,x_old)
