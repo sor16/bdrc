@@ -14,11 +14,13 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 
-bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data))){
+bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),...){
   #argument checking
   model_dat <- data[,all.vars(formula)]
   model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-  MCMC_output_list <- bgplm.inference(y=log(model_dat[,1,drop=T]),w=model_dat[,2,drop=T],c_param,w_limits,country,forcepoint)
+  Q <- log(model_dat[,1,drop=T])
+  W <- model_dat[,2,drop=T]
+  MCMC_output_list <- bgplm.inference(Q,W,c_param,w_limits,country,forcepoint,...)
   rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
   names(rating_curve) <- c('W','lower','median','upper')
   rating_curve <- rating_curve[order(rating_curve$W),]
@@ -28,7 +30,7 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
   param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(param_summary) <- c('lower','median','upper')
   param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
-  if(is.null(RC$c)){
+  if(is.null(c_param)){
     param_names <- c('c',param_names)
   }
   param_names <- c('a','b',param_names)
@@ -44,7 +46,7 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
   result_obj$W_full <- W
   result_obj$post_a = MCMC_output_list$a
   result_obj$post_b = MCMC_output_list$b
-  if(!is.null(RC$c)){
+  if(!is.null(c_param)){
     result_obj$post_c <- MCMC_output_list$theta[1,]
     result_obj$post_var_beta <- MCMC_output_list$theta[2,]
     result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
@@ -57,11 +59,11 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
   result_obj$param_summary <- param_summary
   result_obj$beta <- beta_summary
   result_obj$rating_curve <- rating_curve
-
   attr(result_obj, "class") <- "bgplm"
+  return(result_obj)
 }
 
-bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data))){
+bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   suppressPackageStartupMessages(require(doParallel))
   #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC=priors(country)
@@ -88,7 +90,6 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
   RC$epsilon=rep(1,RC$N)
   #Spyrja Bigga út í varíans hér
-  forcepoint_dat=model_dat[forcepoint,]
   RC$epsilon[forcepoint]=1/RC$N
 
   RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
@@ -121,18 +122,17 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
   RC$W_u=WFill$W_u
   RC$W_u_tild=WFill$W_u_tild
-  RC$W_u_tild <- RC$W_u-min(RC$W_u)
   Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
   Bsiminput[is.na(Bsiminput)]=0
   RC$Bsim=B_splines(Bsiminput)
 
   #MCMC parameters added, number of iterations,burnin and thin
-  nr_iter=20000
-  burnin=2000
-  thin=5
-  cl <- makeCluster(4)
+  if(num_chains>4){
+    stop('Max number of chains is 4. Please pick a lower number of chains')
+  }
+  cl <- makeCluster(num_chains)
   registerDoParallel(cl)
-  MCMC_output_mat <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
+  MCMC_output_mat <- foreach(i=1:num_chains,.combine=cbind) %dopar% {
     latent_and_hyper_param <- matrix(0,nrow=length(t_m)+RC$n+2,ncol=nr_iter)
     y_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
     DIC <- rep(0,nr_iter)
@@ -193,19 +193,19 @@ print.bgplm <- function(x,...){
 
 
 summary.bgplm <- function(x,...){
-  names(x$param_summary)=paste0(names(x$param_summary),c('(2.5%)','(50%)','(97.5%)'))
+  names(x$param_summary)=paste0(names(x$param_summary),c('-2.5%)','-50%','-97.5%'))
   cat("\nFormula: \n",
       paste(deparse(x$formula), sep = "\n", collapse = "\n"))
   cat("\nLatent parameters:\n")
   print(x$param_summary[1:2,],row.names = T,digits=3,right=F)
   cat("\nHyperparameters:\n")
-  print(x$param_summary[3:nrow(param_summary),],row.names = T,digits=3,right=F)
+  print(x$param_summary[3:nrow(x$param_summary),],row.names = T,digits=3,right=F)
   cat("\nDIC:",x$DIC[2])
 }
 
 plot.bgplm <- function(x,type='rating_curve',xlab='Q',ylab='W',...){
   if(type=='rating_curve'){
-    plot(x$rating_curve$median,sort(x$W_full),type='l')
+    plot(x$rating_curve$median,x$rating_curve$W,type='l')
     points(x$data[,1,drop=T],x$data[,2,drop=T],...)
   }else if(type=='beta'){
     plot(sort(x$beta$W),type='l',...)

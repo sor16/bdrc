@@ -18,16 +18,13 @@ bplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",force
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-    MCMC_output_list <- bgplm.inference(y=log(model_dat[,1,drop=T]),w=model_dat[,2,drop=T],c_param,w_limits,country,forcepoint)
+    MCMC_output_list <- bplm.inference(y=log(model_dat[,1,drop=T]),w=model_dat[,2,drop=T],c_param,w_limits,country,forcepoint)
     rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
     names(rating_curve) <- c('W','lower','median','upper')
     rating_curve <- rating_curve[order(rating_curve$W),]
-    beta_summary <- data.frame(W=unique(MCMC_output_list$W),as.data.frame(t(apply(MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
-    names(beta_summary) <- c('W','lower','median','upper')
-    beta_summary <- beta_summary[order(beta_summary$W),]
     param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(param_summary) <- c('lower','median','upper')
-    param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
+    param_names <- paste0('lambda_',1:6)
     if(is.null(RC$c)){
         param_names <- c('c',param_names)
     }
@@ -46,19 +43,15 @@ bplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",force
     result_obj$post_b = MCMC_output_list$b
     if(!is.null(RC$c)){
         result_obj$post_c <- MCMC_output_list$theta[1,]
-        result_obj$post_var_beta <- MCMC_output_list$theta[2,]
-        result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
     }else{
         result_obj$post_c <- NULL
-        result_obj$post_var_beta <- MCMC_output_list$theta[2,]
-        result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
     }
     result_obj$DIC <- DIC
     result_obj$param_summary <- param_summary
     result_obj$beta <- beta_summary
     result_obj$rating_curve <- rating_curve
-
-    attr(result_obj, "class") <- "bgplm"
+    attr(result_obj, "class") <- "bplm"
+    return(result_obj)
 }
 
 bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data))){
@@ -71,7 +64,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forc
     RC$tau_pb2=0.25^2
     RC$s=3
     RC$v=5
-    RC$y=rbind(as.matrix(y),0)
+    RC$y=y
     RC$w=as.matrix(w)
     RC$w_tild=RC$w-min(RC$w)
     Adist1 <- Adist(RC$w)
@@ -82,7 +75,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forc
     RC$O=Adist1$O
 
     RC$Sig_ab= rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
-    RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
+    RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b))
 
     RC$P=diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
     RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
@@ -90,10 +83,6 @@ bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forc
     #Spyrja Bigga út í varíans hér
     forcepoint_dat=model_dat[forcepoint,]
     RC$epsilon[forcepoint]=1/RC$N
-
-    RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
-    RC$m1=matrix(0,nrow=2,ncol=RC$n)
-    RC$m2=matrix(0,nrow=RC$n,ncol=2)
     RC$c=c_param
     if(!is.null(RC$c)){
         density_fun <- density_evaluation_known_c
@@ -262,27 +251,20 @@ bplm.density_evaluation_known_c <- function(th,RC){
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bplm.density_evaluation_unknown_c <- function(th,RC){
-    phi_b=th[3]
-    sig_b2=th[2]
     zeta=th[1]
-    lambda=th[4:9]
+    lambda=th[2:7]
 
     f=lambda[1:5]-lambda[6]
     l=c(log(RC$w_tild+exp(th[1])))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    Sig_eps=diag(c(varr,0))
+    Sig_eps=diag(varr)
     #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
-        exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
-
-    X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
+    X=cbind(1,l)
+    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-        sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
+        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+zeta-exp(zeta)/RC$mu_c #63 micro
 
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
