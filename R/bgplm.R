@@ -186,31 +186,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   return(MCMC_output_list)
 }
 
-print.bgplm <- function(x,...){
-  cat("\nCall:\n",
-      paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
-}
 
-
-summary.bgplm <- function(x,...){
-  names(x$param_summary)=paste0(names(x$param_summary),c('-2.5%)','-50%','-97.5%'))
-  cat("\nFormula: \n",
-      paste(deparse(x$formula), sep = "\n", collapse = "\n"))
-  cat("\nLatent parameters:\n")
-  print(x$param_summary[1:2,],row.names = T,digits=3,right=F)
-  cat("\nHyperparameters:\n")
-  print(x$param_summary[3:nrow(x$param_summary),],row.names = T,digits=3,right=F)
-  cat("\nDIC:",x$DIC[2])
-}
-
-plot.bgplm <- function(x,type='rating_curve',xlab='Q',ylab='W',...){
-  if(type=='rating_curve'){
-    plot(x$rating_curve$median,x$rating_curve$W,type='l')
-    points(x$data[,1,drop=T],x$data[,2,drop=T],...)
-  }else if(type=='beta'){
-    plot(sort(x$beta$W),type='l',...)
-  }
-}
 
 #create a predict method for interpolation of posterior predictive
 

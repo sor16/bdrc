@@ -18,7 +18,9 @@ bplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-    MCMC_output_list <- bgplm.inference(y=log(model_dat[,1,drop=T]),w=model_dat[,2,drop=T],c_param,w_limits,country,forcepoint)
+    Q <- log(model_dat[,1,drop=T])
+    W <- model_dat[,2,drop=T]
+    MCMC_output_list <- bplm0.inference(y=Q,w=W,c_param,w_limits,country,forcepoint)
     rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
     names(rating_curve) <- c('W','lower','median','upper')
     rating_curve <- rating_curve[order(rating_curve$W),]
