@@ -104,7 +104,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     unobserved_prediction_fun <- predict_u_unknown_c
   }
   #determine proposal density
-  theta_init=rep(0,9)
+  theta_init=rep(0,8)
   loss_fun = function(th) {-density_fun(th,RC)$p}
   optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
   t_m =optim_obj$par
@@ -198,12 +198,12 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 density_evaluation_known_c <- function(th,RC){
-  phi_b=th[2]
   sig_b2=th[1]
-  lambda=th[4:8]
+  phi_b=th[2]
+  lambda=th[3:8]
 
   f=lambda[1:5]-lambda[6]
-  l=log(RC$w-RC$c)
+  l=c(log(RC$w-RC$c))
 
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   Sig_eps=diag(c(varr,0))
