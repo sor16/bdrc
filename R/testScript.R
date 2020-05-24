@@ -13,12 +13,12 @@ bgplm.fit <- bgplm(rc_formula,rc_dat)
 summary(bgplm.fit)
 
 ggplot(data=bgplm.fit$rating_curve) +
-    #geom_point(data=rc_dat,aes(Q,W)) +
+    geom_point(data=rc_dat,aes(Q,W)) +
     geom_line(aes(median,W)) +
     geom_line(aes(lower,W),linetype='dashed') +
     geom_line(aes(upper,W),linetype='dashed')
 
-ggplot(data=filter(bgplm.fit$rating_curve,W>=min(data$W) & W<=max(data$W))) +
+ggplot(data=filter(bgplm.fit$rating_curve,W>=min(rc_dat$W) & W<=max(rc_dat$W))) +
     geom_point(data=rc_dat,aes(Q,W)) +
     geom_line(aes(median,W)) +
     geom_line(aes(lower,W),linetype='dashed') +
