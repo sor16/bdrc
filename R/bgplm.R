@@ -99,11 +99,11 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   RC$m2 <- matrix(0,nrow=RC$n,ncol=2)
   RC$c <- c_param
   if(!is.null(RC$c)){
-    density_fun <- density_evaluation_known_c
-    unobserved_prediction_fun <- predict_u_known_c
+    density_fun <- bgplm.density_evaluation_known_c
+    unobserved_prediction_fun <- bgplm.predict_u_known_c
   }else{
-    density_fun <- density_evaluation_unknown_c
-    unobserved_prediction_fun <- predict_u_unknown_c
+    density_fun <- bgplm.density_evaluation_unknown_c
+    unobserved_prediction_fun <- bgplm.predict_u_unknown_c
   }
   #determine proposal density
   theta_length <- if(is.null(RC$c)) 9 else 8
@@ -179,9 +179,13 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     return(output_mat)
   }
   stopCluster(cl)
-  MCMC_output_list <- list('W'=c(RC$w,RC$w_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[theta_length+1,]),
-           'b'=MCMC_output_mat[theta_length+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(theta_length+2+RC$n+length(RC$w_u)),],
-           'ypo'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
+  MCMC_output_list <- list('W'=c(RC$w,RC$w_u),
+                           'theta'=MCMC_output_mat[1:theta_length,],
+                           'a'=exp(MCMC_output_mat[theta_length+1,]),
+                           'b'=MCMC_output_mat[theta_length+2,],
+                           'beta'=MCMC_output_mat[(length(t_m)+3):(theta_length+2+RC$n+length(RC$w_u)),],
+                           'ypo'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),
+                           'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
   return(MCMC_output_list)
 }
@@ -197,7 +201,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-density_evaluation_known_c <- function(th,RC){
+bgplm.density_evaluation_known_c <- function(th,RC){
   sig_b2=th[1]
   phi_b=th[2]
   lambda=th[3:8]
@@ -237,7 +241,7 @@ density_evaluation_known_c <- function(th,RC){
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-density_evaluation_unknown_c <- function(th,RC){
+bgplm.density_evaluation_unknown_c <- function(th,RC){
   phi_b=th[3]
   sig_b2=th[2]
   zeta=th[1]
@@ -285,7 +289,7 @@ density_evaluation_unknown_c <- function(th,RC){
 #'\item Vector containing predictive values ypo and values of beta for every stage measurement.
 #'}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-predict_u_known_c <- function(param,RC){
+bgplm.predict_u_known_c <- function(param,RC){
   #collecting parameters from the MCMC sample
   th=param[1:8]
   x=param[9:length(param)]
@@ -333,7 +337,7 @@ predict_u_known_c <- function(param,RC){
 #'\item Vector containing predictive values ypo and values of beta for every stage measurement.
 #'}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-predict_u_unknown_c <- function(param,RC){
+bgplm.predict_u_unknown_c <- function(param,RC){
   #collecting parameters from the MCMC sample
   th=param[1:9]   #hyperparameter vector theta
   x=param[10:length(param)]   #latent parameter vector a,b,beta(w)
