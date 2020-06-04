@@ -179,9 +179,9 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     return(output_mat)
   }
   stopCluster(cl)
-  MCMC_output_list <- list('W'=c(RC$w,RC$w_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[length(t_m)+1,]),
-           'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$w_u)),],
-           'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
+  MCMC_output_list <- list('W'=c(RC$w,RC$w_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[theta_length+1,]),
+           'b'=MCMC_output_mat[theta_length+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(theta_length+2+RC$n+length(RC$w_u)),],
+           'ypo'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
   return(MCMC_output_list)
 }
@@ -293,7 +293,7 @@ predict_u_known_c <- function(param,RC){
   phi_b=exp(th[2])
   lambda = th[3:length(th)]
   #calculate spline variance from B_splines
-  varr = c(exp(RC$Bsim %*% lambda))
+  varr = c(exp(RC$B_u %*% lambda))
   m=length(RC$w_u)
   n=RC$n
   #combine stages from data with unobserved stages
@@ -314,12 +314,11 @@ predict_u_known_c <- function(param,RC){
   beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$w_u-RC$c)
-  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
-  #vector of parameters
-  x_extended=c(x,beta_u)
+  X=cbind(rep(1,m),l,diag(l))
+  x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
-  ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) * sqrt(varr)
-  return(c(beta_u,ypo_extended[(RC$n+1):length(ypo_extended)]))
+  ypo_u = X%*%x_u + as.matrix(rnorm(m)) * sqrt(varr)
+  return(c(beta_u,ypo_u))
 }
 
 #' Predictive values for unoberved stages

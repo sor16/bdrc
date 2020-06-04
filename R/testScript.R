@@ -21,16 +21,11 @@ ggplot(data=bgplm.fit$rating_curve) +
     geom_line(aes(lower,W),linetype='dashed') +
     geom_line(aes(upper,W),linetype='dashed')
 
-ggplot(data=filter(bgplm.fit$rating_curve,W>=min(rc_dat$W) & W<=max(rc_dat$W))) +
-    geom_point(data=rc_dat,aes(Q,W)) +
-    geom_line(aes(median,W)) +
-    geom_line(aes(lower,W),linetype='dashed') +
-    geom_line(aes(upper,W),linetype='dashed')
+bgplm.fit_known_c <- bgplm(rc_formula,rc_dat,c_param = 1.199)
 
-bgplm.fit_known_c <- bgplm(rc_formula,rc_dat,c_param = 0.75)
 summary(bgplm.fit_known_c)
 
-ggplot(data=filter(bgplm.fit_known_c$rating_curve,W>=min(rc_dat$W) & W<=max(rc_dat$W))) +
+ggplot(data=bgplm.fit_known_c$rating_curve) +
     geom_point(data=rc_dat,aes(Q,W)) +
     geom_line(aes(median,W)) +
     geom_line(aes(lower,W),linetype='dashed') +
