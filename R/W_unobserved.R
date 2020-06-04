@@ -10,33 +10,24 @@
 #' The unobserved stages are lower or higher than that of the data, take the same value in W_u_tild as the minimum value and maximum value of the
 #' data respectively. This is done to ensure constant variance below and above observed data.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-W_unobserved <- function(W_unique,min=NA,max=NA){
-    W_u=NULL
-    W_u_tild=NULL
-    w=100*W_unique #work in cm
-    filter=5
+W_unobserved <- function(RC,w_min=NA,w_max=NA){
+    w_u=NULL
+    w=100*c(RC$O) #work in cm
+    max_w_diff=5
     #distance between subsequent elements in vector with additional dummy point 1000
     distvect=abs(w-c(w[2:length(w)],1000))
     #add datapoints to corresponding distances to see range of distance
     distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
-    distfilter=distwithdata[,distvect>filter]
+    distfilter=distwithdata[,distvect>max_w_diff]
     #remove dummy distance
     distfilter=as.matrix(distfilter[,-ncol(distfilter)])
     if(ncol(distfilter)!=0){
         #make sequence from the ranges with length.out equal to corresponding elelement in distvect
-        W_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+round(x[2]/filter)),c(x[1],x[3]))
+        w_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+ceiling(x[2]/max_w_diff)),c(x[1],x[3]))
         }))
     }
-    if(!is.na(min)|!is.na(max)){
-        min=ceiling(min*10)/10
-        max=ceiling(max*10)/10
-        minseq=setdiff(seq(min,min(W_unique),by=0.05),c(min(W_unique)))
-        maxseq=setdiff(seq(max(W_unique),max,length.out=2+ceiling(20*(max-max(W_unique)))),max(W_unique))
-        W_spline=c(rep(min(W_unique),length(minseq)),W_u,rep(max(W_unique),length(maxseq)))
-        W_u=c(minseq,W_u,maxseq)
-        W_u_tild=W_spline-min(W_unique)
-    }else{
-        W_u_tild=W_u-min(W_unique)
-    }
-    return(list("W_u"=W_u,"W_u_tild"=W_u_tild))
+    w_before_data=setdiff(seq(w_min,RC$w_min,by=0.05),c(RC$w_min))
+    w_after_data=setdiff(seq(RC$w_max,w_max,length.out=2+ceiling(20*(w_max-RC$w_max))),RC$w_max)
+    w_u=c(w_before_data,w_u,w_after_data)
+    return(w_u)
 }

@@ -65,37 +65,39 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
 
 bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   suppressPackageStartupMessages(require(doParallel))
-  #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
-  RC=priors(country)
-  RC$nugget=10^-8
-  RC$mu_sb=0.5
-  RC$mu_pb=0.5
-  RC$tau_pb2=0.25^2
-  RC$s=3
-  RC$v=5
-  RC$y=rbind(as.matrix(y),0)
-  RC$w=as.matrix(w)
-  RC$w_tild=RC$w-min(RC$w)
+  #TODO: add error message if length(formula)! <- 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
+  RC <- priors(country)
+  RC$nugget <- 10^-8
+  RC$mu_sb <- 0.5
+  RC$mu_pb <- 0.5
+  RC$tau_pb2 <- 0.25^2
+  RC$s <- 3
+  RC$v <- 5
+  RC$y <- rbind(as.matrix(y),0)
+  RC$w <- as.matrix(w)
+  RC$w_min <- min(RC$w)
+  RC$w_max <- max(RC$w)
+  RC$w_tild <- RC$w-RC$w_min
   Adist1 <- Adist(RC$w)
-  RC$A=Adist1$A
-  RC$dist=Adist1$dist
-  RC$n=Adist1$n
-  RC$N=Adist1$N
-  RC$O=Adist1$O
+  RC$A <- Adist1$A
+  RC$dist <- Adist1$dist
+  RC$n <- Adist1$n
+  RC$N <- Adist1$N
+  RC$O <- Adist1$O
 
-  RC$Sig_ab= rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
-  RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
+  RC$Sig_ab <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
+  RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
 
-  RC$P=diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
-  RC$B=B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
-  RC$epsilon=rep(1,RC$N)
+  RC$P <- diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
+  RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
+  RC$epsilon <- rep(1,RC$N)
   #Spyrja Bigga út í varíans hér
-  RC$epsilon[forcepoint]=1/RC$N
+  RC$epsilon[forcepoint] <- 1/RC$N
 
-  RC$Z=cbind(t(rep(0,2)),t(rep(1,RC$n)))
-  RC$m1=matrix(0,nrow=2,ncol=RC$n)
-  RC$m2=matrix(0,nrow=RC$n,ncol=2)
-  RC$c=c_param
+  RC$Z <- cbind(t(rep(0,2)),t(rep(1,RC$n)))
+  RC$m1 <- matrix(0,nrow=2,ncol=RC$n)
+  RC$m2 <- matrix(0,nrow=RC$n,ncol=2)
+  RC$c <- c_param
   if(!is.null(RC$c)){
     density_fun <- density_evaluation_known_c
     unobserved_prediction_fun <- predict_u_known_c
@@ -104,27 +106,25 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     unobserved_prediction_fun <- predict_u_unknown_c
   }
   #determine proposal density
-  theta_init=rep(0,8)
-  loss_fun = function(th) {-density_fun(th,RC)$p}
-  optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
-  t_m =optim_obj$par
-  H=optim_obj$hessian
-  LH=t(chol(H))/0.8
+  theta_length <- if(is.null(RC$c)) 9 else 8
+  theta_init <- rep(0,theta_length)
+  loss_fun  <-  function(th) {-density_fun(th,RC)$p}
+  optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+  t_m <- optim_obj$par
+  H <- optim_obj$hessian
+  LH <- t(chol(H))/0.8
 
   #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
   if(is.null(w_limits)){
-    Wmax=ceiling(max(RC$w)*10)/10
-    Wmin=ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
+    w_max <- ceiling(max(RC$w)*10)/10
+    w_min <- ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
   }else{
-    Wmin=w_limits[1]
-    Wmax=w_limits[2]
+    w_min <- w_limits[1]
+    w_max <- w_limits[2]
   }
-  WFill=W_unobserved(c(RC$O),min=Wmin,max=Wmax)
-  RC$W_u=WFill$W_u
-  RC$W_u_tild=WFill$W_u_tild
-  Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
-  Bsiminput[is.na(Bsiminput)]=0
-  RC$Bsim=B_splines(Bsiminput)
+  RC$w_u <- W_unobserved(RC,w_min,w_max)
+  w_u_std <- ifelse(RC$w_u < RC$w_min,0.0,ifelse(RC$w_u>RC$w_max,1.0,(RC$w_u-RC$w_min)/(RC$w_max-RC$w_min)))
+  RC$B_u <- B_splines(w_u_std)
 
   #MCMC parameters added, number of iterations,burnin and thin
   if(num_chains>4){
@@ -136,25 +136,25 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     latent_and_hyper_param <- matrix(0,nrow=length(t_m)+RC$n+2,ncol=nr_iter)
     y_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
     DIC <- rep(0,nr_iter)
-    t_old=as.matrix(t_m)
-    Dens<-density_fun(t_old,RC)
-    p_old=Dens$p
-    ypo_old=Dens$ypo
-    x_old=Dens$x
+    t_old <- as.matrix(t_m)
+    Dens <- density_fun(t_old,RC)
+    p_old <- Dens$p
+    ypo_old <- Dens$ypo
+    x_old <- Dens$x
     DIC_old <- Dens$DIC
     for(j in 1:nr_iter){
-      t_new=t_old+solve(t(LH),rnorm(length(t_m),0,1))
+      t_new <- t_old+solve(t(LH),rnorm(length(t_m),0,1))
       Densnew <- density_fun(t_new,RC)
-      x_new=Densnew$x
-      ypo_new=Densnew$ypo
-      p_new=Densnew$p
+      x_new <- Densnew$x
+      ypo_new <- Densnew$ypo
+      p_new <- Densnew$p
       DIC_new <- Densnew$DIC
-      logR=p_new-p_old
+      logR <- p_new-p_old
       if (logR>log(runif(1))){
-        t_old=t_new
-        p_old=p_new
-        ypo_old=ypo_new
-        x_old=x_new
+        t_old <- t_new
+        p_old <- p_new
+        ypo_old <- ypo_new
+        x_old <- x_new
         DIC_old <- DIC_new
       }
       latent_and_hyper_param[,j] <- c(t_old,x_old)
@@ -162,12 +162,12 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
       DIC[j] <- DIC_old
     }
 
-    seq=seq(burnin,nr_iter,thin)
-    latent_and_hyper_param=latent_and_hyper_param[,seq]
-    y_pred_mat=y_pred_mat[,seq]
-    DIC=DIC[seq]
-    unobserved_mat=apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
-    output_mat=rbind(latent_and_hyper_param,unobserved_mat[1:length(RC$W_u),],y_pred_mat,unobserved_mat[(length(RC$W_u)+1):nrow(unobserved_mat),],t(matrix(DIC)))
+    seq <- seq(burnin,nr_iter,thin)
+    latent_and_hyper_param <- latent_and_hyper_param[,seq]
+    y_pred_mat <- y_pred_mat[,seq]
+    DIC <- DIC[seq]
+    unobserved_mat <- apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
+    output_mat <- rbind(latent_and_hyper_param,unobserved_mat[1:length(RC$w_u),],y_pred_mat,unobserved_mat[(length(RC$w_u)+1):nrow(unobserved_mat),],t(matrix(DIC)))
     if(is.null(RC$c)){
       output_mat[1,] <- min(RC$O)-exp(output_mat[1,])
       output_mat[2,] <- exp(output_mat[2,])
@@ -179,9 +179,9 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     return(output_mat)
   }
   stopCluster(cl)
-  MCMC_output_list=list('W'=c(RC$w,RC$W_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[length(t_m)+1,]),
-           'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$W_u)),],
-           'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$W_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
+  MCMC_output_list <- list('W'=c(RC$w,RC$w_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[length(t_m)+1,]),
+           'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$w_u)),],
+           'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
   return(MCMC_output_list)
 }
@@ -294,10 +294,10 @@ predict_u_known_c <- function(param,RC){
   lambda = th[3:length(th)]
   #calculate spline variance from B_splines
   varr = c(exp(RC$Bsim %*% lambda))
-  m=length(RC$W_u)
+  m=length(RC$w_u)
   n=RC$n
   #combine stages from data with unobserved stages
-  W_all=c(RC$O,RC$W_u)
+  W_all=c(RC$O,RC$w_u)
   #calculating distance matrix for W_all
   dist=abs(outer(W_all,W_all,FUN="-"))
   #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
@@ -313,7 +313,7 @@ predict_u_known_c <- function(param,RC){
   #a sample from posterior of beta_u drawn
   beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
   #buidling blocks of the explanatory matrix X calculated
-  l=log(RC$W_u-RC$c)
+  l=log(RC$w_u-RC$c)
   X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
   #vector of parameters
   x_extended=c(x,beta_u)
@@ -336,23 +336,24 @@ predict_u_known_c <- function(param,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 predict_u_unknown_c <- function(param,RC){
   #collecting parameters from the MCMC sample
-  th=param[1:9]
-  x=param[10:length(param)]
-  zeta=th[1]
+  th=param[1:9]   #hyperparameter vector theta
+  x=param[10:length(param)]   #latent parameter vector a,b,beta(w)
+  #store particular hyperparameter values
+  zeta <- th[1]
   phi_b=exp(th[3])
   sig_b2=exp(th[2])
   lambda = th[4:9]
-  #calculate spline variance from B_splines
-  varr = c(exp(RC$Bsim %*% lambda))
-  m=length(RC$W_u)
+  #get sample of data variance using splines
+  varr = c(exp(RC$B_u %*% lambda))
+  m=length(RC$w_u)
   n=RC$n
   #combine stages from data with unobserved stages
-  W_all=c(RC$O,RC$W_u)
+  w_all=c(RC$O,RC$w_u)
   #calculating distance matrix for W_all
-  dist=abs(outer(W_all,W_all,FUN="-"))
-  #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+  dist=abs(outer(w_all,w_all,FUN="-"))
+  #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/2
-  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+  sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(w_all))*RC$nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -362,14 +363,16 @@ predict_u_unknown_c <- function(param,RC){
   Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
   beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+  above_c <- -(exp(zeta)-RC$w_min) < RC$w_u
+  m_above_c <- sum(above_c)
   #buidling blocks of the explanatory matrix X calculated
-  l=log(RC$W_u_tild+exp(zeta))
-  X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
+  l=log(RC$w_u[above_c]-RC$w_min+exp(zeta))
+  X=cbind(rep(1,m_above_c),l,diag(l))
   #vector of parameters
-  x=c(x,beta_u)
+  x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
-  ypo_u = X%*%x + as.matrix(rnorm(m)) * sqrt(varr)
-  return(as.matrix(c(beta_u,ypo_u)))
+  ypo_u = X%*%x_u + as.matrix(rnorm(m_above_c)) * sqrt(varr[above_c])
+  return(as.matrix(c(beta_u,rep(-Inf,m-m_above_c),ypo_u)))
 }
 
 

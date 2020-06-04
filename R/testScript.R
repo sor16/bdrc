@@ -6,6 +6,9 @@ source('R/B_splines.R')
 source('R/W_unobserved.R')
 source('R/priors.R')
 source('R/bgplm.R')
+source('R/plm_methods.R')
+
+
 rc_dat <- read_excel('data/exceldata_RC.xlsx') %>% mutate(W=0.01*W)
 rc_formula <- as.formula('Q~W')
 bgplm.fit <- bgplm(rc_formula,rc_dat)
@@ -25,7 +28,7 @@ ggplot(data=filter(bgplm.fit$rating_curve,W>=min(rc_dat$W) & W<=max(rc_dat$W))) 
     geom_line(aes(upper,W),linetype='dashed')
 
 bgplm.fit_known_c <- bgplm(rc_formula,rc_dat,c_param = 0.75)
-summary(bgplm.fit_known_c )
+summary(bgplm.fit_known_c)
 
 ggplot(data=filter(bgplm.fit_known_c$rating_curve,W>=min(rc_dat$W) & W<=max(rc_dat$W))) +
     geom_point(data=rc_dat,aes(Q,W)) +
