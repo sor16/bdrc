@@ -73,19 +73,22 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     RC$tau_pb2=0.25^2
     RC$s=3
     RC$v=5
-    RC$y=rbind(as.matrix(y),0)
+    RC$y=as.matrix(y)
     RC$w=as.matrix(w)
     RC$w_tild=RC$w-min(RC$w)
     
-    RC$n=length(RC$y)
+    RC$n=length(y)
     RC$epsilon=0.00001
+    RC$N=length(w)
     
     #### Adist1 <- Adist(RC$w)
     #### RC$A=Adist1$A
     #### RC$dist=Adist1$dist
     #### RC$n=Adist1$n
-    #### RC$N=Adist1$N
+    
     #### RC$O=Adist1$O
+    # Unique values of w for w unoberserved
+    RC$O=t(unique(w))
 
     RC$Sig_ab= rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
     RC$mu_x=as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n)))
@@ -113,10 +116,8 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     loss_fun = function(th) {-density_fun(th,RC)$p}
     optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     t_m =optim_obj$par
-    print(t_m)
     H=optim_obj$hessian
     LH=t(chol(H))/0.8
-
     #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
     if(is.null(w_limits)){
         Wmax=ceiling(max(RC$w)*10)/10
@@ -129,18 +130,19 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     RC$W_u=WFill$W_u
     RC$W_u_tild=WFill$W_u_tild
     RC$W_u_tild <- RC$W_u-min(RC$W_u)
-    Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
-    Bsiminput[is.na(Bsiminput)]=0
-    RC$Bsim=B_splines(Bsiminput)
-
-    #MCMC parameters added, number of iterations,burnin and thin
+    #### Bsiminput=t(RC$W_u_tild)/RC$W_u_tild[length(RC$W_u_tild)]
+    #### Bsiminput[is.na(Bsiminput)]=0
+    #### RC$Bsim=B_splines(Bsiminput)
+    
+    # MCMC parameters added, number of iterations,burnin and thin
     nr_iter=20000
     burnin=2000
     thin=5
+    print('Test')
     cl <- makeCluster(4)
     registerDoParallel(cl)
     MCMC_output_mat <- foreach(i=1:4,.combine=cbind,.export=c("density_fun","unobserved_prediction_fun")) %dopar% {
-        latent_and_hyper_param <- matrix(0,nrow=length(t_m)+RC$n+2,ncol=nr_iter)
+        latent_and_hyper_param <- matrix(0,nrow=length(t_m)+2,ncol=nr_iter)
         y_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
         DIC <- rep(0,nr_iter)
         t_old=as.matrix(t_m)
@@ -173,8 +175,13 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
         latent_and_hyper_param=latent_and_hyper_param[,seq]
         y_pred_mat=y_pred_mat[,seq]
         DIC=DIC[seq]
-        unobserved_mat=apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
-        output_mat=rbind(latent_and_hyper_param,unobserved_mat[1:length(RC$W_u),],y_pred_mat,unobserved_mat[(length(RC$W_u)+1):nrow(unobserved_mat),],t(matrix(DIC)))
+        
+        
+        #####
+        # Fix from here
+        #####
+        ## unobserved_mat=apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
+        output_mat=rbind(latent_and_hyper_param,y_pred_mat,t(matrix(DIC)))
         if(is.null(RC$c)){
             output_mat[1,] <- min(RC$O)-exp(output_mat[1,])
            # output_mat[2,] <- exp(output_mat[2,])
@@ -186,9 +193,8 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
         return(output_mat)
     }
     stopCluster(cl)
-    MCMC_output_list=list('W'=c(RC$w,RC$W_u),'theta'=MCMC_output_mat[1:length(t_m),],'a'=exp(MCMC_output_mat[length(t_m)+1,]),
-                          'b'=MCMC_output_mat[length(t_m)+2,],'beta'=MCMC_output_mat[(length(t_m)+3):(length(t_m)+2+RC$n+length(RC$W_u)),],
-                          'ypo'=exp(MCMC_output_mat[(length(t_m)+2+RC$n+length(RC$W_u)+1):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
+    MCMC_output_list=list('W'=c(RC$w,RC$W_u),'theta'=MCMC_output_mat[1:length(t_m),],
+                          'ypo'=exp(MCMC_output_mat[(length(t_m)+2):(nrow(MCMC_output_mat)-1),]),'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
     return(MCMC_output_list)
 }
@@ -234,7 +240,6 @@ bplm0.density_evaluation_known_c <- function(th,RC){
 
     X=cbind(rep(1,length(l)),l)
 
-   
     L=t(chol(RC$Sig_xinv + (t(X) %*% X)/exp(th[2]))) # fix
     q=solve(L,(RC$Sinvmu+t(X)%*%RC$y/exp(th[2])))
     
@@ -262,16 +267,15 @@ bplm0.density_evaluation_known_c <- function(th,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bplm0.density_evaluation_unknown_c <- function(th,RC){
     
-    
     #f=lambda[1:5]-lambda[6]
-    print(RC$y)
+   
   
-    l=c(log(RC$w-RC$c))
+    l=c(log(RC$w+exp(th[1])))
+    
     
     
     
     X=cbind(rep(1,length(l)),l)
-    
     
     L=t(chol(RC$Sig_xinv + (t(X) %*% X)/exp(th[2]))) # fix
    
@@ -308,15 +312,15 @@ bplm0.predict_u_known_c <- function(param,RC){
     #collecting parameters from the MCMC sample
     #print(length(param))
     th=param #### [1:8]
-    print(th)
-    x=param[9:length(param)]
+    
+    #x=param[9:length(param)]
     #sig_b2=exp(th[1])
     #phi_b=exp(th[2])
     #lambda = th[3:length(th)]
     
     #calculate spline variance from B_splines
     #varr = c(exp(RC$Bsim %*% lambda)) 
-    m=length(RC$W_u)
+    m=length(RC$W_u)-1
     n=RC$n
     #combine stages from data with unobserved stages
     W_all=c(RC$O,RC$W_u)
@@ -324,7 +328,7 @@ bplm0.predict_u_known_c <- function(param,RC){
     dist=abs(outer(W_all,W_all,FUN="-"))
     #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b2*(1 + sqrt(5)*dist/th[2]+(5*dist^2)/(3*th[2]^2))*exp(-sqrt(5)*dist/th[2]) + diag(length(W_all))*RC$nugget
+    sigma_all=(1 + sqrt(5)*dist/th[2]+(5*dist^2)/(3*th[2]^2))*exp(-sqrt(5)*dist/th[2]) + diag(length(W_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -338,7 +342,7 @@ bplm0.predict_u_known_c <- function(param,RC){
     l=log(RC$W_u-RC$c)
     X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
     #vector of parameters
-    x_extended=c(x,beta_u)
+    x_extended=c(beta_u)
     #sample from the posterior of discharge y
     ypo_extended = X%*%x_extended + as.matrix(rnorm(m)) #### * sqrt(varr)
     return(c(beta_u,ypo_extended[(RC$n+1):length(ypo_extended)]))
@@ -359,15 +363,18 @@ bplm0.predict_u_known_c <- function(param,RC){
 bplm0.predict_u_unknown_c <- function(param,RC){
     #collecting parameters from the MCMC sample
     #print(length(param))
-    th=param[1:9]
-    x=param[10:length(param)]
+  
+  
+    th=param #### [1:9]
+    #x=param[10:length(param)]
     zeta=th[1]
+    
     #### phi_b=exp(th[3])
     #### sig_b2=exp(th[2])
     #### lambda = th[4:9]
     #calculate spline variance from B_splines
     #### varr = c(exp(RC$Bsim %*% lambda))
-    m=length(RC$W_u)
+    m=length(RC$W_u)-1
     n=RC$n
     #combine stages from data with unobserved stages
     W_all=c(RC$O,RC$W_u)
@@ -375,23 +382,14 @@ bplm0.predict_u_unknown_c <- function(param,RC){
     dist=abs(outer(W_all,W_all,FUN="-"))
     #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
-    sigma_11=sigma_all[1:n,1:n]
-    sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
-    sigma_12=sigma_all[1:n,(n+1):(n+m)]
-    sigma_21=sigma_all[(n+1):(n+m),1:n]
-    #parameters for the posterior of beta_u
-    mu_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
-    Sigma_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
-    #a sample from posterior of beta_u drawn
-    beta_u=as.numeric(mu_u) + rnorm(ncol(Sigma_u)) %*% chol(Sigma_u)
+    
     #buidling blocks of the explanatory matrix X calculated
     l=log(RC$W_u_tild+exp(zeta))
     X=cbind(rep(1,m),l,matrix(0,m,n),diag(l))
     #vector of parameters
-    x=c(x,beta_u)
+    x=param
     #sample from the posterior of discharge y
-    ypo_u = X%*%x + as.matrix(rnorm(m)) * sqrt(varr)
+    ypo_u = X%*%x + as.matrix(rnorm(m))
     return(as.matrix(c(beta_u,ypo_u)))
 }
 
