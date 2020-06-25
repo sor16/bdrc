@@ -72,8 +72,6 @@ bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forc
     RC$dist <- Adist1$dist
     RC$N <- Adist1$N
     RC$O <- Adist1$O
-    RC$Sig_ab <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
-    RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b))
 
     RC$P <- diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
     RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
