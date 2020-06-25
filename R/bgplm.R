@@ -43,17 +43,16 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
   result_obj=list()
   result_obj$formula <- formula
   result_obj$data <- model_dat
-  result_obj$W_full <- W
   result_obj$post_a = MCMC_output_list$a
   result_obj$post_b = MCMC_output_list$b
-  if(!is.null(c_param)){
+  if(is.null(c_param)){
     result_obj$post_c <- MCMC_output_list$theta[1,]
     result_obj$post_var_beta <- MCMC_output_list$theta[2,]
     result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
   }else{
     result_obj$post_c <- NULL
-    result_obj$post_var_beta <- MCMC_output_list$theta[2,]
-    result_obj$post_phi_beta <- MCMC_output_list$theta[3,]
+    result_obj$post_var_beta <- MCMC_output_list$theta[1,]
+    result_obj$post_phi_beta <- MCMC_output_list$theta[2,]
   }
   result_obj$DIC <- DIC
   result_obj$param_summary <- param_summary
@@ -65,7 +64,7 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
 
 bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   suppressPackageStartupMessages(require(doParallel))
-  #TODO: add error message if length(formula)! <- 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
+  #TODO: add error message if length(formula)! = 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC <- priors(country)
   RC$nugget <- 10^-8
   RC$mu_sb <- 0.5
@@ -108,16 +107,16 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   #determine proposal density
   theta_length <- if(is.null(RC$c)) 9 else 8
   theta_init <- rep(0,theta_length)
-  loss_fun  <-  function(th) {-density_fun(th,RC)$p}
+  loss_fun  <-  function(theta) {-density_fun(theta,RC)$p}
   optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
-  t_m <- optim_obj$par
+  theta_m <- optim_obj$par
   H <- optim_obj$hessian
   LH <- t(chol(H))/0.8
 
   #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
   if(is.null(w_limits)){
     w_max <- ceiling(max(RC$w)*10)/10
-    w_min <- ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(t_m[1]),RC$c))/10
+    w_min <- ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
   }else{
     w_min <- w_limits[1]
     w_max <- w_limits[2]
@@ -133,31 +132,31 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   cl <- makeCluster(num_chains)
   registerDoParallel(cl)
   MCMC_output_mat <- foreach(i=1:num_chains,.combine=cbind) %dopar% {
-    latent_and_hyper_param <- matrix(0,nrow=length(t_m)+RC$n+2,ncol=nr_iter)
+    latent_and_hyper_param <- matrix(0,nrow=length(theta_m)+RC$n+2,ncol=nr_iter)
     y_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
     DIC <- rep(0,nr_iter)
-    t_old <- as.matrix(t_m)
-    Dens <- density_fun(t_old,RC)
+    theta_old <- as.matrix(theta_m)
+    Dens <- density_fun(theta_old,RC)
     p_old <- Dens$p
     ypo_old <- Dens$ypo
     x_old <- Dens$x
     DIC_old <- Dens$DIC
     for(j in 1:nr_iter){
-      t_new <- t_old+solve(t(LH),rnorm(length(t_m),0,1))
-      Densnew <- density_fun(t_new,RC)
+      theta_new <- theta_old+solve(t(LH),rnorm(theta_length,0,1))
+      Densnew <- density_fun(theta_new,RC)
       x_new <- Densnew$x
       ypo_new <- Densnew$ypo
       p_new <- Densnew$p
       DIC_new <- Densnew$DIC
       logR <- p_new-p_old
       if (logR>log(runif(1))){
-        t_old <- t_new
+        theta_old <- theta_new
         p_old <- p_new
         ypo_old <- ypo_new
         x_old <- x_new
         DIC_old <- DIC_new
       }
-      latent_and_hyper_param[,j] <- c(t_old,x_old)
+      latent_and_hyper_param[,j] <- c(theta_old,x_old)
       y_pred_mat[,j] <- ypo_old
       DIC[j] <- DIC_old
     }
@@ -169,7 +168,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
     unobserved_mat <- apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
     output_mat <- rbind(latent_and_hyper_param,unobserved_mat[1:length(RC$w_u),],y_pred_mat,unobserved_mat[(length(RC$w_u)+1):nrow(unobserved_mat),],t(matrix(DIC)))
     if(is.null(RC$c)){
-      output_mat[1,] <- min(RC$O)-exp(output_mat[1,])
+      output_mat[1,] <- RC$w_min-exp(output_mat[1,])
       output_mat[2,] <- exp(output_mat[2,])
       output_mat[3,] <- exp(output_mat[3,])
     }else{
@@ -183,7 +182,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
                            'theta'=MCMC_output_mat[1:theta_length,],
                            'a'=exp(MCMC_output_mat[theta_length+1,]),
                            'b'=MCMC_output_mat[theta_length+2,],
-                           'beta'=MCMC_output_mat[(length(t_m)+3):(theta_length+2+RC$n+length(RC$w_u)),],
+                           'beta'=MCMC_output_mat[(theta_length+3):(theta_length+2+RC$n+length(RC$w_u)),],
                            'ypo'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),
                            'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
@@ -201,10 +200,10 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-bgplm.density_evaluation_known_c <- function(th,RC){
-  sig_b2=th[1]
-  phi_b=th[2]
-  lambda=th[3:8]
+bgplm.density_evaluation_known_c <- function(theta,RC){
+  sig_b2=theta[1]
+  phi_b=theta[2]
+  lambda=theta[3:8]
 
   f=lambda[1:5]-lambda[6]
   l=c(log(RC$w-RC$c))
@@ -237,18 +236,18 @@ bgplm.density_evaluation_known_c <- function(th,RC){
 #'Density evaluation for model2
 #'
 #'Evaluates the log density of the posterior distribution of the parameters of model2BH.
-#'@param th A vector with length 9 containing parameters
+#'@param theta A vector with length 9 containing parameters
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-bgplm.density_evaluation_unknown_c <- function(th,RC){
-  phi_b=th[3]
-  sig_b2=th[2]
-  zeta=th[1]
-  lambda=th[4:9]
+bgplm.density_evaluation_unknown_c <- function(theta,RC){
+  phi_b=theta[3]
+  sig_b2=theta[2]
+  zeta=theta[1]
+  lambda=theta[4:9]
 
   f=lambda[1:5]-lambda[6]
-  l=c(log(RC$w_tild+exp(th[1])))
+  l=c(log(RC$w_tild+exp(theta[1])))
 
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   Sig_eps=diag(c(varr,0))
@@ -291,11 +290,11 @@ bgplm.density_evaluation_unknown_c <- function(th,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.predict_u_known_c <- function(param,RC){
   #collecting parameters from the MCMC sample
-  th=param[1:8]
+  theta=param[1:8]
   x=param[9:length(param)]
-  sig_b2=exp(th[1])
-  phi_b=exp(th[2])
-  lambda = th[3:length(th)]
+  sig_b2=exp(theta[1])
+  phi_b=exp(theta[2])
+  lambda = theta[3:length(theta)]
   #calculate spline variance from B_splines
   varr = c(exp(RC$B_u %*% lambda))
   m=length(RC$w_u)
@@ -339,13 +338,13 @@ bgplm.predict_u_known_c <- function(param,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.predict_u_unknown_c <- function(param,RC){
   #collecting parameters from the MCMC sample
-  th=param[1:9]   #hyperparameter vector theta
+  theta=param[1:9]   #hyperparameter vector theta
   x=param[10:length(param)]   #latent parameter vector a,b,beta(w)
   #store particular hyperparameter values
-  zeta <- th[1]
-  phi_b=exp(th[3])
-  sig_b2=exp(th[2])
-  lambda = th[4:9]
+  zeta <- theta[1]
+  phi_b=exp(theta[3])
+  sig_b2=exp(theta[2])
+  lambda = theta[4:9]
   #get sample of data variance using splines
   varr = c(exp(RC$B_u %*% lambda))
   m=length(RC$w_u)
