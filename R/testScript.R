@@ -45,9 +45,9 @@ summary(bplm.fit)
 
 ggplot(data=bplm.fit$rating_curve) +
     geom_point(data=rc_dat,aes(Q,W)) +
-    geom_line(aes(median,W)) +
-    geom_line(aes(lower,W),linetype='dashed') +
-    geom_line(aes(upper,W),linetype='dashed')
+    geom_line(aes(median,w)) +
+    geom_line(aes(lower,w),linetype='dashed') +
+    geom_line(aes(upper,w),linetype='dashed')
 
 bplm.fit_known_c <- bplm(rc_formula,rc_dat,c_param=0.75)
 
@@ -55,9 +55,9 @@ summary(bplm.fit_known_c)
 
 ggplot(data=bplm.fit_known_c$rating_curve) +
     geom_point(data=rc_dat,aes(Q,W)) +
-    geom_line(aes(median,W)) +
-    geom_line(aes(lower,W),linetype='dashed') +
-    geom_line(aes(upper,W),linetype='dashed')
+    geom_line(aes(median,w)) +
+    geom_line(aes(lower,w),linetype='dashed') +
+    geom_line(aes(upper,w),linetype='dashed')
 
 
 #bgplm0
@@ -67,9 +67,9 @@ summary(bgplm0.fit)
 
 ggplot(data=bgplm0.fit$rating_curve) +
     geom_point(data=rc_dat,aes(Q,W)) +
-    geom_line(aes(median,W)) +
-    geom_line(aes(lower,W),linetype='dashed') +
-    geom_line(aes(upper,W),linetype='dashed')
+    geom_line(aes(median,w)) +
+    geom_line(aes(lower,w),linetype='dashed') +
+    geom_line(aes(upper,w),linetype='dashed')
 
 bgplm.fit_known_c <- bgplm0(rc_formula,rc_dat,c_param = 0.75)
 
@@ -89,9 +89,9 @@ summary(bgplm.fit_known_c)
 
 ggplot(data=bgplm.fit_known_c$rating_curve) +
     geom_point(data=rc_dat,aes(Q,W)) +
-    geom_line(aes(median,W)) +
-    geom_line(aes(lower,W),linetype='dashed') +
-    geom_line(aes(upper,W),linetype='dashed')
+    geom_line(aes(median,w)) +
+    geom_line(aes(lower,w),linetype='dashed') +
+    geom_line(aes(upper,w),linetype='dashed')
 
 ggplot(data=filter(bgplm.fit_known_c$beta,W>=min(rc_dat$W),W<=max(rc_dat$W))) +
     geom_line(aes(W,median)) +
