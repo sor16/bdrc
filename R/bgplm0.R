@@ -18,15 +18,15 @@ bgplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",for
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-    Q <- log(model_dat[,1,drop=T])
+    Q <- model_dat[,1,drop=T]
     W <- model_dat[,2,drop=T]
-    MCMC_output_list <- bgplm.inference(Q,W,c_param,w_limits,country,forcepoint,...)
-    rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
-    names(rating_curve) <- c('W','lower','median','upper')
+    MCMC_output_list <- bplm.inference(y=log(Q),w=W,c_param,w_limits,country,forcepoint)
+    rating_curve <- data.frame(w=MCMC_output_list$w_full,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
+    names(rating_curve) <- c('w','lower','median','upper')
     rating_curve <- rating_curve[order(rating_curve$W),]
-    beta_summary <- data.frame(W=unique(MCMC_output_list$W),as.data.frame(t(apply(MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
-    names(beta_summary) <- c('W','lower','median','upper')
-    beta_summary <- beta_summary[order(beta_summary$W),]
+    beta_summary <- data.frame(w=unique(MCMC_output_list$w_full),as.data.frame(t(apply(MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
+    names(beta_summary) <- c('w','lower','median','upper')
+    beta_summary <- beta_summary[order(beta_summary$w),]
     param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(param_summary) <- c('lower','median','upper')
     param_names <- c('var_epsilon','var_beta','phi_beta')
@@ -64,7 +64,7 @@ bgplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",for
     return(result_obj)
 }
 
-bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bgplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     suppressPackageStartupMessages(require(doParallel))
     #TODO: add error message if length(formula)! <- 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
     RC <- priors(country)
@@ -107,7 +107,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
         unobserved_prediction_fun <- bgplm.predict_u_unknown_c
     }
     #determine proposal density
-    theta_length <- if(is.null(RC$c)) 9 else 8
+    theta_length <- if(is.null(RC$c)) 4 else 3
     theta_init <- rep(0,theta_length)
     loss_fun  <-  function(th) {-density_fun(th,RC)$p}
     optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
@@ -180,7 +180,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
         return(output_mat)
     }
     stopCluster(cl)
-    MCMC_output_list <- list('W'=c(RC$w,RC$w_u),
+    MCMC_output_list <- list('w_full'=c(RC$w,RC$w_u),
                              'theta'=MCMC_output_mat[1:theta_length,],
                              'a'=exp(MCMC_output_mat[theta_length+1,]),
                              'b'=MCMC_output_mat[theta_length+2,],
@@ -203,25 +203,26 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.density_evaluation_known_c <- function(th,RC){
-    sig_b2=th[1]
-    phi_b=th[2]
-    lambda=th[3:8]
+    log_sig_eps2 <- th[1]
+    sig_b2 <- th[2]
+    phi_b <- th[3]
 
-    f=lambda[1:5]-lambda[6]
     l=c(log(RC$w-RC$c))
 
-    varr=c(RC$epsilon*exp(RC$B%*%lambda))
+    varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
+    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
+        exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n)*RC$nugget
     Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
 
     X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-        sig_b2-exp(sig_b2)/RC$mu_sb-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2
+        RC$n*log_sig_eps2/2 +
+        sig_b2-exp(sig_b2)/RC$mu_sb+
+        0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2
 
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n+2)
@@ -244,13 +245,13 @@ bgplm.density_evaluation_known_c <- function(th,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.density_evaluation_unknown_c <- function(th,RC){
     zeta <- th[1]
-    sig_eps2 <- th[2]
+    log_sig_eps2 <- th[2]
     sig_b2 <- th[3]
     phi_b <- th[4]
 
     l=c(log(RC$w_tild+exp(zeta)))
 
-    varr=RC$epsilon*exp(RC$sig_eps)
+    varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
     R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
@@ -261,6 +262,10 @@ bgplm.density_evaluation_unknown_c <- function(th,RC){
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
+        RC$n*log_sig_eps2/2 - log_sig_eps2 +
+        sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
+
+    -0.5%*%t(w)%*%w-sum(log(diag(L)))-
         (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
         sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2 #63 micro
 
@@ -291,22 +296,24 @@ bgplm.density_evaluation_unknown_c <- function(th,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.predict_u_known_c <- function(param,RC){
     #collecting parameters from the MCMC sample
-    th=param[1:8]
-    x=param[9:length(param)]
-    sig_b2=exp(th[1])
-    phi_b=exp(th[2])
-    lambda = th[3:length(th)]
-    #calculate spline variance from B_splines
-    varr = c(exp(RC$B_u %*% lambda))
+    th=param[1:3]   #hyperparameter vector theta
+    x=param[4:length(param)]   #latent parameter vector a,b,beta(w)
+    #store particular hyperparameter values
+    log_sig_eps2 <- th[1]
+    sig_b2=exp(th[2])
+    phi_b=exp(th[3])
+
+    #get sample of data variance using splines
     m=length(RC$w_u)
+    varr = rep(exp(log_sig_eps2),m)
     n=RC$n
     #combine stages from data with unobserved stages
-    W_all=c(RC$O,RC$w_u)
+    w_all=c(RC$O,RC$w_u)
     #calculating distance matrix for W_all
-    dist=abs(outer(W_all,W_all,FUN="-"))
-    #defining the variance of the joint prior for betas from data and beta unobserved, that is p(beta,beta_u).
+    dist=abs(outer(w_all,w_all,FUN="-"))
+    #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(W_all))*RC$nugget
+    sigma_all=sig_b2*(1 + sqrt(5)*dist/phi_b+(5*dist^2)/(3*phi_b^2))*exp(-sqrt(5)*dist/phi_b) + diag(length(w_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -339,16 +346,17 @@ bgplm.predict_u_known_c <- function(param,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.predict_u_unknown_c <- function(param,RC){
     #collecting parameters from the MCMC sample
-    th=param[1:9]   #hyperparameter vector theta
-    x=param[10:length(param)]   #latent parameter vector a,b,beta(w)
+    th=param[1:4]   #hyperparameter vector theta
+    x=param[5:length(param)]   #latent parameter vector a,b,beta(w)
     #store particular hyperparameter values
     zeta <- th[1]
-    phi_b=exp(th[3])
-    sig_b2=exp(th[2])
-    lambda = th[4:9]
+    log_sig_eps2 <- th[2]
+    sig_b2=exp(th[3])
+    phi_b=exp(th[4])
+
     #get sample of data variance using splines
-    varr = c(exp(RC$B_u %*% lambda))
     m=length(RC$w_u)
+    varr = rep(exp(log_sig_eps2),m)
     n=RC$n
     #combine stages from data with unobserved stages
     w_all=c(RC$O,RC$w_u)
