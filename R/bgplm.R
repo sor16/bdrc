@@ -18,15 +18,18 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
   #argument checking
   model_dat <- data[,all.vars(formula)]
   model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-  Q <- log(model_dat[,1,drop=T])
-  W <- model_dat[,2,drop=T]
-  MCMC_output_list <- bgplm.inference(Q,W,c_param,w_limits,country,forcepoint,...)
-  rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$ypo,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
+  Q <- model_dat[,1,drop=T]
+  w <- model_dat[,2,drop=T]
+  MCMC_output_list <- bgplm.inference(y=log(Q),w,c_param,w_limits,country,forcepoint,...)
+  rating_curve <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$y_post_pred,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
   names(rating_curve) <- c('W','lower','median','upper')
   rating_curve <- rating_curve[order(rating_curve$W),]
-  beta_summary <- data.frame(W=unique(MCMC_output_list$W),as.data.frame(t(apply(MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
+  beta_summary <- data.frame(W=unique(MCMC_output_list$W),as.data.frame(t(apply(matrix(rep(MCMC_output_list$b,nrow(MCMC_output_list$beta)),nrow=nrow(MCMC_output_list$beta),byrow=T)+MCMC_output_list$beta,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
   names(beta_summary) <- c('W','lower','median','upper')
   beta_summary <- beta_summary[order(beta_summary$W),]
+  sigma_eps_summary <- data.frame(W=MCMC_output_list$W,as.data.frame(t(apply(MCMC_output_list$sigma_eps,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T))),row.names=NULL)
+  names(sigma_eps_summary) <- c('W','lower','median','upper')
+  sigma_eps_summary <- sigma_eps_summary[order(sigma_eps_summary$W),]
   param_summary <- as.data.frame(t(apply(rbind(MCMC_output_list$a,MCMC_output_list$b,MCMC_output_list$theta),1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
   names(param_summary) <- c('lower','median','upper')
   param_names <- c('var_beta','phi_beta',paste0('lambda_',1:6))
@@ -54,9 +57,16 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,country="Iceland",forc
     result_obj$post_var_beta <- MCMC_output_list$theta[1,]
     result_obj$post_phi_beta <- MCMC_output_list$theta[2,]
   }
+  result_obj$beta_post
+  result_obj$sigma_eps_post <- MCMC_output_list$sigma_eps
+  result_obj$y_post <- MCMC_output_list$y_post
+  result_obj$y_post_pred <- MCMC_output_list$y_post_pred
+
+
   result_obj$DIC <- DIC
   result_obj$param_summary <- param_summary
   result_obj$beta <- beta_summary
+  result_obj$sigma_eps <- sigma_eps_summary
   result_obj$rating_curve <- rating_curve
   attr(result_obj, "class") <- "bgplm"
   return(result_obj)
@@ -133,40 +143,57 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
   registerDoParallel(cl)
   MCMC_output_mat <- foreach(i=1:num_chains,.combine=cbind) %dopar% {
     latent_and_hyper_param <- matrix(0,nrow=length(theta_m)+RC$n+2,ncol=nr_iter)
-    y_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
+    y_post_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
+    y_post_pred_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
+    sigma_eps_mat <- matrix(0,nrow=RC$N,ncol=nr_iter)
     DIC <- rep(0,nr_iter)
     theta_old <- as.matrix(theta_m)
     Dens <- density_fun(theta_old,RC)
     p_old <- Dens$p
-    ypo_old <- Dens$ypo
+    y_post_old <- Dens$yp
+    y_post_pred_old <- Dens$ypo
+    sigma_eps_old <- Dens$varr
     x_old <- Dens$x
     DIC_old <- Dens$DIC
     for(j in 1:nr_iter){
       theta_new <- theta_old+solve(t(LH),rnorm(theta_length,0,1))
       Densnew <- density_fun(theta_new,RC)
       x_new <- Densnew$x
-      ypo_new <- Densnew$ypo
+      y_post_new <- Densnew$yp
+      y_post_pred_new <- Densnew$ypo
+      sigma_eps_new <- Densnew$varr
       p_new <- Densnew$p
       DIC_new <- Densnew$DIC
       logR <- p_new-p_old
       if (logR>log(runif(1))){
         theta_old <- theta_new
         p_old <- p_new
-        ypo_old <- ypo_new
+        y_post_old <- y_post_new
+        y_post_pred_old <- y_post_pred_new
+        sigma_eps_old <- sigma_eps_new
         x_old <- x_new
         DIC_old <- DIC_new
       }
       latent_and_hyper_param[,j] <- c(theta_old,x_old)
-      y_pred_mat[,j] <- ypo_old
+      y_post_mat[,j] <- y_post_old
+      y_post_pred_mat[,j] <- y_post_pred_old
+      sigma_eps_mat[,j] <- sigma_eps_old
       DIC[j] <- DIC_old
     }
 
     seq <- seq(burnin,nr_iter,thin)
     latent_and_hyper_param <- latent_and_hyper_param[,seq]
-    y_pred_mat <- y_pred_mat[,seq]
+    y_post_mat <- y_post_mat[,seq]
+    y_post_pred_mat <- y_post_pred_mat[,seq]
+    sigma_eps_mat <- sigma_eps_mat[,seq]
     DIC <- DIC[seq]
     unobserved_mat <- apply(latent_and_hyper_param,2,function(x) unobserved_prediction_fun(x,RC))
-    output_mat <- rbind(latent_and_hyper_param,unobserved_mat[1:length(RC$w_u),],y_pred_mat,unobserved_mat[(length(RC$w_u)+1):nrow(unobserved_mat),],t(matrix(DIC)))
+    output_mat <- rbind(latent_and_hyper_param,
+                        unobserved_mat[1:length(RC$w_u),],
+                        y_post_mat,unobserved_mat[(length(RC$w_u)+1):(2*length(RC$w_u)),],
+                        y_post_pred_mat,unobserved_mat[(2*length(RC$w_u)+1):(3*length(RC$w_u)),],
+                        sigma_eps_mat,unobserved_mat[(3*length(RC$w_u)+1):(4*length(RC$w_u)),],
+                        t(matrix(DIC)))
     if(is.null(RC$c)){
       output_mat[1,] <- RC$w_min-exp(output_mat[1,])
       output_mat[2,] <- exp(output_mat[2,])
@@ -183,7 +210,9 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,country="Iceland",for
                            'a'=exp(MCMC_output_mat[theta_length+1,]),
                            'b'=MCMC_output_mat[theta_length+2,],
                            'beta'=MCMC_output_mat[(theta_length+3):(theta_length+2+RC$n+length(RC$w_u)),],
-                           'ypo'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(nrow(MCMC_output_mat)-1),]),
+                           'y_post'=exp(MCMC_output_mat[(theta_length+2+RC$n+length(RC$w_u)+1):(theta_length+2+RC$n+RC$N+2*length(RC$w_u)),]),
+                           'y_post_pred'=exp(MCMC_output_mat[(theta_length+2+RC$n+RC$N+2*length(RC$w_u)+1):(theta_length+2+RC$n+2*RC$N+3*length(RC$w_u)),]),
+                           'sigma_eps'=MCMC_output_mat[(theta_length+2+RC$n+2*RC$N+3*length(RC$w_u)+1):(theta_length+2+RC$n+3*RC$N+4*length(RC$w_u)),],
                            'DIC'=MCMC_output_mat[nrow(MCMC_output_mat),])
 
   return(MCMC_output_list)
@@ -296,7 +325,7 @@ bgplm.predict_u_known_c <- function(param,RC){
   phi_b=exp(theta[2])
   lambda = theta[3:length(theta)]
   #calculate spline variance from B_splines
-  varr = c(exp(RC$B_u %*% lambda))
+  varr_u = c(exp(RC$B_u %*% lambda))
   m=length(RC$w_u)
   n=RC$n
   #combine stages from data with unobserved stages
@@ -320,8 +349,9 @@ bgplm.predict_u_known_c <- function(param,RC){
   X=cbind(rep(1,m),l,diag(l))
   x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
-  ypo_u = X%*%x_u + as.matrix(rnorm(m)) * sqrt(varr)
-  return(c(beta_u,ypo_u))
+  yp_u <- c(X%*%x_u)
+  ypo_u = yp_u + as.matrix(rnorm(m)) * sqrt(varr_u)
+  return(as.matrix(c(beta_u,yp_u,ypo_u,varr_u)))
 }
 
 #' Predictive values for unoberved stages
@@ -346,7 +376,7 @@ bgplm.predict_u_unknown_c <- function(param,RC){
   sig_b2=exp(theta[2])
   lambda = theta[4:9]
   #get sample of data variance using splines
-  varr = c(exp(RC$B_u %*% lambda))
+  varr_u = c(exp(RC$B_u %*% lambda))
   m=length(RC$w_u)
   n=RC$n
   #combine stages from data with unobserved stages
@@ -373,8 +403,9 @@ bgplm.predict_u_unknown_c <- function(param,RC){
   #vector of parameters
   x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
-  ypo_u = X%*%x_u + as.matrix(rnorm(m_above_c)) * sqrt(varr[above_c])
-  return(as.matrix(c(beta_u,rep(-Inf,m-m_above_c),ypo_u)))
+  yp_u <- c(X%*%x_u)
+  ypo_u = yp_u + as.matrix(rnorm(m_above_c)) * sqrt(varr_u[above_c])
+  return(c(beta_u,rep(-Inf,m-m_above_c),yp_u,rep(-Inf,m-m_above_c),ypo_u,varr_u))
 }
 
 
