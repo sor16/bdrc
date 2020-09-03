@@ -14,33 +14,18 @@
 #'\item N:     Number of measurements
 #'}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-Adist <- function(w){
-N=length(w)
-O=t(unique(w))
-n=length(O)
-
-A=matrix(0,nrow=N,ncol=n)
-
-A[1,1]=1
-
-e=1
-for(ee in 2:N){
-
-  if(w[ee]==w[ee-1]){
-
-        A[ee,e]=1
-
-  }else{
-    e=e+1
-    A[ee,e]=1
-
+create_A <- function(RC){
+  A=matrix(0,nrow=RC$n,ncol=RC$n_unique)
+  A[1,1]=1
+  i=1
+  for(ii in 2:RC$n){
+    if(RC$w[ii]==RC$w[ii-1]){
+          A[ii,i]=1
+    }else{
+      i=i+1
+      A[ii,i]=1
+    }
   }
+  return(A)
 }
-W=O
- for(ee in 2:n){
-   W=rbind(W,O)
- }
 
-dist=abs(W-t(W))
-return(list("dist"=dist,"A"=A,"n"=n,"N"=N,"O"=O))
-}

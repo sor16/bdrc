@@ -12,7 +12,7 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 W_unobserved <- function(RC,w_min=NA,w_max=NA){
     w_u=NULL
-    w=100*c(RC$O) #work in cm
+    w=100*c(RC$w) #work in cm
     max_w_diff=5
     #distance between subsequent elements in vector with additional dummy point 1000
     distvect=abs(w-c(w[2:length(w)],1000))
