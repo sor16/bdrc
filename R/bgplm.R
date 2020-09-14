@@ -42,7 +42,7 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,n
   result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
   result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
   result_obj$beta_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
-  result_obj$sigma_eps_posterior <- sqrt(exp(MCMC_output_list$sigma_eps))
+  result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps)
   result_obj$DIC_posterior <- MCMC_output_list$DIC
   #summary objects
   result_obj$rating_curve <- get_MCMC_summary(result_obj$Q_posterior_predictive,w=MCMC_output_list$w)
@@ -56,7 +56,6 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,n
 }
 
 bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-  suppressPackageStartupMessages(require(doParallel))
   #TODO: add error message if length(formula)! = 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC <- priors('bgplm',c_param)
   RC$y <- rbind(as.matrix(y),0)

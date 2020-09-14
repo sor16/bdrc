@@ -36,7 +36,7 @@ bplm <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nr
     }
     result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
     result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
-    result_obj$sigma_eps_posterior <- sqrt(exp(MCMC_output_list$sigma_eps))
+    result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps)
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$Q_posterior_predictive,w=MCMC_output_list$w)
