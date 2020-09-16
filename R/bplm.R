@@ -132,8 +132,8 @@ bplm.density_evaluation_known_c <- function(th,RC){
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f) #63 micro
+    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+      pri('eta',v = RC$v,s = RC$s,f = f, P = RC$P)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
     sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
@@ -166,8 +166,9 @@ bplm.density_evaluation_unknown_c <- function(th,RC){
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-        (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+zeta-exp(zeta)/RC$mu_c #63 micro
+    p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
+      pri('eta',v = RC$v,s = RC$s,f = f, P = RC$P) + 
+      pri('c', zeta = zeta, mu_c = RC$mu_c)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
     sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))

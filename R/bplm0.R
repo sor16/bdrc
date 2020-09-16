@@ -56,7 +56,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
     RC$w_max <- max(RC$w)
     RC$w_tild <- RC$w-RC$w_min
     RC$n <- length(w)
-    forcepoint_dat=model_dat[forcepoint,]
+    #forcepoint_dat=y[forcepoint,]
     RC$epsilon[forcepoint]=1/RC$n
     if(!is.null(RC$c)){
         density_fun <- bplm0.density_evaluation_known_c
@@ -148,7 +148,7 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
 
     p=0.5*sum(q^2)+log(L[1,1])+log(L[2,2])-
     0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2 +
-    zeta-exp(zeta)*RC$mu_c
+    pri('c',zeta = zeta,mu_c = RC$mu_c)
 
     x=solve(t(L),(q+as.matrix(rnorm(2))))
     yp=X %*% x

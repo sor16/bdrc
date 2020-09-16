@@ -154,3 +154,23 @@ get_desired_output <- function(model,RC){
     return(desired_output)
 }
 
+pri <- function(type,...){
+  args = list(...)
+  if(type == 'c'){
+    p = args$zeta-exp(args$zeta)/args$mu_c
+    
+  }else if(type == 'sig_eps2'){
+    p = 0
+    
+  }else if(type == 'sig_b2'){
+    p = args$sig_b2-exp(args$sig_b2)/args$mu_sb
+    
+  }else if(type == 'phi_b'){
+    p = -(0.5/args$tau_pb2*(args$phi_b-args$mu_pb)^2)
+    
+  }else if(type == 'eta'){
+    p = -(args$v+5-1)/2*log(args$v*args$s+args$f%*%args$P%*%args$f)
+    
+  }
+  return(p)
+}

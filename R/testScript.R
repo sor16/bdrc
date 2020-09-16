@@ -16,7 +16,7 @@ rc_dat <- read_excel('data/exceldata_RC.xlsx') %>% mutate(W=0.01*W)
 rc_formula <- as.formula('Q~W')
 
 ## bplm0
-bplm0.fit <- bplm0(rc_formula,rc_dat)
+bplm0.fit <- bplm0(formula = rc_formula,data = rc_dat)
 
 summary(bplm0.fit)
 
