@@ -3,7 +3,7 @@
 #' Infers a rating curve for paired measurements of stage and discharge using a  power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
 #'@param data data.frame containing the columns in formula
-#'@param w_limits vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
+#'@param w_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
 #'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
 #'automatically be set to c_hat.
@@ -14,13 +14,13 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 
-bplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     w <- model_dat[,2,drop=T]
-    MCMC_output_list <- bplm0.inference(y=log(Q),w=w,c_param,w_limits,forcepoint,...)
+    MCMC_output_list <- bplm0.inference(y=log(Q),w=w,c_param,w_max,forcepoint,...)
     result_obj=list()
     attr(result_obj, "class") <- "bplm0"
     result_obj$formula <- formula
@@ -47,7 +47,7 @@ bplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,n
     return(result_obj)
 }
 
-bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     require(parallel)
     RC <- priors('bplm0',c_param)
     RC$y <- as.matrix(y)
@@ -56,11 +56,14 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
     RC$w_max <- max(RC$w)
     RC$w_tild <- RC$w-RC$w_min
     RC$n <- length(w)
-    #forcepoint_dat=y[forcepoint,]
     RC$epsilon[forcepoint]=1/RC$n
     if(!is.null(RC$c)){
+      if(RC$c<=RC$w_min){
         density_fun <- bplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bplm0.predict_u_known_c
+      }else{
+        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$w_min,' m'))
+      }
     }else{
         density_fun <- bplm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- bplm0.predict_u_unknown_c
@@ -73,13 +76,12 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
     theta_m =optim_obj$par
     H=optim_obj$hessian
     RC$LH=t(chol(H))/(2.38/sqrt(2))
-    #create equally spaced grid of stages
-    if(is.null(w_limits)){ # if not user defined, round w_min and w_max to nearest decimeter
-      w_max <- ceiling(RC$w_max*10)/10
-      w_min <- floor(10*ifelse(is.null(RC$c),RC$w_min-exp(theta_m[1]),RC$c))/10
-    }else{
-      w_min <- w_limits[1]
-      w_max <- w_limits[2]
+    w_min <- ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c)
+    if(is.null(w_max)){
+      w_max <- RC$w_max
+    }
+    if(w_max<RC$w_max){
+      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$w_max,' m'))
     }
     RC$w_u <- W_unobserved(RC,w_min,w_max)
     RC$n_u <- length(RC$w_u)

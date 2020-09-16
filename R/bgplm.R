@@ -3,7 +3,7 @@
 #' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
 #'@param data data.frame containing the columns in formula
-#'@param w_limits vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
+#'@param w_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
 #'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
 #'automatically be set to c_hat.
@@ -14,13 +14,13 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 
-bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
   #TODO:argument checking
   model_dat <- data[,all.vars(formula)]
   model_dat <- model_dat[order(model_dat[,2,drop=T]),]
   Q <- model_dat[,1,drop=T]
   w <- model_dat[,2,drop=T]
-  MCMC_output_list <- bgplm.inference(y=log(Q),w,c_param,w_limits,forcepoint,...)
+  MCMC_output_list <- bgplm.inference(y=log(Q),w,c_param,w_max,forcepoint,...)
   #prepare S3 model object to be returned
   result_obj=list()
   attr(result_obj, "class") <- "bgplm"
@@ -55,7 +55,7 @@ bgplm <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,n
   return(result_obj)
 }
 
-bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   #TODO: add error message if length(formula)! = 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC <- priors('bgplm',c_param)
   RC$y <- rbind(as.matrix(y),0)
@@ -80,8 +80,12 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
   RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
   RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
   if(!is.null(RC$c)){
-    density_fun <- bgplm.density_evaluation_known_c
-    unobserved_prediction_fun <- bgplm.predict_u_known_c
+    if(RC$c<=RC$w_min){
+      density_fun <- bgplm.density_evaluation_known_c
+      unobserved_prediction_fun <- bgplm.predict_u_known_c
+    }else{
+      stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$w_min,' m'))
+    }
   }else{
     density_fun <- bgplm.density_evaluation_unknown_c
     unobserved_prediction_fun <- bgplm.predict_u_unknown_c
@@ -94,14 +98,12 @@ bgplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
   theta_m <- optim_obj$par
   H <- optim_obj$hessian
   RC$LH <- t(chol(H))/0.8
-
-  #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
-  if(is.null(w_limits)){
-    w_max <- ceiling(max(RC$w)*10)/10
-    w_min <- floor(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
-  }else{
-    w_min <- w_limits[1]
-    w_max <- w_limits[2]
+  w_min <- ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c)
+  if(is.null(w_max)){
+    w_max <- RC$w_max
+  }
+  if(w_max<RC$w_max){
+    stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$w_max,' m'))
   }
   RC$w_u <- W_unobserved(RC,w_min,w_max)
   RC$n_u <- length(RC$w_u)
@@ -162,11 +164,10 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
-    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P) +
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
     pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
-    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
-
+    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb) +
+    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P)
 
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
@@ -207,11 +208,10 @@ bgplm.density_evaluation_unknown_c <- function(theta,RC){
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
   p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
-    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P) +
-    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
     pri('c', zeta = zeta, mu_c = RC$mu_c) +
-    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
-
+    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
+    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)+
+    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P)
 
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)

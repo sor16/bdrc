@@ -3,7 +3,7 @@
 #' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
 #'@param data data.frame containing the columns in formula
-#'@param w_limits vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
+#'@param w_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
 #'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
 #'automatically be set to c_hat.
@@ -14,13 +14,13 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 
-bgplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     w <- model_dat[,2,drop=T]
-    MCMC_output_list <- bgplm0.inference(y=log(Q),w=w,c_param,w_limits,forcepoint)
+    MCMC_output_list <- bgplm0.inference(y=log(Q),w=w,c_param,w_max,forcepoint)
     #prepare S3 model object to be returned
     result_obj=list()
     attr(result_obj, "class") <- "bgplm0"
@@ -53,7 +53,7 @@ bgplm0 <- function(formula,data,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
     return(result_obj)
 }
 
-bgplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     suppressPackageStartupMessages(require(parallel))
     RC <- priors('bgplm0',c_param)
     RC$y <- rbind(as.matrix(y),0)
@@ -78,8 +78,12 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
     if(!is.null(RC$c)){
+      if(RC$c<=RC$w_min){
         density_fun <- bgplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bgplm0.predict_u_known_c
+      }else{
+        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$w_min,' m'))
+      }
     }else{
         density_fun <- bgplm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- bgplm0.predict_u_unknown_c
@@ -93,13 +97,12 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE
     H <- optim_obj$hessian
     RC$LH <- t(chol(H))/0.8
 
-    #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
-    if(is.null(w_limits)){
-        w_max <- ceiling(max(RC$w)*10)/10
-        w_min <- floor(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
-    }else{
-        w_min <- w_limits[1]
-        w_max <- w_limits[2]
+    w_min <- ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c)
+    if(is.null(w_max)){
+        w_max <- RC$w_max
+    }
+    if(w_max<RC$w_max){
+      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$w_max,' m'))
     }
     RC$w_u <- W_unobserved(RC,w_min,w_max)
     RC$n_u <- length(RC$w_u)
