@@ -76,7 +76,7 @@ bgplm0.fit_known_c <- bgplm0(rc_formula,rc_dat,c_param = 0.75)
 summary(bgplm0.fit_known_c)
 
 ggplot(data=bgplm0.fit_known_c$rating_curve) +
-    geom_point(data=rc_dat,aes(Q,w)) +
+    geom_point(data=rc_dat,aes(Q,W)) +
     geom_line(aes(median,w)) +
     geom_line(aes(lower,w),linetype='dashed') +
     geom_line(aes(upper,w),linetype='dashed')

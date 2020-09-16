@@ -162,10 +162,12 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-    (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-    sig_b2-exp(sig_b2)/RC$mu_sb-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P) +
+    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
+    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
 
+  
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
   sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
@@ -204,10 +206,13 @@ bgplm.density_evaluation_unknown_c <- function(theta,RC){
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))-
-    (RC$v+5-1)/2*log(RC$v*RC$s+f%*%RC$P%*%f)+
-    sig_b2-exp(sig_b2)/RC$mu_sb+zeta-exp(zeta)/RC$mu_c-0.5/RC$tau_pb2*(phi_b-RC$mu_pb)^2
-
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
+    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P) +
+    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
+    pri('c', zeta = zeta, mu_c = RC$mu_c) +
+    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
+  
+  
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
   sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
