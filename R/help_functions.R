@@ -174,3 +174,51 @@ pri <- function(type,...){
   }
   return(p)
 }
+
+
+
+pri_new <- function(type,...){
+  args = list(...)
+  if(type == 'c'){
+    p = args$zeta-exp(args$zeta)/args$mu_c
+    
+  }else if(type == 'sig_eps2'){
+    p = 0
+    
+  }else if(type == 'sig_b2'){
+    p = args$sig_b2-exp(args$sig_b2)/args$mu_sb
+    
+  }else if(type == 'phi_b'){
+    p = -(0.5/args$tau_pb2*(args$phi_b-args$mu_pb)^2)
+    
+  }else if(type == 'eta'){
+    p = -(args$v+5-1)/2*log(args$v*args$s+args$f%*%args$P%*%args$f)
+    
+  }
+  return(p)
+}
+
+
+
+p = #- 0.5*w'*w - sum(log(diag(L))) ...         % log(p(y*|t))
+    + psi1 - exp(psi1)*RC.lam_c ...               # log(p(psi1))
++ 0.5*lambda(1) - exp(0.5*lambda(1))*RC.lam_eta1  # log(p(lam1))
++ psi4 - exp(psi4)*RC.lam_seta                    # log(p(psi4))    
+-0.5*exp(-2*psi4)*t(lambda)*RC.R*lambda           # log(p(eta_m1|psi4,lam1))
+-(length(lambda) - 1)*psi4;
+
+
+
+
+p = #-0.5*w'*w-sum(log(diag(L)))... % log(p(y*|t))
+    + psi1 - exp(psi1)*RC.lam_c                       # log(p(psi1))
+    + 0.5*lambda(1) - exp(0.5*lambda(1))*RC$lam_eta1  # log(p(lam1))
+    + psi4 - exp(psi4)*RC$lam_seta                    # log(p(psi4))    
+    -0.5*exp(-2*psi4)*t(lambda)*RC.R*lambda           # log(p(eta_m1|psi4,lam1))
+-(length(lambda) - 1)*psi4
++ psi2 - exp(psi2)*RC$lam_psi2
+- 0.5*psi3 - RC$lam_psi3*(sqrt(0.5))*exp(-0.5*psi3)
+
+
+
+
