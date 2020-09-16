@@ -83,7 +83,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,n
     #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
     if(is.null(w_limits)){
         w_max <- ceiling(max(RC$w)*10)/10
-        w_min <- ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
+        w_min <- floor(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
     }else{
         w_min <- w_limits[1]
         w_max <- w_limits[2]
@@ -167,7 +167,7 @@ bplm.density_evaluation_unknown_c <- function(th,RC){
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
-      pri('eta',v = RC$v,s = RC$s,f = f, P = RC$P) + 
+      pri('eta',v = RC$v,s = RC$s,f = f, P = RC$P) +
       pri('c', zeta = zeta, mu_c = RC$mu_c)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))

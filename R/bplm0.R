@@ -76,7 +76,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE,
     #create equally spaced grid of stages
     if(is.null(w_limits)){ # if not user defined, round w_min and w_max to nearest decimeter
       w_max <- ceiling(RC$w_max*10)/10
-      w_min <- ceiling(10*ifelse(is.null(RC$c),RC$w_min-exp(theta_m[1]),RC$c))/10
+      w_min <- floor(10*ifelse(is.null(RC$c),RC$w_min-exp(theta_m[1]),RC$c))/10
     }else{
       w_min <- w_limits[1]
       w_max <- w_limits[2]

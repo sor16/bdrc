@@ -96,7 +96,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_limits=NULL,forcepoint=rep(FALSE
     #make Wmin and Wmax divisable by 10 up, both in order to make rctafla and so l_m is defined
     if(is.null(w_limits)){
         w_max <- ceiling(max(RC$w)*10)/10
-        w_min <- ceiling(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
+        w_min <- floor(10*ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c))/10
     }else{
         w_min <- w_limits[1]
         w_max <- w_limits[2]
