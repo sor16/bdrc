@@ -45,6 +45,7 @@ bplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm',c_param)
     result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
+    result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
 
@@ -114,6 +115,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['w']] <- c(RC$w,RC$w_u)
+    output_list[['run_info']] <- list('nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 

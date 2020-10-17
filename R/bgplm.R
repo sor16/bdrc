@@ -30,12 +30,12 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
   result_obj$b_posterior = MCMC_output_list$x[2,]
   if(is.null(c_param)){
     result_obj$c_posterior <- MCMC_output_list$theta[1,]
-    result_obj$sig_beta_posterior <- MCMC_output_list$theta[2,]
+    result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2,]
     result_obj$phi_beta_posterior <- MCMC_output_list$theta[3,]
     result_obj$lambda_posterior <- MCMC_output_list$theta[4:nrow(MCMC_output_list$theta),]
   }else{
     result_obj$c_posterior <- NULL
-    result_obj$sig_beta_posterior <- MCMC_output_list$theta[1,]
+    result_obj$sigma_beta_posterior <- MCMC_output_list$theta[1,]
     result_obj$phi_beta_posterior <- MCMC_output_list$theta[2,]
     result_obj$lambda_posterior <- MCMC_output_list$theta[3:nrow(MCMC_output_list$theta),]
   }
@@ -52,6 +52,7 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
   result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
   row.names(result_obj$param_summary) <- get_param_names('bgplm',c_param)
   result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
+  result_obj$run_info <- MCMC_output_list$run_info
   return(result_obj)
 }
 
@@ -133,6 +134,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   }
   output_list$x[1,] <- exp(output_list$x[1,])
   output_list[['w']] <- c(RC$w,RC$w_u)
+  output_list[['run_info']] <- list('nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
   return(output_list)
 }
 
