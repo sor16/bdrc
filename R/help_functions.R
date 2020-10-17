@@ -11,13 +11,13 @@ library(parallel)
 priors <- function(model,c_param) {
     RC=list()
     #Prior parameters for all models
-    RC$mu_a <- 3.20;
-    RC$mu_b <- 2.29;
-    RC$sig_a <- sqrt(1.21);
-    RC$sig_b <- sqrt(0.48);
-    RC$p_ab <- -0.61;
+    RC$mu_a <- 3;
+    RC$mu_b <- 1.835;
+    RC$sig_a <- 3;
+    RC$sig_b <- 0.426;
+    RC$p_ab <- 0;
     if(is.null(c_param)){
-        RC$mu_c <- 1.9;
+        RC$lambda_c <- 2;
     }else{
         RC$c <- c_param
     }
@@ -27,7 +27,10 @@ priors <- function(model,c_param) {
         RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b))
         RC$Sig_xinv <- solve(RC$Sig_x)
         RC$Sinvmu <- RC$Sig_xinv%*%RC$mu_x
+        RC$lambda_se <- 28.78
     }else{
+        RC$lambda_eta1 <- 28.78
+        RC$lambda_seta <- 8.62
         RC$nugget <- 10^-8
         RC$mu_sb <- 0.5
         RC$mu_pb <- 0.5
@@ -157,20 +160,16 @@ get_desired_output <- function(model,RC){
 pri <- function(type,...){
   args = list(...)
   if(type == 'c'){
-    p = args$zeta-exp(args$zeta)/args$mu_c
-
-  }else if(type == 'sig_eps2'){
-    p = 0
-
+    p <- args$zeta - exp(args$zeta)*args$lambda_c
+  }else if(type == 'sigma_eps2'){
+    p <- 0.5*args$log_sig_eps2 - exp(0.5*args$log_sig_eps2)*args$lambda_se
   }else if(type == 'sig_b2'){
-    p = args$sig_b2-exp(args$sig_b2)/args$mu_sb
-
+    p <- args$sig_b2-exp(args$sig_b2)/args$mu_sb
   }else if(type == 'phi_b'){
-    p = -(0.5/args$tau_pb2*(args$phi_b-args$mu_pb)^2)
+    p <- -(0.5/args$tau_pb2*(args$phi_b-args$mu_pb)^2)
 
   }else if(type == 'eta'){
-    p = -(args$v+5-1)/2*log(args$v*args$s+args$f%*%args$P%*%args$f)
-
+    p <- -(args$v+5-1)/2*log(args$v*args$s+args$f%*%args$P%*%args$f)
   }
   return(p)
 }

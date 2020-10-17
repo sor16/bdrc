@@ -126,7 +126,8 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
     L=t(chol(RC$Sig_xinv + (t(X) %*% X)/exp(log_sig_eps2)))
     q=solve(L,(RC$Sinvmu+t(X)%*%RC$y/exp(log_sig_eps2)))
     p=0.5*sum(q^2)+log(L[1,1])+log(L[2,2])-
-     0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2# - log_sig_eps2
+      0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2 +
+      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
     x=solve(t(L),(q+as.matrix(rnorm(2))))
     yp=X %*% x
     ypo=yp+as.matrix(rnorm(RC$n,sd=sqrt(exp(log_sig_eps2))))
@@ -152,7 +153,8 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
 
     p=0.5*sum(q^2)+log(L[1,1])+log(L[2,2])-
     0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2 +
-    pri('c',zeta = zeta,mu_c = RC$mu_c)
+    pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
+    pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     x=solve(t(L),(q+as.matrix(rnorm(2))))
     yp=X %*% x
