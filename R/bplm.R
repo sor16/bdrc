@@ -29,10 +29,16 @@ bplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(
     result_obj$b_posterior = MCMC_output_list$x[2,]
     if(is.null(c_param)){
         result_obj$c_posterior <- MCMC_output_list$theta[1,]
-        result_obj$lambda_posterior <- MCMC_output_list$theta[2:nrow(MCMC_output_list$theta),]
+        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[2,]
+        for(i in 3:nrow(MCMC_output_list$theta)){
+          result_obj[[paste0('eta',i,'_posterior')]] <- MCMC_output_list$theta[i,]
+        }
     }else{
         result_obj$c_posterior <- NULL
-        result_obj$lambda_posterior <- MCMC_output_list$theta
+        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[1,]
+        for(i in 2:nrow(MCMC_output_list$theta)){
+          result_obj[[paste0('eta',i,'_posterior')]] <- MCMC_output_list$theta[i,]
+        }
     }
     result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
     result_obj$Q_posterior <- exp(MCMC_output_list$y_post)

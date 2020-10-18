@@ -126,11 +126,11 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     if(is.null(RC$c)){
         output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
         output_list$theta[2,] <- sqrt(exp(output_list$theta[2,]))
-        output_list$theta[3,] <- exp(output_list$theta[3,])
+        output_list$theta[3,] <- sqrt(exp(output_list$theta[3,]))
         output_list$theta[4,] <- exp(output_list$theta[4,])
     }else{
         output_list$theta[1,] <- sqrt(exp(output_list$theta[1,]))
-        output_list$theta[2,] <- exp(output_list$theta[2,])
+        output_list$theta[2,] <- sqrt(exp(output_list$theta[2,]))
         output_list$theta[3,] <- exp(output_list$theta[3,])
     }
     output_list$x[1,] <- exp(output_list$x[1,])
