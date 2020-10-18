@@ -69,7 +69,6 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     RC$dist <- as.matrix(dist(c(RC$w_unique)))
 
     RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
-    RC$P <- diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
     RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
     RC$epsilon <- rep(1,RC$n)
     #Spyrja Bigga út í varíans hér
