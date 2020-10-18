@@ -149,10 +149,10 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-bgplm0.density_evaluation_known_c <- function(th,RC){
-    log_sig_eps2 <- th[1]
-    log_sig_b2 <- th[2]
-    log_phi_b <- th[3]
+bgplm0.density_evaluation_known_c <- function(theta,RC){
+    log_sig_eps2 <- theta[1]
+    log_sig_b2 <- theta[2]
+    log_phi_b <- theta[3]
 
     l=c(log(RC$w-RC$c))
 
@@ -191,11 +191,11 @@ bgplm0.density_evaluation_known_c <- function(th,RC){
 #'@param RC A list containing prior parameters, matrices and the data.
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-bgplm0.density_evaluation_unknown_c <- function(th,RC){
-    zeta <- th[1]
-    log_sig_eps2 <- th[2]
-    log_sig_b2 <- th[3]
-    log_phi_b <- th[4]
+bgplm0.density_evaluation_unknown_c <- function(theta,RC){
+    zeta <- theta[1]
+    log_sig_eps2 <- theta[2]
+    log_sig_b2 <- theta[3]
+    log_phi_b <- theta[4]
 
     l=c(log(RC$w_tild+exp(zeta)))
 

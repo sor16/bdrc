@@ -37,7 +37,7 @@ priors <- function(model,c_param) {
     if(model %in% c('bplm0','bgplm0')){
       RC$lambda_se <- 28.78
     }else{
-      RC$lambda_eta1 <- 28.78
+      RC$lambda_eta_1 <- 28.78
       RC$lambda_seta <- 8.62
     }
     return(RC)
@@ -166,8 +166,8 @@ pri <- function(type,...){
     p <- args$log_sig_b2 - exp(args$log_sig_b2)*args$lambda_sb
   }else if(type == 'phi_b'){
     p <- - 0.5*args$log_phi_b - args$lambda_pb*(sqrt(0.5))*exp(-0.5*args$log_phi_b)
-  }else if(type == 'eta1'){
-    p <- 0.5*args$eta1 - exp(0.5*args$eta1)*args$lambda_eta1
+  }else if(type == 'eta_1'){
+    p <- 0.5*args$eta_1 - exp(0.5*args$eta_1)*args$lambda_eta_1
   }else if(type == 'eta_minus1'){
     p <- -0.5*t(as.matrix(args$eta_minus1))%*%as.matrix(args$eta_minus1)
   }else if(type == 'sigma_eta'){
