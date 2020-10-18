@@ -57,7 +57,7 @@ bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
 bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     suppressPackageStartupMessages(require(parallel))
     RC <- priors('bgplm0',c_param)
-    RC$y <- rbind(as.matrix(y),0)
+    RC$y <- rbind(as.matrix(y),RC$mu_b)
     RC$w <- as.matrix(w)
     RC$w_min <- min(RC$w)
     RC$w_max <- max(RC$w)
@@ -75,7 +75,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     #Spyrja Bigga út í varíans hér
     RC$epsilon[forcepoint] <- 1/RC$n_unique
 
-    RC$Z <- cbind(t(rep(0,2)),t(rep(1,RC$n_unique)))
+    RC$Z <- cbind(t(c(0,1)),t(rep(1,RC$n_unique)))
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
     if(!is.null(RC$c)){
@@ -152,24 +152,25 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.density_evaluation_known_c <- function(th,RC){
     log_sig_eps2 <- th[1]
-    sig_b2 <- th[2]
-    phi_b <- th[3]
+    log_sig_b2 <- th[2]
+    log_phi_b <- th[3]
 
     l=c(log(RC$w-RC$c))
 
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
-        exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n_unique)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+    R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
+        exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
+    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
 
     X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
-      pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb)+
-      pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
+      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
+      pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+      pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
 
 
     W=solve(L,X%*%Sig_x)
@@ -194,26 +195,26 @@ bgplm0.density_evaluation_known_c <- function(th,RC){
 bgplm0.density_evaluation_unknown_c <- function(th,RC){
     zeta <- th[1]
     log_sig_eps2 <- th[2]
-    sig_b2 <- th[3]
-    phi_b <- th[4]
+    log_sig_b2 <- th[3]
+    log_phi_b <- th[4]
 
     l=c(log(RC$w_tild+exp(zeta)))
 
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
-    R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
-        exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n_unique)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+    R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
+        exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
+    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
 
     X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
-      pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
-      pri('c', zeta = zeta, mu_c = RC$mu_c) +
-      pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)
-
+      pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
+      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
+      pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+      pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
     sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
