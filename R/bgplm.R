@@ -32,12 +32,18 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     result_obj$c_posterior <- MCMC_output_list$theta[1,]
     result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2,]
     result_obj$phi_beta_posterior <- MCMC_output_list$theta[3,]
-    result_obj$lambda_posterior <- MCMC_output_list$theta[4:nrow(MCMC_output_list$theta),]
+    result_obj$sigma_eta_posterior <- MCMC_output_list$theta[4,]
+    for(i in 5:nrow(MCMC_output_list$theta)){
+      result_obj[[paste0('eta_',i-4,'_posterior')]] <- MCMC_output_list$theta[i,]
+    }
   }else{
     result_obj$c_posterior <- NULL
     result_obj$sigma_beta_posterior <- MCMC_output_list$theta[1,]
     result_obj$phi_beta_posterior <- MCMC_output_list$theta[2,]
-    result_obj$lambda_posterior <- MCMC_output_list$theta[3:nrow(MCMC_output_list$theta),]
+    result_obj$sigma_eta_posterior <- MCMC_output_list$theta[3,]
+    for(i in 4:nrow(MCMC_output_list$theta)){
+      result_obj[[paste0('eta_',i-3,'_posterior')]] <- MCMC_output_list$theta[i,]
+    }
   }
   result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
   result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
@@ -59,7 +65,7 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
 bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   #TODO: add error message if length(formula)! = 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC <- priors('bgplm',c_param)
-  RC$y <- rbind(as.matrix(y),0)
+  RC$y <- rbind(as.matrix(y),RC$mu_b)
   RC$w <- as.matrix(w)
   RC$w_min <- min(RC$w)
   RC$w_max <- max(RC$w)
@@ -71,13 +77,13 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   RC$dist <- as.matrix(dist(c(RC$w_unique)))
 
   RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
-  RC$P <- diag(nrow=5,ncol=5,6)-matrix(nrow=5,ncol=5,1)
+  RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
   RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
   RC$epsilon <- rep(1,RC$n)
   #Spyrja Bigga út í varíans hér
   RC$epsilon[forcepoint] <- 1/RC$n
 
-  RC$Z <- cbind(t(rep(0,2)),t(rep(1,RC$n_unique)))
+  RC$Z <- cbind(t(c(0,1)),t(rep(1,RC$n_unique)))
   RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
   RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
   if(!is.null(RC$c)){
@@ -92,7 +98,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
     unobserved_prediction_fun <- bgplm.predict_u_unknown_c
   }
   #determine proposal density
-  RC$theta_length <- if(is.null(RC$c)) 9 else 8
+  RC$theta_length <- if(is.null(RC$c)) 10 else 9
   theta_init <- rep(0,RC$theta_length)
   loss_fun  <-  function(theta) {-density_fun(theta,RC)$p}
   optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
@@ -126,10 +132,10 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   #refinement of list elements
   if(is.null(RC$c)){
     output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
-    output_list$theta[2,] <- exp(output_list$theta[2,])
+    output_list$theta[2,] <- sqrt(exp(output_list$theta[2,]))
     output_list$theta[3,] <- exp(output_list$theta[3,])
   }else{
-    output_list$theta[1,] <- exp(output_list$theta[1,])
+    output_list$theta[1,] <- sqrt(exp(output_list$theta[1,]))
     output_list$theta[2,] <- exp(output_list$theta[2,])
   }
   output_list$x[1,] <- exp(output_list$x[1,])
@@ -150,26 +156,32 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.density_evaluation_known_c <- function(theta,RC){
-  sig_b2=theta[1]
-  phi_b=theta[2]
-  lambda=theta[3:8]
-
-  f=lambda[1:5]-lambda[6]
+  log_sig_b2 <- theta[1]
+  log_phi_b <- theta[2]
+  log_sig_eta2 <- theta[3]
+  eta_1 <- theta[4]
+  eta_minus1 <- theta[5:9]
+  
+  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+  
   l=c(log(RC$w-RC$c))
 
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   Sig_eps=diag(c(varr,0))
   #Matern covariance
-  R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
 
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
   p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
-    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
-    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb) +
-    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P)
+    pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+    pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +      
+    pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
+    pri('eta_minus1',eta_minus1=eta_minus1) +
+    pri('sigma_eta',log_sig_eta2=log_sig_eta2,lambda_seta=RC$lambda_seta)
+  
 
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
@@ -191,29 +203,35 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm.density_evaluation_unknown_c <- function(theta,RC){
-  phi_b=theta[3]
-  sig_b2=theta[2]
-  zeta=theta[1]
-  lambda=theta[4:9]
+  zeta <- theta[1]
+  log_sig_b2 <- theta[2]
+  log_phi_b <- theta[3]
+  log_sig_eta2 <- theta[4]
+  eta_1 <- theta[5]
+  eta_minus1 <- theta[6:10]
+  
+  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
 
-  f=lambda[1:5]-lambda[6]
-  l=c(log(RC$w_tild+exp(theta[1])))
+  l=c(log(RC$w_tild+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   Sig_eps=diag(c(varr,0))
   #Matern covariance
-  R_Beta=(1+sqrt(5)*RC$dist/exp(phi_b)+5*RC$dist^2/(3*exp(phi_b)^2))*
-          exp(-sqrt(5)*RC$dist/exp(phi_b))+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(sig_b2)*R_Beta))
+  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
+          exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
 
   X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
   L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
   w=solve(L,RC$y-X%*%RC$mu_x)
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
-    pri('c', zeta = zeta, mu_c = RC$mu_c) +
-    pri('sig_b2',sig_b2 = sig_b2, mu_sb = RC$mu_sb) +
-    pri('phi_b',tau_pb2 = RC$tau_pb2, phi_b = phi_b, mu_pb = RC$mu_pb)+
-    pri('eta', v = RC$v, s = RC$s, f = f, P = RC$P)
+  
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+    pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
+    pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+    pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +      
+    pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
+    pri('eta_minus1',eta_minus1=eta_minus1) +
+    pri('sigma_eta',log_sig_eta2=log_sig_eta2,lambda_seta=RC$lambda_seta)
 
   W=solve(L,X%*%Sig_x)
   x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
@@ -244,7 +262,11 @@ bgplm.predict_u_known_c <- function(theta,x,RC){
   #store particular hyperparameter values
   sig_b2=exp(theta[1])
   phi_b=exp(theta[2])
-  lambda <- theta[3:8]
+  log_sig_eta2 <- theta[3]
+  eta_1 <- theta[4]
+  eta_minus1 <- theta[5:9]
+  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+  
   n=RC$n_unique
   m=RC$n_u
   #get sample of data variance using splines
@@ -292,7 +314,11 @@ bgplm.predict_u_unknown_c <- function(theta,x,RC){
   zeta <- theta[1]
   sig_b2=exp(theta[2])
   phi_b=exp(theta[3])
-  lambda <- theta[4:9]
+  log_sig_eta2 <- theta[4]
+  eta_1 <- theta[5]
+  eta_minus1 <- theta[6:10]
+  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+  
   n=RC$n_unique
   m=RC$n_u
   #get sample of data variance using splines
