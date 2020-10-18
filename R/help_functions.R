@@ -127,11 +127,11 @@ get_param_names <- function(model,c_param){
     if(model=='bplm0'){
         hyper_param <- 'sigma_eps'
     }else if(model=='bplm'){
-        hyper_param <- paste('lambda',1:6,sep='_')
+        hyper_param <- c('sigma_eta',paste('eta',1:6,sep='_'))
     }else if(model=='bgplm0'){
         hyper_param <- c('sigma_eps','sigma_beta','phi_beta')
     }else if(model=='bgplm'){
-        hyper_param <- c('sigma_beta','phi_beta',paste('lambda',1:6,sep='_'))
+        hyper_param <- c('sigma_beta','phi_beta','sigma_eta',paste('eta',1:6,sep='_'))
     }
     if(is.null(c_param)){
         hyper_param <- c('c',hyper_param)
