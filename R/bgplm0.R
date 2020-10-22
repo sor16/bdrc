@@ -74,7 +74,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     #Spyrja Bigga út í varíans hér
     RC$epsilon[forcepoint] <- 1/RC$n_unique
 
-    RC$Z <- cbind(t(c(0,1)),t(rep(1,RC$n_unique)))
+    RC$Z <- cbind(t(c(0,1)),t(rep(0,RC$n_unique)))
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
     if(!is.null(RC$c)){
@@ -151,7 +151,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
-    log_sig_b2 <- theta[2]
+    log_sig_b <- theta[2]
     log_phi_b <- theta[3]
 
     l=c(log(RC$w-RC$c))
@@ -161,16 +161,15 @@ bgplm0.density_evaluation_known_c <- function(theta,RC){
     #Matern covariance
     R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
         exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
+    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
 
     X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
+    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
-      pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+      pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
       pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
-
 
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
@@ -194,25 +193,24 @@ bgplm0.density_evaluation_known_c <- function(theta,RC){
 bgplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
-    log_sig_b2 <- theta[3]
+    log_sig_b <- theta[3]
     log_phi_b <- theta[4]
 
     l=c(log(RC$w_tild+exp(zeta)))
-
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
     R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
         exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(log_sig_b2)*R_Beta))
+    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
 
     X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps))
+    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
       pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
-      pri('sigma_b2',log_sig_b2 = log_sig_b2, lambda_sb = RC$lambda_sb) +
+      pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
       pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
@@ -243,7 +241,7 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     #store particular hyperparameter values
     log_sig_eps2 <- theta[1]
-    sig_b2=exp(theta[2])
+    sig_b=exp(theta[2])
     phi_b=exp(theta[3])
     n=RC$n_unique
     m=RC$n_u
@@ -256,7 +254,7 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     dist_mat=as.matrix(dist(w_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -292,7 +290,7 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     #store particular hyperparameter values
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
-    sig_b2=exp(theta[3])
+    sig_b=exp(theta[3])
     phi_b=exp(theta[4])
     n=RC$n_unique
     m=RC$n_u
@@ -304,7 +302,7 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     dist_mat=as.matrix(dist(w_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
