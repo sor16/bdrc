@@ -57,6 +57,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
     RC$w_max <- max(RC$w)
     RC$w_tild <- RC$w-RC$w_min
     RC$n <- length(w)
+    RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint]=1/RC$n
     if(!is.null(RC$c)){
       if(RC$c<=RC$w_min){
@@ -122,17 +123,24 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
 bplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     l=c(log(RC$w-RC$c))
-    X=cbind(rep(1,length(l)),l)
-    L=t(chol(RC$Sig_xinv + (t(X) %*% X)/exp(log_sig_eps2)))
-    q=solve(L,(RC$Sinvmu+t(X)%*%RC$y/exp(log_sig_eps2)))
-    p=0.5*sum(q^2)+log(L[1,1])+log(L[2,2])-
-      0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2 +
-      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
-    x=solve(t(L),(q+as.matrix(rnorm(2))))
-    yp=X %*% x
-    ypo=yp+as.matrix(rnorm(RC$n,sd=sqrt(exp(log_sig_eps2))))
-    D=-2*sum(log(dlnorm(exp(RC$y),X%*%x,sqrt(exp(log_sig_eps2)))))
+    varr=RC$epsilon*exp(log_sig_eps2)
+    Sig_eps=diag(varr)
+    Sig_x=RC$Sig_ab
 
+    X=cbind(rep(1,length(l)),l)
+    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
+    w=solve(L,RC$y-X%*%RC$mu_x)
+    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+      pri('sigma_eps2',log_log_sig_eps2 = log_log_sig_eps2,lambda_se=RC$lambda_se)
+
+    W=solve(L,X%*%Sig_x)
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x=as.matrix(x_u-t(W)%*%solve(L,sss))
+    yp=(X %*% x)[1:RC$n,]
+    #posterior predictive draw
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
 
@@ -147,19 +155,24 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
     l=c(log(RC$w-RC$w_min+exp(zeta)))
+    varr=RC$epsilon*exp(log_sig_eps2)
+    Sig_eps=diag(varr)
+    Sig_x=RC$Sig_ab
     X=cbind(rep(1,length(l)),l)
-    L=t(chol(RC$Sig_xinv + (t(X) %*% X)/exp(log_sig_eps2)))
-    q=solve(L,(RC$Sinvmu+t(X)%*%RC$y/exp(log_sig_eps2)))
-
-    p=0.5*sum(q^2)+log(L[1,1])+log(L[2,2])-
-    0.5*sum(RC$y^2)/exp(log_sig_eps2)-RC$n*log_sig_eps2/2 +
+    L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
+    w=solve(L,RC$y-X%*%RC$mu_x)
+    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
     pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
     pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
-    x=solve(t(L),(q+as.matrix(rnorm(2))))
-    yp=X %*% x
-    ypo=yp+as.matrix(rnorm(RC$n,sd=sqrt(exp(log_sig_eps2))))
-    D=-2*sum(log(dlnorm(exp(RC$y),X%*%x,sqrt(exp(log_sig_eps2)))))
+    W=solve(L,X%*%Sig_x)
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x=as.matrix(x_u-t(W)%*%solve(L,sss))
+    yp=(X %*% x)[1:RC$n,]
+    #posterior predictive draw
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
