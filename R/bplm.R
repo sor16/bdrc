@@ -115,9 +115,13 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     for(elem in names(MCMC_output_list[[1]])){
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
-    #refinement of list elements
     if(is.null(RC$c)){
-        output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
+      output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
+      output_list$theta[2,] <- exp(output_list$theta[2,])
+      output_list$theta[3:8,] <- RC$P%*%output_list$theta[3:8,]
+    }else{
+      output_list$theta[1,] <- exp(output_list$theta[1,])
+      output_list$theta[2:7,] <- RC$P%*%output_list$theta[2:7,]
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['w']] <- c(RC$w,RC$w_u)
@@ -133,22 +137,22 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
 #'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bplm.density_evaluation_known_c <- function(theta,RC){
-    log_sig_eta2 <- theta[1]
+    log_sig_eta <- theta[1]
     eta_1 <- theta[2]
-    eta_minus1 <- theta[3:7]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+    z <- theta[3:7]
+    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
     l=c(log(RC$w-RC$c))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
     Sig_eps=diag(varr)
     X=cbind(1,l)
-    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
+    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
-      pri('eta_minus1',eta_minus1=eta_minus1) +
-      pri('sigma_eta',log_sig_eta2=log_sig_eta2,lambda_seta=RC$lambda_seta)
+      pri('eta_minus1',z=z) +
+      pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
     sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
@@ -171,23 +175,23 @@ bplm.density_evaluation_known_c <- function(theta,RC){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bplm.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
-    log_sig_eta2 <- theta[2]
+    log_sig_eta <- theta[2]
     eta_1 <- theta[3]
-    eta_minus1 <- theta[4:8]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+    z <- theta[4:8]
+    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
     l=c(log(RC$w_tild+exp(zeta)))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
     Sig_eps=diag(varr)
     X=cbind(1,l)
-    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps))
+    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
       pri('c', zeta = zeta, lambda_c = RC$lambda_c) +
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
-      pri('eta_minus1',eta_minus1=eta_minus1) +
-      pri('sigma_eta',log_sig_eta2=log_sig_eta2,lambda_seta=RC$lambda_seta)
+      pri('eta_minus1',z=z) +
+      pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
@@ -217,8 +221,8 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
 bplm.predict_u_known_c <- function(theta,x,RC){
     log_sig_eta2 <- theta[1]
     eta_1 <- theta[2]
-    eta_minus1 <- theta[3:7]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+    z <- theta[3:7]
+    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*z)))
     m <- length(RC$w_u)
     #calculate spline variance from B_splines
     varr_u <- c(exp(RC$B_u %*% lambda))
@@ -247,8 +251,8 @@ bplm.predict_u_unknown_c <- function(theta,x,RC){
     zeta=theta[1]
     log_sig_eta2 <- theta[2]
     eta_1 <- theta[3]
-    eta_minus1 <- theta[4:8]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*eta_minus1)))
+    z <- theta[4:8]
+    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*z)))
     m=length(RC$w_u)
     #calculate spline variance from B_splines
     varr_u <- c(exp(RC$B_u %*% lambda))
