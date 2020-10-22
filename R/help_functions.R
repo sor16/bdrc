@@ -14,8 +14,8 @@ priors <- function(model,c_param) {
     RC$mu_a <- 3;
     RC$mu_b <- 1.835;
     RC$sig_a <- 3;
-    RC$sig_b <- 0.426;
     RC$p_ab <- 0;
+    RC$nugget <- 10^-8
     if(is.null(c_param)){
         RC$lambda_c <- 2;
     }else{
@@ -23,16 +23,17 @@ priors <- function(model,c_param) {
     }
     #if f(h)=b vs f(h)=b+beta(h)
     if(model %in% c('bplm0','bplm')){
+        RC$sig_b <- 0.426;
         RC$Sig_x <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
         RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b))
         RC$Sig_xinv <- solve(RC$Sig_x)
         RC$Sinvmu <- RC$Sig_xinv%*%RC$mu_x
     }else{
+        RC$sig_b <- 0.01;
         RC$lambda_sb <- 5.405
         RC$lambda_pb <- 3.988
-        RC$Sig_ab <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
-        RC$nugget <- 10^-8
     }
+    RC$Sig_ab <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
     #if fixed variance vs not fixed variance
     if(model %in% c('bplm0','bgplm0')){
       RC$lambda_se <- 28.78
@@ -162,16 +163,16 @@ pri <- function(type,...){
     p <- args$zeta - exp(args$zeta)*args$lambda_c
   }else if(type == 'sigma_eps2'){
     p <- 0.5*args$log_sig_eps2 - exp(0.5*args$log_sig_eps2)*args$lambda_se
-  }else if(type == 'sigma_b2'){
-    p <- args$log_sig_b2 - exp(args$log_sig_b2)*args$lambda_sb
+  }else if(type == 'sigma_b'){
+    p <- args$log_sig_b - exp(args$log_sig_b)*args$lambda_sb
   }else if(type == 'phi_b'){
-    p <- - 0.5*args$log_phi_b - args$lambda_pb*(sqrt(0.5))*exp(-0.5*args$log_phi_b)
+    p <- - 0.5*args$log_phi_b - args$lambda_pb*sqrt(0.5)*exp(-0.5*args$log_phi_b)
   }else if(type == 'eta_1'){
     p <- 0.5*args$eta_1 - exp(0.5*args$eta_1)*args$lambda_eta_1
   }else if(type == 'eta_minus1'){
-    p <- -0.5*t(as.matrix(args$eta_minus1))%*%as.matrix(args$eta_minus1)
+    p <- -0.5*t(as.matrix(args$z))%*%as.matrix(args$z)
   }else if(type == 'sigma_eta'){
-    p <- args$log_sig_eta2 - exp(args$log_sig_eta2)*args$lambda_seta
+    p <- args$log_sig_eta - exp(args$log_sig_eta)*args$lambda_seta
   }
   return(p)
 }
