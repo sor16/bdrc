@@ -104,6 +104,22 @@ ggplot(data=bgplm.fit_known_c$rating_curve) +
     geom_line(aes(lower,w),linetype='dashed') +
     geom_line(aes(upper,w),linetype='dashed')
 
+#for debugging
+data=rc_dat
+formula <- rc_formula
+model_dat <- data[,all.vars(formula)]
+model_dat <- model_dat[order(model_dat[,2,drop=T]),]
+Q <- model_dat[,1,drop=T]
+w <- model_dat[,2,drop=T]
+y=log(Q)
+c_param=0.75
+#c_param=NULL
+w_max=NULL
+forcepoint=rep(FALSE,nrow(data))
+num_chains=4
+nr_iter=20000
+burnin=2000
+thin=5
 
 
 
