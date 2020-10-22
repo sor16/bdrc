@@ -131,7 +131,7 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
-      pri('sigma_eps2',log_log_sig_eps2 = log_log_sig_eps2,lambda_se=RC$lambda_se)
+      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
