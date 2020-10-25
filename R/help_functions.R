@@ -1,12 +1,9 @@
-library(parallel)
-
 #' Prior parameter specification
 #'
 #' Specifies the prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}
 #'@param country A string with the name of the country of which the prior parameters into the models should be specified for
 #'@return Returns a list of prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}.
 #'The priors are based from data from rivers of a given country.If you want to add your country to this function,
-#' please contact the developers at sor16@@hi.is or aoj8@@hi.is.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 priors <- function(model,c_param) {
     RC=list()
@@ -138,6 +135,41 @@ get_param_names <- function(model,c_param){
         hyper_param <- c('c',hyper_param)
     }
     return(c('a','b',hyper_param))
+}
+
+get_transformed_param <- function(v,param_name,mod){
+  if(param_name=='a'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(a)',length(v))
+  }else if(param_name=='b'){
+    out_v <- v
+    names(out_v) <- rep('b',length(v))
+  }else if(param_name=='c'){
+    out_v <- log(args$w_min-v)
+    names(out_v) <- rep('log(w_min-c)',length(v))
+  }else if(param_name=='sigma_eps'){
+    out_v <- 2*log(v)
+    names(out_v) <- rep('2log(sigma_eps)',length(v))
+  }else if(param_name=='sigma_beta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(sigma_beta)',length(v))
+  }else if(param_name=='phi_beta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(phi_beta)',length(v))
+  }else if(param_name=='sigma_eta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(sigma_eta)',length(v))
+  }else if(param_name=='eta_1'){
+    out_v <- v
+    names(out_v) <- rep('eta_1',length(v))
+  }else if(param_name %in% paste0('eta_',2:6)){
+    eta_nr <- as.numeric(unlist(strsplit(param_name,split='_'))[2])
+    out_v <- v-mod[[paste0('eta_',eta_nr-1,'_posterior')]]
+    names(out_v) <- rep(paste0('z_',eta_nr-1),length(v))
+  }else{
+    stop('param not found')
+  }
+  return(out_v)
 }
 
 get_desired_output <- function(model,RC){

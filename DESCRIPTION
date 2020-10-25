@@ -1,8 +1,15 @@
 Package: RCmodels
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("Axel Orn", "Jansson", email = "aoj8@hi.is", role = c("aut", "cre"))
-Description: What the package does (one paragraph)
+Title: Fit Bayesian Power Law Models
+Version: 1.0.0
+Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut", "cre","cph")),
+             person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut")),
+             person("Axel Orn", "Jansson", email = "axelorn94@hi.is", role = c("aut")),
+             person("Rafael", "Vias", email = "raffidf@gmail.com", role = c("ctb"))
+             )
+Description: Fits rating curves from paired stage and discharge measurements in rivers using Bayesian power law models
 Depends: R (>= 3.1.3)
-License: What license is it under?
+License: MIT + file LICENSE
 LazyData: true
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat

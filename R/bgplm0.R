@@ -1,4 +1,4 @@
-#' Generalized Bayesian Power Law Model
+#' Bayesian Generalized Power Law Model with Constant Variance
 #'
 #' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
@@ -13,7 +13,7 @@
 #'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
-
+#'@export
 bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
     model_dat <- data[,all.vars(formula)]
@@ -71,7 +71,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
     RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
     RC$epsilon <- rep(1,RC$n)
-    #Spyrja Bigga út í varíans hér
+
     RC$epsilon[forcepoint] <- 1/RC$n_unique
 
     RC$Z <- cbind(t(c(0,1)),t(rep(0,RC$n_unique)))
@@ -138,17 +138,6 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nr
     return(output_list)
 }
 
-
-
-#create a predict method for interpolation of posterior predictive
-
-#'Density evaluation for model2
-#'
-#'Evaluates the log density of the posterior distribution of the parameters of .
-#'@param th A vector with length 9 containing parameters
-#'@param RC A list containing prior parameters, matrices and the data.
-#'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     log_sig_b <- theta[2]
@@ -183,13 +172,6 @@ bgplm0.density_evaluation_known_c <- function(theta,RC){
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
 
-#'Density evaluation for model2
-#'
-#'Evaluates the log density of the posterior distribution of the parameters of model2BH.
-#'@param th A vector with length 9 containing parameters
-#'@param RC A list containing prior parameters, matrices and the data.
-#'@return Returns a list containing predictive values of the parameters drawn out of the evaluated density.
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
@@ -225,18 +207,6 @@ bgplm0.density_evaluation_unknown_c <- function(theta,RC){
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
 
-#' Predictive values for unoberved stages
-#'
-#'Calculates predictive values for unobserved stages
-#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
-#'and six lambda parameters that affect the variance through the Bspline functions.
-#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
-#'
-#'@return
-#'\itemize{
-#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
-#'}
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.predict_u_known_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     #store particular hyperparameter values
@@ -274,18 +244,6 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     return(list('x'=beta_u,'y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
-#' Predictive values for unoberved stages
-#'
-#'Calculates predictive values for unobserved stages
-#'@param param A vector of samples of theta and samples of betas from MCMC. Theta is a vector containing c (stage at which discharge is zero), two hyperparameters sig_b^2 and phi_b
-#'and six lambda parameters that affect the variance through the Bspline functions.
-#'@param RC A list containing prior parameters, matrices and the data which are calculated in \code{\link{model2BH}}
-#'
-#'@return
-#'\itemize{
-#'\item Vector containing predictive values ypo and values of beta for every stage measurement.
-#'}
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     #store particular hyperparameter values
     zeta <- theta[1]
@@ -324,6 +282,3 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     ypo_u = yp_u + as.matrix(rnorm(m_above_c)) * sqrt(varr_u[above_c])
     return(list('x'=beta_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }
-
-
-
