@@ -178,7 +178,102 @@ pri <- function(type,...){
 }
 
 
+#'Unobserved stages
+#'
+#'W_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
+#'
+#'@param W_unique vector containing unique stages from river data.
+#'@param min minimum stage of rating curve.
+#'@param max maximum stage of rating curve.
+#'@return W_unobserved returns a list of vectors, W_u and W_u_tild. W_u is a vector of unobserved stage values
+#' needed to make an equally spaced grid of stages. W_u_tild is a vector which is calculated by W_u-min(W_unique) needed to input into B_splines.
+#' The unobserved stages are lower or higher than that of the data, take the same value in W_u_tild as the minimum value and maximum value of the
+#' data respectively. This is done to ensure constant variance below and above observed data.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+W_unobserved <- function(RC,w_min=NA,w_max=NA){
+  w_u=NULL
+  w=100*c(RC$w) #work in cm
+  max_w_diff=5
+  #distance between subsequent elements in vector with additional dummy point 1000
+  distvect=abs(w-c(w[2:length(w)],1000))
+  #add datapoints to corresponding distances to see range of distance
+  distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
+  distfilter=distwithdata[,distvect>max_w_diff]
+  #remove dummy distance
+  distfilter=as.matrix(distfilter[,-ncol(distfilter)])
+  if(ncol(distfilter)!=0){
+    #make sequence from the ranges with length.out equal to corresponding elelement in distvect
+    w_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+ceiling(x[2]/max_w_diff)),c(x[1],x[3]))
+    }))
+  }
+  w_before_data=setdiff(seq(w_min,RC$w_min,by=0.05),c(RC$w_min))
+  w_after_data=setdiff(seq(RC$w_max,w_max,length.out=2+ceiling(20*(w_max-RC$w_max))),RC$w_max)
+  w_u=c(w_before_data,w_u,w_after_data)
+  return(w_u)
+}
 
+#'Bsplines in a generalized rating curve
+#'
+#'A function to test the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
+#'with 2 interior knots and 6 basis functions.
+#'
+#'@param ZZ A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
+#'(w-min(w)) divided by last element of the resulting vector, where w is stage observations.
+#'@return The function returns a linear combination of scaled B-spline basis functions for every stage observation.
+#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+B_splines <- function(ZZ){
+  #The number of equally spaced interior knots.
+  kx=2
+  #Delta x and Delta y.
+  dx=1/(kx+1)
+  #The order of the splines.
+  M = 4
+  #Determine the number of functions.
+  Nx = kx + M
+  #The epsilon-knots
+  epsilon_x = dx*seq(0,kx+1,by=1)
+  #the tau-knots.
+  tau_x = matrix(0,nrow=1,ncol=(kx+2*M))
+  tau_x[1:M] = epsilon_x[1]*matrix(1,nrow=1,ncol=M)
+  tau_x[(M+1):(kx+M)]=epsilon_x[2:(kx+1)]
+  tau_x[(kx+M+1):(kx+2*M)]=epsilon_x[kx+2]*matrix(1,nrow=1,ncol=M)
+  #Vector with values of x and y.
+  lx = length(ZZ)
+  #Compute the x-splines and the y-splines.
+  XX = matrix(0,nrow=(kx+M),ncol=length(ZZ))
+  # i = 1
+  XX[1,] = (1/dx^3)*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1]);
+  # i = 2
+  XX[2,] = (1/dx^3)*(ZZ-tau_x[2])*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/2/dx^3)*(tau_x[M+2]-ZZ)*(ZZ-tau_x[3])*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/4/dx^3)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/4/dx^3)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])
+  # i = 3
+  XX[3,] = (1/2/dx^3)*(ZZ-tau_x[3])*(ZZ-tau_x[3])*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/4/dx^3)*(ZZ-tau_x[3])*(tau_x[M+2]-ZZ)*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/4/dx^3)*(ZZ-tau_x[3])*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+    (1/6/dx^3)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M])*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+    (1/6/dx^3)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M])*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+    (1/6/dx^3)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M+1])*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+    (1/6/dx^3)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(tau_x[M+2]<=ZZ)*(ZZ<tau_x[M+3])
+  # i = kx + 2
+  XX[kx+2,] =  -(1/6/dx^3)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]<=ZZ)*(ZZ<tau_x[kx+3])-
+    (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+4])*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+    (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+    (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+5])*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+    (1/4/dx^3)*(ZZ-tau_x[kx+6])*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+    (1/4/dx^3)*(ZZ-tau_x[kx+6])*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+    (1/2/dx^3)*(ZZ-tau_x[kx+6])*(ZZ-tau_x[kx+6])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])
+  # i = kx + 3
+  XX[kx+3,] = - (1/4/dx^3)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+    (1/4/dx^3)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+    (1/2/dx^3)*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+6])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+    (1/dx^3)*(ZZ-tau_x[kx+7])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])
+  # i = kx + 4
+  XX[kx+4,] = -(1/dx^3)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<=tau_x[kx+5])
+  XX = t(XX)
+  return(XX)
+}
 
 
 
