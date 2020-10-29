@@ -62,7 +62,7 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
   return(result_obj)
 }
 
-bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,length(w)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   #TODO: add error message if length(formula)! = 3 or if it contains more than one covariate. Also make sure that names in formula exist in data
   RC <- priors('bgplm',c_param)
   RC$y <- rbind(as.matrix(y),RC$mu_b)
@@ -74,7 +74,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   RC$n <- length(RC$w)
   RC$n_unique <- length(RC$w_unique)
   RC$A <- create_A(RC$w)
-  RC$dist <- as.matrix(dist(c(RC$w_unique)))
+  RC$dist <- as.matrix(stats::dist(c(RC$w_unique)))
 
   RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
   RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
@@ -101,7 +101,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   RC$theta_length <- if(is.null(RC$c)) 10 else 9
   theta_init <- rep(0,RC$theta_length)
   loss_fun  <-  function(theta) {-density_fun(theta,RC)$p}
-  optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+  optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
   theta_m <- optim_obj$par
   H <- optim_obj$hessian
   RC$LH <- t(chol(H))/0.8
@@ -122,7 +122,7 @@ bgplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
   if(num_chains>4){
     stop('Max number of chains is 4. Please pick a lower number of chains')
   }
-  MCMC_output_list <- mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
+  MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
     run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
   })
   output_list <- list()
@@ -177,13 +177,13 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
 
 
   W=solve(L,X%*%Sig_x)
-  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(RC$n_unique+2)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(stats::rnorm(RC$n)),0)
   x=as.matrix(x_u-t(W)%*%solve(L,sss))
   yp=(X %*% x)[1:RC$n,]
   #posterior predictive draw
-  ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
   return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
 }
@@ -219,14 +219,14 @@ bgplm.density_evaluation_unknown_c <- function(theta,RC){
     pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
   W=solve(L,X%*%Sig_x)
-  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(RC$n_unique+2)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(stats::rnorm(RC$n)),0)
   x=as.matrix(x_u-t(W)%*%solve(L,sss))
   yp=(X %*% x)[1:RC$n,]
   #posterior predictive draw
-  ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+  ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
 
-  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
   return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
 }
@@ -247,7 +247,7 @@ bgplm.predict_u_known_c <- function(theta,x,RC){
   #combine stages from data with unobserved stages
   w_all=c(RC$w_unique,RC$w_u)
   #calculating distance matrix for W_all
-  dist_mat=as.matrix(dist(w_all))
+  dist_mat=as.matrix(stats::dist(w_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/2
   sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
@@ -259,14 +259,14 @@ bgplm.predict_u_known_c <- function(theta,x,RC){
   mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
   Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+  beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$w_u-RC$c)
   X=cbind(rep(1,m),l,diag(l))
   x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
   yp_u <- c(X%*%x_u)
-  ypo_u = yp_u + as.matrix(rnorm(m)) * sqrt(varr_u)
+  ypo_u = yp_u + as.matrix(stats::rnorm(m)) * sqrt(varr_u)
   return(list('x'=beta_u,'sigma_eps'=varr_u,'y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
@@ -287,7 +287,7 @@ bgplm.predict_u_unknown_c <- function(theta,x,RC){
   #combine stages from data with unobserved stages
   w_all=c(RC$w_unique,RC$w_u)
   #calculating distance matrix for W_all
-  dist_mat=as.matrix(dist(w_all))
+  dist_mat=as.matrix(stats::dist(w_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/2
   sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
@@ -299,7 +299,7 @@ bgplm.predict_u_unknown_c <- function(theta,x,RC){
   mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
   Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+  beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
   above_c <- -(exp(zeta)-RC$w_min) < RC$w_u
   m_above_c <- sum(above_c)
   #buidling blocks of the explanatory matrix X calculated
@@ -309,6 +309,6 @@ bgplm.predict_u_unknown_c <- function(theta,x,RC){
   x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
   yp_u <- c(X%*%x_u)
-  ypo_u = yp_u + as.matrix(rnorm(m_above_c)) * sqrt(varr_u[above_c])
+  ypo_u = yp_u + as.matrix(stats::rnorm(m_above_c)) * sqrt(varr_u[above_c])
   return(list('x'=beta_u,'sigma_eps'=varr_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }

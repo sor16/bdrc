@@ -1,8 +1,8 @@
 #' Prior parameter specification
 #'
-#' Specifies the prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}
+#'
 #'@param country A string with the name of the country of which the prior parameters into the models should be specified for
-#'@return Returns a list of prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}.
+#'@return
 #'The priors are based from data from rivers of a given country.If you want to add your country to this function,
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 priors <- function(model,c_param) {
@@ -47,7 +47,7 @@ priors <- function(model,c_param) {
 #'Adist links unique water level measurements (\strong{w'}) to actual
 #'water level measurements (w) such that \strong{w}=\strong{Aw'}.
 #'from the measurements.
-#'@param w full stage measurements
+#'@param w numeric vector of stage measurements in meters
 #'@return
 #'\itemize{
 #'\item A: Matrix \strong{A} linking unique water level measurements (\strong{w'}) to actual
@@ -86,10 +86,10 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     theta_old <- theta_m
     density_eval_old <- density_eval_m
     for(i in 1:nr_iter){
-        theta_new <- theta_old+solve(t(RC$LH),rnorm(RC$theta_length,0,1))
+        theta_new <- theta_old+solve(t(RC$LH),stats::rnorm(RC$theta_length,0,1))
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
-        if (logR>log(runif(1))){
+        if (logR>log(stats::runif(1))){
             theta_old <- theta_new
             density_eval_old <- density_eval_new
         }
@@ -112,7 +112,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
 }
 
 get_MCMC_summary <- function(X,w=NULL){
-    summary_dat <- as.data.frame(t(apply(X,1,quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
+    summary_dat <- as.data.frame(t(apply(X,1,stats::quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(summary_dat) <- c('lower','median','upper')
     if(!is.null(w)){
         summary_dat <- data.frame(w=w,summary_dat,row.names=NULL)

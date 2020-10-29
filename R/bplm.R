@@ -55,8 +55,7 @@ bplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(
     return(result_obj)
 }
 
-bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-    require(parallel)
+bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,length(w)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
     RC=priors('bplm',c_param)
     RC$y <- as.matrix(y)
@@ -86,7 +85,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     RC$theta_length <- if(is.null(RC$c)) 8 else 7
     theta_init <- rep(0,RC$theta_length)
     loss_fun  <-  function(th) {-density_fun(th,RC)$p}
-    optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     theta_m <- optim_obj$par
     H <- optim_obj$hessian
     RC$LH <- t(chol(H))/0.8
@@ -108,7 +107,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     if(num_chains>4){
         stop('Max number of chains is 4. Please pick a lower number of chains')
     }
-    MCMC_output_list <- mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
+    MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
         run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
     })
     output_list <- list()
@@ -147,14 +146,14 @@ bplm.density_evaluation_known_c <- function(theta,RC){
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
     W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
 
-    D=-2*sum(log(dlnorm(exp(RC$y),yp,sqrt(varr))))
+    D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
 }
@@ -180,14 +179,14 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
     W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
 
-    D=-2*sum(log(dlnorm(exp(RC$y),yp,sqrt(varr))))
+    D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
 }
@@ -204,7 +203,7 @@ bplm.predict_u_known_c <- function(theta,x,RC){
     X <- cbind(rep(1,m),l)
     #sample from the posterior of discharge y
     yp_u <- X%*%x
-    ypo_u <- yp_u  + as.matrix(rnorm(m)) * sqrt(varr_u)
+    ypo_u <- yp_u  + as.matrix(stats::rnorm(m)) * sqrt(varr_u)
     return(list('y_post'=yp_u,'y_post_pred'=ypo_u,'sigma_eps'=varr_u))
 }
 
@@ -225,7 +224,7 @@ bplm.predict_u_unknown_c <- function(theta,x,RC){
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior of discharge y
     yp_u <- X%*%x
-    ypo_u = X%*%x + as.matrix(rnorm(m_above_c)) * sqrt(varr_u[above_c])
+    ypo_u = X%*%x + as.matrix(stats::rnorm(m_above_c)) * sqrt(varr_u[above_c])
     return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u),'sigma_eps'=varr_u))
 }
 

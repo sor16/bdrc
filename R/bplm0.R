@@ -68,8 +68,7 @@ bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     return(result_obj)
 }
 
-bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-    require(parallel)
+bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,length(w)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('bplm0',c_param)
     RC$y <- as.matrix(y)
     RC$w <- w
@@ -94,7 +93,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
     RC$theta_length <- if(is.null(RC$c)) 2 else 1
     theta_init <- rep(0,RC$theta_length)
     loss_fun = function(theta) {-density_fun(theta,RC)$p}
-    optim_obj=optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    optim_obj=stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     theta_m =optim_obj$par
     H=optim_obj$hessian
     RC$LH=t(chol(H))/(2.38/sqrt(2))
@@ -113,7 +112,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
     if(num_chains>4){
       stop('Max number of chains is 4. Please pick a lower number of chains')
     }
-    MCMC_output_list <- mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
+    MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
       run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
     })
     output_list <- list()
@@ -147,13 +146,13 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
 
@@ -172,13 +171,13 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
     pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"DIC"=D))
 }
@@ -192,7 +191,7 @@ bplm0.predict_u_known_c <- function(theta,x,RC){
   X=cbind(rep(1,m),l)
   #sample from the posterior predictive distr of y
   yp_u <- X%*%x
-  ypo_u <- yp_u + as.matrix(rnorm(m)) * sqrt(exp(log_sig_eps2))
+  ypo_u <- yp_u + as.matrix(stats::rnorm(m)) * sqrt(exp(log_sig_eps2))
   return(list('y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
@@ -208,7 +207,7 @@ bplm0.predict_u_unknown_c <- function(theta,x,RC){
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior predictive distr of y
     yp_u <- X%*%x
-    ypo_u = yp_u + as.matrix(rnorm(m_above_c)) * sqrt(exp(log_sig_eps2))
+    ypo_u = yp_u + as.matrix(stats::rnorm(m_above_c)) * sqrt(exp(log_sig_eps2))
     return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }
 
