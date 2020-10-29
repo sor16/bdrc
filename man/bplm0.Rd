@@ -27,7 +27,7 @@ bplm0(
 \value{
 bplm0 returns an object of class "bplm0"
 The functions summary are used to obtain an print summary of the fitted model.
-An object of class "bplm0" is a list containt at least the following component:
+An object of class "bplm0" is a list containt at least the following component: \cr
 \code{rating_curve} \cr
 \code{rating_curve_mean} \cr
 \code{param_summary} \cr

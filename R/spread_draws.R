@@ -1,6 +1,6 @@
-#' Spread MCMC chain for parameters to data.frame
+#' Spread MCMC chain draws to data.frame
 #'
-#' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
+#' Useful to convert MCMC chains draws of particular parameters in a model object to a tidyverse friendly data frame for further data wrangling and plotting
 #'@param mod an object of class "bplm0","bplm","bgplm0" or "bgplm".
 #'@param param character with the name of the parameter of interest. Also accepts "latent_parameters" and "hyperparameters".
 #'@param transformed boolean value determining whether the parameter is to be represented on the transformed scale used in sampling or the original scale. Defaults to FALSE.
@@ -11,6 +11,11 @@
 #'\code{value}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
 #'@seealso \code{\link{bplm0}},\code{\link{bplm}},\code{\link{bgplm0}},\code{\link{bgplm}} for further information on parameters
+#'@examples
+#'data(sim_dat)
+#'f <- Q~W
+#'bplm0.fit <- bplm0(f,sim_dat)
+#'summary(bplm9.fit)
 #'@export
 spread_draws <- function(mod,param,transformed=F){
     num_chains <- mod$run_info$num_chains

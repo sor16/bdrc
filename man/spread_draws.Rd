@@ -2,7 +2,7 @@
 % Please edit documentation in R/spread_draws.R
 \name{spread_draws}
 \alias{spread_draws}
-\title{Spread MCMC chain for parameters to data.frame}
+\title{Spread MCMC chain draws to data.frame}
 \usage{
 spread_draws(mod, param, transformed = F)
 }
@@ -21,7 +21,13 @@ Data frame with columns
 \code{value}
 }
 \description{
-Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
+Useful to convert MCMC chains draws of particular parameters in a model object to a tidyverse friendly data frame for further data wrangling and plotting
+}
+\examples{
+data(sim_dat)
+f <- Q~W
+bplm0.fit <- bplm0(f,sim_dat)
+summary(bplm9.fit)
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
