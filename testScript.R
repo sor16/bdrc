@@ -1,19 +1,12 @@
-library(readxl)
+library(devtools)
+load_all()
+library(RCmodels)
 library(dplyr)
 library(ggplot2)
-source('R/B_splines.R')
-source('R/W_unobserved.R')
-source('R/help_functions.R')
-source('R/spread_draws.R')
-source('R/plm_methods.R')
-source('R/bplm0.R')
-source('R/bplm.R')
-source('R/bgplm0.R')
-source('R/bgplm.R')
-
 
 #read data
-rc_dat <- read_excel('data/exceldata_RC.xlsx') %>% mutate(W=0.01*W)
+data(V316_river)
+rc_dat <- V316_river
 rc_formula <- as.formula('Q~W')
 
 ## bplm0
