@@ -8,7 +8,7 @@ water level measurements}
 create_A(w)
 }
 \arguments{
-\item{w}{full stage measurements}
+\item{w}{numeric vector of stage measurements in meters}
 }
 \value{
 \itemize{

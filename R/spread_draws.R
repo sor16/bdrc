@@ -16,6 +16,7 @@
 #'f <- Q~W
 #'bplm0.fit <- bplm0(f,sim_dat)
 #'summary(bplm9.fit)
+#'plot(bplm0.fit,type='rating_curve')
 #'@export
 spread_draws <- function(mod,param,transformed=F){
     num_chains <- mod$run_info$num_chains

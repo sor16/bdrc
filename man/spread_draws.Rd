@@ -28,6 +28,7 @@ data(sim_dat)
 f <- Q~W
 bplm0.fit <- bplm0(f,sim_dat)
 summary(bplm9.fit)
+plot(bplm0.fit,type='rating_curve')
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.

@@ -10,11 +10,10 @@ priors(model, c_param)
 \item{country}{A string with the name of the country of which the prior parameters into the models should be specified for}
 }
 \value{
-Returns a list of prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}.
 The priors are based from data from rivers of a given country.If you want to add your country to this function,
 }
 \description{
-Specifies the prior parameters into \code{\link{model1BH}} and \code{\link{model2BH}}
+Prior parameter specification
 }
 \references{
 Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}

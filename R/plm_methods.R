@@ -14,7 +14,12 @@ summary_fun <- function(x){
     cat("\nDIC:",x$DIC_summary[,2])
 }
 
+
 plot_fun <- function(x,type){
+
+}
+
+predict_fun <- function(x,type){
 
 }
 
@@ -30,6 +35,9 @@ summary.bplm0 <- function(x,...){
 plot.bplm0 <- function(x,type='rating_curve',...){
 }
 
+predict.bplm0 <- function(x,...){
+}
+
 print.bplm <- function(x,...){
     print_fun(x)
 }
@@ -39,6 +47,9 @@ summary.bplm <- function(x,...){
 }
 
 plot.bplm <- function(x,type='rating_curve',...){
+}
+
+predict.bplm <- function(x,...){
 }
 
 print.bgplm0 <- function(x,...){
@@ -52,6 +63,9 @@ summary.bgplm0 <- function(x,...){
 plot.bgplm0 <- function(x,type='rating_curve',...){
 }
 
+predict.bgplm0 <- function(x,...){
+}
+
 print.bgplm <- function(x,...){
     print_fun(x)
 }
@@ -61,4 +75,7 @@ summary.bgplm <- function(x,...){
 }
 
 plot.bgplm <- function(x,type='rating_curve',...){
+}
+
+predict.bgplm <- function(x,...){
 }
