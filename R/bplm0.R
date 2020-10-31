@@ -1,37 +1,38 @@
 #' Bayesian Power Law Model with Constant Variance
 #'
-#' bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian power law model with constant variance as described in Hrafnkelsson et al.
+#' bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
 #'@param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".
 #'@param data data.frame containing the variables specified in formula
 #'@param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
 #'@param w_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #'@param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
-#'@return bplm0 returns an object of class "bplm0"
-#'The functions summary are used to obtain an print summary of the fitted model.
-#'An object of class "bplm0" is a list containt at least the following component: \cr
-#'\code{rating_curve} \cr
-#'\code{rating_curve_mean} \cr
-#'\code{param_summary} \cr
-#'\code{DIC_summary} \cr
-#'\code{Q_posterior_predictive} \cr
-#'\code{Q_posterior} \cr
-#'\code{a_posterior} \cr
-#'\code{b_posterior} \cr
-#'\code{c_posterior} \cr
-#'\code{sigma_eps_posterior} \cr
-#'\code{formula} \cr
-#'\code{data} \cr
-#'\code{run_info}
+#'@return bplm0 returns an object of class "bplm0"\cr\cr
+#'The function summary is used to obtain and print a summary of the model.\cr\cr
+#'An object of class "bplm0" is a list containing the following components: \cr
+#'
+#'\item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
+#'\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
+#'\item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
+#'\item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+#'\item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
+#'\item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
+#'\item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
+#'\item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
+#'\item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
+#'\item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
+#'\item{\code{formula}}{object of type "formula" provided by the user.}
+#'\item{\code{data}}{data provided by the user.}
+#'\item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
-#'@seealso \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the quality of inference.
+#'@seealso \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
 #'@examples
-#'data(sim_dat)
+#'data(V316_river)
 #'f <- Q~W
-#'bplm0.fit <- bplm0(f,sim_dat)
-#'summary(bplm9.fit)
+#'bplm0.fit <- bplm0(f,V316_river)
+#'summary(bplm0.fit)
 #'plot(bplm0.fit)
 #'bplm0.fit_known_c <- bplm0(f,sim_dat,c_param=)
-#'summary(bplm9.fit)
+#'summary(bplm0.fit)
 #'plot(bplm0.fit)
 #'@export
 bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
@@ -55,8 +56,8 @@ bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
       result_obj$c_posterior <- NULL
       result_obj$sigma_eps_posterior <- MCMC_output_list$theta[1,]
     }
-    result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
-    result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred)
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post)
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$Q_posterior_predictive,w=MCMC_output_list$w)
