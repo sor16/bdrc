@@ -15,7 +15,45 @@ summary_fun <- function(x){
 }
 
 
-plot_fun <- function(x,type){
+plot_fun <- function(x,type=NULL,param=NULL,transformed=F){
+    plot_dat <- spread_draws(x,param,transformed)
+    if(type=='trace'){
+        if('param' %in% names(plot_dat)){
+            params <- unique(plot_dat$param)
+            plot_dat$param <- factor(sapply(plot_dat$param,get_parameter_levels,transformed),levels=get_parameter_levels(params),labels=params)
+            plot_dat$chain <- factor(plot_dat$chain,levels=1:max(plot_dat$chain))
+            plot_dat$param_expr <- sapply(plot_dat$param,get_param_expression,transformed)
+            p <- ggplot(plot_dat,aes(iter,value,col=chain)) +
+                geom_line() +
+                facet_wrap(~param_expr,scales='free',labeller = label_parsed) +
+                scale_color_manual(values=c("#BC3C29FF","#0072B5FF","#E18727FF","#20854EFF"),
+                                   name='Chain number') +
+                xlab('Iteration') +
+                ylab('') +
+                theme_classic() +
+                theme(strip.background = element_blank(),
+                      strip.text.x = element_text(size = 16))
+        }else{
+            param_expr <- get_param_expression(param,transformed)
+            p <- ggplot(plot_dat,aes_('',param),col="#BC3C29FF") +
+                geom_line() +
+                facet_wrap(~chain,scales='free') +
+                xlab('Iteration') +
+                ylab() +
+                theme_classic() +
+                theme(strip.background = element_blank(),
+                      strip.text.x = element_text(size = 12))
+        }
+
+    }else if(type=='histogram'){
+
+    }else if (type=='graph'){
+        plot_dat <- spread_draws(x,param,transformed)
+    }
+    if(type %in% c('rating_curve',))
+    spread_draws(x,)
+
+
 
 }
 
