@@ -39,13 +39,13 @@ bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
         result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2,]
         result_obj$phi_beta_posterior <- MCMC_output_list$theta[3,]
     }
-    result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
-    result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred)
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post)
     result_obj$beta_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$Q_posterior_predictive,w=MCMC_output_list$w)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$Q_posterior,w=MCMC_output_list$w)
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,w=MCMC_output_list$w)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,w=MCMC_output_list$w)
     result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,w=unique(MCMC_output_list$w))
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bgplm0',c_param)
@@ -133,7 +133,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,le
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['w']] <- c(RC$w,RC$w_u)
-    output_list[['run_info']] <- list('nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list[['run_info']] <- list('c_param'=c_param,'w_max'=w_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 

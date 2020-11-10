@@ -40,13 +40,13 @@ bplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(
           result_obj[[paste0('eta_',i-1,'_posterior')]] <- MCMC_output_list$theta[i,]
         }
     }
-    result_obj$Q_posterior_predictive <- exp(MCMC_output_list$y_post_pred)
-    result_obj$Q_posterior <- exp(MCMC_output_list$y_post)
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred)
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post)
     result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps)
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$Q_posterior_predictive,w=MCMC_output_list$w)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$Q_posterior,w=MCMC_output_list$w)
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,w=MCMC_output_list$w)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,w=MCMC_output_list$w)
     result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior,w=MCMC_output_list$w)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm',c_param)
@@ -124,7 +124,7 @@ bplm.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,leng
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['w']] <- c(RC$w,RC$w_u)
-    output_list[['run_info']] <- list('nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list[['run_info']] <- list('c_param'=c_param,'w_max'=w_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 

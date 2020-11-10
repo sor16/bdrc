@@ -129,7 +129,7 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,len
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['w']] <- c(RC$w,RC$w_u)
-    output_list[['run_info']] <- list('nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list[['run_info']] <- list('c_param'=c_param,'w_max'=w_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 
