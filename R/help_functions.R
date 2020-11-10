@@ -137,7 +137,62 @@ get_param_names <- function(model,c_param){
     return(c('a','b',hyper_param))
 }
 
-get_transformed_param <- function(v,param_name,mod){
+# get_param_expression <- function(param,transformed=F){
+#   if(param=='a'){
+#     p_expr <- if(transformed) bquote(log(a)) else bquote(a)
+#   }else if(param=='b'){
+#     p_expr <- bquote(b)
+#   }else if(param=='c'){
+#     p_expr <- if(transformed) bquote(log(w[min]-c)) else bquote(c)
+#   }else if(param=='sigma_eps'){
+#     p_expr <- if(transformed) bquote(log(sigma[epsilon]^2)) else bquote(sigma[epsilon])
+#   }else if(param=='sigma_beta'){
+#     p_expr <- if(transformed) bquote(log(sigma[beta])) else bquote(sigma[beta])
+#   }else if(param=='phi_beta'){
+#     p_expr <- if(transformed) bquote(log(phi[beta])) else bquote(phi[beta])
+#   }else if(param=='sigma_eta'){
+#     p_expr <- if(transformed) bquote(log(sigma[eta])) else bquote(sigma[eta])
+#   }else if(param=='eta_1'){
+#     p_expr <- bquote(eta[1])
+#   }else if(param %in% paste0('eta_',2:6)){
+#     param_nr <- as.numeric(unlist(strsplit(param,split='_'))[2])
+#     p_expr <- if(transformed) bquote(z[.(param_nr)]) else bquote(eta[.(param_nr)])
+#   }else{
+#     stop('param not found')
+#   }
+#   return(p_expr)
+# }
+
+get_param_expression <- function(param){
+  expr_vec <- c('a'='a','b'='b','c'='c','sigma_eps'='sigma[epsilon]',
+                'sigma_beta'='sigma[beta]','phi_beta'='phi[beta]',
+                'sigma_eta'='sigma[eta]','eta_1'='eta[1]','eta_2'='eta[2]',
+                'eta_3'='eta[3]','eta_4'='eta[4]','eta_5'='eta[5]',
+                'eta_6'='eta[6]','log(w_min-c)'='log(w[min]-c)',
+                'log(sigma_eps)'='log(sigma[epsilon]^2)',
+                'log(sigma_beta)'='log(sigma[beta])',
+                'log(phi_beta)'='log(phi[beta])',
+                'log(sigma_eta)'='log(sigma[eta])',
+                'z_1'='z[1]','z_2'='z[2]','z_3'='z[3]',
+                'z_4'='z[4]','z_5'='z[5]','z_6'='z[6]')
+  param_expr <- expr_vec[param]
+  if(is.na(param_expr)){
+    stop('param not found')
+  }
+  return(param_expr)
+}
+
+get_parameter_levels <- function(param_vec){
+    order_vec <- c('log(a)'=1,'b'=2,'c'=3,'log(w_min-c)'=4,'sigma_eps'=5,
+                   '2log(sigma_eps)'=6,'sigma_beta'=7,'log(sigma_beta)'=8,
+                   'phi_beta'=9,'log(phi_beta)'=10,'sigma_eta'=11,'log(sigma_eta)'=12,
+                   'eta_1'=13,'eta_2'=14,'z_1'=15,'eta_3'=16,'z_2'=17,
+                   'eta_4'=18,'z_3'=19,'eta_5'=20,'z_4'=21,'eta_6'=22,'z_5'=23)
+  return(param_vec[rank(order_vec[param_vec])])
+}
+
+get_transformed_param <- function(v,param_name,mod,...){
+  args <- list(...)
   if(param_name=='a'){
     out_v <- log(v)
     names(out_v) <- rep('log(a)',length(v))
