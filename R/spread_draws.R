@@ -38,15 +38,22 @@ spread_draws <- function(mod,param,transformed=F){
                                   iter=rep(1:(length(MCMC_output)/num_chains)))
             out_dat[,unique(names(MCMC_output))] <- MCMC_output
         }else{
-            c_hat <- if(!is.null(mod$run_info_c_param)) median(mod$c_posterior) else mod$run_info$c_param
+            c_hat <- if(is.null(mod$run_info_c_param)) median(mod$c_posterior) else mod$run_info$c_param
             out_dat_list <- lapply(1:nrow(MCMC_output),
                                    function(i){
                                         out_dat <- data.frame(chain=rep(1:num_chains,rep(ncol(MCMC_output)/num_chains,num_chains)),
-                                                              iter=rep(1:(ncol(MCMC_output)/num_chains),num_chains),w=ifelse(transformed,log(mod$rating_curve$w[i]-c_hat),mod$rating_curve$w[i]))
+                                                              iter=rep(1:(ncol(MCMC_output)/num_chains),num_chains),w=mod$rating_curve$w[i])
+                                        if(transformed){
+                                            out_dat[,'log(w-c_hat)'] <- suppressWarnings(log(out_dat$w-c_hat))
+                                        }
                                         out_dat[,param] <- MCMC_output[i,,drop=T]
                                         return(out_dat)
                                    })
             out_dat <- do.call('rbind',out_dat_list)
+            if(transformed){
+                w_name <- all.vars(mod$formula)[2]
+                out_dat <- out_dat[out_dat$w>=min(mod$data[,w_name]) & out_dat$w<=max(mod$data[,w_name]),]
+            }
         }
     }else if(param %in% c('latent_parameters','hyperparameters')){
         params <- get_param_names(class(mod),c_param=mod$run_info$c_param)
@@ -73,6 +80,7 @@ spread_draws <- function(mod,param,transformed=F){
     }else{
         stop('param not found in model object')
     }
+    rownames(out_dat) <- NULL
     return(out_dat)
 }
 
