@@ -58,6 +58,7 @@ bgplm <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
   result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
   row.names(result_obj$param_summary) <- get_param_names('bgplm',c_param)
   result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
+  result_obj$Bayes_factor <- 1/(exp(0.5*mean(result_obj$DIC_posterior)))
   result_obj$run_info <- MCMC_output_list$run_info
   return(result_obj)
 }
