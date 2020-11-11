@@ -168,8 +168,8 @@ get_param_expression <- function(param){
                 'sigma_beta'='sigma[beta]','phi_beta'='phi[beta]',
                 'sigma_eta'='sigma[eta]','eta_1'='eta[1]','eta_2'='eta[2]',
                 'eta_3'='eta[3]','eta_4'='eta[4]','eta_5'='eta[5]',
-                'eta_6'='eta[6]','log(w_min-c)'='log(w[min]-c)',
-                'log(sigma_eps)'='log(sigma[epsilon]^2)',
+                'eta_6'='eta[6]','log(a)'='log(a)','log(w_min-c)'='log(w[min]-c)',
+                '2log(sigma_eps)'='log(sigma[epsilon]^2)',
                 'log(sigma_beta)'='log(sigma[beta])',
                 'log(phi_beta)'='log(phi[beta])',
                 'log(sigma_eta)'='log(sigma[eta])',
@@ -183,11 +183,11 @@ get_param_expression <- function(param){
 }
 
 get_parameter_levels <- function(param_vec){
-    order_vec <- c('log(a)'=1,'b'=2,'c'=3,'log(w_min-c)'=4,'sigma_eps'=5,
-                   '2log(sigma_eps)'=6,'sigma_beta'=7,'log(sigma_beta)'=8,
-                   'phi_beta'=9,'log(phi_beta)'=10,'sigma_eta'=11,'log(sigma_eta)'=12,
-                   'eta_1'=13,'eta_2'=14,'z_1'=15,'eta_3'=16,'z_2'=17,
-                   'eta_4'=18,'z_3'=19,'eta_5'=20,'z_4'=21,'eta_6'=22,'z_5'=23)
+    order_vec <- c('a'=1,'log(a)'=2,'b'=3,'c'=4,'log(w_min-c)'=5,'sigma_eps'=6,
+                   '2log(sigma_eps)'=7,'sigma_beta'=8,'log(sigma_beta)'=9,
+                   'phi_beta'=10,'log(phi_beta)'=11,'sigma_eta'=12,'log(sigma_eta)'=13,
+                   'eta_1'=14,'eta_2'=15,'z_1'=16,'eta_3'=17,'z_2'=18,
+                   'eta_4'=19,'z_3'=20,'eta_5'=21,'z_4'=22,'eta_6'=23,'z_5'=24)
   return(param_vec[rank(order_vec[param_vec])])
 }
 
