@@ -49,13 +49,15 @@ bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
   h_unique <- unique(MCMC_output_list$h)
   result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,])
   result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,])
-  result_obj$beta_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
+  result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
+  result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
   result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx,])
   result_obj$DIC_posterior <- MCMC_output_list$DIC
   #summary objects
   result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique)
   result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique)
   result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique)
+  result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique)
   result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior,h=h_unique)
   result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
   row.names(result_obj$param_summary) <- get_param_names('bgplm',c_param)
