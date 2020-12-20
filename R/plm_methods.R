@@ -118,7 +118,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                   axis.text.y = element_text(size = 12),
                   axis.title.x = element_text(size = 16),
                   axis.title.y = element_text(size = 16))
-    }else if(type=='beta' | type=='f'){
+    }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
             stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
         }
