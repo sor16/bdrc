@@ -44,23 +44,23 @@ priors <- function(model,c_param) {
 #'Linking unique water level measurements to actual
 #'water level measurements
 #'
-#'Adist links unique water level measurements (\strong{w'}) to actual
-#'water level measurements (w) such that \strong{w}=\strong{Aw'}.
+#'Adist links unique water level measurements (\strong{h'}) to actual
+#'water level measurements (h) such that \strong{h}=\strong{Ah'}.
 #'from the measurements.
-#'@param w numeric vector of stage measurements in meters
+#'@param h numeric vector of stage measurements in meters
 #'@return
 #'\itemize{
-#'\item A: Matrix \strong{A} linking unique water level measurements (\strong{w'}) to actual
-#'water level measurements (w) such that \strong{w}=\strong{Aw'}
+#'\item A: Matrix \strong{A} linking unique water level measurements (\strong{h'}) to actual
+#'water level measurements (h) such that \strong{h}=\strong{Ah'}
 #'}
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-create_A <- function(w){
-    n <- length(w)
-    A=matrix(0,nrow=n,ncol=length(unique(w)))
+create_A <- function(h){
+    n <- length(h)
+    A=matrix(0,nrow=n,ncol=length(unique(h)))
     A[1,1]=1
     i=1
     for(ii in 2:n){
-        if(w[ii]==w[ii-1]){
+        if(h[ii]==h[ii-1]){
             A[ii,i]=1
         }else{
             i=i+1
@@ -111,12 +111,12 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     return(output_list)
 }
 
-get_MCMC_summary <- function(X,w=NULL){
+get_MCMC_summary <- function(X,h=NULL){
     summary_dat <- as.data.frame(t(apply(X,1,stats::quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
     names(summary_dat) <- c('lower','median','upper')
-    if(!is.null(w)){
-        summary_dat <- data.frame(w=w,summary_dat,row.names=NULL)
-        summary_dat <- summary_dat[order(summary_dat$w),]
+    if(!is.null(h)){
+        summary_dat <- data.frame(h=h,summary_dat,row.names=NULL)
+        summary_dat <- summary_dat[order(summary_dat$h),]
     }
     return(summary_dat)
 }
@@ -137,38 +137,13 @@ get_param_names <- function(model,c_param){
     return(c('a','b',hyper_param))
 }
 
-# get_param_expression <- function(param,transformed=F){
-#   if(param=='a'){
-#     p_expr <- if(transformed) bquote(log(a)) else bquote(a)
-#   }else if(param=='b'){
-#     p_expr <- bquote(b)
-#   }else if(param=='c'){
-#     p_expr <- if(transformed) bquote(log(w[min]-c)) else bquote(c)
-#   }else if(param=='sigma_eps'){
-#     p_expr <- if(transformed) bquote(log(sigma[epsilon]^2)) else bquote(sigma[epsilon])
-#   }else if(param=='sigma_beta'){
-#     p_expr <- if(transformed) bquote(log(sigma[beta])) else bquote(sigma[beta])
-#   }else if(param=='phi_beta'){
-#     p_expr <- if(transformed) bquote(log(phi[beta])) else bquote(phi[beta])
-#   }else if(param=='sigma_eta'){
-#     p_expr <- if(transformed) bquote(log(sigma[eta])) else bquote(sigma[eta])
-#   }else if(param=='eta_1'){
-#     p_expr <- bquote(eta[1])
-#   }else if(param %in% paste0('eta_',2:6)){
-#     param_nr <- as.numeric(unlist(strsplit(param,split='_'))[2])
-#     p_expr <- if(transformed) bquote(z[.(param_nr)]) else bquote(eta[.(param_nr)])
-#   }else{
-#     stop('param not found')
-#   }
-#   return(p_expr)
-# }
 
 get_param_expression <- function(param){
   expr_vec <- c('a'='a','b'='b','c'='c','sigma_eps'='sigma[epsilon]',
                 'sigma_beta'='sigma[beta]','phi_beta'='phi[beta]',
                 'sigma_eta'='sigma[eta]','eta_1'='eta[1]','eta_2'='eta[2]',
                 'eta_3'='eta[3]','eta_4'='eta[4]','eta_5'='eta[5]',
-                'eta_6'='eta[6]','log(a)'='log(a)','log(w_min-c)'='log(w[min]-c)',
+                'eta_6'='eta[6]','log(a)'='log(a)','log(h_min-c)'='log(h[min]-c)',
                 '2log(sigma_eps)'='log(sigma[epsilon]^2)',
                 'log(sigma_beta)'='log(sigma[beta])',
                 'log(phi_beta)'='log(phi[beta])',
@@ -183,7 +158,7 @@ get_param_expression <- function(param){
 }
 
 get_parameter_levels <- function(param_vec){
-    order_vec <- c('a'=1,'log(a)'=2,'b'=3,'c'=4,'log(w_min-c)'=5,'sigma_eps'=6,
+    order_vec <- c('a'=1,'log(a)'=2,'b'=3,'c'=4,'log(h_min-c)'=5,'sigma_eps'=6,
                    '2log(sigma_eps)'=7,'sigma_beta'=8,'log(sigma_beta)'=9,
                    'phi_beta'=10,'log(phi_beta)'=11,'sigma_eta'=12,'log(sigma_eta)'=13,
                    'eta_1'=14,'eta_2'=15,'z_1'=16,'eta_3'=17,'z_2'=18,
@@ -200,8 +175,8 @@ get_transformed_param <- function(v,param_name,mod,...){
     out_v <- v
     names(out_v) <- rep('b',length(v))
   }else if(param_name=='c'){
-    out_v <- log(args$w_min-v)
-    names(out_v) <- rep('log(w_min-c)',length(v))
+    out_v <- log(args$h_min-v)
+    names(out_v) <- rep('log(h_min-c)',length(v))
   }else if(param_name=='sigma_eps'){
     out_v <- 2*log(v)
     names(out_v) <- rep('2log(sigma_eps)',length(v))
@@ -267,36 +242,36 @@ pri <- function(type,...){
 
 #'Unobserved stages
 #'
-#'W_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
+#'h_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
 #'
-#'@param W_unique vector containing unique stages from river data.
+#'@param h_unique vector containing unique stages from river data.
 #'@param min minimum stage of rating curve.
 #'@param max maximum stage of rating curve.
-#'@return W_unobserved returns a list of vectors, W_u and W_u_tild. W_u is a vector of unobserved stage values
-#' needed to make an equally spaced grid of stages. W_u_tild is a vector which is calculated by W_u-min(W_unique) needed to input into B_splines.
-#' The unobserved stages are lower or higher than that of the data, take the same value in W_u_tild as the minimum value and maximum value of the
+#'@return h_unobserved returns a list of vectors, h_u and h_u_tild. h_u is a vector of unobserved stage values
+#' needed to make an equally spaced grid of stages. h_u_tild is a vector which is calculated by h_u-min(h_unique) needed to input into B_splines.
+#' The unobserved stages are lower or higher than that of the data, take the same value in h_u_tild as the minimum value and maximum value of the
 #' data respectively. This is done to ensure constant variance below and above observed data.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-W_unobserved <- function(RC,w_min=NA,w_max=NA){
-  w_u=NULL
-  w=100*c(RC$w) #work in cm
-  max_w_diff=5
+h_unobserved <- function(RC,h_min=NA,h_max=NA){
+  h_u=NULL
+  h=100*c(RC$h) #work in cm
+  max_h_diff=5
   #distance between subsequent elements in vector with additional dummy point 1000
-  distvect=abs(w-c(w[2:length(w)],1000))
+  distvect=abs(h-c(h[2:length(h)],1000))
   #add datapoints to corresponding distances to see range of distance
-  distwithdata=rbind(w,distvect,c(w[2:length(w)],1000))
-  distfilter=distwithdata[,distvect>max_w_diff]
+  distwithdata=rbind(h,distvect,c(h[2:length(h)],1000))
+  distfilter=distwithdata[,distvect>max_h_diff]
   #remove dummy distance
   distfilter=as.matrix(distfilter[,-ncol(distfilter)])
   if(ncol(distfilter)!=0){
     #make sequence from the ranges with length.out equal to corresponding elelement in distvect
-    w_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+ceiling(x[2]/max_w_diff)),c(x[1],x[3]))
+    h_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+ceiling(x[2]/max_h_diff)),c(x[1],x[3]))
     }))
   }
-  w_before_data=setdiff(seq(w_min,RC$w_min,by=0.05),c(RC$w_min))
-  w_after_data=setdiff(seq(RC$w_max,w_max,length.out=2+ceiling(20*(w_max-RC$w_max))),RC$w_max)
-  w_u=c(w_before_data,w_u,w_after_data)
-  return(w_u)
+  h_before_data=setdiff(seq(h_min,RC$h_min,by=0.05),c(RC$h_min))
+  h_after_data=setdiff(seq(RC$h_max,h_max,length.out=2+ceiling(20*(h_max-RC$h_max))),RC$h_max)
+  h_u=c(h_before_data,h_u,h_after_data)
+  return(h_u)
 }
 
 #'Bsplines in a generalized rating curve
@@ -305,7 +280,7 @@ W_unobserved <- function(RC,w_min=NA,w_max=NA){
 #'with 2 interior knots and 6 basis functions.
 #'
 #'@param ZZ A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
-#'(w-min(w)) divided by last element of the resulting vector, where w is stage observations.
+#'(h-min(h)) divided by last element of the resulting vector, where h is stage observations.
 #'@return The function returns a linear combination of scaled B-spline basis functions for every stage observation.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 B_splines <- function(ZZ){

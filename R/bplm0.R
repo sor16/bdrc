@@ -1,10 +1,10 @@
-#' Bayesian Power Law Model with Constant Variance
+#' Fitting discharge rating curves using Bayesian Power Law Model with constant variance
 #'
 #' bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".
 #' @param data data.frame containing the variables specified in formula
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
-#' @param w_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
+#' @param h_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #' @return bplm0 returns an object of class "bplm0"\cr\cr
 #' The function summary is used to obtain and print a summary of the model.\cr\cr
@@ -23,11 +23,12 @@
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user.}
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
-#' @references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
+#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
+#' preprint 2010.04769
 #' @seealso \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
 #' @examples
 #' data(V316_river)
-#' f <- Q~W
+#' f <- Q~h
 #' bplm0.fit <- bplm0(f,V316_river)
 #' summary(bplm0.fit)
 #' plot(bplm0.fit)
@@ -35,13 +36,13 @@
 #' summary(bplm0.fit)
 #' plot(bplm0.fit)
 #' @export
-bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
-    w <- model_dat[,2,drop=T]
-    MCMC_output_list <- bplm0.inference(y=log(Q),w=w,c_param,w_max,forcepoint,...)
+    h <- model_dat[,2,drop=T]
+    MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint,...)
     result_obj=list()
     attr(result_obj, "class") <- "bplm0"
     result_obj$formula <- formula
@@ -56,12 +57,14 @@ bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
       result_obj$c_posterior <- NULL
       result_obj$sigma_eps_posterior <- MCMC_output_list$theta[1,]
     }
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred)
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post)
+    unique_h_idx <- !duplicated(MCMC_output_list$h)
+    h_unique <- unique(MCMC_output_list$h)
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,])
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,])
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,w=MCMC_output_list$w)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,w=MCMC_output_list$w)
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm0',c_param)
     result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
@@ -70,22 +73,22 @@ bplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow
     return(result_obj)
 }
 
-bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,length(w)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('bplm0',c_param)
     RC$y <- as.matrix(y)
-    RC$w <- w
-    RC$w_min <- min(RC$w)
-    RC$w_max <- max(RC$w)
-    RC$w_tild <- RC$w-RC$w_min
-    RC$n <- length(w)
+    RC$h <- h
+    RC$h_min <- min(RC$h)
+    RC$h_max <- max(RC$h)
+    RC$h_tild <- RC$h-RC$h_min
+    RC$n <- length(h)
     RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint]=1/RC$n
     if(!is.null(RC$c)){
-      if(RC$c<=RC$w_min){
+      if(RC$c<=RC$h_min){
         density_fun <- bplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bplm0.predict_u_known_c
       }else{
-        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$w_min,' m'))
+        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$h_min,' m'))
       }
     }else{
         density_fun <- bplm0.density_evaluation_unknown_c
@@ -99,15 +102,15 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,len
     theta_m =optim_obj$par
     H=optim_obj$hessian
     RC$LH=t(chol(H))/(2.38/sqrt(2))
-    w_min <- ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c)
-    if(is.null(w_max)){
-      w_max <- RC$w_max
+    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
+    if(is.null(h_max)){
+      h_max <- RC$h_max
     }
-    if(w_max<RC$w_max){
-      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$w_max,' m'))
+    if(h_max<RC$h_max){
+      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$h_max,' m'))
     }
-    RC$w_u <- W_unobserved(RC,w_min,w_max)
-    RC$n_u <- length(RC$w_u)
+    RC$h_u <- h_unobserved(RC,h_min,h_max)
+    RC$n_u <- length(RC$h_u)
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output('bplm0',RC)
     #MCMC parameters added, number of iterations,burnin and thin
@@ -123,20 +126,20 @@ bplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,len
     }
     #refinement of list elements
     if(is.null(RC$c)){
-      output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
+      output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
       output_list$theta[2,] <- sqrt(exp(output_list$theta[2,]))
     }else{
       output_list$theta[1,] <- sqrt(exp(output_list$theta[1,]))
     }
     output_list$x[1,] <- exp(output_list$x[1,])
-    output_list[['w']] <- c(RC$w,RC$w_u)
-    output_list[['run_info']] <- list('c_param'=c_param,'w_max'=w_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list[['h']] <- c(RC$h,RC$h_u)
+    output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 
 bplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
-    l=c(log(RC$w-RC$c))
+    l=c(log(RC$h-RC$c))
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
@@ -161,7 +164,7 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
 bplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
-    l=c(log(RC$w-RC$w_min+exp(zeta)))
+    l=c(log(RC$h-RC$h_min+exp(zeta)))
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
@@ -187,9 +190,9 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
 bplm0.predict_u_known_c <- function(theta,x,RC){
   #collecting parameters from the MCMC sample
   log_sig_eps2 = theta[1]
-  m = length(RC$w_u)
+  m = length(RC$h_u)
   #building blocks of the explanatory matrix X calculated
-  l=log(RC$w_u-RC$c)
+  l=log(RC$h_u-RC$c)
   X=cbind(rep(1,m),l)
   #sample from the posterior predictive distr of y
   yp_u <- X%*%x
@@ -201,11 +204,11 @@ bplm0.predict_u_unknown_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     zeta=theta[1]
     log_sig_eps2 = theta[2]
-    m=length(RC$w_u)
-    above_c <- RC$w_min-exp(zeta) < RC$w_u
+    m=length(RC$h_u)
+    above_c <- RC$h_min-exp(zeta) < RC$h_u
     m_above_c <- sum(above_c)
     #building blocks of the explanatory matrix X calculated
-    l=log(RC$w_u[above_c]-RC$w_min+exp(zeta))
+    l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior predictive distr of y
     yp_u <- X%*%x
