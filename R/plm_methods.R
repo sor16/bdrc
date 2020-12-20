@@ -36,7 +36,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                 ylab('') +
                 theme_classic() +
                 theme(strip.background = element_blank(),
-                      strip.text.x = element_text(size = 16))
+                      strip.text.x = element_text(size = 16),
+                      axis.title.x = element_text(size=16),
+                      axis.text.x = element_text(size=12),
+                      axis.text.y = element_text(size=12),
+                      legend.text=element_text(size=12),
+                      legend.title=element_text(size=16),
+                )
         }else{
             param_expr <- get_param_expression(params)
             plot_dat$chain_name <- paste0('Chain nr ',plot_dat$chain)
@@ -47,9 +53,14 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                 ylab(parse(text=param_expr)) +
                 theme_classic() +
                 theme(strip.background = element_blank(),
-                      strip.text.x = element_text(size = 12),
-                      axis.title.x = element_text(size = 12),
-                      axis.title.y = element_text(size = 12))
+                      strip.text.x = element_text(size = 16),
+                      axis.title.x = element_text(size=16),
+                      axis.title.y = element_text(size=16),
+                      axis.text.x = element_text(size=12),
+                      axis.text.y = element_text(size=12),
+                      legend.text=element_text(size=16),
+                      legend.title=element_text(size=16),
+                )
         }
     }else if(type=='histogram'){
         plot_dat <- gather_draws(x,...,transformed=transformed)
@@ -67,11 +78,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
             ylab('') +
             theme_classic() +
             theme(strip.background = element_blank(),
-                  strip.text.x = element_text(size = 16))
+                  strip.text.x = element_text(size = 16),
+                  axis.text.x = element_text(size=12),
+                  axis.text.y = element_text(size=12))
     }else if(type=='rating_curve' | type=='rating_curve_mean'){
         if(transformed){
-            x_lab <- 'log(h-hat(c))'
-            y_lab <- 'log(Q)'
+            x_lab <- latex2exp::TeX('$\\log(\\textit{h-\\hat{c}})$','character')
+            y_lab <- latex2exp::TeX('$\\log(\\textit{Q})$','character')
             c_hat <- if(is.null(x$run_info_c_param)) median(x$c_posterior) else x$run_info$c_param
             plot_dat <- merge(x[[type]],x$data,by.x='h',by.y=all.vars(x$formula)[2])
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
@@ -88,14 +101,17 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                       axis.title.x = element_text(size = 16),
                       axis.title.y = element_text(size = 16))
         }else{
-            x_lab <- 'Discharge~(m^3/s)'
+            x_lab <- latex2exp::TeX('$\\textit{Q}\\lbrack\\textit{m^3/s}\\rbrack$','character')
+            y_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
             p <- ggplot(data=x[[type]]) +
                 geom_point(data=x$data,aes_string(all.vars(x$formula)[1],all.vars(x$formula)[2])) +
                 geom_line(aes(median,h)) +
                 geom_line(aes(lower,h),linetype='dashed') +
                 geom_line(aes(upper,h),linetype='dashed') +
+                scale_x_continuous(expand=c(0,0)) +
+                scale_y_continuous(expand=c(0,0)) +
                 xlab(parse(text=x_lab)) +
-                ylab('Stage (m)') +
+                ylab(parse(text=y_lab)) +
                 theme_classic() +
                 theme(axis.text.x = element_text(size = 12),
                       axis.text.y = element_text(size = 12),
@@ -106,12 +122,14 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
         if(!('sigma_eps_summary' %in% names(x))){
             stop('Plots of type "sigma_eps" are only for models with stage dependent variance, s.a. "bgplm" and "bplm"')
         }
-        y_lab <- 'sigma[epsilon](h)'
+        #y_lab <- 'sigma[epsilon](h)'
+        x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
         p <- ggplot(data=x$sigma_eps_summary) +
             geom_line(aes(h,median)) +
             geom_line(aes(h,lower),linetype='dashed') +
             geom_line(aes(h,upper),linetype='dashed') +
-            xlab('Stage (m)') +
+            xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_classic() +
             theme(axis.text.x = element_text(size = 12),
@@ -122,12 +140,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
         if(!('beta_summary' %in% names(x))){
             stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
         }
-        y_lab <- 'beta(h)'
+        x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        y_lab <- latex2exp::TeX('$\\beta(\\textit{h})$')
         p <- ggplot(data=x$beta_summary) +
             geom_line(aes(h,median)) +
             geom_line(aes(h,lower),linetype='dashed') +
             geom_line(aes(h,upper),linetype='dashed') +
-            xlab('Stage (m)') +
+            xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_classic() +
             theme(axis.text.x = element_text(size = 12),
@@ -138,12 +157,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
         if(!('f_summary' %in% names(x))){
             stop('Plots of type "f" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
         }
-        y_lab <- 'f(h)'
+        x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        y_lab <- latex2exp::TeX('$\\textit{f(h)}$')
         p <- ggplot(data=x$f_summary) +
-            geom_line(aes(median,h)) +
-            geom_line(aes(lower,h),linetype='dashed') +
-            geom_line(aes(upper,h),linetype='dashed') +
-            xlab('Stage (m)') +
+            geom_line(aes(h,median)) +
+            geom_line(aes(h,lower),linetype='dashed') +
+            geom_line(aes(h,upper),linetype='dashed') +
+            xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_classic() +
             theme(axis.text.x = element_text(size = 12),
@@ -157,8 +177,8 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
         resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
         resid_dat$r_lower <- log(resid_dat$lower)-log(resid_dat$median)
         resid_dat$r_upper <- log(resid_dat$upper)-log(resid_dat$median)
-        y_lab <- 'log(Q)-log(hat(Q))'
-        x_lab <- 'log(h-hat(c))'
+        y_lab <- TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$")
+        x_lab <- TeX("$log(\\textit{h - \\hat{c}})$")
         p <- ggplot(data=resid_dat) +
             geom_point(aes(`log(h-c_hat)`,r_median),size=2) +
             geom_line(aes(`log(h-c_hat)`,r_lower),linetype='dashed') +
