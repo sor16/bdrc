@@ -3,24 +3,24 @@
 #' Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
 #'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
 #'@param data data.frame containing the columns in formula
-#'@param w_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
+#'@param h_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
 #'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
-#'@param Wmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
+#'@param hmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) hmin hill
 #'automatically be set to c_hat.
-#'@param Wmax Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
+#'@param hmax Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) hmax will
 #'automatically be set to the maximum stage of the data.
 #'@return List containing information on the calculated rating curve,
 #'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 #'@seealso \code{\link{clean}}
 #'@export
-bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bgplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
     model_dat <- data[,all.vars(formula)]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
-    w <- model_dat[,2,drop=T]
-    MCMC_output_list <- bgplm0.inference(y=log(Q),w=w,c_param,w_max,forcepoint)
+    h <- model_dat[,2,drop=T]
+    MCMC_output_list <- bgplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint)
     #prepare S3 model object to be returned
     result_obj=list()
     attr(result_obj, "class") <- "bgplm0"
@@ -39,14 +39,16 @@ bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
         result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2,]
         result_obj$phi_beta_posterior <- MCMC_output_list$theta[3,]
     }
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred)
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post)
+    unique_h_idx <- !duplicated(MCMC_output_list$h)
+    h_unique <- unique(MCMC_output_list$h)
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,])
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,])
     result_obj$beta_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,w=MCMC_output_list$w)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,w=MCMC_output_list$w)
-    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,w=unique(MCMC_output_list$w))
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique)
+    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bgplm0',c_param)
     result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
@@ -55,21 +57,21 @@ bgplm0 <- function(formula,data,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,nro
     return(result_obj)
 }
 
-bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,length(w)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('bgplm0',c_param)
     RC$y <- rbind(as.matrix(y),RC$mu_b)
-    RC$w <- as.matrix(w)
-    RC$w_min <- min(RC$w)
-    RC$w_max <- max(RC$w)
-    RC$w_tild <- RC$w-RC$w_min
-    RC$w_unique <- unique(RC$w)
-    RC$n <- length(RC$w)
-    RC$n_unique <- length(RC$w_unique)
-    RC$A <- create_A(RC$w)
-    RC$dist <- as.matrix(stats::dist(c(RC$w_unique)))
+    RC$h <- as.matrix(h)
+    RC$h_min <- min(RC$h)
+    RC$h_max <- max(RC$h)
+    RC$h_tild <- RC$h-RC$h_min
+    RC$h_unique <- unique(RC$h)
+    RC$n <- length(RC$h)
+    RC$n_unique <- length(RC$h_unique)
+    RC$A <- create_A(RC$h)
+    RC$dist <- as.matrix(stats::dist(c(RC$h_unique)))
 
     RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
-    RC$B <- B_splines(t(RC$w_tild)/RC$w_tild[length(RC$w_tild)])
+    RC$B <- B_splines(t(RC$h_tild)/RC$h_tild[length(RC$h_tild)])
     RC$epsilon <- rep(1,RC$n)
 
     RC$epsilon[forcepoint] <- 1/RC$n_unique
@@ -78,11 +80,11 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,le
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
     if(!is.null(RC$c)){
-      if(RC$c<=RC$w_min){
+      if(RC$c<=RC$h_min){
         density_fun <- bgplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bgplm0.predict_u_known_c
       }else{
-        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$w_min,' m'))
+        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$h_min,' m'))
       }
     }else{
         density_fun <- bgplm0.density_evaluation_unknown_c
@@ -97,17 +99,17 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,le
     H <- optim_obj$hessian
     RC$LH <- t(chol(H))/0.8
 
-    w_min <- ifelse(is.null(RC$c),min(RC$w)-exp(theta_m[1]),RC$c)
-    if(is.null(w_max)){
-        w_max <- RC$w_max
+    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
+    if(is.null(h_max)){
+        h_max <- RC$h_max
     }
-    if(w_max<RC$w_max){
-      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$w_max,' m'))
+    if(h_max<RC$h_max){
+      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$h_max,' m'))
     }
-    RC$w_u <- W_unobserved(RC,w_min,w_max)
-    RC$n_u <- length(RC$w_u)
-    w_u_std <- ifelse(RC$w_u < RC$w_min,0.0,ifelse(RC$w_u>RC$w_max,1.0,(RC$w_u-RC$w_min)/(RC$w_max-RC$w_min)))
-    RC$B_u <- B_splines(w_u_std)
+    RC$h_u <- h_unobserved(RC,h_min,h_max)
+    RC$n_u <- length(RC$h_u)
+    h_u_std <- ifelse(RC$h_u < RC$h_min,0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-RC$h_min)/(RC$h_max-RC$h_min)))
+    RC$B_u <- B_splines(h_u_std)
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output('bgplm0',RC)
     #MCMC parameters added, number of iterations,burnin and thin
@@ -123,7 +125,7 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,le
     }
     #refinement of list elements
     if(is.null(RC$c)){
-        output_list$theta[1,] <- RC$w_min-exp(output_list$theta[1,])
+        output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
         output_list$theta[2,] <- sqrt(exp(output_list$theta[2,]))
         output_list$theta[3,] <- sqrt(exp(output_list$theta[3,]))
         output_list$theta[4,] <- exp(output_list$theta[4,])
@@ -133,8 +135,8 @@ bgplm0.inference <- function(y,w,c_param=NULL,w_max=NULL,forcepoint=rep(FALSE,le
         output_list$theta[3,] <- exp(output_list$theta[3,])
     }
     output_list$x[1,] <- exp(output_list$x[1,])
-    output_list[['w']] <- c(RC$w,RC$w_u)
-    output_list[['run_info']] <- list('c_param'=c_param,'w_max'=w_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list[['h']] <- c(RC$h,RC$h_u)
+    output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 
@@ -143,7 +145,7 @@ bgplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_b <- theta[2]
     log_phi_b <- theta[3]
 
-    l=c(log(RC$w-RC$c))
+    l=c(log(RC$h-RC$c))
 
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
@@ -178,7 +180,7 @@ bgplm0.density_evaluation_unknown_c <- function(theta,RC){
     log_sig_b <- theta[3]
     log_phi_b <- theta[4]
 
-    l=c(log(RC$w_tild+exp(zeta)))
+    l=c(log(RC$h_tild+exp(zeta)))
     varr=RC$epsilon*exp(log_sig_eps2)
     Sig_eps=diag(c(varr,0))
     #Matern covariance
@@ -219,12 +221,12 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     varr_u = rep(exp(log_sig_eps2),m)
 
     #combine stages from data with unobserved stages
-    w_all=c(RC$w_unique,RC$w_u)
-    #calculating distance matrix for W_all
-    dist_mat=as.matrix(stats::dist(w_all))
+    h_all=c(RC$h_unique,RC$h_u)
+    #calculating distance matrix for h_all
+    dist_mat=as.matrix(stats::dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -235,7 +237,7 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     #a sample from posterior of beta_u drawn
     beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
     #buidling blocks of the explanatory matrix X calculated
-    l=log(RC$w_u-RC$c)
+    l=log(RC$h_u-RC$c)
     X=cbind(rep(1,m),l,diag(l))
     x_u=c(x[1:2],beta_u)
     #sample from the posterior of discharge y
@@ -255,12 +257,12 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     #get sample of data variance using splines
     varr_u = rep(exp(log_sig_eps2),m)
     #combine stages from data with unobserved stages
-    w_all=c(RC$w_unique,RC$w_u)
-    #calculating distance matrix for W_all
-    dist_mat=as.matrix(stats::dist(w_all))
+    h_all=c(RC$h_unique,RC$h_u)
+    #calculating distance matrix for h_all
+    dist_mat=as.matrix(stats::dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(w_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -270,10 +272,10 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
     #a sample from posterior of beta_u drawn
     beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
-    above_c <- -(exp(zeta)-RC$w_min) < RC$w_u
+    above_c <- -(exp(zeta)-RC$h_min) < RC$h_u
     m_above_c <- sum(above_c)
     #buidling blocks of the explanatory matrix X calculated
-    l=log(RC$w_u[above_c]-RC$w_min+exp(zeta))
+    l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
     X=cbind(rep(1,m_above_c),l,diag(l))
     #vector of parameters
     x_u=c(x[1:2],beta_u[above_c])
