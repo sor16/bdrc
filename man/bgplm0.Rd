@@ -8,7 +8,7 @@ bgplm0(
   formula,
   data,
   c_param = NULL,
-  w_max = NULL,
+  h_max = NULL,
   forcepoint = rep(FALSE, nrow(data)),
   ...
 )
@@ -18,14 +18,14 @@ bgplm0(
 
 \item{data}{data.frame containing the columns in formula}
 
-\item{w_max}{vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.}
+\item{h_max}{vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.}
 
 \item{country}{Name of the country the prior parameters should be defined for, default value is "Iceland".}
 
-\item{Wmin}{Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmin will
+\item{hmin}{Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) hmin hill
 automatically be set to c_hat.}
 
-\item{Wmax}{Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) Wmax will
+\item{hmax}{Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) hmax will
 automatically be set to the maximum stage of the data.}
 }
 \value{

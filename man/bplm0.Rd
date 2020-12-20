@@ -2,13 +2,13 @@
 % Please edit documentation in R/bplm0.R
 \name{bplm0}
 \alias{bplm0}
-\title{Bayesian Power Law Model with Constant Variance}
+\title{Fitting discharge rating curves using Bayesian Power Law Model with constant variance}
 \usage{
 bplm0(
   formula,
   data,
   c_param = NULL,
-  w_max = NULL,
+  h_max = NULL,
   forcepoint = rep(FALSE, nrow(data)),
   ...
 )
@@ -20,7 +20,7 @@ bplm0(
 
 \item{c_param}{stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data}
 
-\item{w_max}{maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.}
+\item{h_max}{maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.}
 
 \item{forcepoint}{A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
@@ -44,11 +44,11 @@ An object of class "bplm0" is a list containing the following components: \cr
 \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
 }
 \description{
-bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian power law model with constant variance as described in Hrafnkelsson et al.
+bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
 }
 \examples{
 data(V316_river)
-f <- Q~W
+f <- Q~h
 bplm0.fit <- bplm0(f,V316_river)
 summary(bplm0.fit)
 plot(bplm0.fit)
@@ -57,7 +57,8 @@ summary(bplm0.fit)
 plot(bplm0.fit)
 }
 \references{
-Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
+B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
+preprint 2010.04769
 }
 \seealso{
 \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.

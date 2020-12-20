@@ -8,7 +8,7 @@ B_splines(ZZ)
 }
 \arguments{
 \item{ZZ}{A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
-(w-min(w)) divided by last element of the resulting vector, where w is stage observations.}
+(h-min(h)) divided by last element of the resulting vector, where h is stage observations.}
 }
 \value{
 The function returns a linear combination of scaled B-spline basis functions for every stage observation.

@@ -5,20 +5,20 @@
 \title{Linking unique water level measurements to actual
 water level measurements}
 \usage{
-create_A(w)
+create_A(h)
 }
 \arguments{
-\item{w}{numeric vector of stage measurements in meters}
+\item{h}{numeric vector of stage measurements in meters}
 }
 \value{
 \itemize{
-\item A: Matrix \strong{A} linking unique water level measurements (\strong{w'}) to actual
-water level measurements (w) such that \strong{w}=\strong{Aw'}
+\item A: Matrix \strong{A} linking unique water level measurements (\strong{h'}) to actual
+water level measurements (h) such that \strong{h}=\strong{Ah'}
 }
 }
 \description{
-Adist links unique water level measurements (\strong{w'}) to actual
-water level measurements (w) such that \strong{w}=\strong{Aw'}.
+Adist links unique water level measurements (\strong{h'}) to actual
+water level measurements (h) such that \strong{h}=\strong{Ah'}.
 from the measurements.
 }
 \references{
