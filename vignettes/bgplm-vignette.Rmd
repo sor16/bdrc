@@ -15,30 +15,40 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, fig.width=7, fig.height=6}
-library(devtools)
-load_all()
 library(RCmodels)
-source('~/Documents/Rfolder/RCmodels/R/plm_methods.R')
-library(ggplot2)
-library(latex2exp)
 data(V316_river)
 f <- Q~W
-bplm.fit <- bplm(f,V316_river)
+bgplm.fit <- bplm(f,V316_river)
 ```
 
-##Plotting examples
+## Plotting examples
 
 ```{r, fig.width=7, fig.height=6}
-plot(bplm.fit,type = 'rating_curve')
+plot(bgplm.fit,type = 'rating_curve')
 ```
+
 ```{r, fig.width=7, fig.height=6}
-plot(bplm.fit,type = 'residuals')
+plot(bgplm.fit,type = 'beta')
 ```
+
 ```{r, fig.width=7, fig.height=6}
-plot(bplm.fit,type = 'histogram','hyperparameters')
+plot(bgplm.fit,type = 'sigma_eps')
 ```
+
 ```{r, fig.width=7, fig.height=6}
-plot(bplm.fit,type = 'histogram','a','b','c')
+plot(bgplm.fit,type = 'residuals')
+```
+
+```{r, fig.width=7, fig.height=6}
+plot(bgplm.fit,type = 'histogram','hyperparameters')
+```
+
+```{r, fig.width=7, fig.height=6}
+plot(bgplm.fit,type = 'histogram','hyperparameters',transformed=T)
+```
+
+```{r, fig.width=7, fig.height=6}
+plot(bgplm.fit,type = 'histogram','a','b')
 ```
 
 
