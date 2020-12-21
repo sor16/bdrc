@@ -1,19 +1,50 @@
 #' Bayesian Power Law Model
 #'
-#' Infers a rating curve for paired measurements of stage and discharge using a  power law model described in Hrafnkelsson et al.
-#'@param formula formula with name of discharge column in data as response and name of stage column in data as the single covariate.
-#'@param data data.frame containing the columns in formula
-#'@param h_max vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.
-#'@param country Name of the country the prior parameters should be defined for, default value is "Iceland".
-#'@param hmin Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) hmin will
-#'automatically be set to c_hat.
-#'@param hmax Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) hmax will
-#'automatically be set to the maximum stage of the data.
-#'@return List containing information on the calculated rating curve,
-#'the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LowerTable, UpperTable, plotTable.
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-#'@seealso \code{\link{clean}}
-#'@export
+#' bplm is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
+#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".
+#' @param data data.frame containing the variables specified in formula
+#' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
+#' @param w_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
+#' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#' @return bplm returns an object of class "bplm"\cr\cr
+#' The function summary is used to obtain and print a summary of the model.\cr\cr
+#' An object of class "bplm" is a list containing the following components: \cr
+#'
+#' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
+#' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
+#' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
+#' \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+#' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
+#' \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
+#' \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
+#' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
+#' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
+#' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
+#' \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1}.}
+#' \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2}.}
+#' \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3}.}
+#' \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4}.}
+#' \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
+#' \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
+#' \item{\code{DIC_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
+#' \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\epsilon}}}
+#' \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
+#' \item{\code{formula}}{object of type "formula" provided by the user.}
+#' \item{\code{data}}{data provided by the user.}
+#' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
+#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
+#' preprint 2010.04769
+#' @seealso \code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm.fit <- bplm(f,V316_river)
+#' summary(bplm.fit)
+#' plot(bplm.fit)
+#' bplm.fit_known_c <- bplm(f,sim_dat,c_param=)
+#' summary(bplm.fit)
+#' plot(bplm.fit)
+#' @export
 bplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #TODO: argument checking
     model_dat <- data[,all.vars(formula)]

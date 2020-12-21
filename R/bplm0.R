@@ -20,6 +20,8 @@
 #' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
 #' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
 #' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
+#' \item{\code{DIC_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
+#' \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user.}
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
