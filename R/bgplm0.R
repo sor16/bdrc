@@ -4,7 +4,7 @@
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".
 #' @param data data.frame containing the variables specified in formula
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
-#' @param w_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
+#' @param h_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #' @return bgplm0 returns an object of class "bgplm0"\cr\cr
 #' The function summary is used to obtain and print a summary of the model.\cr\cr
@@ -70,16 +70,18 @@ bgplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nro
     }
     unique_h_idx <- !duplicated(MCMC_output_list$h)
     h_unique <- unique(MCMC_output_list$h)
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,])
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,])
-    result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
+    h_unique_order <- order(h_unique)
+    h_unique_sorted <- h_unique[h_unique_order]
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
+    result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),][h_unique_order,]
     result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique)
-    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique)
-    result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique)
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
+    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique_sorted)
+    result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique_sorted)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bgplm0',c_param)
     result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)

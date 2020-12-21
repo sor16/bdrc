@@ -61,12 +61,14 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     }
     unique_h_idx <- !duplicated(MCMC_output_list$h)
     h_unique <- unique(MCMC_output_list$h)
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,])
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,])
+    h_unique_order <- order(h_unique)
+    h_unique_sorted <- h_unique[h_unique_order]
+    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
+    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
     result_obj$DIC_posterior <- MCMC_output_list$DIC
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique)
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm0',c_param)
     result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
