@@ -14,30 +14,36 @@ bgplm(
 )
 }
 \arguments{
-\item{formula}{formula with name of discharge column in data as response and name of stage column in data as the single covariate.}
+\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".}
 
-\item{data}{data.frame containing the columns in formula}
+\item{data}{data.frame containing the variables specified in formula}
 
-\item{h_max}{vector of length 2 setting the lower and upper bound of stage values at which a rating curve should be predicted. If NULL, the known value of c or the mle of c will be used as lower bound (depending on the value of the input parameter c) and maximum stage value in data as upper bound.}
+\item{c_param}{stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data}
 
-\item{country}{Name of the country the prior parameters should be defined for, default value is "Iceland".}
+\item{h_max}{maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.}
 
-\item{hmin}{Positive numeric value for the lowest stage the user wants to calculate a rating curve. If input is an empty string (default) hmin will
-automatically be set to c_hat.}
-
-\item{hmax}{Positive numeric value for the highest stage the user wants to calculate a rating curve. If input is an empty string (default) hmax hill
-automatically be set to the maximum stage of the data.}
+\item{forcepoint}{A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
 \value{
-List containing information on the calculated rating curve,
-the data frames observedData, betaData, completePrediction, observedPrediction, TableOfData, FitTable, LoherTable, UpperTable, plotTable.
+
 }
 \description{
-Infers a rating curve for paired measurements of stage and discharge using a generalized power law model described in Hrafnkelsson et al.
+bgplm is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
+}
+\examples{
+data(V316_river)
+f <- Q~W
+bgplm.fit <- bgplm(f,V316_river)
+summary(bgplm.fit)
+plot(bgplm.fit)
+bgplm.fit_known_c <- bgplm(f,sim_dat,c_param=)
+summary(bgplm.fit)
+plot(bgplm.fit)
 }
 \references{
-Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
+B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
+preprint 2010.04769
 }
 \seealso{
-\code{\link{clean}}
+\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bgplm.plot}} to help visualize the full posterior distributions.
 }

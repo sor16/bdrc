@@ -25,23 +25,7 @@ bplm0(
 \item{forcepoint}{A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
 \value{
-bplm0 returns an object of class "bplm0"\cr\cr
-The function summary is used to obtain and print a summary of the model.\cr\cr
-An object of class "bplm0" is a list containing the following components: \cr
 
-\item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
-\item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-\item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
-\item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
-\item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
-\item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
-\item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
-\item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
-\item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
-\item{\code{formula}}{object of type "formula" provided by the user.}
-\item{\code{data}}{data provided by the user.}
-\item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
 }
 \description{
 bplm0 is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
