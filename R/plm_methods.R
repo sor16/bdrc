@@ -217,67 +217,297 @@ predict_fun <- function(object,newdata=NULL){
     return(pred_dat)
 }
 
-
+#' Print bplm0 object
+#'
+#' Print the results of a bplm0 object
+#' @param x an object of class "bplm0"
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model, \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm.fit <- bplm(f,V316_river)
+#' print(bplm0.fit)
+#' @export
 print.bplm0 <- function(x,...){
     print_fun(x)
 }
 
+#' Summarizing bplm0 fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' summary(bplm0.fit)
+#' @export
 summary.bplm0 <- function(object,...){
     summary_fun(object)
 }
 
+#' Plot bplm0 fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @param type a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'
+#' @return bplm0 returns an object of class ggplot2
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
+#' @import ggplot2
+#' @import latex2exp
 plot.bplm0 <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
 
+#' Predict method for bplm0 fit
+#'
+#' Print the results of a  object
+#' @param object an object of class "bplm0"
+#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @return numeric vector of discharge values for the stage values given in newdata
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
 predict.bplm0 <- function(object,newdata=NULL){
     predict_fun(object,newdata)
 }
 
+#' Print bplm object
+#'
+#' Print the results of a bplm object
+#' @param x an object of class "bplm"
+#' @return bgplm0 returns an object of class "bplm"\cr\cr
+#' @seealso \code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm.fit <- bplm(f,V316_river)
+#' print(bplm.fit)
+#' @export
+#'
 print.bplm <- function(x,...){
     print_fun(x)
 }
 
+#' Summarizing bplm fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @return bgplm0 returns an object of class "bplm"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' summary(bplm0.fit)
+#' @export
 summary.bplm <- function(object,...){
     summary_fun(object)
 }
 
+#' Plot bplm0 fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @param type a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'
+#' @return bplm0 returns an object of class "bplm0"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
+#' @import ggplot2
+#' @import latex2exp
 plot.bplm <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
 
+#' Predict method for bplm0 fit
+#'
+#' Print the results of a  object
+#' @param object an object of class "bplm0"
+#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @return numeric vector of discharge values for the stage values given in newdata
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
 predict.bplm <- function(object,newdata=NULL){
     predict_fun(object,newdata)
 }
 
+#' Print bgplm0 object
+#'
+#' Print the results of a bgplm0 object
+#' @param x an object of class "bgplm0"
+#' @seealso \code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bgplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bgplm0.fit <- bgplm0(f,V316_river)
+#' print(bgplm0.fit)
+#' @export
 print.bgplm0 <- function(x,...){
     print_fun(x)
 }
 
+#' Summarizing bplm fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @return bgplm0 returns an object of class "bplm"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' summary(bplm0.fit)
+#' @export
 summary.bgplm0 <- function(object,...){
     summary_fun(object)
 }
 
+#' Plot bplm0 fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @param type a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'
+#' @return bplm0 returns an object of class "bplm0"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
+#' @import ggplot2
+#' @import latex2exp
 plot.bgplm0 <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
 
+#' Predict method for bplm0 fit
+#'
+#' Print the results of a  object
+#' @param object an object of class "bplm0"
+#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @return numeric vector of discharge values for the stage values given in newdata
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
 predict.bgplm0 <- function(object,newdata=NULL){
     predict_fun(object,newdata)
 }
 
+#' Print bgplm object
+#'
+#' Print the results of a bgplm object
+#' @param x an object of class "bgplm"
+#' @seealso \code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bgplm.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bgplm.fit <- bgplm(f,V316_river)
+#' print(bgplm.fit)
+#' @export
 print.bgplm <- function(x,...){
     print_fun(x)
 }
 
+#' Summarizing bplm fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @return bgplm0 returns an object of class "bplm"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' summary(bplm0.fit)
+#' @export
 summary.bgplm <- function(object,...){
     summary_fun(object)
 }
 
+#' Plot bplm0 fit
+#'
+#' Print the results of a  object
+#' @param x an object of class "bplm0"
+#' @param type a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'
+#' @return bplm0 returns an object of class "bplm0"\cr\cr
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
+#' @import ggplot2
+#' @import latex2exp
 plot.bgplm <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
 
+#' Predict method for bplm0 fit
+#'
+#' Print the results of a  object
+#' @param object an object of class "bplm0"
+#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @return numeric vector of discharge values for the stage values given in newdata
+#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+#' @examples
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' plot(bplm0.fit)
+#' @export
 predict.bgplm <- function(object,newdata=NULL){
     predict_fun(object,newdata)
 }
+
+# gather_draws(bgplm.fit, 'rating_curve') %>%
+#     group_by(h) %>%
+#     summarise(lower_50 = quantile(value, 0.25),
+#               upper_50 = quantile(value, 0.75),
+#               lower_60 = quantile(value, 0.2),
+#               upper_60 = quantile(value, 0.8),
+#               lower_70 = quantile(value, 0.15),
+#               upper_70 = quantile(value, 0.85),
+#               lower_80 = quantile(value, 0.1),
+#               upper_80 = quantile(value, 0.9),
+#               lower_90 = quantile(value, 0.05),
+#               upper_90 = quantile(value, 0.95),
+#               lower_95 = quantile(value, 0.025),
+#               upper_95 = quantile(value, 0.975)) %>%
+#     pivot_longer(c(-h), names_to = c("which", "prob"), names_sep = "_") %>%
+#     pivot_wider(names_from = which, values_from = value) %>%
+#     mutate(prob = parse_number(prob)) %>%
+#     ggplot() +
+#     geom_ribbon(aes(h, ymin = lower, ymax = upper,fill = factor(-prob)), alpha = 0.7) +
+#     geom_point(data=bgplm.fit$data,aes(W,Q))+
+#     scale_fill_brewer() +
+#     scale_x_continuous(expand = c(0,0))+
+#     scale_y_continuous(expand = c(0,0)) +
+#     theme_classic() +
+#     theme(legend.position = "none")

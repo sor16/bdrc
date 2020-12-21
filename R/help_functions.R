@@ -116,7 +116,6 @@ get_MCMC_summary <- function(X,h=NULL){
     names(summary_dat) <- c('lower','median','upper')
     if(!is.null(h)){
         summary_dat <- data.frame(h=h,summary_dat,row.names=NULL)
-        summary_dat <- summary_dat[order(summary_dat$h),]
     }
     return(summary_dat)
 }
