@@ -21,9 +21,9 @@
 spread_draws <- function(mod,...,transformed=F){
     gathered_dat <- gather_draws(mod,...,transformed = F)
     if('h' %in% names(gathered_dat)){
-        spread_dat <- expand.grid(h=sort(unique(gathered_dat$h)),
-                                  iter=sort(unique(gathered_dat$iter)),
-                                  chain=sort(unique(gathered_dat$chain)))
+        spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
+                                  chain=sort(unique(gathered_dat$chain)),
+                                  h=sort(unique(gathered_dat$h)))
         spread_dat <- spread_dat[,c('chain','iter','h')]
     }else{
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
