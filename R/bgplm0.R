@@ -274,8 +274,10 @@ bgplm0.predict_u_known_c <- function(theta,x,RC){
     X=cbind(rep(1,m),l,diag(l))
     x_u=c(x[1:2],beta_u)
     #sample from the posterior of discharge y
-    yp_u <- X%*%x_u
-    ypo_u = yp_u + as.matrix(stats::rnorm(m)) * sqrt(varr_u)
+    yp_u <- c(X%*%x_u)
+    #make sure the log discharge at point of zero discharge is -Inf
+    yp_u[1] <- -Inf
+    ypo_u = yp_u + stats::rnorm(m) * sqrt(varr_u)
     return(list('x'=beta_u,'y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
@@ -313,7 +315,7 @@ bgplm0.predict_u_unknown_c <- function(theta,x,RC){
     #vector of parameters
     x_u=c(x[1:2],beta_u[above_c])
     #sample from the posterior of discharge y
-    yp_u <- X%*%x_u
-    ypo_u = yp_u + as.matrix(stats::rnorm(m_above_c)) * sqrt(varr_u[above_c])
+    yp_u <- c(X%*%x_u)
+    ypo_u = yp_u + stats::rnorm(m_above_c) * sqrt(varr_u[above_c])
     return(list('x'=beta_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }

@@ -199,8 +199,8 @@ bplm0.predict_u_known_c <- function(theta,x,RC){
   l=log(RC$h_u-RC$c)
   X=cbind(rep(1,m),l)
   #sample from the posterior predictive distr of y
-  yp_u <- X%*%x
-  ypo_u <- yp_u + as.matrix(stats::rnorm(m)) * sqrt(exp(log_sig_eps2))
+  yp_u <- c(X%*%x)
+  ypo_u <- yp_u + stats::rnorm(m) * sqrt(exp(log_sig_eps2))
   return(list('y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
@@ -215,8 +215,8 @@ bplm0.predict_u_unknown_c <- function(theta,x,RC){
     l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior predictive distr of y
-    yp_u <- X%*%x
-    ypo_u = yp_u + as.matrix(stats::rnorm(m_above_c)) * sqrt(exp(log_sig_eps2))
+    yp_u <- c(X%*%x)
+    ypo_u = yp_u + stats::rnorm(m_above_c) * sqrt(exp(log_sig_eps2))
     return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }
 
