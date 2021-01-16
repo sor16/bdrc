@@ -1,55 +1,71 @@
 #' Bayesian Generalized Power Law Model
 #'
-#' bgplm is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model with constant variance as described in Hrafnkelsson et al.
+#' bgplm is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model as described in Hrafnkelsson et al.
+#'
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".
 #' @param data data.frame containing the variables specified in formula
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
 #' @param h_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
-#' @return bgplm returns an object of class "bgplm"\cr\cr
-#' The function summary is used to obtain and print a summary of the model.\cr\cr
-#' An object of class "bgplm" is a list containing the following components: \cr
 #'
-#' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-#' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
-#' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-#' \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
-#' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
-#' \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
-#' \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
-#' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
-#' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
-#' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
-#' \item{\code{sigma_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\beta}}.}
-#' \item{\code{phi_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_{\beta}}.}
-#' \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\eta}}.}
-#' \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1}.}
-#' \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2}.}
-#' \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3}.}
-#' \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4}.}
-#' \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
-#' \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
-#' \item{\code{beta_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta}.}
-#' \item{\code{sigma_eps_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}.}
-#' \item{\code{DIC_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
-#' \item{\code{beta_summary}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta}.}
-#' \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_{\epsilon}.}
-#' \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
-#' \item{\code{formula}}{object of type "formula" provided by the user.}
-#' \item{\code{data}}{data provided by the user.}
-#' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
-#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
-#' preprint 2010.04769
-#' @seealso \code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bgplm.plot}} to help visualize the full posterior distributions.
+#' @details Fits a discharge rating curve using a Bayesian generalized power-law model described in x. The generalized power-law model is of the form
+#' \deqn{Q=a(h-c)^{f(h)}}
+#' where \eqn{Q} is discharge, \eqn{h} is stage, \eqn{a} and \eqn{c} are unknown constants and \eqn{f} is a function of  \eqn{h} referred to as the generalized power-law exponent.\cr\cr
+#' The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function \eqn{f} is modelled at the latent level as a fixed constant b plus a continuous stochastic process which is assumed to be twice differentiable. The model is presented on a logarithmic scale
+#' \deqn{log(Q_i) = log(a) + (b + \beta(h_i)) log(h_i - c) + \epsilon_i,     i = 1,...,n}
+#' where \eqn{\epsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\epsilon(h_i)^{2}} that can vary with stage.
+#' The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}, see Matern (1960).
+#' An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the conditional density the latent parameters conditioned on the hyperparameters.\cr\cr
+#' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density.
+#' Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using Markov chain Monte Carlo simulation.
+#'
+#' @return
+#' bgplm returns an object of class "bgplm". An object of class "bgplm" is a list containing the following components:
+#' \describe{
+#'  \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
+#'  \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
+#'  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
+#'  \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+#'  \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
+#'  \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
+#'  \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
+#'  \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
+#'  \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
+#'  \item{\code{sigma_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\beta}.}
+#'  \item{\code{phi_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_\beta}.}
+#'  \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\eta}.}
+#'  \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1}.}
+#'  \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2}.}
+#'  \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3}.}
+#'  \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4}.}
+#'  \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
+#'  \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
+#'  \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)}.}
+#'  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)}.}
+#'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
+#'  \item{\code{DIC_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
+#'  \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
+#'  \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
+#'  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
+#'  \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
+#'  \item{\code{formula}}{object of type "formula" provided by the user.}
+#'  \item{\code{data}}{data provided by the user.}
+#'  \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
+#' }
+#'
+#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
+#'
+#' @seealso \code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction and \code{\link{plot.bgplm}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
+#'
 #' @examples
 #' data(V316_river)
-#' f <- Q~W
-#' bgplm.fit <- bgplm(f,V316_river)
+#' formula <- Q~W
+#' bgplm.fit <- bgplm(formula,V316_river)
 #' summary(bgplm.fit)
 #' plot(bgplm.fit)
-#' bgplm.fit_known_c <- bgplm(f,sim_dat,c_param=)
-#' summary(bgplm.fit)
-#' plot(bgplm.fit)
+#' bgplm.fit_known_c <- bgplm(f,V316_river,c_param=0.75,h_max=2)
+#' summary(bgplm.fit_known_c)
+#' plot(bgplm.fit_known_c)
 #' @export
 bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
   #TODO:argument checking
