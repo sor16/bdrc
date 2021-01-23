@@ -13,12 +13,14 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=8, 
-  fig.height=5, 
-  fig.path="figs-introduction/"
+  fig.width=14, 
+  fig.height=8, 
+  fig.path='figs-introduction/',
+  fig.align='center',
+  prompt=T
 )
 ```
-A discharge rating curve is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge. The rating curve is used to predict discharge given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different dishcarge rating curve models are implemented in this R package using a Bayesian hierarchical model:
+A discharge rating curve is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it's used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different dishcarge rating curve models are implemented in this R package using a Bayesian hierarchical model:
 
 * bplm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model
 
@@ -31,6 +33,7 @@ A discharge rating curve is a model that describes the relationship between wate
 For further details about the different models, see x. The models differ in their complexity and the bgplm is the most flexible and complex model. We will focus on the use of bgplm throughout this introduction vignette and explore the different ways to fit the gplm and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
 ```{r,message=F}
 #load the packages needed for this vignette
+devtools::load_all()
 library(bdrc)
 library(ggplot2)
 library(dplyr)
@@ -49,16 +52,38 @@ bgplm.fit <- bgplm(Q~W,data=V316_river)
 ```
 
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=8, fig.height=6}
 plot(bgplm.fit)
 ```
 
-## Assess model fit and convergence
-```{r, fig.width=6, fig.height=5}
+## Visualizing posterior distributions of different parameters
+
+```{r, fig.width=14, fig.height=8}
+plot(bgplm.fit,type='histogram','hyperparameters','latent_parameters')
+```
+
+```{r, fig.width=8, fig.height=6}
+plot(bgplm.fit,type='histogram','c',transformed=T)
+```
+
+```{r, fig.width=8, fig.height=6}
+plot(bgplm.fit,type='histogram',paste('eta',1:6,sep='_'),transformed=T)
+```
+
+## Assessing model fitness and convergence
+
+```{r, fig.width=8, fig.height=6}
 plot(bgplm.fit,type='residuals')
 ```
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=14, fig.height=8}
 plot(bgplm.fit,type='trace','hyperparameters',transformed=T)
 ```
+```{r, fig.width=14, fig.height=8}
+plot(bgplm.fit,type='collage',transformed=T)
+```
+
+## Customization of models
+
 ## Comparing different models
+
