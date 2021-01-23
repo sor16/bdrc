@@ -157,7 +157,7 @@ get_param_names <- function(model,c_param){
 
 
 get_param_expression <- function(param){
-  expr_vec <- c('a'='\\textit{a}','b'='\\textit{b}','c'='\\textit{c}','sigma_eps'='\\sigma_\\varepsilon',
+  expr_vec <- c('a'='\\textit{a}','b'='\\textit{b}','c'='\\textit{c}','sigma_eps'='\\sigma_\\epsilon',
                 'sigma_beta'='\\sigma_\\beta','phi_beta'='\\phi_\\beta',
                 'sigma_eta'='\\sigma_\\eta','eta_1'='\\eta_1','eta_2'='\\eta_2',
                 'eta_3'='\\eta_3','eta_4'='\\eta_4','eta_5'='\\eta_5',
@@ -170,7 +170,7 @@ get_param_expression <- function(param){
                 'z_4'='\\textit{z_4}','z_5'='\\textit{z_5}','z_6'='\\textit{z_6}')
   param_expr <- paste0('$',expr_vec[param],'$')
   param_expr <- latex2exp::TeX(param_expr,output = 'character')
-  #param_expr <- latex2exp::latex2exp(expr_vec[param],output = 'character')
+  #param_expr <- latex2exp::latex2exp(param_expr,output = 'character')
   if(is.na(param_expr)){
     stop('param not found')
   }
@@ -183,7 +183,7 @@ get_parameter_levels <- function(param_vec){
                    'phi_beta'=10,'log(phi_beta)'=11,'sigma_eta'=12,'log(sigma_eta)'=13,
                    'eta_1'=14,'eta_2'=15,'z_1'=16,'eta_3'=17,'z_2'=18,
                    'eta_4'=19,'z_3'=20,'eta_5'=21,'z_4'=22,'eta_6'=23,'z_5'=24)
-  return(param_vec[rank(order_vec[param_vec])])
+  return(names(sort(rank(order_vec[param_vec]))))
 }
 
 get_transformed_param <- function(v,param_name,mod,...){
