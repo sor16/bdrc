@@ -119,13 +119,19 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                       axis.title.y = element_text(size = 16))
         }
     }else if(type=='sigma_eps'){
-        if(!('sigma_eps_summary' %in% names(x))){
-            stop('Plots of type "sigma_eps" are only for models with stage dependent variance, s.a. "bgplm" and "bplm"')
+        x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        if('sigma_eps_summary' %in% names(x)){
+            y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
+            plot_dat <- x$sigma_eps_summary
+        }else{
+            y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}$','character')
+            plot_dat <- data.frame(h=x$rating_curve$h,
+                                   lower=x$param_summary['sigma_eps','lower'],
+                                   median=x$param_summary['sigma_eps','median'],
+                                   upper=x$param_summary['sigma_eps','upper'])
         }
         #y_lab <- 'sigma[epsilon](h)'
-        x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
-        y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
-        p <- ggplot(data=x$sigma_eps_summary) +
+        p <- ggplot(data=plot_dat) +
             geom_line(aes(h,median)) +
             geom_line(aes(h,lower),linetype='dashed') +
             geom_line(aes(h,upper),linetype='dashed') +
@@ -154,12 +160,18 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                   axis.title.x = element_text(size = 16),
                   axis.title.y = element_text(size = 16))
     }else if(type=='f'){
-        if(!('f_summary' %in% names(x))){
-            stop('Plots of type "f" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
-        }
         x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
-        y_lab <- latex2exp::TeX('$\\textit{f(h)}$')
-        p <- ggplot(data=x$f_summary) +
+        if('f_summary' %in% names(x)){
+            y_lab <- latex2exp::TeX('$\\textit{b+\\beta(h)}$')
+            plot_dat <- x$f_summary
+        }else{
+            y_lab <- latex2exp::TeX('$\\textit{b}$')
+            plot_dat <- data.frame(h=x$rating_curve$h,
+                                   lower=x$param_summary['b','lower'],
+                                   median=x$param_summary['b','median'],
+                                   upper=x$param_summary['b','upper'])
+        }
+        p <- ggplot(data=plot_dat) +
             geom_line(aes(h,median)) +
             geom_line(aes(h,lower),linetype='dashed') +
             geom_line(aes(h,upper),linetype='dashed') +
@@ -171,12 +183,18 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                   axis.title.x = element_text(size = 16),
                   axis.title.y = element_text(size = 16))
     }else if(type=='residuals'){
-        resid_dat <- merge(x$rating_curve,x$data,by.x='h',by.y=all.vars(x$formula)[2])
+        resid_dat <- merge(x$rating_curve[,c('h','median')],x$data,by.x='h',by.y=all.vars(x$formula)[2],)
+        if('sigma_eps_summary' %in% names(x)){
+            resid_dat <- merge(resid_dat,x$sigma_eps_summary[,c('h','median')],by = 'h')
+            names(resid_dat) <- c('h','median','Q','sigma_eps')
+        }else{
+            resid_dat$sigma_eps <- x$param_summary['sigma_eps','median']
+        }
         c_hat <- if(is.null(x$run_info_c_param)) median(x$c_posterior) else x$run_info$c_param
         resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
         resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
-        resid_dat$r_lower <- log(resid_dat$lower)-log(resid_dat$median)
-        resid_dat$r_upper <- log(resid_dat$upper)-log(resid_dat$median)
+        resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
+        resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
         y_lab <- TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$")
         x_lab <- TeX("$log(\\textit{h - \\hat{c}})$")
         p <- ggplot(data=resid_dat) +
@@ -191,6 +209,20 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                   axis.text.y = element_text(size = 12),
                   axis.title.x = element_text(size = 16),
                   axis.title.y = element_text(size = 16))
+    }else if(type=='collage'){
+        args <- unique(c(...))
+        if(length(args)==0){
+            args <- c('rating_curve','residuals','f','sigma_eps')
+        }
+        legal_args <- c('rating_curve','rating_curve_mean','sigma_eps','f','beta','residuals')
+        if(all(args %in% legal_args)){
+            plot_list <- lapply(args,function(y){
+                plot(x,type=y,transformed=transformed)
+            })
+            p <- do.call(grid.arrange,c(plot_list,ncol=round(sqrt(length(args)))))
+        }else{
+            stop(cat(paste('For type collage, arguments must be in the following list:\n -',paste(legal_args,collapse='\n -'))))
+        }
     }
     return(p)
 }
@@ -261,7 +293,8 @@ summary.bplm0 <- function(object,...){
 #' plot(bplm0.fit)
 #' @export
 #' @import ggplot2
-#' @import latex2exp
+#' @importFrom latex2exp TeX
+#' @importFrom gridExtra grid.arrange
 plot.bplm0 <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
@@ -330,7 +363,8 @@ summary.bplm <- function(object,...){
 #' plot(bplm0.fit)
 #' @export
 #' @import ggplot2
-#' @import latex2exp
+#' @importFrom latex2exp TeX
+#' @importFrom gridExtra grid.arrange
 plot.bplm <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
@@ -397,7 +431,8 @@ summary.bgplm0 <- function(object,...){
 #' plot(bplm0.fit)
 #' @export
 #' @import ggplot2
-#' @import latex2exp
+#' @importFrom latex2exp TeX
+#' @importFrom gridExtra grid.arrange
 plot.bgplm0 <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
@@ -464,7 +499,8 @@ summary.bgplm <- function(object,...){
 #' plot(bplm0.fit)
 #' @export
 #' @import ggplot2
-#' @import latex2exp
+#' @importFrom latex2exp TeX
+#' @importFrom gridExtra grid.arrange
 plot.bgplm <- function(x,type='rating_curve',...,transformed=F){
     plot_fun(x,type,...,transformed=transformed)
 }
@@ -502,7 +538,7 @@ predict.bgplm <- function(object,newdata=NULL){
 #               upper_95 = quantile(value, 0.975)) %>%
 #     pivot_longer(c(-h), names_to = c("which", "prob"), names_sep = "_") %>%
 #     pivot_wider(names_from = which, values_from = value) %>%
-#     mutate(prob = parse_number(prob)) %>%
+#     mutate(prob = as.numeric(prob)) %>%
 #     ggplot() +
 #     geom_ribbon(aes(h, ymin = lower, ymax = upper,fill = factor(-prob)), alpha = 0.7) +
 #     geom_point(data=bgplm.fit$data,aes(W,Q))+
