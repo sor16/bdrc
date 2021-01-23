@@ -1,9 +1,9 @@
 Package: bdrc
 Title: Bayesian Discharge Rating Curves
 Version: 1.0.0
-Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut", "cre","cph")),
-             person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut")),
-             person("Axel Orn", "Jansson", email = "axelorn94@hi.is", role = c("aut")),
+Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut","cph")),
+             person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut","cre")),
+             person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut")),
              person("Rafael", "Vias", email = "raffidf@gmail.com", role = c("ctb"))
              )
 Description: Fits rating curves from paired stage and discharge measurements in rivers using a Bayesian hierarchical model
@@ -16,5 +16,7 @@ Suggests:
     knitr,
     rmarkdown,
     ggplot2,
-    latex2exp
+    latex2exp,
+    gridExtra
 VignetteBuilder: knitr
+BugReports: https://github.com/sor16/bdrc/issues
