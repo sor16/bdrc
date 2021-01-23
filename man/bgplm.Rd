@@ -31,31 +31,31 @@ bgplm returns an object of class "bgplm". An object of class "bgplm" is a list c
  \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
  \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
- \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
- \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
- \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
- \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
- \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
- \item{\code{sigma_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\beta}.}
- \item{\code{phi_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_\beta}.}
- \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\eta}.}
- \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1}.}
- \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2}.}
- \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3}.}
- \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4}.}
- \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
- \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
- \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)}.}
- \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)}.}
- \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
- \item{\code{DIC_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
+ \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.}
+ \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.}
+ \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a} excluding burn-in samples.}
+ \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b} excluding burn-in samples.}
+ \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c} excluding burn-in samples.}
+ \item{\code{sigma_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\beta} excluding burn-in samples.}
+ \item{\code{phi_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_\beta} excluding burn-in samples.}
+ \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\eta} excluding burn-in samples.}
+ \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1} excluding burn-in samples.}
+ \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2} excluding burn-in samples.}
+ \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3} excluding burn-in samples.}
+ \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4} excluding burn-in samples.}
+ \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5} excluding burn-in samples.}
+ \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6} excluding burn-in samples.}
+ \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)} excluding burn-in samples.}
+ \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burnin samples.}
+ \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)} excluding burnin samples.}
+ \item{\code{DIC_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion excluding burnin samples.}
  \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
  \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
  \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
  \item{\code{formula}}{object of type "formula" provided by the user.}
  \item{\code{data}}{data provided by the user.}
- \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
+ \item{\code{run_info}}{information about the specific parameters used in the MCMC chain.}
 }
 }
 \description{
