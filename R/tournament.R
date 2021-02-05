@@ -65,7 +65,7 @@ tournament <- function(formula,data,...) {
         args$bplm <- bplm(formula, data)
         args$bplm0 <- bplm0(formula, data)
     }
-    round1<- list(list(m_bgplm,m_bgplm0),list(m_bplm,m_bplm0))
+    round1<- list(list(args$bgplm,args$bgplm0),list(args$bplm,args$bplm0))
     round1_res <- lapply(1:length(round1),function(i){
                     game_df <- evaluate_game(round1[[i]])
                     round_df <- data.frame(round=1,game=i)
@@ -103,7 +103,7 @@ tournament <- function(formula,data,...) {
 #' @seealso \code{\link{summary.torunament}} for summaries
 #' @export
 print.tournament <- function(x){
-    cat(paste0('Tournament with winner',class(x$winner)))
+    cat(paste0('Tournament with winner ',class(x$winner)))
 }
 
 #' Print summary of tournament object
