@@ -15,7 +15,7 @@ summary_fun <- function(x){
 }
 
 
-plot_fun <- function(x,type=NULL,...,transformed=F){
+plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
     args <- c(...)
     if(type=='trace'){
         plot_dat <- gather_draws(x,args,transformed=transformed)
@@ -63,7 +63,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
                 )
         }
     }else if(type=='histogram'){
-        plot_dat <- gather_draws(x,...,transformed=transformed)
+        plot_dat <- gather_draws(x,args,transformed=transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "histogram" can only be of stage-independent parameters')
         }
@@ -219,10 +219,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F){
             plot_list <- lapply(args,function(y){
                 plot(x,type=y,transformed=transformed)
             })
-            p <- do.call(grid.arrange,c(plot_list,ncol=round(sqrt(length(args)))))
+            p <- do.call(gridExtra::grid.arrange,c(plot_list,ncol=round(sqrt(length(args)))))
         }else{
             stop(cat(paste('For type collage, arguments must be in the following list:\n -',paste(legal_args,collapse='\n -'))))
         }
+    }
+    if(type!='collage' & !is.null(title)){
+        p <- p + ggtitle(title) + theme(plot.title=element_text(size=18))
     }
     return(p)
 }
@@ -295,8 +298,8 @@ summary.bplm0 <- function(object,...){
 #' @import ggplot2
 #' @importFrom latex2exp TeX
 #' @importFrom gridExtra grid.arrange
-plot.bplm0 <- function(x,type='rating_curve',...,transformed=F){
-    plot_fun(x,type,...,transformed=transformed)
+plot.bplm0 <- function(x,type='rating_curve',...,transformed=F,title=NULL){
+    plot_fun(x,type,...,transformed=transformed,title=title)
 }
 
 #' Predict method for bplm0 fit
@@ -365,8 +368,8 @@ summary.bplm <- function(object,...){
 #' @import ggplot2
 #' @importFrom latex2exp TeX
 #' @importFrom gridExtra grid.arrange
-plot.bplm <- function(x,type='rating_curve',...,transformed=F){
-    plot_fun(x,type,...,transformed=transformed)
+plot.bplm <- function(x,type='rating_curve',...,transformed=F,title=NULL){
+    plot_fun(x,type,...,transformed=transformed,title=title)
 }
 
 #' Predict method for bplm0 fit
@@ -433,8 +436,8 @@ summary.bgplm0 <- function(object,...){
 #' @import ggplot2
 #' @importFrom latex2exp TeX
 #' @importFrom gridExtra grid.arrange
-plot.bgplm0 <- function(x,type='rating_curve',...,transformed=F){
-    plot_fun(x,type,...,transformed=transformed)
+plot.bgplm0 <- function(x,type='rating_curve',...,transformed=F,title=NULL){
+    plot_fun(x,type,...,transformed=transformed,title=title)
 }
 
 #' Predict method for bplm0 fit
@@ -501,8 +504,8 @@ summary.bgplm <- function(object,...){
 #' @import ggplot2
 #' @importFrom latex2exp TeX
 #' @importFrom gridExtra grid.arrange
-plot.bgplm <- function(x,type='rating_curve',...,transformed=F){
-    plot_fun(x,type,...,transformed=transformed)
+plot.bgplm <- function(x,type='rating_curve',...,transformed=F,title=NULL){
+    plot_fun(x,type,...,transformed=transformed,title=title)
 }
 
 #' Predict method for bplm0 fit
