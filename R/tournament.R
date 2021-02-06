@@ -15,7 +15,7 @@ evaluate_game <- function(m){
     BF_prop <- BF_vec[1]/BF_vec[2]
     PR_m1 <- 1/(1+(1/BF_prop))
     DIC_vec <- sapply(m,function(x) x$DIC_summary[,2])
-    winner <- if_else(PR_m1>=0.5,1,2)
+    winner <- ifelse(PR_m1>=0.5,1,2)
     data.frame(model=sapply(m,class),
                BF=BF_vec,
                DIC=DIC_vec,
@@ -91,27 +91,10 @@ tournament <- function(formula,data,...) {
     cat(paste0("The overall winner is ",round2_winner,"!",sep = " "))
     out_obj <- list()
     attr(out_obj, "class") <- "tournament"
+    out_obj$contestants <- args
     out_obj$winner <- round2[[which(round2_res$winner)]]
     out_obj$summary <- rbind(round1_res,round2_res)
     return(out_obj)
 }
 
-#' Print tournament object
-#'
-#' Print the results of a tournament of model comparisons
-#' @param x an object of class "tournament"
-#' @seealso \code{\link{summary.torunament}} for summaries
-#' @export
-print.tournament <- function(x){
-    cat(paste0('Tournament with winner ',class(x$winner)))
-}
 
-#' Print summary of tournament object
-#'
-#' Print the summary of a tournament of model comparisons
-#' @param x an object of class "tournament"
-#' @seealso \code{\link{summary.torunament}} for summaries
-#' @export
-summary.tournament <- function(x){
-    x$summary
-}
