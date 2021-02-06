@@ -76,14 +76,12 @@ plot.tournament <- function(x,type="rating_curve"){
             plot(m,type="f",title=class(m)) + ylim(ylim_min,ylim_max)
         })
         p <- do.call(gridExtra::grid.arrange,c(plot_list,ncol=2))
-    }else if(type=="rating_curve"){
+    }else if(type %in% c("rating_curve","rating_curve_log","rating_curve_mean","rating_curve_mean")){
+        rc_type <- type
+        transformed <- grepl('log',rc_type)
+        rc_type <- gsub('_log','',type)
         plot_list <- lapply(x$contestants,function(m){
-            plot(m,type="rating_curve",title=class(m))
-        })
-        p <- do.call(gridExtra::grid.arrange,c(plot_list,ncol=2))
-    }else if(type=="rating_curve_log"){
-        plot_list <- lapply(x$contestants,function(m){
-            plot(m,type="rating_curve",transformed=T,title=class(m))
+            plot(m,type=rc_type,transformed=transformed,title=class(m))
         })
         p <- do.call(gridExtra::grid.arrange,c(plot_list,ncol=2))
     }
