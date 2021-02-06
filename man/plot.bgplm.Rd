@@ -4,7 +4,7 @@
 \alias{plot.bgplm}
 \title{Plot bplm0 fit}
 \usage{
-\method{plot}{bgplm}(x, type = "rating_curve", ..., transformed = F)
+\method{plot}{bgplm}(x, type = "rating_curve", ..., transformed = F, title = NULL)
 }
 \arguments{
 \item{x}{an object of class "bplm0"}
