@@ -75,18 +75,23 @@ bplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(
     h_unique <- unique(MCMC_output_list$h)
     h_unique_order <- order(h_unique)
     h_unique_sorted <- h_unique[h_unique_order]
+    h_idx_data <- match(h,h_unique_sorted)
     result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
     result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
     result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx,][h_unique_order,])
-    result_obj$DIC_posterior <- MCMC_output_list$DIC
+    result_obj$Deviance_posterior <- c(MCMC_output_list$D)
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
     result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
     result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior,h=h_unique_sorted)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm',c_param)
-    result_obj$DIC_summary <- get_MCMC_summary(result_obj$DIC_posterior)
-    result_obj$Bayes_factor <- 1/mean(exp(0.5*result_obj$DIC_posterior))
+    result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
+    #Deviance calculation
+    D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$sigma_eps_summary$mean[h_idx_data])))
+    p_D <- result_obj$Deviance_summary[,'mean']-D_hat
+    result_obj$DIC <- D_hat+2*p_D
+    result_obj$B <- 1/mean(exp(0.5*result_obj$Deviance_posterior))
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
@@ -191,7 +196,7 @@ bplm.density_evaluation_known_c <- function(theta,RC){
 
     D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
 
-    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
+    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
 bplm.density_evaluation_unknown_c <- function(theta,RC){
@@ -224,7 +229,7 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
 
     D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
 
-    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"DIC"=D))
+    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
 bplm.predict_u_known_c <- function(theta,x,RC){
