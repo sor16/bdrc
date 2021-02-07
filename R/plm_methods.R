@@ -4,14 +4,15 @@ print_fun <- function(x){
 }
 
 summary_fun <- function(x){
-    names(x$param_summary)=paste0(names(x$param_summary),c('-2.5%','-50%','-97.5%'))
+    param_summary <- x$param_summary[,c('lower','median','upper')]
+    names(param_summary) <- paste0(names(param_summary),c('-2.5%','-50%','-97.5%'))
     cat("\nFormula: \n",
         paste(deparse(x$formula), sep = "\n", collapse = "\n"))
     cat("\nLatent parameters:\n")
-    print(x$param_summary[1:2,],row.names = T,digits=3,right=F)
+    print(param_summary[1:2,],row.names = T,digits=3,right=F)
     cat("\nHyperparameters:\n")
-    print(x$param_summary[3:nrow(x$param_summary),],row.names = T,digits=3,right=F)
-    cat("\nDIC:",x$DIC_summary[,2])
+    print(param_summary[3:nrow(param_summary),],row.names = T,digits=3,right=F)
+    cat("\nDIC:",x$DIC)
 }
 
 
