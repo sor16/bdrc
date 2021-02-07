@@ -112,8 +112,14 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
 }
 
 get_MCMC_summary <- function(X,h=NULL){
-    summary_dat <- as.data.frame(t(apply(X,1,stats::quantile, probs = c(0.025,0.5, 0.975),na.rm=T)))
-    names(summary_dat) <- c('lower','median','upper')
+    summary_dat <- apply(X,1,function(x) {
+                      c(stats::quantile(x,probs=0.025,na.rm=T),
+                        stats::quantile(x,probs=0.5,na.rm=T),
+                        mean(x,na.rm=T),
+                        stats::quantile(x,probs=0.975,na.rm=T))
+                    })
+    summary_dat <- as.data.frame(t(summary_dat))
+    names(summary_dat) <- c('lower','median','mean','upper')
     if(!is.null(h)){
         summary_dat <- data.frame(h=h,summary_dat,row.names=NULL)
     }
@@ -227,7 +233,7 @@ get_desired_output <- function(model,RC){
     const_b <- model %in% c('bplm0','bplm')
     desired_output <- list('y_post'=list('observed'=RC$n,'unobserved'=RC$n_u),
                            'y_post_pred'=list('observed'=RC$n,'unobserved'=RC$n_u),
-                           'DIC'=list('observed'=1,'unobserved'=0))
+                           'D'=list('observed'=1,'unobserved'=0))
     if(!const_var){
         desired_output$sigma_eps <- list('observed'=RC$n,'unobserved'=RC$n_u)
     }
