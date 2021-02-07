@@ -31,12 +31,12 @@ plot.tournament <- function(x,type="rating_curve"){
         })
         DIC_post_dat <- do.call(rbind,DIC_post_dat)
         DIC_median_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),median=m$DIC_summary[,2])
+            data.frame(model=class(m),median=m$DIC_summary[,2],mean=mean(c(m$DIC_posterior)))
         })
         DIC_median_dat <- do.call(rbind,DIC_median_dat)
         p <- ggplot() +
              geom_density(data=DIC_post_dat,aes(DIC,col=model)) +
-             geom_vline(data=DIC_median_dat,aes(xintercept=median,col=model),linetype='dashed') +
+             geom_vline(data=DIC_median_dat,aes(xintercept=mean,col=model),linetype='dashed') +
              theme_classic() +
              scale_color_manual(values=c("#BC3C29FF","#0072B5FF","#E18727FF","#20854EFF"),
                                 name='Model') +
