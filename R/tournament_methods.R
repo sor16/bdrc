@@ -25,24 +25,16 @@ summary.tournament <- function(x){
 #' @importFrom gridExtra grid.arrange
 #' @export
 plot.tournament <- function(x,type="rating_curve"){
-    if(type=="DIC"){
-        DIC_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),DIC=c(m$DIC_posterior))
+    if(type=="Deviance"){
+        Deviance_post_dat <- lapply(x$contestants,function(m){
+            data.frame(model=class(m),D=c(m$Deviance_posterior))
         })
-        DIC_post_dat <- do.call(rbind,DIC_post_dat)
-        DIC_median_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),median=m$DIC_summary[,2],mean=mean(c(m$DIC_posterior)))
-        })
-        DIC_median_dat <- do.call(rbind,DIC_median_dat)
+        Deviance_post_dat <- do.call(rbind,Deviance_post_dat)
         p <- ggplot() +
-             geom_density(data=DIC_post_dat,aes(DIC,col=model)) +
-             geom_vline(data=DIC_median_dat,aes(xintercept=mean,col=model),linetype='dashed') +
+             geom_boxplot(data=Deviance_post_dat,aes(x=model,y=D),width=0.4) +
              theme_classic() +
-             scale_color_manual(values=c("#BC3C29FF","#0072B5FF","#E18727FF","#20854EFF"),
-                                name='Model') +
-             ylab('Posterior density') +
-             scale_x_continuous(expand=c(0,0)) +
-             scale_y_continuous(expand=c(0,NA))
+             xlab('Model') +
+             ylab('Deviance')
     }else if(type=="residuals"){
         plot_list <- lapply(x$contestants,function(m){
                         plot(m,type='residuals',title=class(m))
@@ -84,6 +76,8 @@ plot.tournament <- function(x,type="rating_curve"){
             plot(m,type=rc_type,transformed=transformed,title=class(m))
         })
         p <- do.call(gridExtra::grid.arrange,c(plot_list,ncol=2))
+    }else{
+        stop('type not recognized. Must be one of "Deviance","residuals","sigma_eps","f","rating_curve","rating_curve_log","rating_curve_mean","rating_curve_mean"')
     }
     return(p)
 }
