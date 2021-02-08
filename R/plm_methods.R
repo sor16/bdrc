@@ -121,12 +121,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
         }
     }else if(type=='sigma_eps'){
         x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        h_in_data <- x$data[,all.vars(x$formula)[2]]
         if('sigma_eps_summary' %in% names(x)){
             y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
-            plot_dat <- x$sigma_eps_summary
+            plot_dat <- x$sigma_eps_summary[x$sigma_eps_summary$h>=min(h_in_data) & x$sigma_eps_summary$h<=max(h_in_data),]
         }else{
             y_lab <- latex2exp::TeX('$\\sigma_{\\epsilon}$','character')
-            plot_dat <- data.frame(h=x$rating_curve$h,
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2]],
                                    lower=x$param_summary['sigma_eps','lower'],
                                    median=x$param_summary['sigma_eps','median'],
                                    upper=x$param_summary['sigma_eps','upper'])
@@ -149,7 +150,8 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
         }
         x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
         y_lab <- latex2exp::TeX('$\\beta(\\textit{h})$')
-        p <- ggplot(data=x$beta_summary) +
+        h_in_data <- x$data[,all.vars(x$formula)[2]]
+        p <- ggplot(data=x$beta_summary[x$beta_summary$h>=min(h_in_data) & x$beta_summary$h<=max(h_in_data),]) +
             geom_line(aes(h,median)) +
             geom_line(aes(h,lower),linetype='dashed') +
             geom_line(aes(h,upper),linetype='dashed') +
@@ -162,12 +164,13 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
                   axis.title.y = element_text(size = 16))
     }else if(type=='f'){
         x_lab <- latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        h_in_data <- x$data[,all.vars(x$formula)[2]]
         if('f_summary' %in% names(x)){
             y_lab <- latex2exp::TeX('$\\textit{b+\\beta(h)}$')
-            plot_dat <- x$f_summary
+            plot_dat <- x$f_summary[x$f_summary$h>=min(h_in_data) & x$f_summary$h<=max(h_in_data),]
         }else{
             y_lab <- latex2exp::TeX('$\\textit{b}$')
-            plot_dat <- data.frame(h=x$rating_curve$h,
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2]],
                                    lower=x$param_summary['b','lower'],
                                    median=x$param_summary['b','median'],
                                    upper=x$param_summary['b','upper'])
