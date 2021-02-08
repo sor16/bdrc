@@ -102,7 +102,7 @@ bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
   result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
   result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
   result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),][h_unique_order,]
-  result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(MCMC_output_list$x)-2),nrow=nrow(MCMC_output_list$x)-2,byrow=T)+MCMC_output_list$x[3:nrow(MCMC_output_list$x),]
+  result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(result_obj$beta_posterior)),nrow=nrow(result_obj$beta_posterior),byrow=T) + result_obj$beta_posterior
   result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx,][h_unique_order,])
   result_obj$Deviance_posterior <- c(MCMC_output_list$D)
   #summary objects
