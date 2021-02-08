@@ -11,13 +11,13 @@
 #'
 #' @seealso \code{\link{tournament}}
 evaluate_game <- function(m){
-    BF_vec <- sapply(m,function(x) x$B)
-    BF_prop <- BF_vec[1]/BF_vec[2]
-    PR_m1 <- 1/(1+(1/BF_prop))
+    B_vec <- sapply(m,function(x) x$B)
+    BF <- B_vec[1]/B_vec[2]
+    PR_m1 <- 1/(1+(1/BF))
     DIC_vec <- sapply(m,function(x) x$DIC)
     winner <- ifelse(PR_m1>=0.5,1,2)
     data.frame(model=sapply(m,class),
-               BF=BF_vec,
+               B=B_vec,
                DIC=DIC_vec,
                P=c(PR_m1,1-PR_m1),
                winner=1:2==winner)
