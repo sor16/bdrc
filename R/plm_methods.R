@@ -94,6 +94,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
                 geom_line(aes(`log(h-c_hat)`,log(median))) +
                 geom_line(aes(`log(h-c_hat)`,log(lower)),linetype='dashed') +
                 geom_line(aes(`log(h-c_hat)`,log(upper)),linetype='dashed') +
+                scale_x_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_classic() +
@@ -110,7 +111,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
                 geom_line(aes(lower,h),linetype='dashed') +
                 geom_line(aes(upper,h),linetype='dashed') +
                 scale_x_continuous(expand=c(0,0)) +
-                scale_y_continuous(expand=c(0,0)) +
+                scale_y_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_classic() +
