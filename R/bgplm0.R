@@ -49,6 +49,11 @@ bgplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nro
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]
+    if(!is.null(c_param)){
+      if(min(h)<c_param){
+        stop('c_param must be lower than the minimum stage value in the data')
+      }
+    }
     MCMC_output_list <- bgplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint)
     #prepare S3 model object to be returned
     result_obj=list()
