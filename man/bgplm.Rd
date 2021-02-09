@@ -26,11 +26,13 @@ bgplm(
 }
 \value{
 bgplm returns an object of class "bgplm". An object of class "bgplm" is a list containing the following components:
-\describe{
  \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
  \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
- \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+ \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
+ \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
+ \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
+ \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
  \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.}
  \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.}
  \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a} excluding burn-in samples.}
@@ -48,15 +50,11 @@ bgplm returns an object of class "bgplm". An object of class "bgplm" is a list c
  \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)} excluding burn-in samples.}
  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burnin samples.}
  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)} excluding burnin samples.}
- \item{\code{DIC_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion excluding burnin samples.}
- \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
- \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
- \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
- \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
+ \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
+ \item{\code{DIC}}{Deviance Information Criterion for the model}
  \item{\code{formula}}{object of type "formula" provided by the user.}
  \item{\code{data}}{data provided by the user.}
  \item{\code{run_info}}{information about the specific parameters used in the MCMC chain.}
-}
 }
 \description{
 bgplm is used to fit a rating curve for paired measurements of stage and discharge using a Bayesian Power Law Model as described in Hrafnkelsson et al.

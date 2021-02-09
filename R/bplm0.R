@@ -6,22 +6,26 @@
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data
 #' @param h_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
-#' @return bplm0 returns an object of class "bplm0"\cr\cr
-#' The function summary is used to obtain and print a summary of the model.\cr\cr
-#' An object of class "bplm0" is a list containing the following components: \cr
 #'
+#' @details The power-law model, which is commonly used in hydraulic practice, is of the form
+#' \deqn{Q=a(h-c)^{b}}
+#' where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants. It is presented here as a Bayesian hierarchical model. The model is on a logarithmic scale
+#' \deqn{log(Q_i) = log(a) + b log(h_i - c) + \epsilon,     i = 1,...,n}
+#' where \eqn{\epsilon} follows a normal distribution with mean zero and variance \eqn{\sigma_\epsilon^2}, independent of stage. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
+#' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
+#' @return bplm0 returns an object of class "bplm0". An object of class "bplm0" is a list containing the following components: \cr
 #' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
 #' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
 #' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-#' \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+#' \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
 #' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
 #' \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
 #' \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
 #' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
 #' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
 #' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
-#' \item{\code{DIC_posterior}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion.}
-#' \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
+#' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
+#' \item{\code{DIC}}{Deviance Information Criterion for the model}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user.}
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
@@ -30,13 +34,13 @@
 #' @seealso \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
 #' @examples
 #' data(V316_river)
-#' f <- Q~h
-#' bplm0.fit <- bplm0(f,V316_river)
+#' formula <- Q~W
+#' bplm0.fit <- bplm0(formula,V316_river)
 #' summary(bplm0.fit)
 #' plot(bplm0.fit)
-#' bplm0.fit_known_c <- bplm0(f,sim_dat,c_param=)
-#' summary(bplm0.fit)
-#' plot(bplm0.fit)
+#' bplm0.fit_known_c <- bplm0(f,V316_river,c_param=0.75,h_max=2)
+#' summary(bplm0.fit_known_c)
+#' plot(bplm0.fit_known_c)
 #' @export
 bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
     #argument checking
@@ -82,7 +86,6 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$param_summary['sigma_eps','mean'])))
     p_D <- result_obj$Deviance_summary[,'mean']-D_hat
     result_obj$DIC <- D_hat+2*p_D
-    result_obj$B <- 1/mean(exp(0.5*result_obj$Deviance_posterior))
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }

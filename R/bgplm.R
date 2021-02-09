@@ -17,11 +17,13 @@
 #' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 #' @return
 #' bgplm returns an object of class "bgplm". An object of class "bgplm" is a list containing the following components:
-#' \describe{
 #'  \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
 #'  \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
 #'  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-#'  \item{\code{DIC_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the Deviance Information Criterion.}
+#'  \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
+#'  \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
+#'  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
+#'  \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
 #'  \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.}
 #'  \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.}
 #'  \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a} excluding burn-in samples.}
@@ -39,15 +41,11 @@
 #'  \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)} excluding burn-in samples.}
 #'  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burnin samples.}
 #'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)} excluding burnin samples.}
-#'  \item{\code{DIC_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the Deviance Information Criterion excluding burnin samples.}
-#'  \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
-#'  \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
-#'  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
-#'  \item{\code{Bayes_factor}}{a numeric value containing the rating curves Bayes factor.}
+#'  \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
+#'  \item{\code{DIC}}{Deviance Information Criterion for the model}
 #'  \item{\code{formula}}{object of type "formula" provided by the user.}
 #'  \item{\code{data}}{data provided by the user.}
 #'  \item{\code{run_info}}{information about the specific parameters used in the MCMC chain.}
-#' }
 #'
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 #'
@@ -123,7 +121,6 @@ bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
   D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$sigma_eps_summary$mean[h_idx_data])))
   p_D <- result_obj$Deviance_summary[,'mean']-D_hat
   result_obj$DIC <- D_hat+2*p_D
-  result_obj$B <- 1/mean(exp(0.5*result_obj$Deviance_posterior))
   result_obj$run_info <- MCMC_output_list$run_info
   return(result_obj)
 }
