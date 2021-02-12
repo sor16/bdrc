@@ -1,0 +1,42 @@
+---
+title: "Tournament - Model comparison"
+author: "Sölvi Rögnvaldsson, Axel Örn Jansson and Birgir Hrafnkelsson"
+date:
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=14, 
+  fig.height=8, 
+  fig.path='figs-introduction/',
+  fig.align='center',
+  prompt=T
+)
+```
+
+```{r,message=F}
+#load the packages needed for this vignette
+devtools::load_all()
+library(bdrc)
+library(ggplot2)
+library(dplyr)
+```
+We will use a dataset from a river called x in Sweden that comes with the package:
+```{r, data}
+data(V316_river)
+V316_river
+```
+
+## Find the most adequate model
+
+## Compare different components of the models
+
+
+
