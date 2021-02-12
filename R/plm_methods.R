@@ -86,7 +86,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
         if(transformed){
             x_lab <- latex2exp::TeX('$\\log(\\textit{h-\\hat{c}})$','character')
             y_lab <- latex2exp::TeX('$\\log(\\textit{Q})$','character')
-            c_hat <- if(is.null(x$run_info_c_param)) median(x$c_posterior) else x$run_info$c_param
+            c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
             plot_dat <- merge(x[[type]],x$data,by.x='h',by.y=all.vars(x$formula)[2])
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
             p <- ggplot(data=plot_dat) +
@@ -195,7 +195,7 @@ plot_fun <- function(x,type=NULL,...,transformed=F,title=NULL){
         }else{
             resid_dat$sigma_eps <- x$param_summary['sigma_eps','median']
         }
-        c_hat <- if(is.null(x$run_info_c_param)) median(x$c_posterior) else x$run_info$c_param
+        c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
         resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
         resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
         resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
