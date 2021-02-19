@@ -75,7 +75,7 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     h_idx_data <- match(h,h_unique_sorted)
     result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
     result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
-    result_obj$Deviance_posterior <- MCMC_output_list$D
+    result_obj$Deviance_posterior <- c(MCMC_output_list$D)
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
     result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
