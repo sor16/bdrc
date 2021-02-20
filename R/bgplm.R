@@ -52,14 +52,17 @@
 #' @seealso \code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction and \code{\link{plot.bgplm}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
 #'
 #' @examples
+#' \dontrun{
 #' data(V316_river)
+#' set.seed(1)
 #' formula <- Q~W
 #' bgplm.fit <- bgplm(formula,V316_river)
 #' summary(bgplm.fit)
 #' plot(bgplm.fit)
-#' bgplm.fit_known_c <- bgplm(f,V316_river,c_param=0.75,h_max=2)
+#' bgplm.fit_known_c <- bgplm(formula,V316_river,c_param=0.75,h_max=2)
 #' summary(bgplm.fit_known_c)
 #' plot(bgplm.fit_known_c)
+#' }
 #' @export
 bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
   #TODO:argument checking
@@ -185,7 +188,14 @@ bgplm.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
   if(num_chains>4){
     stop('Max number of chains is 4. Please pick a lower number of chains')
   }
-  MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_chains,FUN=function(i){
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/Travis/AppVeyor
+    num_cores <- 2L
+  } else {
+    num_cores <- min(parallel::detectCores(),num_chains)
+  }
+  MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_cores,FUN=function(i){
     run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
   })
   output_list <- list()
