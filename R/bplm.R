@@ -38,7 +38,7 @@
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
 #' preprint 2010.04769
-#' @seealso \code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm.plot}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
