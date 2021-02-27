@@ -1,11 +1,11 @@
 #' Prior parameter specification
 #'
-#'
-#'@param country A string with the name of the country of which the prior parameters into the models should be specified for
+#'@param model character denoting which model to get the fixed values of parameters of prior distributions. One of bplm0,bplm,bgplm0,bgplm
+#'@param c_param The value of the parameter c, the stage at zero discharge. NULL if unknown
 #'@return
 #'The priors are based from data from rivers of a given country.If you want to add your country to this function,
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
-priors <- function(model,c_param) {
+priors <- function(model,c_param=NULL) {
     RC=list()
     #Prior parameters for all models
     RC$mu_a <- 3;
@@ -270,9 +270,9 @@ pri <- function(type,...){
 #'
 #'h_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
 #'
-#'@param h_unique vector containing unique stages from river data.
-#'@param min minimum stage of rating curve.
-#'@param max maximum stage of rating curve.
+#'@param RC list which must include the stage values h,h_min and h_max
+#'@param h_min minimum stage of rating curve.
+#'@param h_max maximum stage of rating curve.
 #'@return h_unobserved returns a list of vectors, h_u and h_u_tild. h_u is a vector of unobserved stage values
 #' needed to make an equally spaced grid of stages. h_u_tild is a vector which is calculated by h_u-min(h_unique) needed to input into B_splines.
 #' The unobserved stages are lower or higher than that of the data, take the same value in h_u_tild as the minimum value and maximum value of the
@@ -300,15 +300,14 @@ h_unobserved <- function(RC,h_min=NA,h_max=NA){
   return(h_u)
 }
 
-#'Bsplines in a generalized rating curve
+#'B-splines in a generalized rating curve
 #'
-#'A function to test the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
+#'A function to calculate the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
 #'with 2 interior knots and 6 basis functions.
 #'
 #'@param ZZ A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
 #'(h-min(h)) divided by last element of the resulting vector, where h is stage observations.
 #'@return The function returns a linear combination of scaled B-spline basis functions for every stage observation.
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 B_splines <- function(ZZ){
   #The number of equally spaced interior knots.
   kx=2

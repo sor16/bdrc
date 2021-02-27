@@ -4,10 +4,12 @@
 \alias{priors}
 \title{Prior parameter specification}
 \usage{
-priors(model, c_param)
+priors(model, c_param = NULL)
 }
 \arguments{
-\item{country}{A string with the name of the country of which the prior parameters into the models should be specified for}
+\item{model}{character denoting which model to get the fixed values of parameters of prior distributions. One of bplm0,bplm,bgplm0,bgplm}
+
+\item{c_param}{The value of the parameter c, the stage at zero discharge. NULL if unknown}
 }
 \value{
 The priors are based from data from rivers of a given country.If you want to add your country to this function,

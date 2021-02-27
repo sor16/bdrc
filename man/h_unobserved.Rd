@@ -7,11 +7,11 @@
 h_unobserved(RC, h_min = NA, h_max = NA)
 }
 \arguments{
-\item{h_unique}{vector containing unique stages from river data.}
+\item{RC}{list which must include the stage values h,h_min and h_max}
 
-\item{min}{minimum stage of rating curve.}
+\item{h_min}{minimum stage of rating curve.}
 
-\item{max}{maximum stage of rating curve.}
+\item{h_max}{maximum stage of rating curve.}
 }
 \value{
 h_unobserved returns a list of vectors, h_u and h_u_tild. h_u is a vector of unobserved stage values
