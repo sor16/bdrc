@@ -8,16 +8,20 @@
 }
 \arguments{
 \item{x}{an object of class "bplm0"}
+
+\item{...}{not used in this function}
 }
 \description{
 Print the results of a bplm0 object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
-bplm.fit <- bplm(f,V316_river)
+bplm0.fit <- bplm0(f,V316_river)
 print(bplm0.fit)
 }
+}
 \seealso{
-\code{\link{bplm0}} for fitting the bplm0 model, \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{bplm0}} for fitting the bplm0 model, \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
 }

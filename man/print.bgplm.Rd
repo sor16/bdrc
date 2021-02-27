@@ -8,16 +8,20 @@
 }
 \arguments{
 \item{x}{an object of class "bgplm"}
+
+\item{...}{not used in this function}
 }
 \description{
 Print the results of a bgplm object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
 bgplm.fit <- bgplm(f,V316_river)
 print(bgplm.fit)
 }
+}
 \seealso{
-\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bgplm.plot}} to help visualize the full posterior distributions.
+\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
 }

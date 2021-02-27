@@ -2,27 +2,41 @@
 % Please edit documentation in R/plm_methods.R
 \name{plot.bplm}
 \alias{plot.bplm}
-\title{Plot bplm0 fit}
+\title{Plot bplm fit}
 \usage{
-\method{plot}{bplm}(x, type = "rating_curve", ..., transformed = F, title = NULL)
+\method{plot}{bplm}(x, ...)
 }
 \arguments{
-\item{x}{an object of class "bplm0"}
+\item{x}{an object of class "bplm"}
 
-\item{type}{a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'}
-}
-\value{
-bplm0 returns an object of class "bplm0"\cr\cr
+\item{...}{Arguments to be passed to other methods. The following arguments are supported:
+\itemize{
+ \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+                   \itemize{
+                      \item{"rating_curve"}{ to plot the rating curve on original scale.}
+                      \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
+                      \item{"f"}{ to plot the power-law exponent}
+                      \item{"sigma_eps"}{ to plot the standard deviation on the data level}
+                      \item{"residuals"}{ to plot the log residuals}
+                      \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
+                      \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
+                   }}
+\item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+\item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
+\item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
+}}
 }
 \description{
 Print the results of a  object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
-bplm0.fit <- bplm0(f,V316_river)
-plot(bplm0.fit)
+bplm.fit <- bplm(f,V316_river)
+plot(bplm.fit)
+}
 }
 \seealso{
-\code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 }

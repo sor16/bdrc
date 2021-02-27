@@ -7,20 +7,24 @@
 \method{summary}{bplm}(object, ...)
 }
 \arguments{
-\item{x}{an object of class "bplm0"}
+\item{object}{an object of class "bplm"}
+
+\item{...}{not used in this function}
 }
 \value{
 bgplm0 returns an object of class "bplm"\cr\cr
 }
 \description{
-Print the results of a  object
+Summarize the results of a bplm object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
-bplm0.fit <- bplm0(f,V316_river)
-summary(bplm0.fit)
+bplm.fit <- bplm(f,V316_river)
+summary(bplm.fit)
+}
 }
 \seealso{
-\code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 }

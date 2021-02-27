@@ -2,14 +2,16 @@
 % Please edit documentation in R/plm_methods.R
 \name{predict.bplm}
 \alias{predict.bplm}
-\title{Predict method for bplm0 fit}
+\title{Predict method for bplm fit}
 \usage{
-\method{predict}{bplm}(object, newdata = NULL)
+\method{predict}{bplm}(object, newdata = NULL, ...)
 }
 \arguments{
-\item{object}{an object of class "bplm0"}
+\item{object}{an object of class "bplm"}
 
 \item{newdata}{a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.}
+
+\item{...}{not used in this function}
 }
 \value{
 numeric vector of discharge values for the stage values given in newdata
@@ -18,11 +20,14 @@ numeric vector of discharge values for the stage values given in newdata
 Print the results of a  object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
-bplm0.fit <- bplm0(f,V316_river)
-plot(bplm0.fit)
+bplm.fit <- bplm(f,V316_river,h_max=2)
+#predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
+predict(bplm.fit,newdata=seq(1,2,by=0.01))
+}
 }
 \seealso{
-\code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 }

@@ -2,25 +2,29 @@
 % Please edit documentation in R/plm_methods.R
 \name{summary.bgplm0}
 \alias{summary.bgplm0}
-\title{Summarizing bplm fit}
+\title{Summarizing bgplm0 fit}
 \usage{
 \method{summary}{bgplm0}(object, ...)
 }
 \arguments{
-\item{x}{an object of class "bplm0"}
+\item{object}{an object of class "bgplm0"}
+
+\item{...}{not used in this function}
 }
 \value{
 bgplm0 returns an object of class "bplm"\cr\cr
 }
 \description{
-Print the results of a  object
+Summarize the results of a bgplm0 object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
-bplm0.fit <- bplm0(f,V316_river)
-summary(bplm0.fit)
+bgplm0.fit <- bgplm0(f,V316_river)
+summary(bgplm0.fit)
+}
 }
 \seealso{
-\code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
 }

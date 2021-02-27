@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{an object of class "bplm"}
+
+\item{...}{not used in this function}
 }
 \value{
 bgplm0 returns an object of class "bplm"\cr\cr
@@ -16,11 +18,13 @@ bgplm0 returns an object of class "bplm"\cr\cr
 Print the results of a bplm object
 }
 \examples{
+\dontrun{
 data(V316_river)
 f <- Q~W
 bplm.fit <- bplm(f,V316_river)
 print(bplm.fit)
 }
+}
 \seealso{
-\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm.plot}} to help visualize the full posterior distributions.
+\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 }
