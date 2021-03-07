@@ -38,7 +38,6 @@ theme_bdrc <- function(){
 #'
 #' Visualize results from model ojbects in bdrc, bplm0, bplm, bgplm0,bgplm
 #' @param x an object of class "bplm0","bplm","bgplm0" or "bgplm"
-#' @param type a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'
 #' @param ... Arguments to be passed to other methods. The following arguments are supported:
 #' \itemize{
 #'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
@@ -46,6 +45,7 @@ theme_bdrc <- function(){
 #'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
 #'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
 #'                       \item{"f"}{ to plot the power-law exponent}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent}
 #'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
 #'                       \item{"residuals"}{ to plot the log residuals}
 #'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
@@ -56,9 +56,10 @@ theme_bdrc <- function(){
 #' \item{}{ additional characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
 #' }
 #' @return returns an object of class ggplot2 or Grob object
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom latex2exp TeX
 #' @importFrom rlang .data
+#' @importFrom stats median
 plot_fun <- function(x,...){
     args <- list(...)
     if('type' %in% names(args)){
@@ -80,7 +81,10 @@ plot_fun <- function(x,...){
         title <- NULL
     }
     args <- unlist(args)
-    if(type=='trace'){
+    legal_types <- c('rating_curve','rating_curve_mean','f','sigma_eps','residuals','trace','histogram')
+    if(!(type %in% legal_types)){
+        stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
+    }else if(type=='trace'){
         plot_dat <- gather_draws(x,args,transformed=transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "trace" can only be of stage-independent parameters')
@@ -101,7 +105,7 @@ plot_fun <- function(x,...){
         }else{
             param_expr <- get_param_expression(params)
             plot_dat$chain_name <- paste0('Chain nr ',plot_dat$chain)
-            p <- ggplot(plot_dat,aes_string(x='iter',y='value')) +
+            p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value)) +
                 geom_path(col="#0072B5FF") +
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
@@ -147,7 +151,7 @@ plot_fun <- function(x,...){
             x_lab <- TeX('$\\textit{Q}\\lbrack\\textit{m^3/s}\\rbrack$','character')
             y_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
             p <- ggplot(data=x[[type]]) +
-                geom_point(data=x$data,aes_string(all.vars(x$formula)[1],all.vars(x$formula)[2])) +
+                geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]])) +
                 geom_path(aes(x=.data$median,y=.data$h)) +
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed') +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed') +
@@ -159,13 +163,13 @@ plot_fun <- function(x,...){
         }
     }else if(type=='sigma_eps'){
         x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
-        h_in_data <- x$data[,all.vars(x$formula)[2]]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         if('sigma_eps_summary' %in% names(x)){
             y_lab <- TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
             plot_dat <- x$sigma_eps_summary[x$sigma_eps_summary$h>=min(h_in_data) & x$sigma_eps_summary$h<=max(h_in_data),]
         }else{
             y_lab <- TeX('$\\sigma_{\\epsilon}$','character')
-            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2]],
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
                                    lower=x$param_summary['sigma_eps','lower'],
                                    median=x$param_summary['sigma_eps','median'],
                                    upper=x$param_summary['sigma_eps','upper'])
@@ -183,7 +187,7 @@ plot_fun <- function(x,...){
         }
         x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
         y_lab <- TeX('$\\beta(\\textit{h})$')
-        h_in_data <- x$data[,all.vars(x$formula)[2]]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         p <- ggplot(data=x$beta_summary[x$beta_summary$h>=min(h_in_data) & x$beta_summary$h<=max(h_in_data),]) +
             geom_path(aes(.data$h,.data$median)) +
             geom_path(aes(.data$h,.data$lower),linetype='dashed') +
@@ -193,13 +197,13 @@ plot_fun <- function(x,...){
             theme_bdrc()
     }else if(type=='f'){
         x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
-        h_in_data <- x$data[,all.vars(x$formula)[2]]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         if('f_summary' %in% names(x)){
             y_lab <- TeX('$\\textit{b+\\beta(h)}$')
             plot_dat <- x$f_summary[x$f_summary$h>=min(h_in_data) & x$f_summary$h<=max(h_in_data),]
         }else{
             y_lab <- TeX('$\\textit{b}$')
-            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2]],
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
                                    lower=x$param_summary['b','lower'],
                                    median=x$param_summary['b','median'],
                                    upper=x$param_summary['b','upper'])
