@@ -6,7 +6,6 @@
 #' @details TODO
 #' @return
 #' A data.frame with the summary of the results of the game
-#'
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 #'
 #' @seealso \code{\link{tournament}}
@@ -43,7 +42,12 @@ evaluate_game <- function(m){
 #'
 #' @seealso \code{\link{summary.tournament}}
 #' @examples
-#' TODO
+#' \dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' t_obj <- tournament(f,V316_river)
+#' plot(t_obj)
+#' }
 #' @export
 tournament <- function(formula,data,...) {
     args <- list(...)
