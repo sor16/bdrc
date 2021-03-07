@@ -1,0 +1,71 @@
+development:
+  mode: auto
+home:
+  title: Fit Bayesian Discharge Rating Curves
+
+authors:
+  Birgir Hrafnkelsson:
+    href: https://english.hi.is/staff/birgirhr
+  Solvi Rognvaldsson:
+    href: https://github.com/sor16
+
+reference:
+  - title: Models
+    contents:
+    - bplm0
+    - bplm
+    - bgplm0
+    - bgplm
+
+  - title: Tournament - Model comparison
+    contents:
+    - tournament
+
+  - title: Methods for bplm0 objects
+    contents:
+    - print.bplm0
+    - summary.bplm0
+    - autoplot.bplm0
+    - plot.bplm0
+    - predict.bplm0
+
+  - title: Methods for bplm objects
+    contents:
+    - print.bplm
+    - summary.bplm
+    - autoplot.bplm
+    - plot.bplm
+    - predict.bplm
+
+  - title: Methods for bgplm0 objects
+    contents:
+    - print.bgplm0
+    - summary.bgplm0
+    - autoplot.bgplm0
+    - plot.bgplm0
+    - predict.bgplm0
+
+  - title: Methods for bgplm objects
+    contents:
+    - print.bgplm
+    - summary.bgplm
+    - autoplot.bgplm
+    - plot.bgplm
+    - predict.bgplm
+
+  - title: Methods for tournament objects
+    contents:
+    - print.tournament
+    - summary.tournament
+    - autoplot.tournament
+    - plot.tournament
+    - predict.tournament
+
+  - title: Data manipulation functions
+    contents:
+    - spread_draws
+    - gather_draws
+
+  - title: Data
+    contents:
+    - V316_river
