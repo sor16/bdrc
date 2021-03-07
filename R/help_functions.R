@@ -115,11 +115,10 @@ get_MCMC_summary <- function(X,h=NULL){
     summary_dat <- apply(X,1,function(x) {
                       c(stats::quantile(x,probs=0.025,na.rm=T),
                         stats::quantile(x,probs=0.5,na.rm=T),
-                        mean(x,na.rm=T),
                         stats::quantile(x,probs=0.975,na.rm=T))
                     })
     summary_dat <- as.data.frame(t(summary_dat))
-    names(summary_dat) <- c('lower','median','mean','upper')
+    names(summary_dat) <- c('lower','median','upper')
     if(!is.null(h)){
         summary_dat <- data.frame(h=h,summary_dat,row.names=NULL)
     }
@@ -226,6 +225,50 @@ get_transformed_param <- function(v,param_name,mod,...){
     stop('param not found')
   }
   return(out_v)
+}
+
+get_transformed_param <- function(v,param_name,mod,...){
+  args <- list(...)
+  # fun_vec <- c('a'=log,
+  #              'b'=identity,
+  #              'c'=function(x,h_min) log())
+  if(param_name=='a'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(a)',length(v))
+  }else if(param_name=='b'){
+    out_v <- v
+    names(out_v) <- rep('b',length(v))
+  }else if(param_name=='c'){
+    out_v <- log(args$h_min-v)
+    names(out_v) <- rep('log(h_min-c)',length(v))
+  }else if(param_name=='sigma_eps'){
+    out_v <- 2*log(v)
+    names(out_v) <- rep('2log(sigma_eps)',length(v))
+  }else if(param_name=='sigma_beta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(sigma_beta)',length(v))
+  }else if(param_name=='phi_beta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(phi_beta)',length(v))
+  }else if(param_name=='sigma_eta'){
+    out_v <- log(v)
+    names(out_v) <- rep('log(sigma_eta)',length(v))
+  }else if(param_name=='eta_1'){
+    out_v <- v
+    names(out_v) <- rep('eta_1',length(v))
+  }else if(param_name %in% paste0('eta_',2:6)){
+    eta_nr <- as.numeric(unlist(strsplit(param_name,split='_'))[2])
+    out_v <- v-mod[[paste0('eta_',eta_nr-1,'_posterior')]]
+    names(out_v) <- rep(paste0('z_',eta_nr-1),length(v))
+  }else{
+    stop('param not found')
+  }
+  return(out_v)
+}
+
+
+transform_theta <- function(theta,theta_names){
+
 }
 
 get_desired_output <- function(model,RC){
