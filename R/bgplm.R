@@ -176,7 +176,8 @@ bgplm.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
   optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
   theta_m <- optim_obj$par
   H <- optim_obj$hessian
-  RC$LH <- t(chol(H))/0.8
+  proposal_scaling <- 2.38^2/RC$theta_length
+  RC$LH <- t(chol(H))/sqrt(proposal_scaling)
   h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
   if(is.null(h_max)){
     h_max <- RC$h_max
