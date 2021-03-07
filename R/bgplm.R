@@ -65,7 +65,13 @@
 #' }
 #' @export
 bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data))){
-  #TODO:argument checking
+  #argument checking
+  stopifnot('formula' %in% class(formula))
+  stopifnot('data.frame' %in% class(data))
+  stopifnot(is.null(c_param) | is.double(c_param))
+  stopifnot(is.null(h_max) | is.double(h_max))
+  formula_args <- all.vars(formula)
+  stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
   model_dat <- as.data.frame(data[,all.vars(formula)])
   model_dat <- model_dat[order(model_dat[,2,drop=T]),]
   Q <- model_dat[,1,drop=T]
