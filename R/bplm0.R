@@ -45,28 +45,32 @@
 #' plot(bplm0.fit_known_c)
 #' }
 #' @export
-bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
-    model_dat <- data[,all.vars(formula)]
+    stopifnot('formula' %in% class(formula))
+    stopifnot('data.frame' %in% class(data))
+    stopifnot(is.null(c_param) | is.double(c_param))
+    stopifnot(is.null(h_max) | is.double(h_max))
+    formula_args <- all.vars(formula)
+    stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
+    model_dat <- as.data.frame(data[,formula_args])
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]
-    if(!is.null(c_param)){
-      if(min(h)<c_param){
+    if(!is.null(c_param) && min(h)<c_param){
         stop('c_param must be lower than the minimum stage value in the data')
-      }
     }
-    MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint,...)
+    MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint)
     result_obj=list()
     attr(result_obj, "class") <- "bplm0"
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$a_posterior = MCMC_output_list$x[1,]
     result_obj$b_posterior = MCMC_output_list$x[2,]
+    #refinement of list elements
     if(is.null(c_param)){
       result_obj$c_posterior <- MCMC_output_list$theta[1,]
       result_obj$sigma_eps_posterior <- MCMC_output_list$theta[2,]
-
     }else{
       result_obj$c_posterior <- NULL
       result_obj$sigma_eps_posterior <- MCMC_output_list$theta[1,]
@@ -86,9 +90,17 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     row.names(result_obj$param_summary) <- get_param_names('bplm0',c_param)
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculation
-    D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$param_summary['sigma_eps','mean'])))
-    p_D <- result_obj$Deviance_summary[,'mean']-D_hat
-    result_obj$DIC <- D_hat+2*p_D
+    # theta_hat_names <- row.names(result_obj$param_summary)[3:nrow(result_obj$param_summary)]
+    # theta_hat <- result_obj$param_summary[3:nrow(result_obj$param_summary),'median']
+    # theta_hat_transformed <- sapply(1:length(theta_hat), function(i){ print(theta_hat[i]);print(theta_hat_names[i]); get_transformed_param(theta_hat[i],theta_hat_names[i],mod='bplm0')})
+    # if(is.null(c_param)){
+    #   density_eval_hat <-  bplm0.density_evaluation_unknown_c(theta_hat_transformed,MCMC_output_list$RC)
+    # }else{
+    #   density_eval_hat <-  bplm0.density_evaluation_known_c(theta_hat_transformed,MCMC_output_list$RC)
+    # }
+    # result_obj$D_hat <- density_eval_hat$D
+    # result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    # result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
@@ -117,11 +129,12 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     #determine proposal density
     RC$theta_length <- if(is.null(RC$c)) 2 else 1
     theta_init <- rep(0,RC$theta_length)
-    loss_fun = function(theta) {-density_fun(theta,RC)$p}
-    optim_obj=stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
-    theta_m =optim_obj$par
-    H=optim_obj$hessian
-    RC$LH=t(chol(H))/(2.38/sqrt(2))
+    loss_fun <- function(theta) {-density_fun(theta,RC)$p}
+    optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    theta_m <- optim_obj$par
+    H <- optim_obj$hessian
+    proposal_scaling <- 2.38^2/RC$theta_length
+    RC$LH <- t(chol(H))/sqrt(proposal_scaling)
     h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
     if(is.null(h_max)){
       h_max <- RC$h_max
@@ -160,6 +173,7 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['h']] <- c(RC$h,RC$h_u)
+    output_list[['RC']] <- RC
     output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
@@ -168,6 +182,7 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     l=c(log(RC$h-RC$c))
     varr=RC$epsilon*exp(log_sig_eps2)
+    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
 
@@ -193,6 +208,7 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
     log_sig_eps2 <- theta[2]
     l=c(log(RC$h-RC$h_min+exp(zeta)))
     varr=RC$epsilon*exp(log_sig_eps2)
+    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
     X=cbind(rep(1,length(l)),l)
