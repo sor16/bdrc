@@ -2,8 +2,8 @@
 #'
 #' Useful to convert MCMC chain draws of particular parameters or output from the model object to a wide format for further data wrangling
 #'@param mod an object of class "bplm0","bplm","bgplm0" or "bgplm".
-#'@param param character with the name of the parameter of interest. Also accepts "latent_parameters" and "hyperparameters".
-#'@param transformed boolean value determining whether the parameter is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.
+#'@param ... any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".
+#'@param transformed boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.
 #'@return Data frame with columns
 #'\code{chain}
 #'\code{iter}
@@ -12,11 +12,15 @@
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
 #'@seealso \code{\link{bplm0}},\code{\link{bplm}},\code{\link{bgplm0}},\code{\link{bgplm}} for further information on parameters
 #'@examples
-#'data(sim_dat)
-#'f <- Q~W
-#'bplm0.fit <- bplm0(f,sim_dat)
-#'summary(bplm9.fit)
-#'plot(bplm0.fit,type='rating_curve')
+#'\dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' hyp_samples <- spread_draws(bplm0.fit,'hyperparameters')
+#' head(hyp_samples)
+#' rating_curve_samples <- spread_draws(bplm0.fit,'rating_curve','rating_curve_mean')
+#' head(rating_curve_samples)
+#'}
 #'@export
 spread_draws <- function(mod,...,transformed=F){
     gathered_dat <- gather_draws(mod,...,transformed = F)
@@ -42,7 +46,7 @@ spread_draws <- function(mod,...,transformed=F){
 #'
 #' Useful to convert MCMC chain draws of particular parameters or output from the model object to a long format for further data wrangling
 #'@param mod an object of class "bplm0","bplm","bgplm0" or "bgplm".
-#'@param ... character vectors of parameters or other output from the model output of interest. Also accepts "latent_parameters" and "hyperparameters".
+#'@param ... any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".
 #'@param transformed boolean value determining whether the parameter is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.
 #'@return Data frame with columns
 #'\code{chain}
@@ -52,11 +56,15 @@ spread_draws <- function(mod,...,transformed=F){
 #'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
 #'@seealso \code{\link{bplm0}},\code{\link{bplm}},\code{\link{bgplm0}},\code{\link{bgplm}} for further information on parameters
 #'@examples
-#'data(sim_dat)
-#'f <- Q~W
-#'bplm0.fit <- bplm0(f,sim_dat)
-#'summary(bplm9.fit)
-#'plot(bplm0.fit,type='rating_curve')
+#'\dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' bplm0.fit <- bplm0(f,V316_river)
+#' hyp_samples <- spread_draws(bplm0.fit,'hyperparameters')
+#' head(hyp_samples)
+#' rating_curve_samples <- spread_draws(bplm0.fit,'rating_curve','rating_curve_mean')
+#' head(rating_curve_samples)
+#'}
 #'@export
 gather_draws <- function(mod,...,transformed=F){
     args <- c(...)

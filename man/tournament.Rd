@@ -27,7 +27,12 @@ tournament compares
 TODO
 }
 \examples{
-TODO
+\dontrun{
+data(V316_river)
+f <- Q~W
+t_obj <- tournament(f,V316_river)
+plot(t_obj)
+}
 }
 \references{
 B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.

@@ -12,17 +12,12 @@ A data frame with columns:
 }
 }
 \source{
-Icelandic Meteorological Office. \url{https://en.vedur.is/}
+Icelandic Meteorological Office. \url{http://www.vedur.is}
 }
 \usage{
 V316_river
 }
 \description{
-Data from x river in Iceland
-}
-\examples{
-\dontrun{
- V316_river
-}
+Paired stage and discharge measurements from x to y
 }
 \keyword{datasets}

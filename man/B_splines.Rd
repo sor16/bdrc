@@ -2,7 +2,7 @@
 % Please edit documentation in R/help_functions.R
 \name{B_splines}
 \alias{B_splines}
-\title{Bsplines in a generalized rating curve}
+\title{B-splines in a generalized rating curve}
 \usage{
 B_splines(ZZ)
 }
@@ -14,9 +14,6 @@ B_splines(ZZ)
 The function returns a linear combination of scaled B-spline basis functions for every stage observation.
 }
 \description{
-A function to test the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
+A function to calculate the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
 with 2 interior knots and 6 basis functions.
-}
-\references{
-Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 }

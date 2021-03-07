@@ -9,8 +9,7 @@ bplm0(
   data,
   c_param = NULL,
   h_max = NULL,
-  forcepoint = rep(FALSE, nrow(data)),
-  ...
+  forcepoint = rep(FALSE, nrow(data))
 )
 }
 \arguments{
@@ -54,19 +53,22 @@ where \eqn{\epsilon} follows a normal distribution with mean zero and variance \
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
+\dontrun{
 data(V316_river)
+set.seed(1)
 formula <- Q~W
 bplm0.fit <- bplm0(formula,V316_river)
 summary(bplm0.fit)
 plot(bplm0.fit)
-bplm0.fit_known_c <- bplm0(f,V316_river,c_param=0.75,h_max=2)
+bplm0.fit_known_c <- bplm0(formula,V316_river,c_param=0.75,h_max=2)
 summary(bplm0.fit_known_c)
 plot(bplm0.fit_known_c)
+}
 }
 \references{
 B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
 preprint 2010.04769
 }
 \seealso{
-\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{bplm0.plot}} to help visualize the full posterior distributions.
+\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
 }

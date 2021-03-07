@@ -4,11 +4,21 @@
 \alias{summary.tournament}
 \title{Print summary of tournament object}
 \usage{
-\method{summary}{tournament}(x)
+\method{summary}{tournament}(object, ...)
 }
 \arguments{
-\item{x}{an object of class "tournament"}
+\item{object}{an object of class "tournament"}
+
+\item{...}{not used in this function}
 }
 \description{
 Print the summary of a tournament of model comparisons
+}
+\examples{
+\dontrun{
+data(V316_river)
+f <- Q~W
+t_obj <- tournament(f,V316_river)
+summary(t_obj)
+}
 }

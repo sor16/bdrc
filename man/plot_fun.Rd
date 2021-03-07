@@ -16,6 +16,7 @@ plot_fun(x, ...)
                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
                       \item{"f"}{ to plot the power-law exponent}
+                      \item{"beta"}{ to plot the random effect in the power-law exponent}
                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
                       \item{"residuals"}{ to plot the log residuals}
                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
@@ -25,8 +26,6 @@ plot_fun(x, ...)
 \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
 \item{}{ additional characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
 }}
-
-\item{type}{a character to denote the plot type. One of 'trace','histogram','rating_curve','rating_curve_mean','residuals'}
 }
 \value{
 returns an object of class ggplot2 or Grob object

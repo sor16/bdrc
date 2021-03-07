@@ -4,14 +4,24 @@
 \alias{print.tournament}
 \title{Print tournament object}
 \usage{
-\method{print}{tournament}(x)
+\method{print}{tournament}(x, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
+
+\item{...}{not used in this function}
 }
 \description{
 Print the results of a tournament of model comparisons
 }
+\examples{
+\dontrun{
+data(V316_river)
+f <- Q~W
+t_obj <- tournament(f,V316_river)
+print(t_obj)
+}
+}
 \seealso{
-\code{\link{summary.torunament}} for summaries
+\code{\link{summary.tournament}} for summaries
 }

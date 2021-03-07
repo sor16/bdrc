@@ -4,16 +4,42 @@
 \alias{plot.tournament}
 \title{Plot comparison of models in tournament}
 \usage{
-\method{plot}{tournament}(x, type = "rating_curve")
+\method{plot}{tournament}(x, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
 
-\item{type}{character denoting the type of plot desired. One of "tree","DIC","residuals","f","sigma_eps","rating_curve","rating_curve_log"}
+\item{...}{Arguments to be passed to other methods. The following arguments are supported:
+\itemize{
+  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+                   \itemize{
+                      \item{"Deviance"}{ to plot the rating curve on original scale.}
+                      \item{"rating_curve"}{ to plot the rating curve on original scale.}
+                      \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
+                      \item{"f"}{ to plot the power-law exponent}
+                      \item{"sigma_eps"}{ to plot the standard deviation on the data level}
+                      \item{"residuals"}{ to plot the log residuals}
+                   }}
+  \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+  \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
+}}
 }
 \description{
-Plot comparison of models in tournament
+Compare the four models from the tournament object in multiple ways
+}
+\examples{
+\dontrun{
+data(V316_river)
+f <- Q~W
+t_obj <- tournament(f,V316_river)
+plot(t_obj)
+plot(t_obj,type='rating_curve_log')
+plot(t_obj,type='Deviance')
+plot(t_obj,type='f')
+plot(t_obj,type='sigma_eps')
+plot(t_obj,type='residuals')
+}
 }
 \seealso{
-\code{\link{summary.torunament}} for summaries
+\code{\link{summary.tournament}} for summaries
 }
