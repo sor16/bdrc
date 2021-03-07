@@ -52,9 +52,9 @@
 #' plot(bplm.fit_known_c)
 #' }
 #' @export
-bplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data))){
     #TODO: argument checking
-    model_dat <- data[,all.vars(formula)]
+    model_dat <- as.data.frame(data[,all.vars(formula)])
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]
@@ -100,9 +100,9 @@ bplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(
     row.names(result_obj$param_summary) <- get_param_names('bplm',c_param)
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculation
-    D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$sigma_eps_summary$mean[h_idx_data])))
-    p_D <- result_obj$Deviance_summary[,'mean']-D_hat
-    result_obj$DIC <- D_hat+2*p_D
+    #D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$sigma_eps_summary$mean[h_idx_data])))
+    #p_D <- result_obj$Deviance_summary[,'mean']-D_hat
+    #result_obj$DIC <- D_hat+2*p_D
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
@@ -196,6 +196,7 @@ bplm.density_evaluation_known_c <- function(theta,RC){
     l=c(log(RC$h-RC$c))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
+    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
     Sig_eps=diag(varr)
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
@@ -227,6 +228,7 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
     l=c(log(RC$h_tild+exp(zeta)))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
+    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
     Sig_eps=diag(varr)
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))

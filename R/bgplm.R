@@ -64,9 +64,9 @@
 #' plot(bgplm.fit_known_c)
 #' }
 #' @export
-bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data)),...){
+bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data))){
   #TODO:argument checking
-  model_dat <- data[,all.vars(formula)]
+  model_dat <- as.data.frame(data[,all.vars(formula)])
   model_dat <- model_dat[order(model_dat[,2,drop=T]),]
   Q <- model_dat[,1,drop=T]
   h <- model_dat[,2,drop=T]
@@ -75,7 +75,7 @@ bgplm <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
       stop('c_param must be lower than the minimum stage value in the data')
     }
   }
-  MCMC_output_list <- bgplm.inference(y=log(Q),h,c_param,h_max,forcepoint,...)
+  MCMC_output_list <- bgplm.inference(y=log(Q),h,c_param,h_max,forcepoint)
   #prepare S3 model object to be returned
   result_obj=list()
   attr(result_obj, "class") <- "bgplm"
@@ -233,6 +233,7 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
   l=c(log(RC$h-RC$c))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
+  if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
@@ -274,6 +275,7 @@ bgplm.density_evaluation_unknown_c <- function(theta,RC){
   l=c(log(RC$h_tild+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
+  if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
