@@ -1,13 +1,11 @@
 #' Data from x river in Iceland
 #'
-#' @source Icelandic Meteorological Office. \url{https://en.vedur.is/}
+#' Paired stage and discharge measurements from x to y
+#'
 #' @format A data frame with columns:
 #' \describe{
 #'  \item{W}{Measurements of river stage}
 #'  \item{Q}{Measurements of river discharge}
 #' }
-#' @examples
-#' \dontrun{
-#'  V316_river
-#' }
+#' @source Icelandic Meteorological Office. \url{http://www.vedur.is}
 "V316_river"
