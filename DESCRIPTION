@@ -1,6 +1,6 @@
 Package: bdrc
 Title: Bayesian Discharge Rating Curves
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut","cph")),
              person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut","cre")),
              person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut")),
