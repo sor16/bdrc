@@ -32,7 +32,10 @@
 #' \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\eta}}.}
 #' \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta}.}
 #' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-#' \item{\code{DIC}}{Deviance Information Criterion for the model}
+#' \item{\code{D_hat}}{deviance at the median value of the parameters}
+#' \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
+#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+#' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user.}
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
@@ -73,8 +76,6 @@ bgplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nro
     #prepare S3 model object to be returned
     result_obj=list()
     attr(result_obj, "class") <- "bgplm0"
-    result_obj$formula <- formula
-    result_obj$data <- model_dat
     result_obj$a_posterior = MCMC_output_list$x[1,]
     result_obj$b_posterior = MCMC_output_list$x[2,]
     if(is.null(c_param)){
@@ -106,9 +107,14 @@ bgplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nro
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bgplm0',c_param)
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
-    D_hat <- -2*sum(log(stats::dlnorm(Q,log(result_obj$rating_curve_mean$mean[h_idx_data]),result_obj$param_summary['sigma_eps','mean'])))
-    p_D <- result_obj$Deviance_summary[,'mean']-D_hat
-    result_obj$DIC <- D_hat+2*p_D
+    #Deviance calculations
+    result_obj$D_hat <- MCMC_output_list$D_hat
+    result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
+    # store other information
+    result_obj$accepantance_rate <- MCMC_output_list[['acceptance_rate']]
+    result_obj$formula <- formula
+    result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
@@ -187,6 +193,8 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
     for(elem in names(MCMC_output_list[[1]])){
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
+    #Calculate Dhat
+    output_list[['D_hat']] <- density_fun(apply(output_list$theta,1,median),RC)$D
     #refinement of list elements
     if(is.null(RC$c)){
         output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -200,6 +208,7 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['h']] <- c(RC$h,RC$h_u)
+    output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
     output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }

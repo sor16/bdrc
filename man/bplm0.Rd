@@ -36,7 +36,10 @@ bplm0 returns an object of class "bplm0". An object of class "bplm0" is a list c
 \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
 \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
 \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-\item{\code{DIC}}{Deviance Information Criterion for the model}
+\item{\code{D_hat}}{deviance at the median value of the parameters}
+\item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
+\item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+\item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
 \item{\code{data}}{data provided by the user.}
 \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}

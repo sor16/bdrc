@@ -25,7 +25,10 @@
 #' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
 #' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
 #' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-#' \item{\code{DIC}}{Deviance Information Criterion for the model}
+#' \item{\code{D_hat}}{deviance at the median value of the parameters}
+#' \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
+#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+#' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user.}
 #' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
@@ -63,8 +66,6 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint)
     result_obj=list()
     attr(result_obj, "class") <- "bplm0"
-    result_obj$formula <- formula
-    result_obj$data <- model_dat
     result_obj$a_posterior = MCMC_output_list$x[1,]
     result_obj$b_posterior = MCMC_output_list$x[2,]
     #refinement of list elements
@@ -89,18 +90,14 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     row.names(result_obj$param_summary) <- get_param_names('bplm0',c_param)
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
-    #Deviance calculation
-    # theta_hat_names <- row.names(result_obj$param_summary)[3:nrow(result_obj$param_summary)]
-    # theta_hat <- result_obj$param_summary[3:nrow(result_obj$param_summary),'median']
-    # theta_hat_transformed <- sapply(1:length(theta_hat), function(i){ print(theta_hat[i]);print(theta_hat_names[i]); get_transformed_param(theta_hat[i],theta_hat_names[i],mod='bplm0')})
-    # if(is.null(c_param)){
-    #   density_eval_hat <-  bplm0.density_evaluation_unknown_c(theta_hat_transformed,MCMC_output_list$RC)
-    # }else{
-    #   density_eval_hat <-  bplm0.density_evaluation_known_c(theta_hat_transformed,MCMC_output_list$RC)
-    # }
-    # result_obj$D_hat <- density_eval_hat$D
-    # result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
-    # result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
+    #Deviance calculations
+    result_obj$D_hat <- MCMC_output_list$D_hat
+    result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
+    # store other information
+    result_obj$accepantance_rate <- MCMC_output_list[['acceptance_rate']]
+    result_obj$formula <- formula
+    result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
@@ -164,6 +161,8 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     for(elem in names(MCMC_output_list[[1]])){
       output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
+    #Calculate Dhat
+    output_list[['D_hat']] <- density_fun(apply(output_list$theta,1,median),RC)$D
     #refinement of list elements
     if(is.null(RC$c)){
       output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -173,7 +172,7 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     }
     output_list$x[1,] <- exp(output_list$x[1,])
     output_list[['h']] <- c(RC$h,RC$h_u)
-    output_list[['RC']] <- RC
+    output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
     output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }

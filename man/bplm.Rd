@@ -43,7 +43,10 @@ bplm returns an object of class "bplm". An object of class "bplm" is a list cont
 \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
 \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
 \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-\item{\code{DIC}}{Deviance Information Criterion for the model}
+\item{\code{D_hat}}{deviance at the median value of the parameters}
+\item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
+\item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+\item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
 \item{\code{data}}{data provided by the user.}
 \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
