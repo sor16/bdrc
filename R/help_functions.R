@@ -85,11 +85,13 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     density_eval_m <- density_fun(theta_m,RC)
     theta_old <- theta_m
     density_eval_old <- density_eval_m
+    acceptance_vec <- rep(F,nr_iter)
     for(i in 1:nr_iter){
         theta_new <- theta_old+solve(t(RC$LH),stats::rnorm(RC$theta_length,0,1))
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
         if (logR>log(stats::runif(1))){
+            acceptance_vec[i] <- T
             theta_old <- theta_new
             density_eval_old <- density_eval_new
         }
@@ -99,6 +101,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
         }
     }
     idx <- seq(burnin,nr_iter,thin)
+    acceptance_vec <- acceptance_vec[idx]
     theta_mat <- theta_mat[,idx,drop=F]
     output_list <- sapply(output_list,FUN=function(x) x[,idx,drop=F],simplify=F,USE.NAMES=T)
     for(i in 1:ncol(theta_mat)){
@@ -108,6 +111,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
         }
     }
     output_list[['theta']] <- theta_mat
+    output_list[['acceptance_vec']] <- t(as.matrix(acceptance_vec))
     return(output_list)
 }
 
