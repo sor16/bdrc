@@ -1,11 +1,4 @@
 context('Advanced data wrangling of bdrc model objects')
-set.seed(1)
-bplm0.fit <- bplm0(Q~W,V316_river)
-bplm.fit <- bplm(Q~W,V316_river)
-bgplm0.fit <- bgplm0(Q~W,V316_river)
-bgplm.fit <- bgplm(Q~W,V316_river)
-
-bplm0.fit_known_c <- bplm0(Q~W,V316_river,c_param=0.8)
 
 check_spread_draws_MCMC_mat_concordance <- function(mod,dat){
     components <- unique(names(dat)[!(names(dat) %in% c('chain','iter','h'))])
@@ -81,6 +74,6 @@ test_that("spread draws and gather draws are concordant with MCMC matrices", {
     check_gather_draws_MCMC_mat_concordance(bgplm.fit,spread_draws(bgplm.fit,'rating_curve','rating_curve_mean','sigma_eps','beta','f','sigma_eta'))
 })
 
-
+## TODO test transformed
 
 

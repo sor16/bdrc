@@ -142,12 +142,8 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
     if(!is.null(RC$c)){
-      if(RC$c<=RC$h_min){
         density_fun <- bgplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bgplm0.predict_u_known_c
-      }else{
-        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$h_min,' m'))
-      }
     }else{
         density_fun <- bgplm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- bgplm0.predict_u_unknown_c

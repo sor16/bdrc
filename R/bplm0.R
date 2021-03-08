@@ -113,12 +113,8 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint]=1/RC$n
     if(!is.null(RC$c)){
-      if(RC$c<=RC$h_min){
         density_fun <- bplm0.density_evaluation_known_c
         unobserved_prediction_fun <- bplm0.predict_u_known_c
-      }else{
-        stop(paste0('the given c must be less than the lowest stage measurement, which is ',RC$h_min,' m'))
-      }
     }else{
         density_fun <- bplm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- bplm0.predict_u_unknown_c
