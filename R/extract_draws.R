@@ -40,6 +40,7 @@ spread_draws <- function(mod,...,transformed=F){
     mod_res <- as.data.frame(do.call('cbind',mod_res_list))
     names(mod_res) <- unique(gathered_dat$name)
     spread_dat <- cbind(spread_dat,mod_res)
+    return(spread_dat)
 }
 
 #' Gather MCMC chain draws to data.frame on a long format
@@ -126,7 +127,7 @@ gather_draws_param <- function(mod,param,transformed,baseline_dat){
     }
     out_dat <- baseline_dat
     if('h' %in% names(baseline_dat)){
-        param_dat <- expand.grid(name=param_name,h=mod$rating_curve$h,value=MCMC_output)
+        param_dat <- expand.grid(name=param_name,value=MCMC_output,h=mod$rating_curve$h)
         out_dat <- cbind(out_dat,param_dat[,c('name','value')])
     }else{
         out_dat$name <- param_name
