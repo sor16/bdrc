@@ -216,7 +216,6 @@ bplm.density_evaluation_known_c <- function(theta,RC){
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
-    print(p)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
     sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
