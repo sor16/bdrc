@@ -1,7 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bdrc - Bayesian Discharge Rating Curves <img src="man/figures/logo.png" align="right" alt="" width="120" />
+## bdrc - Bayesian Discharge Rating Curves <img src="man/figures/logo.png" align="right" alt="" width="140" />
+
+<!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg)](https://codecov.io/gh/sor16/bdrc?branch=master)
+<!-- badges: end -->
 
 The package implements the following Bayesian hierarchical discharge
 rating curve models for paired measurements of stage and discharge in

@@ -20,6 +20,7 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
 BugReports: https://github.com/sor16/bdrc/issues
