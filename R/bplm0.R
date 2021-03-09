@@ -177,7 +177,7 @@ bplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     l=c(log(RC$h-RC$c))
     varr=RC$epsilon*exp(log_sig_eps2)
-    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
 
@@ -203,7 +203,7 @@ bplm0.density_evaluation_unknown_c <- function(theta,RC){
     log_sig_eps2 <- theta[2]
     l=c(log(RC$h-RC$h_min+exp(zeta)))
     varr=RC$epsilon*exp(log_sig_eps2)
-    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
     Sig_x=RC$Sig_ab
     X=cbind(rep(1,length(l)),l)

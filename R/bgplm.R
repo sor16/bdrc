@@ -244,7 +244,7 @@ bgplm.density_evaluation_known_c <- function(theta,RC){
   l=c(log(RC$h-RC$c))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
-  if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
@@ -286,7 +286,7 @@ bgplm.density_evaluation_unknown_c <- function(theta,RC){
   l=c(log(RC$h_tild+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
-  if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget

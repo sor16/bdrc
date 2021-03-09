@@ -207,7 +207,7 @@ bplm.density_evaluation_known_c <- function(theta,RC){
     l=c(log(RC$h-RC$c))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
@@ -216,6 +216,7 @@ bplm.density_evaluation_known_c <- function(theta,RC){
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
+    print(p)
     W=solve(L,X%*%RC$Sig_x)
     x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
     sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
@@ -239,7 +240,7 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
     l=c(log(RC$h_tild+exp(zeta)))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    if(any(varr>10^2)) return(list(p=-Inf)) # to avoid numerical instability
+    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
     X=cbind(1,l)
     L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
