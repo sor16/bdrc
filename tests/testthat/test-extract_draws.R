@@ -1,4 +1,12 @@
 context('Advanced data wrangling of bdrc model objects')
+set.seed(1)
+data(V316_river)
+bplm0.fit <- bplm0(Q~W,V316_river)
+bplm.fit <- bplm(Q~W,V316_river)
+bgplm0.fit <- bgplm0(Q~W,V316_river)
+bgplm.fit <- bgplm(Q~W,V316_river)
+
+bplm0.fit_known_c <- bplm0(Q~W,V316_river,c_param=0.8)
 
 check_spread_draws_MCMC_mat_concordance <- function(mod,dat){
     components <- unique(names(dat)[!(names(dat) %in% c('chain','iter','h'))])

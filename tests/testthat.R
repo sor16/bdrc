@@ -1,4 +1,4 @@
 library(testthat)
-library(RCmodels)
+library(bdrc)
 
-test_check("RCmodels")
+test_check("bdrc")
