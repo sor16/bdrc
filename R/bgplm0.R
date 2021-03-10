@@ -182,9 +182,11 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
     } else {
       num_cores <- min(parallel::detectCores(),num_chains)
     }
-    MCMC_output_list <- parallel::mclapply(1:num_chains,mc.cores=num_cores,FUN=function(i){
-        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
+    cl <- parallel::makeForkCluster(num_cores)
+    MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
+      run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
     })
+    parallel::stopCluster(cl)
     output_list <- list()
     for(elem in names(MCMC_output_list[[1]])){
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
