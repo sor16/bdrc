@@ -33,10 +33,8 @@ A discharge rating curve (drc) is a model that describes the relationship betwee
 For further details about the different models, see x. The models differ in their complexity and the bgplm is the most flexible and complex model. We will focus on the use of bgplm throughout this introduction vignette and explore the different ways to fit the gplm and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
 ```{r,message=F}
 #load the packages needed for this vignette
-devtools::load_all()
 library(bdrc)
 library(ggplot2)
-library(dplyr)
 ```
 We will use a dataset from a river called x in Sweden that comes with the package:
 ```{r, data}
