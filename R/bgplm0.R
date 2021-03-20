@@ -193,7 +193,11 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
     #Calculate Dhat
-    output_list[['D_hat']] <- density_fun(apply(output_list$theta,1,median),RC)$D
+    theta_median <- apply(output_list$theta,1,median)
+    if(!is.null(c_param)){
+      theta_median <- c(RC$c,theta_median)
+    }
+    output_list[['D_hat']] <- bgplm0.calc_Dhat(theta_median,RC)
     #refinement of list elements
     if(is.null(RC$c)){
         output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -281,6 +285,31 @@ bgplm0.density_evaluation_unknown_c <- function(theta,RC){
     D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
+}
+
+bgplm0.calc_Dhat <- function(theta,RC){
+  zeta <- theta[1]
+  log_sig_eps2 <- theta[2]
+  log_sig_b <- theta[3]
+  log_phi_b <- theta[4]
+
+  l=c(log(RC$h_tild+exp(zeta)))
+  varr=RC$epsilon*exp(log_sig_eps2)
+  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
+  Sig_eps=diag(c(varr,0))
+  #Matern covariance
+  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*
+    exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
+
+  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
+  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
+  w=solve(L,RC$y-X%*%RC$mu_x)
+  x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
+  yp=(X %*% x)[1:RC$n,]
+
+  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  return(D)
 }
 
 bgplm0.predict_u_known_c <- function(theta,x,RC){

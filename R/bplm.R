@@ -185,7 +185,11 @@ bplm.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,leng
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
     #Calculate Dhat
-    output_list[['D_hat']] <- density_fun(apply(output_list$theta,1,median),RC)$D
+    theta_median <- apply(output_list$theta,1,median)
+    if(!is.null(c_param)){
+      theta_median <- c(RC$c,theta_median)
+    }
+    output_list[['D_hat']] <- bplm.calc_Dhat(theta_median,RC)
     if(is.null(RC$c)){
       output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
       output_list$theta[2,] <- exp(output_list$theta[2,])
@@ -264,6 +268,28 @@ bplm.density_evaluation_unknown_c <- function(theta,RC){
     D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
+}
+
+bplm.calc_Dhat <- function(theta,RC){
+  zeta <- theta[1]
+  log_sig_eta <- theta[2]
+  eta_1 <- theta[3]
+  z <- theta[4:8]
+  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
+
+  l=c(log(RC$h_tild+exp(zeta)))
+
+  varr=c(RC$epsilon*exp(RC$B%*%lambda))
+  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
+  Sig_eps=diag(varr)
+  X=cbind(1,l)
+  L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
+  w=solve(L,RC$y-X%*%RC$mu_x)
+  x=RC$mu_x+RC$Sig_x%*%(t(X)%*%solve(t(L),w))
+  yp=(X %*% x)[1:RC$n,]
+
+  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  return(D)
 }
 
 bplm.predict_u_known_c <- function(theta,x,RC){
