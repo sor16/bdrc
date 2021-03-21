@@ -8,3 +8,5 @@
 ^codecov\.yml$
 ^\.github$
 ^README.Rmd
+^doc$
+^Meta$

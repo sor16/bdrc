@@ -4,7 +4,7 @@ author: "Sölvi Rögnvaldsson, Axel Örn Jansson and Birgir Hrafnkelsson"
 date:
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{tournament}
+  %\VignetteIndexEntry{Tournament - Model comparison}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
