@@ -164,7 +164,7 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     #Calculate Dhat
     theta_median <- apply(output_list$theta,1,median)
     if(!is.null(c_param)){
-      theta_median <- c(RC$c,theta_median)
+      theta_median <- c(log(RC$h_min-RC$c),theta_median)
     }
     output_list[['D_hat']] <- bplm0.calc_Dhat(theta_median,RC)
     #refinement of list elements
