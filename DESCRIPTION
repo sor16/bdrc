@@ -13,7 +13,6 @@ LazyData: true
 RoxygenNote: 7.1.1
 Imports:
     ggplot2,
-    latex2exp,
     grid,
     gridExtra,
     rlang
@@ -22,5 +21,5 @@ Suggests:
     knitr,
     rmarkdown,
     covr
-VignetteBuilder: knitr
+VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/sor16/bdrc/issues

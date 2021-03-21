@@ -22,7 +22,7 @@ summary_fun <- function(x){
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
 theme_bdrc <- function(){
     theme_classic() %+replace%
-        theme( #text = element_text(family="Times", face="plain"),
+        theme( text = element_text(family="Times", face="plain"),
                strip.background = element_blank(),
                strip.text.x = element_text(size = 16),
                axis.title.x = element_text(size=16),
@@ -57,7 +57,6 @@ theme_bdrc <- function(){
 #' }
 #' @return returns an object of class ggplot2 or Grob object
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
-#' @importFrom latex2exp TeX
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,...){
@@ -81,9 +80,9 @@ plot_fun <- function(x,...){
         title <- NULL
     }
     args <- unlist(args)
-    legal_types <- c('rating_curve','rating_curve_mean','f','sigma_eps','residuals','trace','histogram')
+    legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram')
     if(!(type %in% legal_types)){
-        stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
+        stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
     }else if(type=='trace'){
         plot_dat <- gather_draws(x,args,transformed=transformed)
         if('h' %in% names(plot_dat)){
