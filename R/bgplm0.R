@@ -187,7 +187,6 @@ bgplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,le
       run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
     })
     parallel::stopCluster(cl)
-    closeAllConnections()
     output_list <- list()
     for(elem in names(MCMC_output_list[[1]])){
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
