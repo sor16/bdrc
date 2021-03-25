@@ -5,7 +5,7 @@ date:
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Tournament - Model comparison}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{rmarkdown::render}
   %\VignetteEncoding{UTF-8}
 ---
 
