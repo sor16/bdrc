@@ -1,8 +1,4 @@
 context('bgplm')
-set.seed(1)
-data(V316_river)
-bgplm.fit <- bgplm(Q~W,V316_river)
-bgplm.fit_known_c <- bgplm(Q~W,V316_river,c_param=0.8,h_max=2.5)
 
 test_that("bgplm can handle different inputs", {
     expect_error(bgplm(Q~W,c(1,2,3)))
@@ -83,7 +79,9 @@ test_that("the bgplm object with known c with a maximum stage value is in tact",
 })
 
 
-# test_that("bgplm output remains unchanged", {
-#     expect_equal_to_reference(bgplm.fit,file='tests/testthat/cached_results/bgplm.fit.rds',update=T)
-#     expect_equal_to_reference(bgplm.fit_known_c,file='tests/testthat/cached_results/bgplm.fit_known_c.rds',update=T)
-# })
+test_that("bgplm output remains unchanged", {
+    skip_on_cran()
+    skip_on_ci()
+    expect_equal_to_reference(bgplm.fit,file='../cached_results/bgplm.fit.rds',update=T)
+    expect_equal_to_reference(bgplm.fit_known_c,file='../cached_results/bgplm.fit_known_c.rds',update=T)
+})
