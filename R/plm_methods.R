@@ -121,15 +121,17 @@ plot_fun <- function(x,...){
         plot_dat$name_expr <- factor(plot_dat$name,levels=param_levels,labels=sapply(param_levels,get_param_expression))
         plot_dat$chain <- factor(as.character(plot_dat$chain),levels=1:max(plot_dat$chain))
         p <- ggplot(plot_dat,aes(x=.data$value)) +
-            geom_histogram(bins=100,fill="#0072B5FF") +
+            geom_histogram(bins=50,fill="#0072B5FF") +
             facet_wrap(~name_expr,scales='free',labeller = label_parsed) +
             xlab('') +
             ylab('') +
             theme_bdrc()
     }else if(type=='rating_curve' | type=='rating_curve_mean'){
         if(transformed){
-            x_lab <- TeX('$\\log(\\textit{h-\\hat{c}})$','character')
-            y_lab <- TeX('$\\log(\\textit{Q})$','character')
+            #to generate label - latex2exp::TeX('$\\log(\\textit{h-\\hat{c}})$','character')
+            x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
+            #to generate label - latex2exp::TeX('$\\log(\\textit{Q})$','character')
+            y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
             c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
             plot_dat <- merge(x[[type]],x$data,by.x='h',by.y=all.vars(x$formula)[2])
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
@@ -147,8 +149,10 @@ plot_fun <- function(x,...){
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
         }else{
-            x_lab <- TeX('$\\textit{Q}\\lbrack\\textit{m^3/s}\\rbrack$','character')
-            y_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+            #to generate label - latex2exp::TeX('$\\textit{Q}\\lbrack\\textit{m^3/s}\\rbrack$','character')
+            x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
+            #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+            y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
             p <- ggplot(data=x[[type]]) +
                 geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]])) +
                 geom_path(aes(x=.data$median,y=.data$h)) +
@@ -161,13 +165,16 @@ plot_fun <- function(x,...){
                 theme_bdrc()
         }
     }else if(type=='sigma_eps'){
-        x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         if('sigma_eps_summary' %in% names(x)){
-            y_lab <- TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
+            #to generate label - latex2exp::TeX('$\\sigma_{\\epsilon}(\\textit{h})$','character')
+            y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'(','',italic(paste('h')),')','','')"
             plot_dat <- x$sigma_eps_summary[x$sigma_eps_summary$h>=min(h_in_data) & x$sigma_eps_summary$h<=max(h_in_data),]
         }else{
-            y_lab <- TeX('$\\sigma_{\\epsilon}$','character')
+            #to generate label - latex2exp::TeX('$\\sigma_{\\epsilon}$','character')
+            y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'')"
             plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
                                    lower=x$param_summary['sigma_eps','lower'],
                                    median=x$param_summary['sigma_eps','median'],
@@ -184,8 +191,10 @@ plot_fun <- function(x,...){
         if(!('beta_summary' %in% names(x))){
             stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
         }
-        x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
-        y_lab <- TeX('$\\beta(\\textit{h})$')
+        #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
+        #to generate label - latex2exp::TeX('$\\beta(\\textit{h})$','character')
+        y_lab <- "paste('','',beta,,,,'(','',italic(paste('h')),')','','')"
         h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         p <- ggplot(data=x$beta_summary[x$beta_summary$h>=min(h_in_data) & x$beta_summary$h<=max(h_in_data),]) +
             geom_path(aes(.data$h,.data$median)) +
@@ -195,13 +204,16 @@ plot_fun <- function(x,...){
             ylab(parse(text=y_lab)) +
             theme_bdrc()
     }else if(type=='f'){
-        x_lab <- TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
+        x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
         if('f_summary' %in% names(x)){
-            y_lab <- TeX('$\\textit{b+\\beta(h)}$')
+            #to generate label - latex2exp::TeX('$\\textit{b+\\beta(h)}$','character')
+            y_lab <- "paste('','',italic(paste('b+',beta,,,,'(','h',')','')),'')"
             plot_dat <- x$f_summary[x$f_summary$h>=min(h_in_data) & x$f_summary$h<=max(h_in_data),]
         }else{
-            y_lab <- TeX('$\\textit{b}$')
+            #to generate label - latex2exp::TeX('$\\textit{b}$','character')
+            y_lab <- "paste('','',italic(paste('b')),'')"
             plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
                                    lower=x$param_summary['b','lower'],
                                    median=x$param_summary['b','median'],
@@ -227,8 +239,10 @@ plot_fun <- function(x,...){
         resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
         resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
         resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
-        y_lab <- TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$")
-        x_lab <- TeX("$log(\\textit{h - \\hat{c}})$")
+        #to generate label - latex2exp::TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$",'character')
+        y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
+        #to generate label - latex2exp::TeX("$log(\\textit{h - \\hat{c}})$",'character')
+        x_lab <- "paste('','log','(','',italic(paste('h',phantom() - phantom(),'',hat(paste('c')))),')','','')"
         p <- ggplot(data=resid_dat) +
             geom_point(aes(.data$`log(h-c_hat)`,.data$r_median),size=2) +
             geom_path(aes(.data$`log(h-c_hat)`,.data$r_lower),linetype='dashed') +
