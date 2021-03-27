@@ -22,5 +22,5 @@ Suggests:
     rmarkdown,
     covr,
     vdiffr
-VignetteBuilder: rmarkdown
+VignetteBuilder: knitr
 BugReports: https://github.com/sor16/bdrc/issues
