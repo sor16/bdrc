@@ -60,6 +60,7 @@ test_that("the bplm0 object with known c with a maximum stage value is in tact",
 test_that("bplm0 output remains unchanged", {
     skip_on_cran()
     skip_on_ci()
+    skip_on_covr()
     expect_equal_to_reference(bplm0.fit,file='../cached_results/bplm0.fit.rds',update=T)
     expect_equal_to_reference(bplm0.fit_known_c,file='../cached_results/bplm0.fit_known_c.rds',update=T)
 })
