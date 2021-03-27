@@ -7,7 +7,7 @@ Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c
              person("Rafael", "Vias", email = "raffidv@gmail.com", role = c("aut"))
              )
 Description: Fits rating curves from paired stage and discharge measurements in rivers using a Bayesian hierarchical model.
-Depends: R (>= 3.3)
+Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 7.1.1
@@ -20,6 +20,7 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    covr
+    covr,
+    vdiffr
 VignetteBuilder: rmarkdown
 BugReports: https://github.com/sor16/bdrc/issues
