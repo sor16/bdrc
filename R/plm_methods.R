@@ -22,7 +22,7 @@ summary_fun <- function(x){
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
 theme_bdrc <- function(){
     theme_classic() %+replace%
-        theme( text = element_text(family="Times", face="plain"),
+        theme( #text = element_text(family="Times", face="plain"),
                strip.background = element_blank(),
                strip.text.x = element_text(size = 16),
                axis.title.x = element_text(size=16),
