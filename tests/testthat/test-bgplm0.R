@@ -8,10 +8,11 @@ test_that("bgplm0 can handle different inputs", {
     expect_error(bgplm0(Q~W,V316_river,c_param=1.5)) # c_param higher than lowest stage measurements
     expect_error(bgplm0(Q~W,V316_river,c_param=1L)) # c_param not double
     expect_error(bgplm0(Q~W,V316_river,h_max=1.3)) #h_max lower than highest stage measurement
+    skip_on_cran()
     V316_river_new_names <- V316_river
     names(V316_river_new_names) <- c('t1','t2')
     set.seed(1)
-    bgplm0.fit_new_names <- bgplm0(t2~t1,V316_river_new_names)
+    bgplm0.fit_new_names <- bgplm0(t2~t1,V316_river_new_names,parallel=F)
     expect_equal(bgplm0.fit_new_names$rating_curve,bgplm0.fit$rating_curve)
 })
 
@@ -60,7 +61,7 @@ test_that("the bgplm0 object with known c with a maximum stage value is in tact"
     test_stage_dep_component(bgplm0.fit,'beta')
     test_stage_dep_component(bgplm0.fit,'f')
     #check if maxmimum stage was in line with output
-    expect_equal(max(bgplm0.fit_known_c$rating_curve$h),2.5)
+    expect_equal(max(bgplm0.fit_known_c$rating_curve$h),2)
     expect_true(max(diff(bgplm0.fit_known_c$rating_curve$h))<=(0.05+1e-9)) # added tolerance
 })
 
