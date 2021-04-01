@@ -48,7 +48,7 @@
 #' plot(bplm0.fit_known_c)
 #' }
 #' @export
-bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow(data))){
+bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
     stopifnot('formula' %in% class(formula))
     stopifnot('data.frame' %in% class(data))
@@ -63,7 +63,7 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     if(!is.null(c_param) && min(h)<c_param){
         stop('c_param must be lower than the minimum stage value in the data')
     }
-    MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,forcepoint)
+    MCMC_output_list <- bplm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
     result_obj=list()
     attr(result_obj, "class") <- "bplm0"
     result_obj$a_posterior = MCMC_output_list$x[1,]
@@ -102,7 +102,7 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,nrow
     return(result_obj)
 }
 
-bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('bplm0',c_param)
     RC$y <- as.matrix(y)
     RC$h <- h
@@ -144,18 +144,25 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,forcepoint=rep(FALSE,len
     if(num_chains>4){
       stop('Max number of chains is 4. Please pick a lower number of chains')
     }
-    chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-    if (nzchar(chk) && chk == "TRUE") {
-      # use 2 cores in CRAN/Travis/AppVeyor
-      num_cores <- 2L
-    } else {
-      num_cores <- min(parallel::detectCores(),num_chains)
+    if(parallel){
+      chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+      if (nzchar(chk) && chk == "TRUE") {
+        # use 2 cores in CRAN/Travis/AppVeyor
+        num_cores <- 2L
+      } else {
+        num_cores <- min(parallel::detectCores(),num_chains)
+      }
+      cl <- parallel::makeForkCluster(num_cores)
+      MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
+        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
+      })
+      parallel::stopCluster(cl)
+    }else{
+      MCMC_output_list <- lapply(1:num_chains,function(i){
+        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
+      })
     }
-    cl <- parallel::makeForkCluster(num_cores)
-    MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
-      run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
-    })
-    parallel::stopCluster(cl)
+
     output_list <- list()
     for(elem in names(MCMC_output_list[[1]])){
       output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
