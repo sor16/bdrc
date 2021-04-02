@@ -27,9 +27,12 @@ evaluate_game <- function(m){
 #'
 #' tournament compares
 #'
-#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
-#' @param data data.frame containing the variables specified in formula.
-#' @param ... if data and formula are set to NULL, one can add four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.
+#' @param ... Arguments to be passed to other methods. The following arguments are supported:
+#' \itemize{
+#'  \item{\code{formula}}{formula an object of class "formula", with discharge column name as response and stage column name as a covariate.}
+#'  \item{\code{data}}{data.frame containing the variables specified in formula.}
+#'  \item{\code{additional arguments}}{four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.}
+#' }
 #' @details  TODO
 #' @return
 #' An object of type "tournament" with the following elements
@@ -49,10 +52,10 @@ evaluate_game <- function(m){
 #' plot(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,...) {
+tournament <- function(...) {
     args <- list(...)
-    error_msg <- 'Please provide either formula and data or four model objects of types bgplm, bgplm0, bplm and bplm0.'
-    if(is.null(formula) | is.null(data)){
+    error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types bgplm, bgplm0, bplm and bplm0.'
+    if(!('formula' %in% names(args)) | !('data' %in% names(args))){
         if(length(args)!=4){
             stop(error_msg)
         }else{
@@ -64,10 +67,10 @@ tournament <- function(formula=NULL,data=NULL,...) {
             }
         }
     }else{
-        args$bgplm <- bgplm(formula, data)
-        args$bgplm0 <- bgplm0(formula, data)
-        args$bplm <- bplm(formula, data)
-        args$bplm0 <- bplm0(formula, data)
+        args$bgplm <- bgplm(args$formula, args$data)
+        args$bgplm0 <- bgplm0(args$formula, args$data)
+        args$bplm <- bplm(args$formula, args$data)
+        args$bplm0 <- bplm0(args$formula, args$data)
     }
     round1<- list(list(args$bgplm,args$bgplm0),list(args$bplm,args$bplm0))
     round1_res <- lapply(1:length(round1),function(i){
@@ -95,7 +98,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
     cat(paste0("The overall winner is ",round2_winner,"!",sep = " "))
     out_obj <- list()
     attr(out_obj, "class") <- "tournament"
-    out_obj$contestants <- args
+    out_obj$contestants <- args[!(names(args) %in% c('formula','data'))]
     out_obj$winner <- round2[[which(round2_res$winner)]]
     out_obj$summary <- rbind(round1_res,round2_res)
     return(out_obj)
