@@ -27,12 +27,9 @@ evaluate_game <- function(m){
 #'
 #' tournament compares
 #'
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{formula}}{formula an object of class "formula", with discharge column name as response and stage column name as a covariate.}
-#'  \item{\code{data}}{data.frame containing the variables specified in formula.}
-#'  \item{\code{additional arguments}}{four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.}
-#' }
+#' @param ... if data and formula are set to NULL, one can add four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.
+#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
+#' @param data data.frame containing the variables specified in formula.
 #' @details  TODO
 #' @return
 #' An object of type "tournament" with the following elements
