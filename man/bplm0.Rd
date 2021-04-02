@@ -24,7 +24,7 @@ bplm0(
 
 \item{parallel}{logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
-\item{forcepoint}{A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
+\item{forcepoint}{logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
 \value{
 bplm0 returns an object of class "bplm0". An object of class "bplm0" is a list containing the following components: \cr

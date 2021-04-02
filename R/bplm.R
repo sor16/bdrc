@@ -6,7 +6,7 @@
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
 #' @param h_max maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
-#' @param forcepoint A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #'
 #' @details The power-law model, which is commonly used in hydraulic practice, is of the form
 #' \deqn{Q=a(h-c)^{b}}
