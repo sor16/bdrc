@@ -52,7 +52,7 @@ evaluate_game <- function(m){
 tournament <- function(...,formula=NULL,data=NULL) {
     args <- list(...)
     error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types bgplm, bgplm0, bplm and bplm0.'
-    if(!('formula' %in% names(args)) | !('data' %in% names(args))){
+    if(is.null(formula) | is.null(data)){
         if(length(args)!=4){
             stop(error_msg)
         }else{
@@ -64,10 +64,10 @@ tournament <- function(...,formula=NULL,data=NULL) {
             }
         }
     }else{
-        args$bgplm <- bgplm(args$formula, args$data)
-        args$bgplm0 <- bgplm0(args$formula, args$data)
-        args$bplm <- bplm(args$formula, args$data)
-        args$bplm0 <- bplm0(args$formula, args$data)
+        args$bgplm <- bgplm(formula, data)
+        args$bgplm0 <- bgplm0(formula, data)
+        args$bplm <- bplm(formula, data)
+        args$bplm0 <- bplm0(formula, data)
     }
     round1<- list(list(args$bgplm,args$bgplm0),list(args$bplm,args$bplm0))
     round1_res <- lapply(1:length(round1),function(i){
