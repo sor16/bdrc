@@ -96,7 +96,7 @@ bplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
     result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
     # store other information
-    result_obj$accepantance_rate <- MCMC_output_list[['acceptance_rate']]
+    result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
