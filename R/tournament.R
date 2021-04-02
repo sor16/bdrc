@@ -52,7 +52,7 @@ evaluate_game <- function(m){
 #' plot(t_obj)
 #' }
 #' @export
-tournament <- function(...) {
+tournament <- function(...,formula=NULL,data=NULL) {
     args <- list(...)
     error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types bgplm, bgplm0, bplm and bplm0.'
     if(!('formula' %in% names(args)) | !('data' %in% names(args))){
