@@ -17,3 +17,5 @@ set.seed(1)
 bgplm.fit <- bgplm(Q~W,V316_river,parallel=F)
 set.seed(1)
 bgplm.fit_known_c <- bgplm(Q~W,V316_river,c_param=0.8,h_max=2,parallel=F)
+
+t_obj <- tournament(bplm0.fit,bplm.fit,bgplm0.fit,bgplm.fit)
