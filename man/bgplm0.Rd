@@ -9,17 +9,20 @@ bgplm0(
   data,
   c_param = NULL,
   h_max = NULL,
+  parallel = T,
   forcepoint = rep(FALSE, nrow(data))
 )
 }
 \arguments{
 \item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.The details of model specification are given under "Details".}
 
-\item{data}{data.frame containing the variables specified in formula}
+\item{data}{data.frame containing the variables specified in formula.}
 
-\item{c_param}{stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data}
+\item{c_param}{stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.}
 
 \item{h_max}{maximum stage to which the rating curve should extrapolate for. If NULL, the maximum stage value in data is selected as an upper bound.}
+
+\item{parallel}{logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
 \item{forcepoint}{A boolean vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
