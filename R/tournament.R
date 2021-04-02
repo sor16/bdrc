@@ -86,7 +86,7 @@ tournament <- function(...,formula=NULL,data=NULL) {
     round2 <- lapply(1:length(round1),function(i){
         round1[[i]][[which(round1_res$winner[round1_res$game==i])]]
     })
-    round2_res <- cbind(data.frame(round=1,game=3),evaluate_game(round2))
+    round2_res <- cbind(data.frame(round=2,game=3),evaluate_game(round2))
     round2_winner <- round2_res$model[round2_res$winner]
 
     cat("######## ROUND 2 ########\n")
