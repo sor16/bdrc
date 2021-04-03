@@ -15,9 +15,6 @@ A data.frame with the summary of the results of the game
 \description{
 evaluate_game uses the Bayes factor of two models to determine whether one model favors the other
 }
-\details{
-TODO
-}
 \references{
 B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 }

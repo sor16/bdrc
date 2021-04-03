@@ -3,7 +3,6 @@
 #' evaluate_game uses the Bayes factor of two models to determine whether one model favors the other
 #'
 #' @param m a list of two model objects fit on the same dataset. Model objects allowed are "bgplm", "bgplm0", "bplm" and "bplm0"
-#' @details TODO
 #' @return
 #' A data.frame with the summary of the results of the game
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
@@ -25,9 +24,9 @@ evaluate_game <- function(m){
 
 #' Determine the most adequate rating curve model
 #'
-#' tournament compares
+#' tournament compares four rating curve models of different complexities and determines which model is the most adequate
 #'
-#' @param ... if data and formula are set to NULL, one can add four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.
+#' @param ... if data and formula are set to NULL, one can add four model objects of types "bgplm", "bgplm0", "bplm" and "bplm0". This prevents the function from running all four models explicitly.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
 #' @param data data.frame containing the variables specified in formula.
 #' @details  TODO
@@ -35,7 +34,8 @@ evaluate_game <- function(m){
 #' An object of type "tournament" with the following elements
 #' \describe{
 #'  \item{\code{summary}}{a data frame with information on reults of the different games in the tournament.}
-#'  \item{\code{winner}}{model object of the winning model}
+#'  \item{\code{contestants}}{model objects of types "bplm0","bplm","bpglm0" and "bgplm" being compared.}
+#'  \item{\code{winner}}{model object of the tournament winner.}
 #' }
 #'
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.

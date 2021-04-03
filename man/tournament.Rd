@@ -4,25 +4,25 @@
 \alias{tournament}
 \title{Determine the most adequate rating curve model}
 \usage{
-tournament(...)
+tournament(..., formula = NULL, data = NULL)
 }
 \arguments{
-\item{...}{Arguments to be passed to other methods. The following arguments are supported:
-\itemize{
- \item{\code{formula}}{formula an object of class "formula", with discharge column name as response and stage column name as a covariate.}
- \item{\code{data}}{data.frame containing the variables specified in formula.}
- \item{\code{additional arguments}}{four model objects of types bgplm, bgplm0, bplm and bplm0. This prevents the function from running all four models explicitly.}
-}}
+\item{...}{if data and formula are set to NULL, one can add four model objects of types "bgplm", "bgplm0", "bplm" and "bplm0". This prevents the function from running all four models explicitly.}
+
+\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
+
+\item{data}{data.frame containing the variables specified in formula.}
 }
 \value{
 An object of type "tournament" with the following elements
 \describe{
  \item{\code{summary}}{a data frame with information on reults of the different games in the tournament.}
- \item{\code{winner}}{model object of the winning model}
+ \item{\code{contestants}}{model objects of types "bplm0","bplm","bpglm0" and "bgplm" being compared.}
+ \item{\code{winner}}{model object of the tournament winner.}
 }
 }
 \description{
-tournament compares
+tournament compares four rating curve models of different complexities and determines which model is the most adequate
 }
 \details{
 TODO
