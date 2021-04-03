@@ -772,7 +772,10 @@ summary.bgplm <- function(object,...){
 #' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries of model parameters, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
-#' x=1
+#' data(V316_river)
+#' f <- Q~W
+#' bgplm.fit <- bgplm(f,V316_river)
+#' autoplot(bgplm.fit)
 #' }
 #' @export
 autoplot.bgplm <- function(x,...){

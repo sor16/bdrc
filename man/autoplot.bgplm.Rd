@@ -34,7 +34,10 @@ Uses ggplot2 to plot bgplm object
 }
 \examples{
 \dontrun{
-x=1
+data(V316_river)
+f <- Q~W
+bgplm.fit <- bgplm(f,V316_river)
+autoplot(bgplm.fit)
 }
 }
 \seealso{
