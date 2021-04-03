@@ -154,6 +154,7 @@ bplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
         num_cores <- min(parallel::detectCores(),num_chains)
       }
       cl <- parallel::makeForkCluster(num_cores)
+      parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
       MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
         run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
       })
