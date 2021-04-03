@@ -59,7 +59,6 @@ reference:
     - summary.tournament
     - autoplot.tournament
     - plot.tournament
-    - predict.tournament
 
   - title: Data manipulation functions
     contents:
@@ -69,3 +68,10 @@ reference:
   - title: Data
     contents:
     - V316_river
+articles:
+  - title: Articles
+    navbar: ~
+    contents:
+    - introduction
+    - tournament
+    - advanced_visualization

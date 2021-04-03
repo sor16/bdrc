@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 inst/doc
-docs
 doc
 Meta
 tests/cached_results

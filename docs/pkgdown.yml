@@ -1,0 +1,9 @@
+pandoc: 2.3.1
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  advanced_visualization: advanced_visualization.html
+  introduction: introduction.html
+  tournament: tournament.html
+last_built: 2021-04-03T20:29Z
+
