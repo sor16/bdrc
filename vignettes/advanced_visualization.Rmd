@@ -1,6 +1,6 @@
 ---
 title: "Advanced visualization"
-author: "Sölvi Rögnvaldsson, Axel Örn Jansson and Birgir Hrafnkelsson"
+author: "Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson"
 date:
 output: rmarkdown::html_vignette
 vignette: >

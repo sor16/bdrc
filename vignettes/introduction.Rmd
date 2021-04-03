@@ -1,6 +1,6 @@
 ---
 title: "Introduction"
-author: "Sölvi Rögnvaldsson, Axel Örn Jansson and Birgir Hrafnkelsson"
+author: "Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson"
 date:
 output: rmarkdown::html_vignette
 vignette: >
@@ -13,8 +13,6 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=14, 
-  fig.height=8, 
   fig.path='figs-introduction/',
   fig.align='center',
   prompt=T
