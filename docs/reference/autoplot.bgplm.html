@@ -113,6 +113,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -144,7 +147,14 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for bgplm</span>
-<span class='fu'>autoplot</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>autoplot</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  type <span class='op'>=</span> <span class='st'>"rating_curve"</span>,
+  param <span class='op'>=</span> <span class='cn'>NULL</span>,
+  transformed <span class='op'>=</span> <span class='cn'>F</span>,
+  title <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,22 +164,33 @@
       <td><p>an object of class "bgplm"</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Arguments to be passed to other methods. The following arguments are supported:</p><ul>
-<li><p><code>type</code> a character denoting what type of plot should be drawn. Possible types are
-                   <ul>
-<li><p>"rating_curve" to plot the rating curve on original scale.</p></li>
-<li><p>"rating_curve_mean" to plot the rating curve on a log scale.</p></li>
-<li><p>"f" to plot the power-law exponent</p></li>
-<li><p>"sigma_eps" to plot the standard deviation on the data level</p></li>
-<li><p>"residuals" to plot the log residuals</p></li>
-<li><p>"trace" to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.</p></li>
-<li><p>"histogram" to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.</p></li>
-</ul></p></li>
-<li><p><code>transformed</code> a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.</p></li>
-<li><p><code>title</code> title of the plot. Defaults to NULL, i.e. no title</p></li>
-<li><p>additional characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.</p></li>
+      <th>type</th>
+      <td><p>a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are</p><ul>
+<li><p>"rating_curve" to plot the rating curve.</p></li>
+<li><p>"rating_curve_mean" to plot the posterior mean of the rating curve.</p></li>
+<li><p>"f" to plot the power-law exponent.</p></li>
+<li><p>"beta" to plot the random effect in the power-law exponent.</p></li>
+<li><p>"sigma_eps" to plot the standard deviation on the data level.</p></li>
+<li><p>"residuals" to plot the log residuals.</p></li>
+<li><p>"trace" to plot trace plots of parameters given in param.</p></li>
+<li><p>"histogram" to plot histograms of parameters given in param.</p></li>
 </ul></td>
+    </tr>
+    <tr>
+      <th>param</th>
+      <td><p>a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.</p></td>
+    </tr>
+    <tr>
+      <th>transformed</th>
+      <td><p>a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.</p></td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td><p>a character denoting the title of the plot. Defaults to NULL, i.e. no title.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>further arguments passed to other methods (currently unused).</p></td>
     </tr>
     </table>
 
