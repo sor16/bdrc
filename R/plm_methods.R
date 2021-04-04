@@ -37,54 +37,34 @@ theme_bdrc <- function(){
 #' Plot bdrc model objects
 #'
 #' Visualize results from model ojbects in bdrc, bplm0, bplm, bgplm0,bgplm
-#' @param x an object of class "bplm0","bplm","bgplm0" or "bgplm"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param x an object of class "bplm0","bplm","bgplm0" or "bgplm".
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{}{ additional characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
-#' @return returns an object of class ggplot2 or Grob object
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @return returns an object of class ggplot2 or Grob object.
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
-plot_fun <- function(x,...){
-    args <- list(...)
-    if('type' %in% names(args)){
-        type <- args$type
-        args <- args[names(args)!='type'] # remove type from args list
-    }else{
-        type <- 'rating_curve'
-    }
-    if('transformed' %in% names(args)){
-        transformed <- args$transformed
-        args <- args[names(args)!='transformed'] # remove transformed from args list
-    }else{
-        transformed <- F
-    }
-    if('title' %in% names(args)){
-        title <- args$title
-        args <- args[names(args)!='title'] # remove title from args list
-    }else{
-        title <- NULL
-    }
-    args <- unlist(args)
+plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram')
+    types_with_param <- c('trace','histogram')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
+    }else if(type %in% types_with_param & is.null(param)){
+        stop('If type histogram or trace, param must be non-null, should be a character vector of the names parameters to visualize.')
     }else if(type=='trace'){
-        plot_dat <- gather_draws(x,args,transformed=transformed)
+        plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "trace" can only be of stage-independent parameters')
         }
@@ -112,7 +92,7 @@ plot_fun <- function(x,...){
                 theme_bdrc()
         }
     }else if(type=='histogram'){
-        plot_dat <- gather_draws(x,args,transformed=transformed)
+        plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "histogram" can only be of stage-independent parameters')
         }
@@ -260,28 +240,12 @@ plot_fun <- function(x,...){
 
 
 #' @importFrom gridExtra arrangeGrob
-plot_collage <- function(x,...){
-    args <- list(...)
-    args <- args[names(args)!='type']
-    if('transformed' %in% names(args)){
-        transformed <- args$transformed
-        args <- args[names(args)!='transformed'] # remove transformed from args list
-    }else{
-        transformed <- F
-    }
-    args <- unique(unlist(args))
-    if(length(args)==0){
-        args <- c('rating_curve','residuals','f','sigma_eps')
-    }
-    legal_args <- c('rating_curve','rating_curve_mean','sigma_eps','f','beta','residuals')
-    if(all(args %in% legal_args)){
-        plot_list <- lapply(args,function(y){
-            plot_fun(x,type=y,transformed=transformed)
-        })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(args)))))
-    }else{
-        stop(cat(paste('For type collage, arguments must be in the following list:\n -',paste(legal_args,collapse='\n - '))))
-    }
+plot_collage <- function(x,transformed=F){
+    types <- c('rating_curve','residuals','f','sigma_eps')
+    plot_list <- lapply(types,function(ty){
+        plot_fun(x,type=ty,transformed=transformed)
+    })
+    p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(types)))))
     return(p)
 }
 
@@ -346,24 +310,23 @@ summary.bplm0 <- function(object,...){
 #' Autoplot bplm0 fit
 #'
 #' Uses ggplot2 to plot bplm0 object
-#' @param x an object of class "bplm0"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param x an object of class "bplm0".
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
-#' @return returns an object of class ggplot2
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
+#' @return returns an object of class ggplot2.
 #' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries of model parameters, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -373,30 +336,29 @@ summary.bplm0 <- function(object,...){
 #' autoplot(bplm0.fit)
 #' }
 #' @export
-autoplot.bplm0 <- function(x,...){
-    plot_fun(x,...)
+autoplot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
 #' Plot bplm0 fit
 #'
 #' Print the results of a  object
-#' @param x an object of class "bplm0"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param x an object of class "bplm0".
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -408,13 +370,12 @@ autoplot.bplm0 <- function(x,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bplm0 <- function(x,...){
-    args <- list(...)
-    if(is.null(args$type) || args$type!='collage'){
-        p <- autoplot(x,...)
+plot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    if(is.null(type) || type!='collage'){
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
     }else{
-        p <- plot_collage(x,...)
+        p <- plot_collage(x,transformed=transformed)
         grid.draw(p)
     }
 }
@@ -483,22 +444,21 @@ summary.bplm <- function(object,...){
 #'
 #' Uses ggplot2 to plot bplm object
 #' @param x an object of class "bplm"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries of model parameters, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 #' @examples
@@ -509,30 +469,29 @@ summary.bplm <- function(object,...){
 #' autoplot(bplm.fit)
 #' }
 #' @export
-autoplot.bplm <- function(x,...){
-    plot_fun(x,...)
+autoplot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
 #' Plot bplm fit
 #'
 #' Print the results of a  object
 #' @param x an object of class "bplm"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -544,13 +503,12 @@ autoplot.bplm <- function(x,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bplm <- function(x,...){
-    args <- list(...)
-    if(is.null(args$type) || args$type!='collage'){
-        p <- autoplot(x,...)
+plot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    if(is.null(type) || type!='collage'){
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
     }else{
-        p <- plot_collage(x,...)
+        p <- plot_collage(x,transformed=transformed)
         grid.draw(p)
     }
 }
@@ -617,22 +575,21 @@ summary.bgplm0 <- function(object,...){
 #'
 #' Uses ggplot2 to plot bgplm0 object
 #' @param x an object of class "bgplm0"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries of model parameters, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
 #' @examples
@@ -643,30 +600,29 @@ summary.bgplm0 <- function(object,...){
 #' autoplot(bgplm0.fit)
 #' }
 #' @export
-autoplot.bgplm0 <- function(x,...){
-    plot_fun(x,...)
+autoplot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
 #' Plot bgplm0 fit
 #'
 #' Print the results of a  object
 #' @param x an object of class "bgplm0"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -678,13 +634,12 @@ autoplot.bgplm0 <- function(x,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bgplm0 <- function(x,...){
-    args <- list(...)
-    if(is.null(args$type) || args$type!='collage'){
-        p <- autoplot(x,...)
+plot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    if(is.null(type) || type!='collage'){
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
     }else{
-        p <- plot_collage(x,...)
+        p <- plot_collage(x,transformed=transformed)
         grid.draw(p)
     }
 }
@@ -752,22 +707,21 @@ summary.bgplm <- function(object,...){
 #' Uses ggplot2 to plot bgplm object
 #'
 #' @param x an object of class "bgplm"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'   \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#'   \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#'   \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#'   \item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries of model parameters, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
 #' @examples
@@ -778,8 +732,8 @@ summary.bgplm <- function(object,...){
 #' autoplot(bgplm.fit)
 #' }
 #' @export
-autoplot.bgplm <- function(x,...){
-    plot_fun(x,...)
+autoplot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
 #' Plot bgplm fit
@@ -787,22 +741,21 @@ autoplot.bgplm <- function(x,...){
 #' Print the results of a  object
 #'
 #' @param x an object of class "bgplm"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
-#' \itemize{
-#'  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
+#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                       \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                       \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-#'                    }}
-#' \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#' \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' \item{additional }{characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
-#' }
+#'                       \item{"rating_curve"}{ to plot the rating curve.}
+#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'                       \item{"f"}{ to plot the power-law exponent.}
+#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
+#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'                       \item{"residuals"}{ to plot the log residuals.}
+#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
+#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                    }
+#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -814,13 +767,12 @@ autoplot.bgplm <- function(x,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bgplm <- function(x,...){
-    args <- list(...)
-    if(is.null(args$type) || args$type!='collage'){
-        p <- autoplot(x,...)
+plot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+    if(is.null(type) || type!='collage'){
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
     }else{
-        p <- plot_collage(x,...)
+        p <- plot_collage(x,transformed=transformed)
         grid.draw(p)
     }
 }
