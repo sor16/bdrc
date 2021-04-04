@@ -4,27 +4,37 @@
 \alias{plot.bplm0}
 \title{Plot bplm0 fit}
 \usage{
-\method{plot}{bplm0}(x, ...)
+\method{plot}{bplm0}(
+  x,
+  type = "rating_curve",
+  param = NULL,
+  transformed = F,
+  title = NULL,
+  ...
+)
 }
 \arguments{
-\item{x}{an object of class "bplm0"}
+\item{x}{an object of class "bplm0".}
 
-\item{...}{Arguments to be passed to other methods. The following arguments are supported:
+\item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
- \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
-                   \itemize{
-                      \item{"rating_curve"}{ to plot the rating curve on original scale.}
-                      \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-                      \item{"f"}{ to plot the power-law exponent}
-                      \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-                      \item{"residuals"}{ to plot the log residuals}
-                      \item{"trace"}{ to plot trace plots of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-                      \item{"histogram"}{ to plot histograms of a list of one or more parameter. Requires parameter names as additional arguments, see below.}
-                   }}
-\item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-\item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-\item{additional}{ characters or character vectors denoting the parameters to plot. Used when type is "trace" or "histogram". Allowed values are the parameter names found in the summary of the model object. See Examples.}
+   \item{"rating_curve"}{ to plot the rating curve.}
+   \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+   \item{"f"}{ to plot the power-law exponent.}
+   \item{"beta"}{ to plot the random effect in the power-law exponent.}
+   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+   \item{"residuals"}{ to plot the log residuals.}
+   \item{"trace"}{ to plot trace plots of parameters given in param.}
+   \item{"histogram"}{ to plot histograms of parameters given in param.}
 }}
+
+\item{param}{a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
+
+\item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+
+\item{title}{a character denoting the title of the plot. Defaults to NULL, i.e. no title.}
+
+\item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
 Print the results of a  object
