@@ -20,15 +20,15 @@ knitr::opts_chunk$set(
 ```
 A discharge rating curve (drc) is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it's used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different dishcarge rating curve models are implemented in this R package using a Bayesian hierarchical model:
 
-* bplm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model
+* plm() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model
 
-* bplm() - Power-law model with variance that may vary with stage
+* plm() - Power-law model with variance that may vary with stage
 
-* bgplm0() - Generalized power-law model with constant variance (hence the 0)
+* gplm0() - Generalized power-law model with constant variance (hence the 0)
 
-* bgplm() - Generalized power-law model with variance that may vary with stage
+* gplm() - Generalized power-law model with variance that may vary with stage
 
-For further details about the different models, see x. The models differ in their complexity and the bgplm is the most flexible and complex model. We will focus on the use of bgplm throughout this introduction vignette and explore the different ways to fit the gplm and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
+For further details about the different models, see x. The models differ in their complexity and the gplm is the most flexible and complex model. We will focus on the use of gplm throughout this introduction vignette and explore the different ways to fit the gplm and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
 ```{r,message=F}
 #load the packages needed for this vignette
 library(bdrc)
@@ -40,93 +40,93 @@ data(V316_river)
 V316_river
 ```
 ## Fit a discharge rating curve
-It is very simple to fit a drc. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the bgplm function:
+It is very simple to fit a drc. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:
 
 ```{r, cache=T}
-bgplm.fit <- bgplm(Q~W,data=V316_river)
+gplm.fit <- gplm(Q~W,data=V316_river)
 ```
-bgplm returns an object of class "bgplm" which we can summarise and visualize using familiar functions such as
+gplm returns an object of class "gplm" which we can summarise and visualize using familiar functions such as
 
 ```{r}
-summary(bgplm.fit)
+summary(gplm.fit)
 ```
 and
 
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit)
+plot(gplm.fit)
 ```
 
-We will dive deeper into visualizing the "bgplm" object in the next sections.
+We will dive deeper into visualizing the "gplm" object in the next sections.
 
 ## Visualizing posterior distributions of different parameters
 The bdrc package provides several tools to visualize the results from the drc model and can give insight into the physical properties of the river at hand. For instance, the hyperparameter $c$ corresponds to the stage of zero discharge. To visualize the posterior of $c$, we can write
 
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit,type='histogram',param='c')
+plot(gplm.fit,type='histogram',param='c')
 ```
 Since $c$ is a strictly positive parameter, it is transformed during Bayesian inference s.t. it has support on the real line with $\zeta=log(h_{min}-c)$. To plot the transformed posterior we write
 
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit,type='histogram',param='c',transformed=T)
+plot(gplm.fit,type='histogram',param='c',transformed=T)
 ```
 The function takes in any number of comma separated character vectors of parameter names. To visualize the posterior distribution of many parameters at once we can for instance write
 
 ```{r, fig.width=8, fig.height=3}
-plot(bgplm.fit,type='histogram',param=c('a','c'))
+plot(gplm.fit,type='histogram',param=c('a','c'))
 ```
 There is a shorthand to visualize all hyperparameters at once
 ```{r, fig.width=10, fig.height=6}
-plot(bgplm.fit,type='histogram',param='hyperparameters')
+plot(gplm.fit,type='histogram',param='hyperparameters')
 ```
 Similairily, writing 'latent_parameters' plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write
 
 ```{r, fig.width=10, fig.height=6}
-plot(bgplm.fit,type='histogram',param='hyperparameters',transformed=T)
+plot(gplm.fit,type='histogram',param='hyperparameters',transformed=T)
 ```
 
-Finally, we can visualize certain components of the drc models that may vary with stage, the power-law exponent $f$ and the standard deviation on the data level $\sigma_{\varepsilon}$. bgplm0 and bgplm generalize the power law exponent, model it as a function of stage $f(h)=b+\beta(h)$, while in bplm0 and bplm model the exponent as a fixed constant $f(h)=b$. We can plot the exponent with
+Finally, we can visualize certain components of the drc models that may vary with stage, the power-law exponent $f$ and the standard deviation on the data level $\sigma_{\varepsilon}$. gplm0 and gplm generalize the power law exponent, model it as a function of stage $f(h)=b+\beta(h)$, while in plm and plm model the exponent as a fixed constant $f(h)=b$. We can plot the exponent with
 
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit,type='f')
+plot(gplm.fit,type='f')
 ```
-bplm and bgplm model the standard deviation, $\sigma_{\varepsilon}$ on the data level as a function of stage, namely as a linear combination of B-splines functions, while bplm0 and bgplm0 model the variance as a fixed constant. We can plot the standard deviation by writing
+plm and gplm model the standard deviation, $\sigma_{\varepsilon}$ on the data level as a function of stage, namely as a linear combination of B-splines functions, while plm and gplm0 model the variance as a fixed constant. We can plot the standard deviation by writing
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit,type='sigma_eps')
+plot(gplm.fit,type='sigma_eps')
 ```
 
 ## Assessing model fitness and convergence
 The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot and tracing plots. The residuals are presented as a function of $log(h-c)$ as the model is linear (or generalized linear) on that scale. 
 ```{r, fig.width=8, fig.height=6}
-plot(bgplm.fit,type='residuals')
+plot(gplm.fit,type='residuals')
 ```
 The traceplots are most meaningful on the transformed scale. To plot a trace plot for a single parameter, write
 
 ```{r, fig.width=10, fig.height=6}
-plot(bgplm.fit,type='trace',param='c',transformed=T)
+plot(gplm.fit,type='trace',param='c',transformed=T)
 ```
 
 To plot a trace plot for all hyperparameters, you write similiarily as above
 ```{r, fig.width=10, fig.height=6}
-plot(bgplm.fit,type='trace',param='hyperparameters',transformed=T)
+plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
 ```
 
 ## Customization of models
-There are ways to customize the bgplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and I want to calculate the rating curve for stage values up to 2.5 m, then  my function call would look like this
+There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and I want to calculate the rating curve for stage values up to 2.5 m, then  my function call would look like this
 ```{r,cache=T,results}
-bgplm.fit.known_c <- bgplm(Q~W,V316_river,c_param=0.75,h_max=2.5)
-summary(bgplm.fit.known_c)
+gplm.fit.known_c <- gplm(Q~W,V316_river,c_param=0.75,h_max=2.5)
+summary(gplm.fit.known_c)
 ```
 one neat way to geta visualization summary of your model is to use the 'collage' option in the plot method:
 
 ```{r, fig.width=8, fig.height=6,results='hide'}
-plot(bgplm.fit.known_c,type='collage',transformed=T)
+plot(gplm.fit.known_c,type='collage',transformed=T)
 ```
 
 ## Prediction for an equally spaced grid of stages
 To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which the Bayesian inference was performed
 ```{r}
 h_grid <- seq(0.75,2.0,by=0.01)
-rating_curve_h_grid <- predict(bgplm.fit.known_c,newdata=h_grid)
+rating_curve_h_grid <- predict(gplm.fit.known_c,newdata=h_grid)
 print(rating_curve_h_grid)
 ```
 
