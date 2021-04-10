@@ -36,8 +36,8 @@ theme_bdrc <- function(){
 
 #' Plot bdrc model objects
 #'
-#' Visualize results from model ojbects in bdrc, bplm0, bplm, bgplm0,bgplm
-#' @param x an object of class "bplm0","bplm","bgplm0" or "bgplm".
+#' Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
+#' @param x an object of class "plm0","plm","gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -169,7 +169,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             theme_bdrc()
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
-            stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "bgplm0" and "bgplm"')
+            stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "gplm0" and "gplm"')
         }
         #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
@@ -271,46 +271,46 @@ predict_fun <- function(object,newdata=NULL){
     return(pred_dat)
 }
 
-#' Print bplm0 object
+#' Print plm0 object
 #'
-#' Print the results of a bplm0 object
-#' @param x an object of class "bplm0"
+#' Print the results of a plm0 object
+#' @param x an object of class "plm0"
 #' @param ... not used in this function
-#' @seealso \code{\link{bplm0}} for fitting the bplm0 model, \code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}} for fitting the plm0 model, \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm0.fit <- bplm0(f,V316_river)
-#' print(bplm0.fit)
+#' plm0.fit <- plm0(f,V316_river)
+#' print(plm0.fit)
 #' }
 #' @export
-print.bplm0 <- function(x,...){
+print.plm0 <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing bplm0 fit
+#' Summarizing plm0 fit
 #'
-#' Summarize the results of a bplm0 object
-#' @param object an object of class "bplm0"
+#' Summarize the results of a plm0 object
+#' @param object an object of class "plm0"
 #' @param ... Not used for this function
-#' @seealso \code{\link{bplm0}} for fitting the bplm0 model, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}} for fitting the plm0 model, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm0.fit <- bplm0(f,V316_river)
-#' summary(bplm0.fit)
+#' plm0.fit <- plm0(f,V316_river)
+#' summary(plm0.fit)
 #' }
 #' @export
-summary.bplm0 <- function(object,...){
+summary.plm0 <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot bplm0 fit
+#' Autoplot plm0 fit
 #'
-#' Uses ggplot2 to plot bplm0 object
-#' @param x an object of class "bplm0".
+#' Uses ggplot2 to plot plm0 object
+#' @param x an object of class "plm0".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -327,23 +327,23 @@ summary.bplm0 <- function(object,...){
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2.
-#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries of model parameters, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries of model parameters, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm0.fit <- bplm0(f,V316_river)
-#' autoplot(bplm0.fit)
+#' plm0.fit <- plm0(f,V316_river)
+#' autoplot(plm0.fit)
 #' }
 #' @export
-autoplot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
-#' Plot bplm0 fit
+#' Plot plm0 fit
 #'
 #' Print the results of a  object
-#' @param x an object of class "bplm0".
+#' @param x an object of class "plm0".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -359,18 +359,18 @@ autoplot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm0.fit <- bplm0(f,V316_river)
-#' plot(bplm0.fit)
+#' plm0.fit <- plm0(f,V316_river)
+#' plot(plm0.fit)
 #' }
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     if(is.null(type) || type!='collage'){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
@@ -380,70 +380,70 @@ plot.bplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL
     }
 }
 
-#' Predict method for bplm0 fit
+#' Predict method for plm0 fit
 #'
 #' Print the results of a  object
-#' @param object an object of class "bplm0"
+#' @param object an object of class "plm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{bplm0}} for fitting the bplm0 model,\code{\link{summary.bplm0}} for summaries, \code{\link{predict.bplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm0.fit <- bplm0(f,V316_river,h_max=2)
+#' plm0.fit <- plm0(f,V316_river,h_max=2)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(bplm0.fit,newdata=seq(1,2,by=0.01))
+#' predict(plm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.bplm0 <- function(object,newdata=NULL,...){
+predict.plm0 <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }
 
-#' Print bplm object
+#' Print plm object
 #'
-#' Print the results of a bplm object
-#' @param x an object of class "bplm"
+#' Print the results of a plm object
+#' @param x an object of class "plm"
 #' @param ... not used in this function
-#' @return bgplm0 returns an object of class "bplm"\cr\cr
-#' @seealso \code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
+#' @return gplm0 returns an object of class "plm"\cr\cr
+#' @seealso \code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm.fit <- bplm(f,V316_river)
-#' print(bplm.fit)
+#' plm.fit <- plm(f,V316_river)
+#' print(plm.fit)
 #' }
 #' @export
 #'
-print.bplm <- function(x,...){
+print.plm <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing bplm fit
+#' Summarizing plm fit
 #'
-#' Summarize the results of a bplm object
-#' @param object an object of class "bplm"
+#' Summarize the results of a plm object
+#' @param object an object of class "plm"
 #' @param ... not used in this function
-#' @return bgplm0 returns an object of class "bplm"\cr\cr
-#' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
+#' @return gplm0 returns an object of class "plm"\cr\cr
+#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm.fit <- bplm(f,V316_river)
-#' summary(bplm.fit)
+#' plm.fit <- plm(f,V316_river)
+#' summary(plm.fit)
 #' }
 #' @export
-summary.bplm <- function(object,...){
+summary.plm <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot bplm fit
+#' Autoplot plm fit
 #'
-#' Uses ggplot2 to plot bplm object
-#' @param x an object of class "bplm"
+#' Uses ggplot2 to plot plm object
+#' @param x an object of class "plm"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -460,23 +460,23 @@ summary.bplm <- function(object,...){
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
-#' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries of model parameters, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries of model parameters, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm.fit <- bplm(f,V316_river)
-#' autoplot(bplm.fit)
+#' plm.fit <- plm(f,V316_river)
+#' autoplot(plm.fit)
 #' }
 #' @export
-autoplot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
-#' Plot bplm fit
+#' Plot plm fit
 #'
 #' Print the results of a  object
-#' @param x an object of class "bplm"
+#' @param x an object of class "plm"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -492,18 +492,18 @@ autoplot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm.fit <- bplm(f,V316_river)
-#' plot(bplm.fit)
+#' plm.fit <- plm(f,V316_river)
+#' plot(plm.fit)
 #' }
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     if(is.null(type) || type!='collage'){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
@@ -513,68 +513,68 @@ plot.bplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
     }
 }
 
-#' Predict method for bplm fit
+#' Predict method for plm fit
 #'
 #' Print the results of a  object
-#' @param object an object of class "bplm"
+#' @param object an object of class "plm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{bplm}} for fitting the bplm model,\code{\link{summary.bplm}} for summaries, \code{\link{predict.bplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bplm.fit <- bplm(f,V316_river,h_max=2)
+#' plm.fit <- plm(f,V316_river,h_max=2)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(bplm.fit,newdata=seq(1,2,by=0.01))
+#' predict(plm.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.bplm <- function(object,newdata=NULL,...){
+predict.plm <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }
 
-#' Print bgplm0 object
+#' Print gplm0 object
 #'
-#' Print the results of a bgplm0 object
-#' @param x an object of class "bgplm0"
+#' Print the results of a gplm0 object
+#' @param x an object of class "gplm0"
 #' @param ... not used in this function
-#' @seealso \code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river)
-#' print(bgplm0.fit)
+#' gplm0.fit <- gplm0(f,V316_river)
+#' print(gplm0.fit)
 #' }
 #' @export
-print.bgplm0 <- function(x,...){
+print.gplm0 <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing bgplm0 fit
+#' Summarizing gplm0 fit
 #'
-#' Summarize the results of a bgplm0 object
-#' @param object an object of class "bgplm0"
+#' Summarize the results of a gplm0 object
+#' @param object an object of class "gplm0"
 #' @param ... not used in this function
-#' @return bgplm0 returns an object of class "bplm"\cr\cr
-#' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
+#' @return gplm0 returns an object of class "plm"\cr\cr
+#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river)
-#' summary(bgplm0.fit)
+#' gplm0.fit <- gplm0(f,V316_river)
+#' summary(gplm0.fit)
 #' }
 #' @export
-summary.bgplm0 <- function(object,...){
+summary.gplm0 <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot bgplm0 fit
+#' Autoplot gplm0 fit
 #'
-#' Uses ggplot2 to plot bgplm0 object
-#' @param x an object of class "bgplm0"
+#' Uses ggplot2 to plot gplm0 object
+#' @param x an object of class "gplm0"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -591,23 +591,23 @@ summary.bgplm0 <- function(object,...){
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
-#' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries of model parameters, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries of model parameters, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river)
-#' autoplot(bgplm0.fit)
+#' gplm0.fit <- gplm0(f,V316_river)
+#' autoplot(gplm0.fit)
 #' }
 #' @export
-autoplot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
-#' Plot bgplm0 fit
+#' Plot gplm0 fit
 #'
 #' Print the results of a  object
-#' @param x an object of class "bgplm0"
+#' @param x an object of class "gplm0"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -623,18 +623,18 @@ autoplot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river)
-#' plot(bgplm0.fit)
+#' gplm0.fit <- gplm0(f,V316_river)
+#' plot(gplm0.fit)
 #' }
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     if(is.null(type) || type!='collage'){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
@@ -644,69 +644,69 @@ plot.bgplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NUL
     }
 }
 
-#' Predict method for bgplm0 fit
+#' Predict method for gplm0 fit
 #'
 #' Print the results of a  object
-#' @param object an object of class "bgplm0"
+#' @param object an object of class "gplm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{bgplm0}} for fitting the bgplm0 model,\code{\link{summary.bgplm0}} for summaries, \code{\link{predict.bgplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river,h_max=2)
+#' gplm0.fit <- gplm0(f,V316_river,h_max=2)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(bgplm0.fit,newdata=seq(1,2,by=0.01))
+#' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.bgplm0 <- function(object,newdata=NULL,...){
+predict.gplm0 <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }
 
-#' Print bgplm object
+#' Print gplm object
 #'
-#' Print the results of a bgplm object
-#' @param x an object of class "bgplm"
+#' Print the results of a gplm object
+#' @param x an object of class "gplm"
 #' @param ... not used in this function
-#' @seealso \code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm.fit <- bgplm(f,V316_river)
-#' print(bgplm.fit)
+#' gplm.fit <- gplm(f,V316_river)
+#' print(gplm.fit)
 #' }
 #' @export
-print.bgplm <- function(x,...){
+print.gplm <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing bplm fit
+#' Summarizing plm fit
 #'
-#' Summarize the results of a bgplm object
-#' @param object an object of class "bgplm"
+#' Summarize the results of a gplm object
+#' @param object an object of class "gplm"
 #' @param ... not used in this function
-#' @return bgplm0 returns an object of class "bplm"\cr\cr
-#' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
+#' @return gplm0 returns an object of class "plm"\cr\cr
+#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm.fit <- bgplm(f,V316_river)
-#' summary(bgplm.fit)
+#' gplm.fit <- gplm(f,V316_river)
+#' summary(gplm.fit)
 #' }
 #' @export
-summary.bgplm <- function(object,...){
+summary.gplm <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot bgplm fit
+#' Autoplot gplm fit
 #'
-#' Uses ggplot2 to plot bgplm object
+#' Uses ggplot2 to plot gplm object
 #'
-#' @param x an object of class "bgplm"
+#' @param x an object of class "gplm"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -723,24 +723,24 @@ summary.bgplm <- function(object,...){
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @return returns an object of class ggplot2
-#' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries of model parameters, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries of model parameters, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm.fit <- bgplm(f,V316_river)
-#' autoplot(bgplm.fit)
+#' gplm.fit <- gplm(f,V316_river)
+#' autoplot(gplm.fit)
 #' }
 #' @export
-autoplot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title)
 }
 
-#' Plot bgplm fit
+#' Plot gplm fit
 #'
 #' Print the results of a  object
 #'
-#' @param x an object of class "bgplm"
+#' @param x an object of class "gplm"
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -756,18 +756,18 @@ autoplot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm.fit <- bgplm(f,V316_river)
-#' plot(bgplm.fit)
+#' gplm.fit <- gplm(f,V316_river)
+#' plot(gplm.fit)
 #' }
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
+plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
     if(is.null(type) || type!='collage'){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
@@ -777,23 +777,23 @@ plot.bgplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL
     }
 }
 
-#' Predict method for bgplm fit
+#' Predict method for gplm fit
 #'
 #' Print the results of a  object
-#' @param object an object of class "bgplm"
+#' @param object an object of class "gplm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{bgplm}} for fitting the bgplm model,\code{\link{summary.bgplm}} for summaries, \code{\link{predict.bgplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.bgplm}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
 #' data(V316_river)
 #' f <- Q~W
-#' bgplm0.fit <- bgplm0(f,V316_river,h_max=2)
+#' gplm0.fit <- gplm0(f,V316_river,h_max=2)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(bgplm0.fit,newdata=seq(1,2,by=0.01))
+#' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.bgplm <- function(object,newdata=NULL,...){
+predict.gplm <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }

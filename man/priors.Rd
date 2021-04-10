@@ -7,7 +7,7 @@
 priors(model, c_param = NULL)
 }
 \arguments{
-\item{model}{character denoting which model to get the fixed values of parameters of prior distributions. One of bplm0,bplm,bgplm0,bgplm}
+\item{model}{character denoting which model to get the fixed values of parameters of prior distributions. One of plm0,plm,gplm0,gplm}
 
 \item{c_param}{The value of the parameter c, the stage at zero discharge. NULL if unknown}
 }

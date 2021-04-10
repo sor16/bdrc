@@ -1,0 +1,89 @@
+context('gplm')
+
+test_that("gplm can handle different inputs", {
+    expect_error(gplm(Q~W,c(1,2,3)))
+    expect_error(gplm('Q~W',V316_river))
+    expect_error(gplm(V~W,V316_river))
+    expect_error(gplm(Q~W+X,V316_river))
+    expect_error(gplm(Q~W,V316_river,c_param=1.5)) # c_param higher than lowest stage measurements
+    expect_error(gplm(Q~W,V316_river,c_param=1L)) # c_param not double
+    expect_error(gplm(Q~W,V316_river,h_max=1.3)) #h_max lower than highest stage measurement
+    skip_on_cran()
+    V316_river_new_names <- V316_river
+    names(V316_river_new_names) <- c('t1','t2')
+    set.seed(1)
+    gplm.fit_new_names <- gplm(t2~t1,V316_river_new_names,parallel=F)
+    expect_equal(gplm.fit_new_names$rating_curve,gplm.fit$rating_curve)
+})
+
+test_that("the gplm object with unknown c is in tact", {
+    expect_is(gplm.fit,"gplm")
+    #latent parameters
+    test_stage_indep_param(gplm.fit,'a')
+    test_stage_indep_param(gplm.fit,'b')
+    #hyperparameters
+    test_stage_indep_param(gplm.fit,'c')
+    test_stage_indep_param(gplm.fit,'sigma_beta')
+    test_stage_indep_param(gplm.fit,'phi_beta')
+    test_stage_indep_param(gplm.fit,'sigma_eta')
+    test_stage_indep_param(gplm.fit,'eta_1')
+    test_stage_indep_param(gplm.fit,'eta_2')
+    test_stage_indep_param(gplm.fit,'eta_3')
+    test_stage_indep_param(gplm.fit,'eta_4')
+    test_stage_indep_param(gplm.fit,'eta_5')
+    test_stage_indep_param(gplm.fit,'eta_6')
+    #Deviance
+    expect_true(is.double(gplm.fit$Deviance_posterior))
+    expect_equal(length(gplm.fit$Deviance_posterior),gplm.fit$run_info$num_chains*((gplm.fit$run_info$nr_iter-gplm.fit$run_info$burnin)/gplm.fit$run_info$thin + 1))
+    expect_equal(unname(unlist(gplm.fit$Deviance_summary[1,])),unname(quantile(gplm.fit$Deviance_posterior,probs=c(0.025,0.5,0.975))))
+    #rating curve and stage dependent parameters
+    test_stage_dep_component(gplm.fit,'rating_curve')
+    test_stage_dep_component(gplm.fit,'rating_curve_mean')
+    test_stage_dep_component(gplm.fit,'beta')
+    test_stage_dep_component(gplm.fit,'f')
+    test_stage_dep_component(gplm.fit,'sigma_eps')
+    #Other information
+    expect_equal(gplm.fit$formula,Q~W)
+    expect_equal(gplm.fit$data,V316_river[order(V316_river$W),c('Q','W')])
+})
+
+test_that("the gplm object with known c with a maximum stage value is in tact", {
+    expect_is(gplm.fit_known_c,"gplm")
+    #latent parameters
+    test_stage_indep_param(gplm.fit_known_c,'a')
+    test_stage_indep_param(gplm.fit_known_c,'b')
+    #hyperparameters
+    expect_true(is.null(gplm.fit_known_c[['c_posterior']]))
+    expect_false('c' %in% row.names(gplm.fit_known_c))
+    test_stage_indep_param(gplm.fit,'sigma_beta')
+    test_stage_indep_param(gplm.fit,'phi_beta')
+    test_stage_indep_param(gplm.fit,'sigma_eta')
+    test_stage_indep_param(gplm.fit,'eta_1')
+    test_stage_indep_param(gplm.fit,'eta_2')
+    test_stage_indep_param(gplm.fit,'eta_3')
+    test_stage_indep_param(gplm.fit,'eta_4')
+    test_stage_indep_param(gplm.fit,'eta_5')
+    test_stage_indep_param(gplm.fit,'eta_6')
+    #Deviance
+    expect_true(is.double(gplm.fit_known_c$Deviance_posterior))
+    expect_equal(length(gplm.fit_known_c$Deviance_posterior),gplm.fit_known_c$run_info$num_chains*((gplm.fit_known_c$run_info$nr_iter-gplm.fit_known_c$run_info$burnin)/gplm.fit_known_c$run_info$thin + 1))
+    expect_equal(unname(unlist(gplm.fit_known_c$Deviance_summary[1,])),unname(quantile(gplm.fit_known_c$Deviance_posterior,probs=c(0.025,0.5,0.975))))
+    #rating curve and stage dependent parameters
+    test_stage_dep_component(gplm.fit,'rating_curve')
+    test_stage_dep_component(gplm.fit,'rating_curve_mean')
+    test_stage_dep_component(gplm.fit,'beta')
+    test_stage_dep_component(gplm.fit,'f')
+    test_stage_dep_component(gplm.fit,'sigma_eps')
+    #check if maxmimum stage was in line with output
+    expect_equal(max(gplm.fit_known_c$rating_curve$h),2)
+    expect_true(max(diff(gplm.fit_known_c$rating_curve$h))<=(0.05+1e-9)) # added tolerance
+})
+
+
+test_that("gplm output remains unchanged", {
+    skip_on_cran()
+    skip_on_ci()
+    skip_on_covr()
+    expect_equal_to_reference(gplm.fit,file='../cached_results/gplm.fit.rds',update=T)
+    expect_equal_to_reference(gplm.fit_known_c,file='../cached_results/gplm.fit_known_c.rds',update=T)
+})

@@ -7,7 +7,7 @@
 gather_draws(mod, ..., transformed = F)
 }
 \arguments{
-\item{mod}{an object of class "bplm0","bplm","bgplm0" or "bgplm".}
+\item{mod}{an object of class "plm0","plm","gplm0" or "gplm".}
 
 \item{...}{any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".}
 
@@ -27,10 +27,10 @@ Useful to convert MCMC chain draws of particular parameters or output from the m
 \dontrun{
 data(V316_river)
 f <- Q~W
-bplm0.fit <- bplm0(f,V316_river)
-hyp_samples <- spread_draws(bplm0.fit,'hyperparameters')
+plm0.fit <- plm0(f,V316_river)
+hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 head(hyp_samples)
-rating_curve_samples <- spread_draws(bplm0.fit,'rating_curve','rating_curve_mean')
+rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
 head(rating_curve_samples)
 }
 }
@@ -38,5 +38,5 @@ head(rating_curve_samples)
 Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
 }
 \seealso{
-\code{\link{bplm0}},\code{\link{bplm}},\code{\link{bgplm0}},\code{\link{bgplm}} for further information on parameters
+\code{\link{plm0}},\code{\link{plm}},\code{\link{gplm0}},\code{\link{gplm}} for further information on parameters
 }

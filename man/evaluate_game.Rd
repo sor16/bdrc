@@ -7,7 +7,7 @@
 evaluate_game(m)
 }
 \arguments{
-\item{m}{a list of two model objects fit on the same dataset. Model objects allowed are "bgplm", "bgplm0", "bplm" and "bplm0"}
+\item{m}{a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"}
 }
 \value{
 A data.frame with the summary of the results of the game

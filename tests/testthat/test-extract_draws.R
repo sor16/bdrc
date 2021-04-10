@@ -34,44 +34,44 @@ check_gather_draws_MCMC_mat_concordance <- function(mod,dat){
 }
 
 test_that("check different inputs to spread draws and gather draws", {
-    expect_equal(spread_draws(bplm0.fit,'c','sigma_eps'),spread_draws(bplm0.fit,c('c','sigma_eps')))
-    expect_equal(spread_draws(bplm.fit,'c',paste0('eta_',1:3)),spread_draws(bplm.fit,c('c','c',paste0('eta_',1:3))))
-    expect_equal(spread_draws(bgplm0.fit,'c','c'),spread_draws(bgplm0.fit,'c'))
-    expect_equal(spread_draws(bgplm.fit,c('c','sigma_beta'),c('eta_1','sigma_eta')),spread_draws(bgplm.fit,'c','sigma_beta','eta_1','sigma_eta'))
-    expect_error(spread_draws(bgplm.fit_known_c,'c'))
+    expect_equal(spread_draws(plm0.fit,'c','sigma_eps'),spread_draws(plm0.fit,c('c','sigma_eps')))
+    expect_equal(spread_draws(plm.fit,'c',paste0('eta_',1:3)),spread_draws(plm.fit,c('c','c',paste0('eta_',1:3))))
+    expect_equal(spread_draws(gplm0.fit,'c','c'),spread_draws(gplm0.fit,'c'))
+    expect_equal(spread_draws(gplm.fit,c('c','sigma_beta'),c('eta_1','sigma_eta')),spread_draws(gplm.fit,'c','sigma_beta','eta_1','sigma_eta'))
+    expect_error(spread_draws(gplm.fit_known_c,'c'))
 
-    expect_equal(gather_draws(bplm0.fit,'c','sigma_eps'),gather_draws(bplm0.fit,c('c','sigma_eps')))
-    expect_equal(gather_draws(bplm.fit,'c',paste0('eta_',1:3)),gather_draws(bplm.fit,c('c','c',paste0('eta_',1:3))))
-    expect_equal(gather_draws(bgplm0.fit,'c','c'),gather_draws(bgplm0.fit,'c'))
-    expect_equal(gather_draws(bgplm.fit,c('c','sigma_beta'),c('eta_1','sigma_eta')),gather_draws(bgplm.fit,'c','sigma_beta','eta_1','sigma_eta'))
-    expect_error(gather_draws(bgplm.fit_known_c,'c'))
+    expect_equal(gather_draws(plm0.fit,'c','sigma_eps'),gather_draws(plm0.fit,c('c','sigma_eps')))
+    expect_equal(gather_draws(plm.fit,'c',paste0('eta_',1:3)),gather_draws(plm.fit,c('c','c',paste0('eta_',1:3))))
+    expect_equal(gather_draws(gplm0.fit,'c','c'),gather_draws(gplm0.fit,'c'))
+    expect_equal(gather_draws(gplm.fit,c('c','sigma_beta'),c('eta_1','sigma_eta')),gather_draws(gplm.fit,'c','sigma_beta','eta_1','sigma_eta'))
+    expect_error(gather_draws(gplm.fit_known_c,'c'))
 })
 
 test_that("spread draws and gather draws are concordant with MCMC matrices", {
     #spread_draws
-    check_spread_draws_MCMC_mat_concordance(bplm0.fit,spread_draws(bplm0.fit,'c','sigma_eps'))
-    check_spread_draws_MCMC_mat_concordance(bplm0.fit,spread_draws(bplm0.fit,'rating_curve','rating_curve_mean','c'))
+    check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'c','sigma_eps'))
+    check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'rating_curve','rating_curve_mean','c'))
 
-    check_spread_draws_MCMC_mat_concordance(bplm.fit,spread_draws(bplm.fit,'c',paste0('eta_',1:6)))
-    check_spread_draws_MCMC_mat_concordance(bplm.fit,spread_draws(bplm.fit,'rating_curve','rating_curve_mean','sigma_eps','sigma_eta'))
+    check_spread_draws_MCMC_mat_concordance(plm.fit,spread_draws(plm.fit,'c',paste0('eta_',1:6)))
+    check_spread_draws_MCMC_mat_concordance(plm.fit,spread_draws(plm.fit,'rating_curve','rating_curve_mean','sigma_eps','sigma_eta'))
 
-    check_spread_draws_MCMC_mat_concordance(bgplm0.fit,spread_draws(bgplm0.fit,'c','phi_beta','sigma_beta'))
-    check_spread_draws_MCMC_mat_concordance(bgplm0.fit,spread_draws(bgplm0.fit,'rating_curve','rating_curve_mean','beta','f','sigma_eps'))
+    check_spread_draws_MCMC_mat_concordance(gplm0.fit,spread_draws(gplm0.fit,'c','phi_beta','sigma_beta'))
+    check_spread_draws_MCMC_mat_concordance(gplm0.fit,spread_draws(gplm0.fit,'rating_curve','rating_curve_mean','beta','f','sigma_eps'))
 
-    check_spread_draws_MCMC_mat_concordance(bgplm.fit,spread_draws(bgplm.fit,'c',paste0('eta_',1:6)))
-    check_spread_draws_MCMC_mat_concordance(bgplm.fit,spread_draws(bgplm.fit,'rating_curve','rating_curve_mean','sigma_eps','beta','f','sigma_eta'))
+    check_spread_draws_MCMC_mat_concordance(gplm.fit,spread_draws(gplm.fit,'c',paste0('eta_',1:6)))
+    check_spread_draws_MCMC_mat_concordance(gplm.fit,spread_draws(gplm.fit,'rating_curve','rating_curve_mean','sigma_eps','beta','f','sigma_eta'))
     #gather_draws
-    check_gather_draws_MCMC_mat_concordance(bplm0.fit,spread_draws(bplm0.fit,'c','sigma_eps'))
-    check_gather_draws_MCMC_mat_concordance(bplm0.fit,spread_draws(bplm0.fit,'rating_curve','rating_curve_mean','c'))
+    check_gather_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'c','sigma_eps'))
+    check_gather_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'rating_curve','rating_curve_mean','c'))
 
-    check_gather_draws_MCMC_mat_concordance(bplm.fit,spread_draws(bplm.fit,'c',paste0('eta_',1:6)))
-    check_gather_draws_MCMC_mat_concordance(bplm.fit,spread_draws(bplm.fit,'rating_curve','rating_curve_mean','sigma_eps','sigma_eta'))
+    check_gather_draws_MCMC_mat_concordance(plm.fit,spread_draws(plm.fit,'c',paste0('eta_',1:6)))
+    check_gather_draws_MCMC_mat_concordance(plm.fit,spread_draws(plm.fit,'rating_curve','rating_curve_mean','sigma_eps','sigma_eta'))
 
-    check_gather_draws_MCMC_mat_concordance(bgplm0.fit,spread_draws(bgplm0.fit,'c','phi_beta','sigma_beta'))
-    check_gather_draws_MCMC_mat_concordance(bgplm0.fit,spread_draws(bgplm0.fit,'rating_curve','rating_curve_mean','beta','f','sigma_eps'))
+    check_gather_draws_MCMC_mat_concordance(gplm0.fit,spread_draws(gplm0.fit,'c','phi_beta','sigma_beta'))
+    check_gather_draws_MCMC_mat_concordance(gplm0.fit,spread_draws(gplm0.fit,'rating_curve','rating_curve_mean','beta','f','sigma_eps'))
 
-    check_gather_draws_MCMC_mat_concordance(bgplm.fit,spread_draws(bgplm.fit,'c',paste0('eta_',1:6)))
-    check_gather_draws_MCMC_mat_concordance(bgplm.fit,spread_draws(bgplm.fit,'rating_curve','rating_curve_mean','sigma_eps','beta','f','sigma_eta'))
+    check_gather_draws_MCMC_mat_concordance(gplm.fit,spread_draws(gplm.fit,'c',paste0('eta_',1:6)))
+    check_gather_draws_MCMC_mat_concordance(gplm.fit,spread_draws(gplm.fit,'rating_curve','rating_curve_mean','sigma_eps','beta','f','sigma_eta'))
 })
 
 ## TODO test transformed

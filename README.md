@@ -7,19 +7,21 @@
 
 [![Codecov test
 coverage](https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg)](https://codecov.io/gh/sor16/bdrc?branch=master)
+[![R build
+status](https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg)](https://github.com/sor16/bdrc/actions)
 <!-- badges: end -->
 
 The package implements the following Bayesian hierarchical discharge
 rating curve models for paired measurements of stage and discharge in
 rivers described in Hrafnkelsson et al.:
 
-`bplm0()` - Power-law model with constant variance
+`plm0()` - Power-law model with constant variance
 
-`bplm()` - Power-law model with variance that may vary with stage
+`plm()` - Power-law model with variance that may vary with stage
 
-`bgplm0()` - Generalized power-law model with constant variance
+`gplm0()` - Generalized power-law model with constant variance
 
-`bgplm()` - Generalized power-law model with variance that may vary with
+`gplm()` - Generalized power-law model with variance that may vary with
 stage
 
 ## Installation

@@ -2,7 +2,7 @@
 #'
 #' evaluate_game uses the Bayes factor of two models to determine whether one model favors the other
 #'
-#' @param m a list of two model objects fit on the same dataset. Model objects allowed are "bgplm", "bgplm0", "bplm" and "bplm0"
+#' @param m a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"
 #' @return
 #' A data.frame with the summary of the results of the game
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
@@ -26,7 +26,7 @@ evaluate_game <- function(m){
 #'
 #' tournament compares four rating curve models of different complexities and determines which model is the most adequate
 #'
-#' @param ... if data and formula are set to NULL, one can add four model objects of types "bgplm", "bgplm0", "bplm" and "bplm0". This prevents the function from running all four models explicitly.
+#' @param ... if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
 #' @param data data.frame containing the variables specified in formula.
 #' @details  TODO
@@ -34,7 +34,7 @@ evaluate_game <- function(m){
 #' An object of type "tournament" with the following elements
 #' \describe{
 #'  \item{\code{summary}}{a data frame with information on reults of the different games in the tournament.}
-#'  \item{\code{contestants}}{model objects of types "bplm0","bplm","bpglm0" and "bgplm" being compared.}
+#'  \item{\code{contestants}}{model objects of types "plm0","plm","bpglm0" and "gplm" being compared.}
 #'  \item{\code{winner}}{model object of the tournament winner.}
 #' }
 #'
@@ -51,25 +51,25 @@ evaluate_game <- function(m){
 #' @export
 tournament <- function(...,formula=NULL,data=NULL) {
     args <- list(...)
-    error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types bgplm, bgplm0, bplm and bplm0.'
+    error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types gplm, gplm0, plm and plm0.'
     if(is.null(formula) | is.null(data)){
         if(length(args)!=4){
             stop(error_msg)
         }else{
             args_class <- sapply(args,class)
-            if(!all(sort(args_class)==c('bgplm','bgplm0','bplm','bplm0'))){
+            if(!all(sort(args_class)==c('gplm','gplm0','plm','plm0'))){
                 stop(error_msg)
             }else{
                 names(args) <- args_class
             }
         }
     }else{
-        args$bgplm <- bgplm(formula, data)
-        args$bgplm0 <- bgplm0(formula, data)
-        args$bplm <- bplm(formula, data)
-        args$bplm0 <- bplm0(formula, data)
+        args$gplm <- gplm(formula, data)
+        args$gplm0 <- gplm0(formula, data)
+        args$plm <- plm(formula, data)
+        args$plm0 <- plm0(formula, data)
     }
-    round1<- list(list(args$bgplm,args$bgplm0),list(args$bplm,args$bplm0))
+    round1<- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){
                     game_df <- evaluate_game(round1[[i]])
                     round_df <- data.frame(round=1,game=i)

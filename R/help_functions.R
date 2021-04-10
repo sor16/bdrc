@@ -1,6 +1,6 @@
 #' Prior parameter specification
 #'
-#'@param model character denoting which model to get the fixed values of parameters of prior distributions. One of bplm0,bplm,bgplm0,bgplm
+#'@param model character denoting which model to get the fixed values of parameters of prior distributions. One of plm0,plm,gplm0,gplm
 #'@param c_param The value of the parameter c, the stage at zero discharge. NULL if unknown
 #'@return
 #'The priors are based from data from rivers of a given country.If you want to add your country to this function,
@@ -19,7 +19,7 @@ priors <- function(model,c_param=NULL) {
         RC$c <- c_param
     }
     #if f(h)=b vs f(h)=b+beta(h)
-    if(model %in% c('bplm0','bplm')){
+    if(model %in% c('plm0','plm')){
         RC$sig_b <- 0.426;
         RC$Sig_x <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
         RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b))
@@ -32,7 +32,7 @@ priors <- function(model,c_param=NULL) {
     }
     RC$Sig_ab <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
     #if fixed variance vs not fixed variance
-    if(model %in% c('bplm0','bgplm0')){
+    if(model %in% c('plm0','gplm0')){
       RC$lambda_se <- 28.78
     }else{
       RC$lambda_eta_1 <- 28.78
@@ -130,13 +130,13 @@ get_MCMC_summary <- function(X,h=NULL){
 }
 
 get_param_names <- function(model,c_param){
-    if(model=='bplm0'){
+    if(model=='plm0'){
         hyper_param <- 'sigma_eps'
-    }else if(model=='bplm'){
+    }else if(model=='plm'){
         hyper_param <- c('sigma_eta',paste('eta',1:6,sep='_'))
-    }else if(model=='bgplm0'){
+    }else if(model=='gplm0'){
         hyper_param <- c('sigma_eps','sigma_beta','phi_beta')
-    }else if(model=='bgplm'){
+    }else if(model=='gplm'){
         hyper_param <- c('sigma_beta','phi_beta','sigma_eta',paste('eta',1:6,sep='_'))
     }
     if(is.null(c_param)){
@@ -276,8 +276,8 @@ transform_theta <- function(theta,theta_names){
 }
 
 get_desired_output <- function(model,RC){
-    const_var <- model %in% c('bplm0','bgplm0')
-    const_b <- model %in% c('bplm0','bplm')
+    const_var <- model %in% c('plm0','gplm0')
+    const_b <- model %in% c('plm0','plm')
     desired_output <- list('y_post'=list('observed'=RC$n,'unobserved'=RC$n_u),
                            'y_post_pred'=list('observed'=RC$n,'unobserved'=RC$n_u),
                            'D'=list('observed'=1,'unobserved'=0))

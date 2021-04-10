@@ -7,7 +7,7 @@
 tournament(..., formula = NULL, data = NULL)
 }
 \arguments{
-\item{...}{if data and formula are set to NULL, one can add four model objects of types "bgplm", "bgplm0", "bplm" and "bplm0". This prevents the function from running all four models explicitly.}
+\item{...}{if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.}
 
 \item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
 
@@ -17,7 +17,7 @@ tournament(..., formula = NULL, data = NULL)
 An object of type "tournament" with the following elements
 \describe{
  \item{\code{summary}}{a data frame with information on reults of the different games in the tournament.}
- \item{\code{contestants}}{model objects of types "bplm0","bplm","bpglm0" and "bgplm" being compared.}
+ \item{\code{contestants}}{model objects of types "plm0","plm","bpglm0" and "gplm" being compared.}
  \item{\code{winner}}{model object of the tournament winner.}
 }
 }
