@@ -135,7 +135,10 @@ plot_fun <- function(x,...){
             c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
             plot_dat <- merge(x[[type]],x$data,by.x='h',by.y=all.vars(x$formula)[2])
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
-            plot_dat$log_Q <- log(plot_dat$Q)
+
+            # plot_dat$log_Q <- log(plot_dat$Q)
+            plot_dat$log_Q <- log(plot_dat[, all.vars(x$formula)[1]])
+
             plot_dat$log_lower <- log(plot_dat$lower)
             plot_dat$log_median <- log(plot_dat$median)
             plot_dat$log_upper <- log(plot_dat$upper)
