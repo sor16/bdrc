@@ -3,5 +3,6 @@
 .RData
 inst/doc
 doc
+docs
 Meta
 tests/cached_results
