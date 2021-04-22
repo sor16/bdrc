@@ -24,3 +24,4 @@ Suggests:
     vdiffr
 VignetteBuilder: knitr
 BugReports: https://github.com/sor16/bdrc/issues
+Encoding: UTF-8
