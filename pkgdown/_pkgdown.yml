@@ -8,50 +8,54 @@ authors:
     href: https://english.hi.is/staff/birgirhr
   Solvi Rognvaldsson:
     href: https://github.com/sor16
+  Axel Orn Jansson:
+    href: https://github.com/axelornj
+  Rafael Vias:
+    href: https://github.com/RafaelVias
 
 reference:
   - title: Models
     contents:
-    - bplm0
-    - bplm
-    - bgplm0
-    - bgplm
+    - plm0
+    - plm
+    - gplm0
+    - gplm
 
   - title: Tournament - Model comparison
     contents:
     - tournament
 
-  - title: Methods for bplm0 objects
+  - title: Methods for plm0 objects
     contents:
-    - print.bplm0
-    - summary.bplm0
-    - autoplot.bplm0
-    - plot.bplm0
-    - predict.bplm0
+    - print.plm0
+    - summary.plm0
+    - autoplot.plm0
+    - plot.plm0
+    - predict.plm0
 
-  - title: Methods for bplm objects
+  - title: Methods for plm objects
     contents:
-    - print.bplm
-    - summary.bplm
-    - autoplot.bplm
-    - plot.bplm
-    - predict.bplm
+    - print.plm
+    - summary.plm
+    - autoplot.plm
+    - plot.plm
+    - predict.plm
 
-  - title: Methods for bgplm0 objects
+  - title: Methods for gplm0 objects
     contents:
-    - print.bgplm0
-    - summary.bgplm0
-    - autoplot.bgplm0
-    - plot.bgplm0
-    - predict.bgplm0
+    - print.gplm0
+    - summary.gplm0
+    - autoplot.gplm0
+    - plot.gplm0
+    - predict.gplm0
 
-  - title: Methods for bgplm objects
+  - title: Methods for gplm objects
     contents:
-    - print.bgplm
-    - summary.bgplm
-    - autoplot.bgplm
-    - plot.bgplm
-    - predict.bgplm
+    - print.gplm
+    - summary.gplm
+    - autoplot.gplm
+    - plot.gplm
+    - predict.gplm
 
   - title: Methods for tournament objects
     contents:
@@ -75,3 +79,25 @@ articles:
     - introduction
     - tournament
     - advanced_visualization
+
+navbar:
+  title: ~
+  type: default
+  left:
+    - text: Background
+      href: articles/background.html
+    - text: Reference
+      href: reference/index.html
+    - text: Articles
+      menu:
+      - text: Introduction to bdrc
+        href: articles/introduction.html
+      - text: Tournament - Model Comparison
+        href: articles/tournament.html
+      - text: Advanced Visualization
+        href: articles/advanced_visualization.html
+    - text: Shiny App
+      href: articles/shiny_app.html
+    - text: News
+      href: news/index.html
+
