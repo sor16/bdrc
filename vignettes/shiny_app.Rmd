@@ -18,6 +18,6 @@ knitr::opts_chunk$set(
   prompt=T
 )
 ```
-An interactive graphical user interface to fit rating curves using the bdrc ratin curve models is available as a Shiny App at the following link:  
+An interactive graphical user interface to fit rating curves using the bdrc rating curve models is available as a Shiny App at the following link:  
 [https://axelornj.shinyapps.io/BayesianRCmodel/](https://axelornj.shinyapps.io/BayesianRCmodel/)
 
