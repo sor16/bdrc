@@ -1,0 +1,23 @@
+---
+title: "Shiny App"
+author:
+date:
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Shiny App}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path='figs-shiny_app/',
+  fig.align='center',
+  prompt=T
+)
+```
+An interactive graphical user interface to fit rating curves using the bdrc ratin curve models is available as a Shiny App at the following link:  
+[https://axelornj.shinyapps.io/BayesianRCmodel/](https://axelornj.shinyapps.io/BayesianRCmodel/)
+
