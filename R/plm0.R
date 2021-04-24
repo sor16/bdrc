@@ -153,9 +153,8 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
         num_cores <- min(parallel::detectCores(),num_chains)
       }
       cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
-      parallel::setDefaultCluster(cl)
       parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-      parallel::clusterExport(NULL,'run_MCMC')
+      parallel::clusterExport(cl,'run_MCMC',envir = environment())
       MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
         run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
       })
