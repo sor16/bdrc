@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tournament - Model comparison • bdrc</title>
+<title>Background • bdrc</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Tournament - Model comparison">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Background">
 <meta property="og:description" content="bdrc">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -92,71 +92,26 @@
 
       
 
-      </header><script src="tournament_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="background_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Tournament - Model comparison</h1>
-                        <h4 class="author">Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
+      <h1 data-toc-skip>Background</h1>
+                        <h4 class="author">Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson"</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/tournament.Rmd"><code>vignettes/tournament.Rmd</code></a></small>
-      <div class="hidden name"><code>tournament.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/background.Rmd"><code>vignettes/background.Rmd</code></a></small>
+      <div class="hidden name"><code>background.Rmd</code></div>
 
     </div>
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="co">#load the packages needed for this vignette</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</span></code></pre></div>
-<p>We will use a dataset from a river called x in Sweden that comes with the package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(V316_river)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>V316_river</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt;         W     Q</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 1  1.2380  8.05</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 2  1.2470  8.37</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 3  1.2520  8.68</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; 4  1.2660  8.59</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 5  1.2680  8.38</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 6  1.2770 10.50</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 7  1.2800  9.33</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 8  1.2800  9.50</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 9  1.2830  9.29</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 10 1.2860  7.61</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 11 1.2960 10.20</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; 12 1.3000 10.10</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 13 1.3010  9.58</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 14 1.3100 10.35</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 15 1.3250 11.20</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; 16 1.3390 10.30</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; 17 1.3450 11.10</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; 18 1.3520 10.90</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt; 19 1.3540 12.40</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt; 20 1.3850 14.20</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt; 21 1.4125 16.80</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt; 22 1.4130 15.20</span></span>
-<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt; 23 1.4670 18.50</span></span>
-<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt; 24 1.4700 19.10</span></span>
-<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt; 25 1.4800 19.40</span></span>
-<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt; 26 1.5660 24.40</span></span>
-<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt; 27 1.6260 27.50</span></span>
-<span id="cb2-31"><a href="#cb2-31"></a><span class="co">#&gt; 28 1.6300 29.60</span></span>
-<span id="cb2-32"><a href="#cb2-32"></a><span class="co">#&gt; 29 1.6580 31.70</span></span></code></pre></div>
-<div id="find-the-most-adequate-model" class="section level2">
-<h2 class="hasAnchor">
-<a href="#find-the-most-adequate-model" class="anchor"></a>Find the most adequate model</h2>
-</div>
-<div id="compare-different-components-of-the-models" class="section level2">
-<h2 class="hasAnchor">
-<a href="#compare-different-components-of-the-models" class="anchor"></a>Compare different components of the models</h2>
-</div>
+<p>This is a vignette on the background of Bayesian discharge rating curves</p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
