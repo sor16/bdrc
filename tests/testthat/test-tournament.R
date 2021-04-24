@@ -11,7 +11,7 @@ test_that("the tournament object is in tact", {
     expect_is(t_obj$contestants$plm,"plm")
     expect_is(t_obj$contestants$gplm0,"gplm0")
     expect_is(t_obj$contestants$gplm,"gplm")
-    expect_true(all(sapply(1:nrow(t_obj$summary),function(i) t_obj$contestants[[t_obj$summary$model[i]]]$DIC==t_obj$summary$DIC[i])))
+    sapply(1:nrow(t_obj$summary),function(i) expect_equal(t_obj$contestants[[t_obj$summary$model[i]]]$DIC,t_obj$summary$DIC[i]))
 })
 
 test_that("Tournament object remains the same", {
