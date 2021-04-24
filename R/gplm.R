@@ -207,7 +207,7 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
     parallel::setDefaultCluster(cl)
     parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-    parallel::clusterExport(cl,'run_MCMC',envir = environment())
+    parallel::clusterExport(cl,c('run_MCMC','initiate_output_list'),envir = environment())
     MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
       run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
     })
