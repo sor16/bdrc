@@ -123,7 +123,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             plot_dat$log_median <- log(plot_dat$median)
             plot_dat$log_upper <- log(plot_dat$upper)
             p <- ggplot(data=plot_dat) +
-                geom_point(aes(x=.data$`log(h-c_hat)`,y=.data$log_Q)) +
+                geom_point(aes(x=.data$`log(h-c_hat)`,y=.data$log_Q), size=.9, shape=21, fill="gray60", color="black") +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_median)) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed') +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed') +
@@ -137,7 +137,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
             y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
             p <- ggplot(data=x[[type]]) +
-                geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]])) +
+                geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]]), size=.9, shape=21, fill="gray60", color="black") +
                 geom_path(aes(x=.data$median,y=.data$h)) +
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed') +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed') +
@@ -227,7 +227,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
         #to generate label - latex2exp::TeX("$log(\\textit{h - \\hat{c}})$",'character')
         x_lab <- "paste('','log','(','',italic(paste('h',phantom() - phantom(),'',hat(paste('c')))),')','','')"
         p <- ggplot(data=resid_dat) +
-            geom_point(aes(.data$`log(h-c_hat)`,.data$r_median),size=2) +
+            geom_point(aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black") +
             geom_path(aes(.data$`log(h-c_hat)`,.data$r_lower),linetype='dashed') +
             geom_path(aes(.data$`log(h-c_hat)`,.data$r_upper),linetype='dashed') +
             geom_abline(intercept=0,slope=0,size=1.1) +
