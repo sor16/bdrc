@@ -84,6 +84,10 @@ gather_draws <- function(mod,...,transformed=F){
         }
     }))
     args_rollout <- unique(args_rollout)
+    f_not_generalized <- any(grepl('^f$',args_rollout)) & is.null(mod$f_posterior)
+    if(f_not_generalized){
+        args_rollout[grepl('^f$',args_rollout)] <- 'b'
+    }
     if(all(args_rollout %in% gsub('_posterior','',names(mod)))){
         stage_dependent <- any(sapply(args_rollout,function(x) !is.null(dim(mod[[paste0(x,'_posterior')]]))))
         if(stage_dependent){
@@ -108,6 +112,9 @@ gather_draws <- function(mod,...,transformed=F){
     }else{
         not_recognized <- which(!(args %in% c(paste0(names(mod),'_posterior'),'latent_parameters','hyperparameters')))
         stop(paste0('Does not recognize the following input arguments in the model object:\n',paste('\t-',args[not_recognized],collapse='\n')))
+    }
+    if(f_not_generalized){
+        out_dat$name[out_dat$name=='b'] <- 'f'
     }
     return(out_dat)
 }
