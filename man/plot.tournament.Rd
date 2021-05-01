@@ -4,25 +4,24 @@
 \alias{plot.tournament}
 \title{Plot comparison of models in tournament}
 \usage{
-\method{plot}{tournament}(x, ...)
+\method{plot}{tournament}(x, type = "deviance", transformed = F, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
 
-\item{...}{Arguments to be passed to other methods. The following arguments are supported:
+\item{type}{a character denoting what type of plot should be drawn. Possible types are
 \itemize{
-  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
-                   \itemize{
-                      \item{"Deviance"}{ to plot the rating curve on original scale.}
-                      \item{"rating_curve"}{ to plot the rating curve on original scale.}
-                      \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-                      \item{"f"}{ to plot the power-law exponent}
-                      \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-                      \item{"residuals"}{ to plot the log residuals}
-                   }}
-  \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-  \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-}}
+  \item{"deviance"}{ to plot the rating curve on original scale.}
+  \item{"rating_curve"}{ to plot the rating curve on original scale.}
+  \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
+  \item{"f"}{ to plot the power-law exponent}
+  \item{"sigma_eps"}{ to plot the standard deviation on the data level}
+  \item{"residuals"}{ to plot the log residuals}
+ }}
+
+\item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+
+\item{title}{of the plot. Defaults to NULL, i.e. no title}
 }
 \description{
 Compare the four models from the tournament object in multiple ways
@@ -34,7 +33,7 @@ f <- Q~W
 t_obj <- tournament(f,V316_river)
 plot(t_obj)
 plot(t_obj,type='rating_curve_log')
-plot(t_obj,type='Deviance')
+plot(t_obj,type='deviance')
 plot(t_obj,type='f')
 plot(t_obj,type='sigma_eps')
 plot(t_obj,type='residuals')

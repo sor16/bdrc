@@ -4,14 +4,14 @@
 \alias{tournament}
 \title{Determine the most adequate rating curve model}
 \usage{
-tournament(..., formula = NULL, data = NULL)
+tournament(formula = NULL, data = NULL, c_param = NULL, ...)
 }
 \arguments{
-\item{...}{if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.}
-
 \item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
 
 \item{data}{data.frame containing the variables specified in formula.}
+
+\item{...}{if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.}
 }
 \value{
 An object of type "tournament" with the following elements

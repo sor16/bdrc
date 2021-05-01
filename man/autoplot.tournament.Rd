@@ -4,19 +4,17 @@
 \alias{autoplot.tournament}
 \title{Autoplot - Comparison of models in tournament}
 \usage{
-\method{autoplot}{tournament}(x, ...)
+\method{autoplot}{tournament}(x, type = "deviance", ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
 
-\item{...}{Arguments to be passed to other methods. The following arguments are supported:
+\item{type}{a character denoting what type of plot should be drawn. Possible types are
 \itemize{
-  \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
-                   \itemize{
-                      \item{"Deviance"}{ to plot the rating curve on original scale.}
-                   }}
-  \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
+ \item{"deviance"}{ to plot the rating curve on original scale.}
 }}
+
+\item{...}{not used in this function}
 }
 \description{
 Compare the four models from the tournament object in different ways
