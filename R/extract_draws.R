@@ -23,7 +23,7 @@
 #'}
 #'@export
 spread_draws <- function(mod,...,transformed=F){
-    gathered_dat <- gather_draws(mod,...,transformed = F)
+    gathered_dat <- gather_draws(mod,...,transformed=transformed)
     if('h' %in% names(gathered_dat)){
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
                                   chain=sort(unique(gathered_dat$chain)),
