@@ -27,11 +27,11 @@ spread_draws <- function(mod,...,transformed=F){
     if('h' %in% names(gathered_dat)){
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
                                   chain=sort(unique(gathered_dat$chain)),
-                                  h=sort(unique(gathered_dat$h)))
+                                  h=sort(unique(gathered_dat$h)),stringsAsFactors = F)
         spread_dat <- spread_dat[,c('chain','iter','h')]
     }else{
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
-                                  chain=sort(unique(gathered_dat$chain)))
+                                  chain=sort(unique(gathered_dat$chain)),stringsAsFactors = F)
         spread_dat <- spread_dat[,c('chain','iter')]
     }
     mod_res_list <- lapply(unique(gathered_dat$name),function(n){
@@ -93,11 +93,11 @@ gather_draws <- function(mod,...,transformed=F){
         if(stage_dependent){
             baseline_dat <- expand.grid(iter=seq_len((mod$run_info$nr_iter-mod$run_info$burnin)/mod$run_info$thin+1),
                                         chain=1:mod$run_info$num_chains,
-                                        h=mod$rating_curve$h)
+                                        h=mod$rating_curve$h,stringsAsFactors = F)
             baseline_dat <- baseline_dat[,c('chain','iter','h')]
         }else{
             baseline_dat <- expand.grid(iter=seq_len((mod$run_info$nr_iter-mod$run_info$burnin)/mod$run_info$thin+1),
-                                        chain=1:mod$run_info$num_chains)
+                                        chain=1:mod$run_info$num_chains,stringsAsFactors = F)
             baseline_dat <- baseline_dat[,c('chain','iter')]
         }
         out_dat_list <- lapply(args_rollout,function(x){
@@ -134,7 +134,7 @@ gather_draws_param <- function(mod,param,transformed,baseline_dat){
     }
     out_dat <- baseline_dat
     if('h' %in% names(baseline_dat)){
-        param_dat <- expand.grid(name=param_name,value=MCMC_output,h=mod$rating_curve$h)
+        param_dat <- expand.grid(name=param_name,value=MCMC_output,h=mod$rating_curve$h,stringsAsFactors = F)
         out_dat <- cbind(out_dat,param_dat[,c('name','value')])
     }else{
         out_dat$name <- param_name
