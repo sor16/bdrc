@@ -81,8 +81,8 @@ autoplot.tournament <- function(x,...){
             data.frame(model=class(m),DIC=c(m$DIC))
         })
         DIC_dat <- do.call(rbind,DIC_dat)
-        p <- ggplot() +
-             geom_boxplot(data=Deviance_post_dat,aes(x=.data$model,y=.data$D),size=.4,color="black",outlier.size=0.1,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
+        p <- ggplot(data=Deviance_post_dat,aes(x=.data$model,y=.data$D)) +
+             geom_boxplot(size=.4,color="black",outlier.size=0.1,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
              stat_boxplot(geom='errorbar') +
              geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
              geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
