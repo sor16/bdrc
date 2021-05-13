@@ -146,15 +146,11 @@
     <p>tournament compares four rating curve models of different complexities and determines which model is the most adequate</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tournament</span><span class='op'>(</span><span class='va'>...</span>, formula <span class='op'>=</span> <span class='cn'>NULL</span>, data <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>tournament</span><span class='op'>(</span>formula <span class='op'>=</span> <span class='cn'>NULL</span>, data <span class='op'>=</span> <span class='cn'>NULL</span>, c_param <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>...</th>
-      <td><p>if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.</p></td>
-    </tr>
     <tr>
       <th>formula</th>
       <td><p>an object of class "formula", with discharge column name as response and stage column name as a covariate.</p></td>
@@ -162,6 +158,10 @@
     <tr>
       <th>data</th>
       <td><p>data.frame containing the variables specified in formula.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.</p></td>
     </tr>
     </table>
 
