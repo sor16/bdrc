@@ -63,23 +63,17 @@ autoplot.tournament <- function(x,type='deviance',...){
         deviance_post_dat <- lapply(x$contestants,function(m){
             data.frame(model=class(m),D=c(m$deviance_posterior))
         })
-<<<<<<< HEAD
         deviance_post_dat <- do.call(rbind,deviance_post_dat)
-        p <- ggplot() +
-             geom_boxplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D),width=0.4) +
-=======
-        Deviance_post_dat <- do.call(rbind,Deviance_post_dat)
         DIC_dat <- lapply(x$contestants,function(m){
             data.frame(model=class(m),DIC=c(m$DIC))
         })
         DIC_dat <- do.call(rbind,DIC_dat)
-        p <- ggplot(data=Deviance_post_dat,aes(x=.data$model,y=.data$D)) +
+        p <- ggplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D)) +
              geom_boxplot(size=.4,color="black",outlier.size=0.1,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
              stat_boxplot(geom='errorbar',width=0.4) +
              geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
              geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
              theme_bdrc() +
->>>>>>> d80a4d69d8c984acb6f01c72a0c5905a781eefca
              xlab('Model') +
              ylab('deviance')
     }
