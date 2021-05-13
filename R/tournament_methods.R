@@ -38,14 +38,11 @@ summary.tournament <- function(object,...){
 #' Compare the four models from the tournament object in different ways
 #'
 #' @param x an object of class "tournament"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
+#' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
-#'   \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
-#'                    \itemize{
-#'                       \item{"Deviance"}{ to plot the rating curve on original scale.}
-#'                    }}
-#'   \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
+#'  \item{"deviance"}{ to plot the rating curve on original scale.}
 #' }
+#' @param ... not used in this function
 #' @seealso \code{\link{summary.tournament}} for summaries
 #' @examples
 #' \dontrun{
@@ -57,33 +54,21 @@ summary.tournament <- function(object,...){
 #' @importFrom ggplot2 ggplot geom_boxplot xlab ylab
 #' @importFrom rlang .data
 #' @export
-autoplot.tournament <- function(x,...){
+autoplot.tournament <- function(x,type='deviance',...){
     args <- list(...)
-    if('type' %in% names(args)){
-        type <- args$type
-    }else{
-        type <- 'Deviance'
-    }
-    if('title' %in% names(args)){
-        title <- args$title
-    }else{
-        title <- NULL
-    }
-    legal_types <- c('Deviance')
+    legal_types <- c('deviance')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
-    }else if(type=="Deviance"){
-        Deviance_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),D=c(m$Deviance_posterior))
+    }else if(type=="deviance"){
+        deviance_post_dat <- lapply(x$contestants,function(m){
+            data.frame(model=class(m),D=c(m$deviance_posterior))
         })
-        Deviance_post_dat <- do.call(rbind,Deviance_post_dat)
+        deviance_post_dat <- do.call(rbind,deviance_post_dat)
         p <- ggplot() +
-             geom_boxplot(data=Deviance_post_dat,aes(x=.data$model,y=.data$D),width=0.4) +
-             theme_bdrc() +
+             geom_boxplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D),width=0.4) +
              xlab('Model') +
-             ylab('Deviance')
+             ylab('deviance')
     }
-    #TODO - add num effective parameters plot
     return(p)
 }
 
@@ -93,20 +78,17 @@ autoplot.tournament <- function(x,...){
 #' Compare the four models from the tournament object in multiple ways
 #'
 #' @param x an object of class "tournament"
-#' @param ... Arguments to be passed to other methods. The following arguments are supported:
+#' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
-#'   \item{\code{type}}{ a character denoting what type of plot should be drawn. Possible types are
-#'                    \itemize{
-#'                       \item{"Deviance"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'                       \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'                       \item{"f"}{ to plot the power-law exponent}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'                       \item{"residuals"}{ to plot the log residuals}
-#'                    }}
-#'   \item{\code{transformed}}{ a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
-#'   \item{\code{title}}{ title of the plot. Defaults to NULL, i.e. no title}
-#' }
+#'   \item{"deviance"}{ to plot the rating curve on original scale.}
+#'   \item{"rating_curve"}{ to plot the rating curve on original scale.}
+#'   \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
+#'   \item{"f"}{ to plot the power-law exponent}
+#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
+#'   \item{"residuals"}{ to plot the log residuals}
+#'  }
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title of the plot. Defaults to NULL, i.e. no title
 #' @seealso \code{\link{summary.tournament}} for summaries
 #' @examples
 #' \dontrun{
@@ -115,7 +97,7 @@ autoplot.tournament <- function(x,...){
 #' t_obj <- tournament(f,V316_river)
 #' plot(t_obj)
 #' plot(t_obj,type='rating_curve_log')
-#' plot(t_obj,type='Deviance')
+#' plot(t_obj,type='deviance')
 #' plot(t_obj,type='f')
 #' plot(t_obj,type='sigma_eps')
 #' plot(t_obj,type='residuals')
@@ -124,22 +106,17 @@ autoplot.tournament <- function(x,...){
 #' @importFrom gridExtra grid.arrange
 #' @importFrom grid grid.draw
 #' @export
-plot.tournament <- function(x,...){
+plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
-    if('transformed' %in% names(args)){
-        transformed <- args$transformed
-    }else{
-        transformed <- F
-    }
-    legal_types <- c("Deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals")
-    if(is.null(args$type) || args$type=='Deviance'){
-        p <- autoplot(x,...)
-    }else if(args$type=="residuals"){
+    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals")
+    if(is.null(type) || type=='deviance'){
+        p <- autoplot(x,transformed=transformed)
+    }else if(type=="residuals"){
         plot_list <- lapply(x$contestants,function(m){
-                        autoplot(m,type=args$type,title=class(m))
+                        autoplot(m,type=type,title=class(m))
                     })
         p <- do.call(grid.arrange,c(plot_list,ncol=2))
-    }else if(args$type=="sigma_eps"){
+    }else if(type=="sigma_eps"){
         ylim_dat <- sapply(x$contestants,function(m){
                         if(grepl('0',class(m))){
                             c(m$param_summary['sigma_eps','lower'],m$param_summary['sigma_eps','upper'])
@@ -150,10 +127,10 @@ plot.tournament <- function(x,...){
         ylim_min <- max(c(0,min(ylim_dat[1,])))
         ylim_max <- max(ylim_dat[2,])
         plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=args$type,title=class(m)) + ylim(ylim_min,ylim_max)
+            autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max)
         })
         p <- do.call(grid.arrange,c(plot_list,ncol=2))
-    }else if(args$type=="f"){
+    }else if(type=="f"){
         ylim_dat <- sapply(x$contestants,function(m){
             if(!grepl('g',class(m))){
                 c(m$param_summary['b','lower'],m$param_summary['b','upper'])
@@ -164,12 +141,12 @@ plot.tournament <- function(x,...){
         ylim_min <- min(ylim_dat[1,])
         ylim_max <- max(ylim_dat[2,])
         plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=args$type,title=class(m)) + ylim(ylim_min,ylim_max)
+            autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max)
         })
         p <- do.call(grid.arrange,c(plot_list,ncol=2))
-    }else if(args$type %in% c("rating_curve","rating_curve_mean")){
+    }else if(type %in% c("rating_curve","rating_curve_mean")){
         plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=args$type,transformed=args$transformed,title=class(m))
+            autoplot(m,type=type,transformed=transformed,title=class(m))
         })
         p <- do.call(grid.arrange,c(plot_list,ncol=2))
     }else{
@@ -181,3 +158,12 @@ plot.tournament <- function(x,...){
         grid.draw(p)
     }
 }
+
+#Idea, create graphical plot for tournament games
+#df <- data.frame(round=c(1,1,1,1,2,2,3),
+#                 game=c(1,1,2,2,1,1,1),
+#                 model=c(c('plm0','plm','gplm0','gplm'),c('plm0','gplm'),'plm0'),
+#                 xloc=c(rep(0,4),rep(1,2),2),
+#                 yloc=c(seq(0,3,by=1),c(0.5,2.5),1.5))
+# seg_dat <- data.frame(x1=c(c(xloc[1:4]),y))
+#ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
