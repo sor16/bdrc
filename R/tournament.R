@@ -51,11 +51,11 @@ evaluate_game <- function(m){
 #' plot(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,c_param=NULL,...) {
+tournament <- function(formula=NULL,data=NULL,...) {
     args <- list(...)
     error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types gplm, gplm0, plm and plm0.'
-    if(!inherits(formula,'formula') | !is.data.frame(data) | (!is.numeric(c_param) & length(c_param)==1)){
-        args <- c(list(formula,data,c_param),args)
+    if(!inherits(formula,'formula') | !is.data.frame(data)){
+        args <- c(list(formula,data),args)
         if(length(args)!=4){
             stop(error_msg)
         }else{
@@ -68,17 +68,16 @@ tournament <- function(formula=NULL,data=NULL,c_param=NULL,...) {
                 if(length(unique(lapply(args,function(x) x$data)))!=1){
                     stop('The four models added have to be fit on the same data set')
                 }
-                c_param <- unique(lapply(args,function(x) x$c_param))
-                if(length(c_param)!=1){
+                if(length(unique(lapply(args,function(x) x$c_param)))!=1){
                     stop('The four models added have to be fit either all with the same stage of zero discharge (c), or all with unknown c')
                 }
             }
         }
     }else{
-        args$gplm <- gplm(formula, data, c_param=c_param)
-        args$gplm0 <- gplm0(formula, data, c_param=c_param)
-        args$plm <- plm(formula, data, c_param=c_param)
-        args$plm0 <- plm0(formula, data, c_param=c_param)
+        args$gplm <- gplm(formula, data, ...)
+        args$gplm0 <- gplm0(formula, data, ...)
+        args$plm <- plm(formula, data, ...)
+        args$plm0 <- plm0(formula, data, ...)
     }
     round1<- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){
