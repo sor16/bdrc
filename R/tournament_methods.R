@@ -61,7 +61,7 @@ autoplot.tournament <- function(x,type='deviance',...){
         stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
     }else if(type=="deviance"){
         deviance_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),D=c(m$deviance_posterior))
+            data.frame(model=class(m),D=c(m$Deviance_posterior))
         })
         deviance_post_dat <- do.call(rbind,deviance_post_dat)
         DIC_dat <- lapply(x$contestants,function(m){
