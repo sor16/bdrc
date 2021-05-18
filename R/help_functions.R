@@ -333,7 +333,7 @@ h_unobserved <- function(RC,h_min=NA,h_max=NA){
   distvect=abs(h-c(h[2:length(h)],1000))
   #add datapoints to corresponding distances to see range of distance
   distwithdata=rbind(h,distvect,c(h[2:length(h)],1000))
-  distfilter=distwithdata[,distvect>max_h_diff]
+  distfilter=distwithdata[,distvect>max_h_diff,drop=F]
   #remove dummy distance
   distfilter=as.matrix(distfilter[,-ncol(distfilter)])
   if(ncol(distfilter)!=0){
