@@ -74,8 +74,8 @@ autoplot.tournament <- function(x,type='deviance',...){
              geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
              geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
              theme_bdrc() +
-             xlab('Model') +
-             ylab('deviance')
+             xlab('') +
+             ylab('Deviance')
     }
     return(p)
 }
