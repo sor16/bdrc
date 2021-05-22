@@ -235,7 +235,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             ylab(parse(text=y_lab)) +
             theme_bdrc()
     }else if(type=='rhat'){                                                                                  
-        rhat_dat <- get_rhat_dat(x,param,smoothness=40)
+        rhat_dat <- get_rhat_dat(x,param)
         p <- ggplot(data=rhat_dat, aes(x=iterations,y=Rhat,color=parameters)) +
             geom_hline(yintercept = 1.1,linetype='dashed') +
             geom_line() +
@@ -243,7 +243,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
-        auto_dat <- get_autocorrelation_dat(x,param,lags=20)
+        auto_dat <- get_autocorrelation_dat(x,param)
         p <- ggplot(data=auto_dat, aes(x=lags,y=autocorrelation,color=parameters)) +
             geom_hline(yintercept=0) +
             geom_line() +
