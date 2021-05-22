@@ -240,14 +240,14 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_hline(yintercept = 1.1,linetype='dashed') +
             geom_line() +
             scale_y_continuous(expand=c(0,0),limits=c(0.99,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
-            scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000,20000)) +
+            scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
         auto_dat <- get_autocorrelation_dat(x,param,lags=20)
         p <- ggplot(data=auto_dat, aes(x=lags,y=autocorrelation,color=parameters)) +
             geom_hline(yintercept=0) +
             geom_line() +
-            geom_point() +
+            geom_point(size=1) +
             scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }
