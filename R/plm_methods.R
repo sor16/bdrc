@@ -57,7 +57,7 @@ theme_bdrc <- function(){
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
-    cbPalette <- c("#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#999999","#000000","#E69F00","#56B4E9")
+    cbPalette <- c("#009E73","#0072B2","#D55E00","#CC79A7","#999999","#000000","#E69F00","#56B4E9","hotpink","slateblue1","red","green")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','rhat','autocorrelation')
     types_with_param <- c('trace','histogram','rhat','autocorrelation')
     if(!(type %in% legal_types)){
