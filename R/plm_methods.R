@@ -127,7 +127,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_median)) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed') +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed') +
-                scale_x_continuous(expand=c(0.01,0)) +
+                #scale_y_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
@@ -141,8 +141,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$median,y=.data$h)) +
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed') +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed') +
-                scale_x_continuous(expand=c(0,0)) +
-                scale_y_continuous(expand=c(0.01,0)) +
+                #scale_x_continuous(expand=c(0,0)) +
+                #scale_y_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
