@@ -97,6 +97,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
     attr(out_obj, "class") <- "tournament"
     out_obj$contestants <- args[!(names(args) %in% c('formula','data'))]
     out_obj$winner <- round2[[which(round2_res$winner)]]
+    attr(out_obj$winner, "class") <- class(round2[[which(round2_res$winner)]])                                    
     out_obj$summary <- rbind(round1_res,round2_res)
     return(out_obj)
 }

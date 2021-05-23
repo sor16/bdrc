@@ -61,7 +61,7 @@ autoplot.tournament <- function(x,type='deviance',...){
         stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
     }else if(type=="deviance"){
         deviance_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),D=c(m$deviance_posterior))
+            data.frame(model=class(m),D=c(m$Deviance_posterior))
         })
         deviance_post_dat <- do.call(rbind,deviance_post_dat)
         DIC_dat <- lapply(x$contestants,function(m){
@@ -74,8 +74,8 @@ autoplot.tournament <- function(x,type='deviance',...){
              geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
              geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
              theme_bdrc() +
-             xlab('Model') +
-             ylab('deviance')
+             xlab('') +
+             ylab('Deviance')
     }
     return(p)
 }

@@ -57,12 +57,12 @@ theme_bdrc <- function(){
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
-    legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram')
-    types_with_param <- c('trace','histogram')
+    legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','rhat','autocorrelation')
+    types_with_param <- c('trace','histogram','rhat','autocorrelation')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
     }else if(type %in% types_with_param & is.null(param)){
-        stop('If type histogram or trace, param must be non-null, should be a character vector of the names parameters to visualize.')
+        stop('If type histogram, trace, rhat or autocorrelation param must be non-null, should be a character vector of the names parameters to visualize.')
     }else if(type=='trace'){
         plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
@@ -233,6 +233,22 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_abline(intercept=0,slope=0,size=1.1) +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
+            theme_bdrc()
+    }else if(type=='rhat'){                                                                                  
+        rhat_dat <- get_rhat_dat(x,param)
+        p <- ggplot(data=rhat_dat, aes(x=iterations,y=Rhat,color=parameters)) +
+            geom_hline(yintercept = 1.1,linetype='dashed') +
+            geom_line() +
+            scale_y_continuous(expand=c(0,0),limits=c(0.99,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
+            scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
+            theme_bdrc()
+    }else if(type=='autocorrelation'){
+        auto_dat <- get_autocorrelation_dat(x,param)
+        p <- ggplot(data=auto_dat, aes(x=lags,y=autocorrelation,color=parameters)) +
+            geom_hline(yintercept=0) +
+            geom_line() +
+            geom_point(size=1) +
+            scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }
     if(!is.null(title)){
