@@ -79,7 +79,7 @@ initiate_output_list <- function(desired_output,nr_iter){
     return(output_list)
 }
 
-run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20000,num_chains=4,burnin=2000,thin=5){
+run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,pb,chain,parallel,nr_iter=20000,burnin=2000,thin=5){
     theta_mat <- matrix(0,nrow=RC$theta_length,ncol=nr_iter)
     output_list <- initiate_output_list(RC$desired_output,nr_iter)
     density_eval_m <- density_fun(theta_m,RC)
@@ -98,6 +98,9 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
         theta_mat[,i] <- theta_old
         for(elem in names(RC$desired_output)){
             output_list[[elem]][1:RC$desired_output[[elem]][['observed']],i] <- density_eval_old[[elem]]
+        }
+        if(chain==1 & parallel | !parallel){
+          utils::setTxtProgressBar(pb, (chain-1)*nr_iter+i)
         }
     }
     idx <- seq(burnin,nr_iter,thin)
