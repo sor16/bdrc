@@ -57,6 +57,7 @@ theme_bdrc <- function(){
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
+    cbPalette <- c("#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#999999","#000000","#E69F00","#56B4E9")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','rhat','autocorrelation')
     types_with_param <- c('trace','histogram','rhat','autocorrelation')
     if(!(type %in% legal_types)){
@@ -241,6 +242,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_line() +
             scale_y_continuous(expand=c(0,0),limits=c(0.99,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
             scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
+            scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
         auto_dat <- get_autocorrelation_dat(x,param)
@@ -249,6 +251,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_line() +
             geom_point(size=1) +
             scale_x_continuous(expand=c(0,0)) +
+            scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }
     if(!is.null(title)){
