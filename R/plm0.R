@@ -61,9 +61,8 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]
-    if(!is.null(c_param) && min(h)<c_param){
-        stop('c_param must be lower than the minimum stage value in the data')
-    }
+    if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
+    if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- plm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
     result_obj=list()
     attr(result_obj, "class") <- "plm0"
@@ -95,6 +94,15 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     result_obj$D_hat <- MCMC_output_list$D_hat
     result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
     result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
+    #Rhat and autocorrelation
+    ##=== NEW start
+    autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
+    names(autocorrelation_df) <- get_param_names('plm0',c_param)
+    autocorrelation_df$lag <- 1:nrow(autocorrelation_df)
+    result_obj$autocorrelation <- autocorrelation_df[,c('lag',get_param_names('plm0',c_param))]
+    result_obj$num_effective_samples <- data.frame(param=get_param_names('plm0',c_param),num_effective_samples=MCMC_output_list$num_effective_samples)
+    result_obj$r_hat <- data.frame(param=get_param_names('plm0',c_param),r_hat=MCMC_output_list$r_hat)
+    ##=== NEW stop
     # store other information
     result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
@@ -141,40 +149,11 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     RC$n_u <- length(RC$h_u)
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output('plm0',RC)
-    if(num_chains>4){
-      stop('Max number of chains is 4. Please pick a lower number of chains')
-    }
-    if(parallel){
-      chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-      if (nzchar(chk) && chk == "TRUE") {
-        # use 2 cores in CRAN/Travis/AppVeyor
-        num_cores <- 2L
-      } else {
-        num_cores <- min(parallel::detectCores(),num_chains)
-      }
-      cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
-      parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-      parallel::clusterExport(cl,c('run_MCMC','initiate_output_list','pri'),envir = environment())
-      MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
-        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
-      })
-      parallel::stopCluster(cl)
-    }else{
-      MCMC_output_list <- lapply(1:num_chains,function(i){
-        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
-      })
-    }
-
-    output_list <- list()
-    for(elem in names(MCMC_output_list[[1]])){
-      output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
-    }
-    #Calculate Dhat
-    theta_median <- apply(output_list$theta,1,median)
-    if(!is.null(c_param)){
-      theta_median <- c(log(RC$h_min-RC$c),theta_median)
-    }
-    output_list[['D_hat']] <- plm0.calc_Dhat(theta_median,RC)
+    output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
+                                        unobserved_prediction_fun=unobserved_prediction_fun,
+                                        parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                        burnin=burnin,thin=thin)
+    output_list$D_hat <- plm0.calc_Dhat(output_list$theta,RC)
     #refinement of list elements
     if(is.null(RC$c)){
       output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -183,9 +162,8 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
       output_list$theta[1,] <- sqrt(exp(output_list$theta[1,]))
     }
     output_list$x[1,] <- exp(output_list$x[1,])
-    output_list[['h']] <- c(RC$h,RC$h_u)
-    output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
-    output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+    output_list$h <- c(RC$h,RC$h_u)
+    output_list$run_info <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
     return(output_list)
 }
 
@@ -242,8 +220,12 @@ plm0.density_evaluation_unknown_c <- function(theta,RC){
 }
 
 plm0.calc_Dhat <- function(theta,RC){
-  zeta <- theta[1]
-  log_sig_eps2 <- theta[2]
+  theta_median <- apply(theta,1,median)
+  if(!is.null(RC$c)){
+    theta_median <- c(log(RC$h_min-RC$c),theta_median)
+  }
+  zeta <- theta_median[1]
+  log_sig_eps2 <- theta_median[2]
   l=c(log(RC$h-RC$h_min+exp(zeta)))
   varr=RC$epsilon*exp(log_sig_eps2)
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
@@ -254,7 +236,6 @@ plm0.calc_Dhat <- function(theta,RC){
   w=solve(L,RC$y-X%*%RC$mu_x)
   x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
-
   D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
   return(D)
 }
