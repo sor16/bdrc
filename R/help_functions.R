@@ -170,14 +170,7 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
   within_chain_var <- rowMeans(output_list$param_var)
   chain_var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
   output_list$r_hat <- sqrt(chain_var_hat/within_chain_var)
-  # print(output_list$param_var)
-  # print(output_list$param_mean)
-  # print(n)
-  # print(between_chain_var)
-  # print(within_chain_var)
-  # print(chain_var_hat)
-  # print((2*matrix(rep(chain_var_hat,T_max),nrow=num_chains)))
-  output_list$autocorrelation <- 1-variogram/(2*matrix(rep(chain_var_hat,T_max),nrow=num_chains))
+  output_list$autocorrelation <- 1-variogram/(2*matrix(rep(chain_var_hat,T_max),nrow=nrow(variogram)))
   output_list$num_effective_samples <-round(m*n/(1+2*rowSums(output_list$autocorrelation)))
   output_list$acceptance_rate <- sum(output_list$acceptance_vec)/ncol(output_list$acceptance_vec)
   output_list$param_mean <- output_list$param_var <- output_list$variogram_chain <- NULL
