@@ -79,7 +79,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
         args$plm <- plm(formula, data, ...)
         args$plm0 <- plm0(formula, data, ...)
     }
-    round1<- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
+    round1 <- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){
                     game_df <- evaluate_game(round1[[i]])
                     round_df <- data.frame(round=1,game=i)
@@ -97,7 +97,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
     attr(out_obj, "class") <- "tournament"
     out_obj$contestants <- args[!(names(args) %in% c('formula','data'))]
     out_obj$winner <- round2[[which(round2_res$winner)]]
-    attr(out_obj$winner, "class") <- class(round2[[which(round2_res$winner)]])                                    
+    attr(out_obj$winner, "class") <- class(round2[[which(round2_res$winner)]])
     out_obj$summary <- rbind(round1_res,round2_res)
     return(out_obj)
 }
