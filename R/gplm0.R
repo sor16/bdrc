@@ -68,11 +68,8 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]
-    if(!is.null(c_param)){
-      if(min(h)<c_param){
-        stop('c_param must be lower than the minimum stage value in the data')
-      }
-    }
+    if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
+    if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- gplm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
     #prepare S3 model object to be returned
     result_obj=list()
@@ -172,40 +169,15 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
     RC$B_u <- B_splines(h_u_std)
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output('gplm0',RC)
-    if(num_chains>4){
-        stop('Max number of chains is 4. Please pick a lower number of chains')
-    }
-    if(parallel){
-      chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-      if (nzchar(chk) && chk == "TRUE") {
-        # use 2 cores in CRAN/Travis/AppVeyor
-        num_cores <- 2L
-      } else {
-        num_cores <- min(parallel::detectCores(),num_chains)
-      }
-      cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
-      parallel::setDefaultCluster(cl)
-      parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-      parallel::clusterExport(cl,c('run_MCMC','initiate_output_list','pri'),envir = environment())
-      MCMC_output_list <- parallel::parLapply(cl,1:num_chains,fun=function(i){
-        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
-      })
-      parallel::stopCluster(cl)
-    }else{
-      MCMC_output_list <- lapply(1:num_chains,function(i){
-        run_MCMC(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter,num_chains,burnin,thin)
-      })
-    }
+    MCMC_output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
+                                             unobserved_prediction_fun=unobserved_prediction_fun,
+                                             parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                             burnin=burnin,thin=thin)
     output_list <- list()
     for(elem in names(MCMC_output_list[[1]])){
         output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
     }
-    #Calculate Dhat
-    theta_median <- apply(output_list$theta,1,median)
-    if(!is.null(c_param)){
-      theta_median <- c(log(RC$h_min-RC$c),theta_median)
-    }
-    output_list[['D_hat']] <- gplm0.calc_Dhat(theta_median,RC)
+    output_list[['D_hat']] <- gplm0.calc_Dhat(output_list$theta,RC)
     #refinement of list elements
     if(is.null(RC$c)){
         output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -296,10 +268,14 @@ gplm0.density_evaluation_unknown_c <- function(theta,RC){
 }
 
 gplm0.calc_Dhat <- function(theta,RC){
-  zeta <- theta[1]
-  log_sig_eps2 <- theta[2]
-  log_sig_b <- theta[3]
-  log_phi_b <- theta[4]
+  theta_median <- apply(theta,1,median)
+  if(!is.null(c_param)){
+    theta_median <- c(log(RC$h_min-RC$c),theta_median)
+  }
+  zeta <- theta_median[1]
+  log_sig_eps2 <- theta_median[2]
+  log_sig_b <- theta_median[3]
+  log_phi_b <- theta_median[4]
 
   l=c(log(RC$h_tild+exp(zeta)))
   varr=RC$epsilon*exp(log_sig_eps2)
