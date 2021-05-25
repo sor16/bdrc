@@ -95,14 +95,12 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
     result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
     #Rhat and autocorrelation
-    ##=== NEW start
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- get_param_names('plm0',c_param)
     autocorrelation_df$lag <- 1:nrow(autocorrelation_df)
     result_obj$autocorrelation <- autocorrelation_df[,c('lag',get_param_names('plm0',c_param))]
     result_obj$num_effective_samples <- data.frame(param=get_param_names('plm0',c_param),num_effective_samples=MCMC_output_list$num_effective_samples)
     result_obj$r_hat <- data.frame(param=get_param_names('plm0',c_param),r_hat=MCMC_output_list$r_hat)
-    ##=== NEW stop
     # store other information
     result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
