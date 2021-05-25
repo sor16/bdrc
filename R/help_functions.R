@@ -79,7 +79,11 @@ initiate_output_list <- function(desired_output,nr_iter){
     return(output_list)
 }
 
-run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,pb,chain,parallel,nr_iter=20000,burnin=2000,thin=5){
+calc_variogram <- function(i,param_mat,burnin=2000,nr_iter=20000){
+  rowSums((param_mat[,(i+1):ncol(param_mat)] - param_mat[,1:(ncol(param_mat)-i)])^2)
+}
+
+run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20000,burnin=2000,thin=5,T_max=30){
     theta_mat <- matrix(0,nrow=RC$theta_length,ncol=nr_iter)
     output_list <- initiate_output_list(RC$desired_output,nr_iter)
     density_eval_m <- density_fun(theta_m,RC)
@@ -99,10 +103,16 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,pb,chain,p
         for(elem in names(RC$desired_output)){
             output_list[[elem]][1:RC$desired_output[[elem]][['observed']],i] <- density_eval_old[[elem]]
         }
-        if(chain==1 & parallel | !parallel){
-          utils::setTxtProgressBar(pb, (chain-1)*nr_iter+i)
-        }
     }
+    param_mat <- rbind(output_list$x[1:2,],theta_mat)
+    split_idx <- round(0.5*(nr_iter-burnin))
+    param_mat1 <- param_mat[,seq(burnin,burnin+split_idx)]
+    param_mat2 <- param_mat[,seq(burnin+split_idx+1,nr_iter)]
+    param_mean <- cbind(rowMeans(param_mat1),rowMeans(param_mat2))
+    param_var <- cbind(apply(param_mat1,1,var),apply(param_mat2,1,var))
+    variogram_chain <- cbind(sapply(1:T_max,calc_variogram,param_mat1,burnin,nr_iter),
+                             sapply(1:T_max,calc_variogram,param_mat2,burnin,nr_iter))
+    rm(param_mat,param_mat1,param_mat2)
     idx <- seq(burnin,nr_iter,thin)
     acceptance_vec <- acceptance_vec[idx]
     theta_mat <- theta_mat[,idx,drop=F]
@@ -113,9 +123,64 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,pb,chain,p
             output_list[[elem]][(RC$desired_output[[elem]][['observed']]+1):nrow(output_list[[elem]]),i] <- unobserved_list[[elem]]
         }
     }
-    output_list[['theta']] <- theta_mat
-    output_list[['acceptance_vec']] <- t(as.matrix(acceptance_vec))
+    output_list$theta <- theta_mat
+    output_list$param_mean <- param_mean
+    output_list$param_var <- param_var
+    output_list$variogram_chain <- variogram_chain
+    print(output_list$variogram_chain)
+    output_list$acceptance_vec <- t(as.matrix(acceptance_vec))
     return(output_list)
+}
+
+get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_chains=4,nr_iter=20000,burnin=2000,thin=5,T_max=30){
+  #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
+  if(num_chains>4){
+    stop('Max number of chains is 4. Please pick a lower number of chains')
+  }
+  run_MCMC_wrapper <- function(i){
+    run_MCMC(theta_m=theta_m,RC=RC,density_fun=density_fun,
+             unobserved_prediction_fun=unobserved_prediction_fun,
+             nr_iter=nr_iter,burnin=burnin,thin=thin)
+  }
+  if(parallel){
+    chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+    if (nzchar(chk) && chk == "TRUE") {
+      # use 2 cores in CRAN/Travis/AppVeyor
+      num_cores <- 2L
+    } else {
+      num_cores <- min(parallel::detectCores(),num_chains)
+    }
+    cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
+    parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
+    parallel::clusterExport(cl,c('run_MCMC','initiate_output_list','pri','calc_variogram',
+                                 'theta_m','RC','density_fun','unobserved_prediction_fun',
+                                 'parallel','nr_iter','burnin','thin'),envir = environment())
+    print(run_MCMC)
+    MCMC_output_list <- parallel::parLapply(cl,1:num_chains,run_MCMC_wrapper)
+    parallel::stopCluster(cl)
+  }else{
+    MCMC_output_list <- lapply(1:num_chains,run_MCMC_wrapper)
+  }
+  print(length(MCMC_output_list[[1]]))
+  print(names(MCMC_output_list[[1]]))
+  print(MCMC_output_list$variogram_chain)
+  print(dim(MCMC_output_list[[1]]$y_post))
+  output_list <- list()
+  for(elem in names(MCMC_output_list[[1]])){
+    output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
+  }
+  m <- 2*num_chains
+  n <- round(0.5*(nr_iter-burnin))
+  variogram <- sapply(1:T_max,function(i) rowMeans(output_list$variogram_chain[,T_max*seq(0,m-1)+i])/(n-i))
+  between_chain_var <- n*apply(output_list$param_mean,1,var)
+  within_chain_var <- rowMeans(output_list$param_var)
+  chain_var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
+  output_list$r_hat <- sqrt(chain_var_hat/within_chain_var)
+  output_list$autocorrelation <- 1-variogram/(2*matrix(rep(chain_var_hat,T_max),nrow=num_chains))
+  output_list$num_effective_samples <-round(m*n/(1+2*rowSums(output_list$autocorrelation)))
+  output_list$acceptance_rate <- sum(output_list$acceptance_vec)/ncol(output_list$acceptance_vec)
+  output_list$param_mean <- output_list$param_var <- output_list$variogram_chain <- NULL
+  return(output_list)
 }
 
 get_MCMC_summary <- function(X,h=NULL){
