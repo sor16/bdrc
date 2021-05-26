@@ -168,14 +168,10 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     RC$B_u <- B_splines(h_u_std)
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output('plm',RC)
-    MCMC_output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
-                                             unobserved_prediction_fun=unobserved_prediction_fun,
-                                             parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
-                                             burnin=burnin,thin=thin)
-    output_list <- list()
-    for(elem in names(MCMC_output_list[[1]])){
-        output_list[[elem]] <- do.call(cbind,lapply(1:num_chains,function(i) MCMC_output_list[[i]][[elem]]))
-    }
+    output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
+                                        unobserved_prediction_fun=unobserved_prediction_fun,
+                                        parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                        burnin=burnin,thin=thin)
     output_list[['D_hat']] <- plm.calc_Dhat(output_list$theta,RC)
     if(is.null(RC$c)){
       output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
@@ -259,7 +255,7 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
 
 plm.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
-  if(!is.null(c_param)){
+  if(!is.null(RC$c)){
     theta_median <- c(log(RC$h_min-RC$c),theta_median)
   }
   zeta <- theta_median[1]
