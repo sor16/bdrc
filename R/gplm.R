@@ -202,7 +202,7 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
                                            parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
                                            burnin=burnin,thin=thin)
   #Calculate Dhat
-  output_list[['D_hat']] <- gplm.calc_Dhat(output_list$theta,RC)
+  output_list$D_hat <- gplm.calc_Dhat(output_list$theta,RC)
   #refinement of list elements
   if(is.null(RC$c)){
     output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])

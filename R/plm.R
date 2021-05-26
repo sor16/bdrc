@@ -172,7 +172,7 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
                                         unobserved_prediction_fun=unobserved_prediction_fun,
                                         parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
                                         burnin=burnin,thin=thin)
-    output_list[['D_hat']] <- plm.calc_Dhat(output_list$theta,RC)
+    output_list$D_hat <- plm.calc_Dhat(output_list$theta,RC)
     if(is.null(RC$c)){
       output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
       output_list$theta[2,] <- exp(output_list$theta[2,])

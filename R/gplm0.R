@@ -180,7 +180,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
                                              unobserved_prediction_fun=unobserved_prediction_fun,
                                              parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
                                              burnin=burnin,thin=thin)
-    output_list[['D_hat']] <- gplm0.calc_Dhat(output_list$theta,RC)
+    output_list$D_hat <- gplm0.calc_Dhat(output_list$theta,RC)
     #refinement of list elements
     if(is.null(RC$c)){
         output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
