@@ -235,7 +235,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_bdrc()
-    }else if(type=='rhat'){                                                                                  
+    }else if(type=='rhat'){
         rhat_dat <- get_rhat_dat(x,param)
         p <- ggplot(data=rhat_dat, aes(x=iterations,y=Rhat,color=parameters)) +
             geom_hline(yintercept = 1.1,linetype='dashed') +
@@ -245,12 +245,14 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
-        auto_dat <- get_autocorrelation_dat(x,param)
-        p <- ggplot(data=auto_dat, aes(x=lags,y=autocorrelation,color=parameters)) +
+        auto_dat <- m$autocorrelation
+        auto_dat <- reshape(auto_dat,varying=param,v.names="autocorrelation",timevar="parameters",times=param,new.row.names=1:(length(param)*nrow(auto_dat)),direction="long")
+        p <- ggplot(data=auto_dat, aes(x=lag,y=autocorrelation,color=parameters)) +
             geom_hline(yintercept=0) +
             geom_line() +
             geom_point(size=1) +
-            scale_x_continuous(expand=c(0,0)) +
+            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(m$autocorrelation)),labels=c(1,seq(5,30,5)),breaks=c(1,seq(5,30,5))) +
+            scale_y_continuous(limits=c(min(auto_dat$autocorrelation),1)) +
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }
