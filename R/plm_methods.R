@@ -251,7 +251,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_hline(yintercept=0) +
             geom_line() +
             geom_point(size=1) +
-            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(m$autocorrelation)),labels=c(1,seq(5,30,5)),breaks=c(1,seq(5,30,5))) +
+            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(m$autocorrelation)),labels=c(1,seq(5,nrow(m$autocorrelation),5)),breaks=c(1,seq(5,nrow(m$autocorrelation),5))) +
             scale_y_continuous(limits=c(min(auto_dat$autocorrelation),1)) +
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
