@@ -53,18 +53,22 @@ theme_bdrc <- function(){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2 or Grob object.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
     cbPalette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','rhat','autocorrelation')
-    types_with_param <- c('trace','histogram','rhat','autocorrelation')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
-    }else if(type %in% types_with_param & is.null(param)){
-        stop('If type histogram, trace, rhat or autocorrelation param must be non-null, should be a character vector of the names parameters to visualize.')
-    }else if(type=='trace'){
+    }
+    mod_params <- get_param_names(class(x),c_param=x$run_info$c_param)
+    if(is.null(param)){
+        param <- mod_params #defaults to all stage independent model parameters
+    }else{
+        param <- get_args_rollout(param,mod_params)
+    }
+    if(type=='trace'){
         plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "trace" can only be of stage-independent parameters')
@@ -235,18 +239,19 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_bdrc()
-    }else if(type=='rhat'){                                                                                  
+    }else if(type=='rhat'){
         rhat_dat <- get_rhat_dat(x,param)
-        p <- ggplot(data=rhat_dat, aes(x=iterations,y=Rhat,color=parameters)) +
+        p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
             geom_hline(yintercept = 1.1,linetype='dashed') +
             geom_line() +
             scale_y_continuous(expand=c(0,0),limits=c(0.99,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
-            scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
+            scale_x_continuous(expand=c(0,0),limits=c(x$run_info$burnin+40,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
-        auto_dat <- get_autocorrelation_dat(x,param)
-        p <- ggplot(data=auto_dat, aes(x=lags,y=autocorrelation,color=parameters)) +
+        mod_params <- get_param_names(class(mod),c_param=mod$run_info$c_param)
+        if(param)
+        p <- ggplot(data=auto_dat, aes(x=.data$lags,y=.data$autocorrelation,color=.data$parameters)) +
             geom_hline(yintercept=0) +
             geom_line() +
             geom_point(size=1) +

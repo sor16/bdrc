@@ -226,6 +226,18 @@ get_param_expression <- function(param){
   return(param_expr)
 }
 
+get_args_rollout <- function(args,param_vec){
+  rollout <- unlist(sapply(args,function(x) {
+    if(x=='latent_parameters'){
+      return(param_vec[1:2])
+    }else if(x=='hyperparameters'){
+      return(param_vec[3:length(param_vec)])
+    }else{
+      return(x)
+    }
+  }))
+  return(unique(rollout))
+}
 
 # get_param_expression <- function(param){
 #   expr_vec <- c('a'='\\textit{a}','b'='\\textit{b}','c'='\\textit{c}','sigma_eps'='\\sigma_\\epsilon',
