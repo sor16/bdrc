@@ -211,18 +211,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             ylab(parse(text=y_lab)) +
             theme_bdrc()
     }else if(type=='residuals'){
-        resid_dat <- merge(x$rating_curve[,c('h','median')],x$data,by.x='h',by.y=all.vars(x$formula)[2],)
-        if('sigma_eps_summary' %in% names(x)){
-            resid_dat <- merge(resid_dat,x$sigma_eps_summary[,c('h','median')],by = 'h')
-            names(resid_dat) <- c('h','median','Q','sigma_eps')
-        }else{
-            resid_dat$sigma_eps <- x$param_summary['sigma_eps','median']
-        }
-        c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
-        resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
-        resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
-        resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
-        resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
+        resid_dat <- get_residuals_dat(x)
         #to generate label - latex2exp::TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$",'character')
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
         #to generate label - latex2exp::TeX("$log(\\textit{h - \\hat{c}})$",'character')
@@ -240,19 +229,20 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
         p <- ggplot(data=rhat_dat, aes(x=iterations,y=Rhat,color=parameters)) +
             geom_hline(yintercept = 1.1,linetype='dashed') +
             geom_line() +
-            scale_y_continuous(expand=c(0,0),limits=c(0.99,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
-            scale_x_continuous(expand=c(0,0),limits=c(2040,20000),breaks=c(5000,10000,15000)) +
+            scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
+            scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
-        auto_dat <- m$autocorrelation
+        auto_dat <- x$autocorrelation
+        param <- get_param_names(class(x),x$run_info$c_param)
         auto_dat <- reshape(auto_dat,varying=param,v.names="autocorrelation",timevar="parameters",times=param,new.row.names=1:(length(param)*nrow(auto_dat)),direction="long")
         p <- ggplot(data=auto_dat, aes(x=lag,y=autocorrelation,color=parameters)) +
             geom_hline(yintercept=0) +
             geom_line() +
             geom_point(size=1) +
-            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(m$autocorrelation)),labels=c(1,seq(5,nrow(m$autocorrelation),5)),breaks=c(1,seq(5,nrow(m$autocorrelation),5))) +
-            scale_y_continuous(limits=c(min(auto_dat$autocorrelation),1)) +
+            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(x$autocorrelation)),labels=c(1,seq(5,nrow(x$autocorrelation),5)),breaks=c(1,seq(5,nrow(x$autocorrelation),5))) +
+            scale_y_continuous(limits=c(min(auto_dat$autocorrelation,-0.05),1)) +
             scale_colour_manual(values=cbPalette) +
             theme_bdrc()
     }
@@ -821,3 +811,54 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 predict.gplm <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }
+
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+get_report_pages.gplm <- function(...,type=1){
+    get_report_pages(...,type=type)
+}
+
+
+get_report_pages.gplm0 <- function(...,type=1){
+    get_report_pages(...,type=type)
+}
+
+
+get_report_pages.plm <- function(...,type=1){
+    get_report_pages(...,type=type)
+}
+
+
+get_report_pages.plm0 <- function(...,type=1){
+    get_report_pages(...,type=type)
+}
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+get_report.gplm <- function(...,directory=NULL,report_title=NULL,type=1){
+    get_report(...,directory=directory,report_title=report_title,type=type)
+}
+
+
+get_report.gplm0 <- function(...,directory=NULL,report_title=NULL,type=1){
+    get_report(...,directory=directory,report_title=report_title,type=type)
+}
+
+
+get_report.plm <- function(...,directory=NULL,report_title=NULL,type=1){
+    get_report(...,directory=directory,report_title=report_title,type=type)
+}
+
+
+get_report.plm0 <- function(...,directory=NULL,report_title=NULL,type=1){
+    get_report(...,directory=directory,report_title=report_title,type=type)
+}
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
