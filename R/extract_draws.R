@@ -74,7 +74,7 @@ gather_draws <- function(mod,...,transformed=F){
         stop('mod must be of class "plm0","plm","gplm0" or "gplm"')
     }
     mod_params <- get_param_names(class(mod),c_param=mod$run_info$c_param)
-    args_rollout <- get_args_rollout(mod_params,args)
+    args_rollout <- get_args_rollout(args,mod_params)
     f_not_generalized <- any(grepl('^f$',args_rollout)) & is.null(mod$f_posterior)
     if(f_not_generalized){
         args_rollout[grepl('^f$',args_rollout)] <- 'b'
