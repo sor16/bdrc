@@ -245,6 +245,7 @@ get_rhat_dat <- function(m,param,smoothness=20){
 #' @importFrom ggplot2 autoplot theme
 #' @importFrom gridExtra grid.arrange arrangeGrob
 #' @importFrom grid tableGrob textGrob gpar
+#' #' @export
 get_conv_diagnostics_plots <- function(m_obj){
     m_class <- class(m_obj)
     model_types <- c('gplm','gplm0','plm','plm0')

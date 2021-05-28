@@ -489,6 +489,7 @@ B_splines <- function(ZZ){
 
 
 
+#' @export
 #' @importFrom stats median
 get_residuals_dat <- function(m){
   resid_dat <- merge(m$rating_curve[,c('h','median')],m$data,by.x='h',by.y=all.vars(m$formula)[2],)
@@ -533,6 +534,7 @@ smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
 
 
 
+#' @export
 #' @importFrom gridExtra tableGrob ttheme_minimal
 predict_matrix <- function(x){
   # c_param <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
@@ -585,6 +587,7 @@ get_report <- function(...,directory=NULL,report_title=NULL,type=1){
 
 
 
+#' @export
 #' @importFrom stats quantile
 #' @importFrom ggplot2 autoplot scale_x_continuous scale_y_continuous
 #' @importFrom gridExtra tableGrob ttheme_minimal
@@ -706,6 +709,7 @@ get_report_grob <- function(...,type=1){
 
 
 
+#' @export
 get_report_pages_fun <- function(...,directory=NULL,report_title=NULL,type=1){
   if(is.null(directory)){
     directory <- getwd()
