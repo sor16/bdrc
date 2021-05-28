@@ -817,52 +817,60 @@ predict.gplm <- function(object,newdata=NULL,...){
 }
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+#' @export
 get_report_pages.gplm <- function(...,type=1){
     get_report_pages(...,type=type)
 }
 
 
+#' @export
 get_report_pages.gplm0 <- function(...,type=1){
     get_report_pages(...,type=type)
 }
 
 
+#' @export
 get_report_pages.plm <- function(...,type=1){
     get_report_pages(...,type=type)
 }
 
 
+#' @export
 get_report_pages.plm0 <- function(...,type=1){
     get_report_pages(...,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+#' @export
 get_report.gplm <- function(...,directory=NULL,report_title=NULL,type=1){
     get_report(...,directory=directory,report_title=report_title,type=type)
 }
 
 
+#' @export
 get_report.gplm0 <- function(...,directory=NULL,report_title=NULL,type=1){
     get_report(...,directory=directory,report_title=report_title,type=type)
 }
 
 
+#' @export
 get_report.plm <- function(...,directory=NULL,report_title=NULL,type=1){
     get_report(...,directory=directory,report_title=report_title,type=type)
 }
 
 
+#' @export
 get_report.plm0 <- function(...,directory=NULL,report_title=NULL,type=1){
     get_report(...,directory=directory,report_title=report_title,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 

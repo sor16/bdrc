@@ -484,9 +484,12 @@ B_splines <- function(ZZ){
 }
 
 
-
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+#' @importFrom stats median
 get_residuals_dat <- function(m){
   resid_dat <- merge(m$rating_curve[,c('h','median')],m$data,by.x='h',by.y=all.vars(m$formula)[2],)
   if('sigma_eps_summary' %in% names(m)){
@@ -502,24 +505,22 @@ get_residuals_dat <- function(m){
   resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
   return(resid_dat)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom ggplot2 ggplot_table
 extract_legend<-function(a.gplot){
   tmp <- ggplot_gtable(ggplot_build(a.gplot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
   legend <- tmp$grobs[[leg]]
   return(legend)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom ggplot2 guides theme
 smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
   p +
     guides(shape = guide_legend(override.aes = list(size = pointSize)),
@@ -528,12 +529,11 @@ smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
           legend.text  = element_text(size = textSize),
           legend.key.size = unit(spaceLegend, "lines"))
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom gridExtra tableGrob ttheme_minimal
 predict_matrix <- function(x){
   # c_param <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
   # c_param <- ceiling(c_param*100)/100
@@ -565,30 +565,29 @@ predict_matrix <- function(x){
                                                 rowhead=list(fg_params=list(col="black",fontface=2L))))
   return(p_mat)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @export
 get_report_pages <- function(...,type=1){
   get_report_grob(...,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @export
 get_report <- function(...,directory=NULL,report_title=NULL,type=1){
   get_report_pages_fun(...,directory=directory,report_title=report_title,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom stats quantile
+#' @importFrom ggplot2 autoplot scale_x_continuous scale_y_continuous
+#' @importFrom gridExtra tableGrob ttheme_minimal
 get_report_grob <- function(...,type=1){
   args <- list(...)
   error_msg1 <- 'Please provide a single object of types tournament, gplm, gplm0, plm or plm0.'
@@ -703,12 +702,10 @@ get_report_grob <- function(...,type=1){
   }
   return(output_list)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 get_report_pages_fun <- function(...,directory=NULL,report_title=NULL,type=1){
   if(is.null(directory)){
     directory <- getwd()
@@ -732,12 +729,13 @@ get_report_pages_fun <- function(...,directory=NULL,report_title=NULL,type=1){
   grob_list_pages <- get_report_pages(...,type=type)
   save_report(grob_list_pages,type=type,file_path=file_path)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom gridExtra grid.arrange arrangeGrob
+#' @importFrom grid textGrob gpar
+#' @importFrom grDevices pdf dev.off
 save_report <- function(grob_list,type=type,file_path,paper='a4',width=8,height=11){
   pdf(file=file_path,paper=paper,width=width,height=height)
   if(type==1){
@@ -755,7 +753,6 @@ save_report <- function(grob_list,type=type,file_path,paper='a4',width=8,height=
   }
   dev.off()
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 

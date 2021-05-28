@@ -177,9 +177,11 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
 #ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
 
 
-
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
 param_draws_list <- function(m,param){
     draws_list <- lapply(param,function(x){
         draws <- gather_draws(m,x,transformed=T)
@@ -189,12 +191,11 @@ param_draws_list <- function(m,param){
     names(draws_list) <- param
     return(draws_list)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom stats var
 chain_statistics <- function(chains){
     chains_length <- nrow(chains)
     split_idx <- round(0.5*chains_length)
@@ -209,12 +210,10 @@ chain_statistics <- function(chains){
     var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
     return(list('W'=within_chain_var,'var_hat'=var_hat))
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 R_hat <- function(chains){
     staistics <- chain_statistics(chains)
     W <- staistics$W
@@ -222,12 +221,10 @@ R_hat <- function(chains){
     rhat <- sqrt(var_hat/W)
     return(rhat)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 get_rhat_dat <- function(m,param,smoothness=20){
     thin <- m$run_info$thin
     burnin <- m$run_info$burnin
@@ -241,12 +238,13 @@ get_rhat_dat <- function(m,param,smoothness=20){
     rhat_dat <- do.call('rbind',rhat_dat)
     return(rhat_dat)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @importFrom ggplot2 autoplot theme
+#' @importFrom gridExtra grid.arrange arrangeGrob
+#' @importFrom grid tableGrob textGrob gpar
 get_conv_diagnostics_plots <- function(m_obj){
     m_class <- class(m_obj)
     model_types <- c('gplm','gplm0','plm','plm0')
@@ -272,25 +270,22 @@ get_conv_diagnostics_plots <- function(m_obj){
     }
     return(p)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @export
 get_report_pages.tournament <- function(...,type=1){
     get_report_pages(...,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#' @export
 get_report.tournament <- function(...,directory=NULL,report_title=NULL,type=1){
     get_report(...,directory=directory,report_title=report_title,type=type)
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
