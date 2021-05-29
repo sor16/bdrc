@@ -200,7 +200,6 @@ save_report <- function(report_pages,path,paper='a4',width=8,height=11){
 
 #### S3 methods
 
-get_report_pages <- function(x) UseMethod("get_report_pages")
 #' @export
 get_report_pages.plm0 <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
@@ -220,8 +219,6 @@ get_report_pages.gplm0 <- function(x,type=1,...){
 get_report_pages.gplm <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
-
-get_report <- function(x) UseMethod("get_report")
 
 #' @export
 get_report.plm0 <- function(x,path=NULL,type=1,...){
