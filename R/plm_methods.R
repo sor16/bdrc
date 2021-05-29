@@ -266,7 +266,7 @@ plot_collage <- function(x,transformed=F){
     p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(types)))))
     return(p)
 }
-
+## TODO: add support for stage values below data but above median of c
 predict_fun <- function(object,newdata=NULL){
     if(is.null(newdata)){
         merged_data <- merge(object$rating_curve,object$data,by.x='h',by.y=all.vars(object$formula)[2])
@@ -815,62 +815,3 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 predict.gplm <- function(object,newdata=NULL,...){
     predict_fun(object,newdata)
 }
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-
-
-#' @export
-get_report_pages.gplm <- function(...,type=1){
-    get_report_pages(...,type=type)
-}
-
-
-#' @export
-get_report_pages.gplm0 <- function(...,type=1){
-    get_report_pages(...,type=type)
-}
-
-
-#' @export
-get_report_pages.plm <- function(...,type=1){
-    get_report_pages(...,type=type)
-}
-
-
-#' @export
-get_report_pages.plm0 <- function(...,type=1){
-    get_report_pages(...,type=type)
-}
-
-
-
-
-
-#' @export
-get_report.gplm <- function(...,directory=NULL,report_title=NULL,type=1){
-    get_report(...,directory=directory,report_title=report_title,type=type)
-}
-
-
-#' @export
-get_report.gplm0 <- function(...,directory=NULL,report_title=NULL,type=1){
-    get_report(...,directory=directory,report_title=report_title,type=type)
-}
-
-
-#' @export
-get_report.plm <- function(...,directory=NULL,report_title=NULL,type=1){
-    get_report(...,directory=directory,report_title=report_title,type=type)
-}
-
-
-#' @export
-get_report.plm0 <- function(...,directory=NULL,report_title=NULL,type=1){
-    get_report(...,directory=directory,report_title=report_title,type=type)
-}
-
-
-

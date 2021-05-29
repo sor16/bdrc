@@ -1,3 +1,21 @@
+#' @importFrom ggplot2 ggplot_gtable
+extract_legend<-function(a.gplot){
+    tmp <- ggplot_gtable(ggplot_build(a.gplot))
+    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+    legend <- tmp$grobs[[leg]]
+    return(legend)
+}
+
+#' @importFrom ggplot2 guides theme
+smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
+    p +
+        guides(shape = guide_legend(override.aes = list(size = pointSize)),
+               color = guide_legend(override.aes = list(size = pointSize))) +
+        theme(legend.title = element_text(size = textSize+5),
+              legend.text  = element_text(size = textSize),
+              legend.key.size = unit(spaceLegend, "lines"))
+}
+
 #' Print tournament object
 #'
 #' Print the results of a tournament of model comparisons
@@ -51,7 +69,7 @@ summary.tournament <- function(object,...){
 #' t_obj <- tournament(f,V316_river)
 #' autoplot(t_obj)
 #' }
-#' @importFrom ggplot2 ggplot geom_boxplot xlab ylab
+#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
 autoplot.tournament <- function(x,type='deviance',...){
@@ -177,75 +195,11 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
 #ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-
-
-param_draws_list <- function(m,param){
-    draws_list <- lapply(param,function(x){
-        draws <- gather_draws(m,x,transformed=T)
-        disjoint <- split(draws$value,draws$chain,drop=TRUE)
-        disjoint <- do.call('cbind',disjoint)
-    })
-    names(draws_list) <- param
-    return(draws_list)
-}
-
-
-
-
-#' @importFrom stats var
-chain_statistics <- function(chains){
-    chains_length <- nrow(chains)
-    split_idx <- round(0.5*chains_length)
-    chains1 <- chains[seq(1,split_idx),]
-    chains2 <- chains[seq(split_idx+1,chains_length),]
-    chains_mean <- c(colMeans(chains1),colMeans(chains2))
-    chains_var <- c(apply(chains1,2,var),apply(chains2,2,var))
-    n <- round(0.5*chains_length)
-    m <- ncol(chains)*2
-    within_chain_var <- mean(chains_var)
-    between_chain_var <- n*var(chains_mean)
-    var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
-    return(list('W'=within_chain_var,'var_hat'=var_hat))
-}
-
-
-
-
-R_hat <- function(chains){
-    staistics <- chain_statistics(chains)
-    W <- staistics$W
-    var_hat <- staistics$var_hat
-    rhat <- sqrt(var_hat/W)
-    return(rhat)
-}
-
-
-
-
-get_rhat_dat <- function(m,param,smoothness=20){
-    thin <- m$run_info$thin
-    burnin <- m$run_info$burnin
-    draws_list <- param_draws_list(m,param)
-    rhat_dat <- lapply(param,function(x){
-        draws  <- draws_list[[x]]
-        real_iter <- seq(4*thin+burnin,((nrow(draws))*thin)+burnin,by=smoothness*thin)
-        by_n <- seq(4,nrow(draws),by=smoothness)
-        data.frame('iterations'=real_iter,'parameters'=rep(x,length(by_n)),'Rhat'=sapply(by_n, function(r) R_hat(draws[1:r,])))
-    })
-    rhat_dat <- do.call('rbind',rhat_dat)
-    return(rhat_dat)
-}
-
-
-
-
+#TODO: move into tournament plot function
 #' @importFrom ggplot2 autoplot theme
-#' @importFrom gridExtra grid.arrange arrangeGrob
-#' @importFrom grid tableGrob textGrob gpar
-#' #' @export
+#' @importFrom gridExtra grid.arrange arrangeGrob tableGrob
+#' @importFrom grid textGrob gpar
+#' @export
 get_conv_diagnostics_plots <- function(m_obj){
     m_class <- class(m_obj)
     model_types <- c('gplm','gplm0','plm','plm0')
@@ -260,8 +214,8 @@ get_conv_diagnostics_plots <- function(m_obj){
         p1 <- smaller_legend(p1)
         p2 <- smaller_legend(p2)
         my_legend <- extract_legend(p1)
-        grid.arrange(arrangeGrob(p1+theme(legend.position="none"),p2+theme(legend.position="none"),nrow=1),
-                     my_legend,ncol=2,widths=c(4,1),top=textGrob(class(m),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+        arrangeGrob(arrangeGrob(p1+theme(legend.position="none"),p2+theme(legend.position="none"),nrow=1),
+                                my_legend,ncol=2,widths=c(4,1),top=textGrob(class(m),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
     })
     names(plot_list) <- names(m_obj)
     if(m_class=='list'){
@@ -272,21 +226,6 @@ get_conv_diagnostics_plots <- function(m_obj){
     return(p)
 }
 
-
-
-
-#' @export
-get_report_pages.tournament <- function(...,type=1){
-    get_report_pages(...,type=type)
-}
-
-
-
-
-#' @export
-get_report.tournament <- function(...,directory=NULL,report_title=NULL,type=1){
-    get_report(...,directory=directory,report_title=report_title,type=type)
-}
 
 
 
