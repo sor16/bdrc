@@ -4,7 +4,7 @@
 \alias{tournament}
 \title{Determine the most adequate rating curve model}
 \usage{
-tournament(formula = NULL, data = NULL, c_param = NULL, ...)
+tournament(formula = NULL, data = NULL, ...)
 }
 \arguments{
 \item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
