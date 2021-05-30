@@ -163,12 +163,12 @@ get_report_pages_fun <- function(x,type=1){
         report_pages <- list(main_page_plot,predict_mat)
     }else{
         main_page_plots <- lapply(names(report_components$main_page_plots),function(m){
-                                arrangeGrob(report_components$main_page_plots[[m]],
-                                            report_components$main_page_table[[m]],
-                                            nrow=2,
-                                            as.table=TRUE,
-                                            heights=c(5,3),
-                                            top=textGrob(x,gp=gpar(fontfamily="Times",fontsize=22,facetype='bold')))
+                                  arrangeGrob(report_components$main_page_plots[[m]],
+                                              report_components$main_page_table[[m]],
+                                              nrow=2,
+                                              as.table=TRUE,
+                                              heights=c(5,3),
+                                              top=textGrob(m,gp=gpar(fontfamily="Times",fontsize=22,facetype='bold')))
                            })
         tournament_page <- arrangeGrob(arrangeGrob(report_components$mcmc_table,report_components$tour_table,nrow=1),
                                        arrangeGrob(report_components$dev_boxplot,ncol=2),
@@ -180,11 +180,10 @@ get_report_pages_fun <- function(x,type=1){
                                         as.table=TRUE,
                                         top=textGrob('',gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
         histogram_pages <- lapply(names(report_components$main_page_plots), function(m) {
-                                arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
-                                            top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold',fontfamily="Times")))
+                                  arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
+                                              top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold',fontfamily="Times")))
                             })
-        #report_pages <- c(main_page_plots,tournament_page,convergence_page,histogram_pages)
-        report_pages <- main_page_plots
+        report_pages <- list(main_page_plots,tournament_page,convergence_page,histogram_pages)
     }
     return(report_pages)
 }
@@ -196,7 +195,13 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=8,height=11){
     }
     pdf(file=path,paper=paper,width=width,height=height)
     for(i in 1:length(report_pages)){
-        grid.arrange(report_pages[[i]])
+        if(any(class(report_pages[[i]])=='list')){
+            for (j in 1:length(report_pages[[i]])) {
+                grid.arrange(report_pages[[i]][[j]],as.table=T)
+            }
+        }else{
+            grid.arrange(report_pages[[i]],as.table=T)
+        }
     }
     dev.off()
 }
