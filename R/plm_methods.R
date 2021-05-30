@@ -235,7 +235,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_line() +
             scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
             scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
-            scale_colour_manual(values=cbPalette) +
+            scale_color_manual(values=cbPalette) +
             theme_bdrc()
     }else if(type=='autocorrelation'){
         auto_dat <- x$autocorrelation
@@ -247,7 +247,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_point(size=1) +
             scale_x_continuous(expand=c(0,0),limits=c(1,nrow(x$autocorrelation)),labels=c(1,seq(5,nrow(x$autocorrelation),5)),breaks=c(1,seq(5,nrow(x$autocorrelation),5))) +
             scale_y_continuous(limits=c(min(auto_dat$autocorrelation,-0.05),1)) +
-            scale_colour_manual(values=cbPalette) +
+            scale_color_manual(values=cbPalette) +
             theme_bdrc()
     }
     if(!is.null(title)){

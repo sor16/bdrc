@@ -1,4 +1,4 @@
-#' @importFrom ggplot2 ggplot_gtable
+#' @importFrom ggplot2 ggplot_gtable ggplot_build
 extract_legend<-function(a.gplot){
     tmp <- ggplot_gtable(ggplot_build(a.gplot))
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -6,7 +6,7 @@ extract_legend<-function(a.gplot){
     return(legend)
 }
 
-#' @importFrom ggplot2 guides theme
+#' @importFrom ggplot2 guides theme guide_legend element_text unit
 smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
     p +
         guides(shape = guide_legend(override.aes = list(size = pointSize)),

@@ -1,4 +1,4 @@
-### TODO: Option in the predict function?? I.e. an help function for predict method
+### TODO: Option in the predict function?? I.e. an help function for predict method. Ath aukastafi. Titill á töflu
 #' @importFrom gridExtra tableGrob ttheme_minimal
 predict_matrix <- function(x){
     # c_param <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
@@ -183,22 +183,26 @@ get_report_pages_fun <- function(x,type=1){
                                 arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
                                             top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold',fontfamily="Times")))
                             })
-        report_pages <- c(main_page_plots,tournament_page,convergence_page,histogram_pages)
+        #report_pages <- c(main_page_plots,tournament_page,convergence_page,histogram_pages)
+        report_pages <- main_page_plots
     }
     return(report_pages)
 }
 
 #' @importFrom grDevices pdf dev.off
-save_report <- function(report_pages,path,paper='a4',width=8,height=11){
+save_report <- function(report_pages,path=NULL,paper='a4',width=8,height=11){
     if(is.null(path)){
         path <- 'report.pdf'
     }
     pdf(file=path,paper=paper,width=width,height=height)
-    report_pages
+    for(i in 1:length(report_pages)){
+        grid.arrange(report_pages[[i]])
+    }
     dev.off()
 }
 
 #### S3 methods
+get_report_pages <- function(x,type=1,...) UseMethod("get_report_pages")
 
 #' @export
 get_report_pages.plm0 <- function(x,type=1,...){
@@ -221,40 +225,38 @@ get_report_pages.gplm <- function(x,type=1,...){
 }
 
 #' @export
+get_report_pages.tournament <- function(x,type=1,...){
+    get_report_pages_fun(x,type=type)
+}
+
+get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
+
+#' @export
 get_report.plm0 <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages(x,type=type)
+    report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-
 #' @export
 get_report.plm <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages(x,type=type)
+    report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
 #' @export
 get_report.gplm0 <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages(x,type=type)
+    report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
 #' @export
 get_report.gplm <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages(x,type=type)
+    report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
-
-#' @export
-get_report_pages.tournament <- function(x,type=1,...){
-    get_report_pages_fun(x,type=type)
-}
-
 
 #' @export
 get_report.tournament <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages(x,type=type)
+    report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
-
-
