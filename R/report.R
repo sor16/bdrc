@@ -6,33 +6,23 @@ predict_matrix <- function(x){
     min_rc_h <- min(x$rating_curve[,'h'])
     min_rc_h <- ceiling(min_rc_h*100)/100
     grid_max <- x$run_info$h_max
-    p_dat <- predict(x,newdata=seq(min_rc_h,grid_max,by=0.01))[c('h','median')]  # c_param (breyta)
-    p_dat$decimal <- floor(p_dat$h*10)/10
-    first_decimal <- length(p_dat$decimal[p_dat$decimal==p_dat$decimal[1]])
-    if(first_decimal!=10) {
-        n <- 10-first_decimal
-        top_rows <- data.frame(h=sapply(n:1,function(x) p_dat$h[1]-0.01*x),median=rep(0,n),decimal=rep(p_dat$decimal[1],n))
-        p_dat <- rbind(top_rows,p_dat)
-    }
-    last_decimal <- length(p_dat$decimal[p_dat$decimal==p_dat$decimal[length(p_dat$decimal)]])
-    if(last_decimal!=10){
-        m <- 10-last_decimal
-        bot_rows <- data.frame(h=sapply(1:m,function(x) p_dat$h[length(p_dat$h)]+0.01*x),median=rep(NA,m),decimal=rep(p_dat$decimal[length(p_dat$decimal)],m))
-        p_dat <- rbind(p_dat,bot_rows)
-    }
-    p_mat <- lapply(unique(p_dat$decimal),function(d) p_dat$median[p_dat$decimal==d])
-    p_mat <- do.call('rbind',p_mat)
-    rownames(p_mat) <- unique(p_dat$decimal)
-    colnames(p_mat) <- seq(0,0.09,by=0.01)
-    p_mat <- round(p_mat,digits=3)
-    p_mat <- tableGrob(p_mat,theme=ttheme_minimal(base_family = "Times",
-                                                  core=list(bg_params = list(fill = blues9[1:2], col=NA),fg_params=list(fontface=3)),
-                                                  colhead=list(fg_params=list(col="black",fontface=2L)),
-                                                  rowhead=list(fg_params=list(col="black",fontface=2L))))
+    p_mat <- predict(x,newdata=seq(min_rc_h,grid_max,by=0.01),wide=TRUE)
+    # split_row <- 6
+    # n_pages <- ceiling(nrow(p_mat)/split_row)
+    # if(n_pages>1){
+    #     split_points <- seq(split_row,floor(nrow(p_mat)/split_row)*split_row,by=split_row)
+    #     idx_vectors <- unname(split(seq(1,nrow(p_mat)), cumsum(seq_along(seq(1,nrow(p_mat))) %in% split_points)))
+    #     p_mat_list <- lapply(idx_vectors,function(x){
+    #                       format(p_mat[x,],nsmall=3)
+    #                   })
+    # }
+    # p_mat_list <- lapply(p_mat_list,function(x){
+    #                   tableGrob(x,theme=ttheme_minimal(core=list(bg_params = list(fill = blues9[1:2], col=NA),fg_params=list(fontface=3)),
+    #                                                        colhead=list(fg_params=list(col="black",fontface=2L)),
+    #                                                        rowhead=list(fg_params=list(col="black",fontface=2L))))
+    #                })
     return(p_mat)
 }
-
-
 
 
 #' @importFrom stats quantile
@@ -106,9 +96,9 @@ get_report_components <- function(x,type=1){
                                             table <- rbind(m$param_summary,m$Deviance_summary)
                                             row.names(table) <- c(sapply(1:length(param), function(x) get_param_expression(x)[[1]]),"Deviance")
                                             table <- format(round(table,digits=3),nsmall=3)
-                                            tableGrob(table,theme=ttheme_minimal(base_family="Times",rowhead=list(fg_params=list(parse=TRUE))))
+                                            tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
-        output_list$p_mat <- predict_matrix(m_obj[[1]])
+        output_list$p_mat_list <- predict_matrix(m_obj[[1]])
         output_list$obj_class <- class(m_obj[[1]])
     }else{
         output_list$main_page_table <- lapply(m_obj,function(m){
@@ -120,7 +110,7 @@ get_report_components <- function(x,type=1){
                                             table <- cbind(table,'R_hat'=rhat_col,'n_eff'=neff_col)
                                             table[,c('lower','median','upper','R_hat')] <- format(round(table[,c('lower','median','upper','R_hat')],digits=3),nsmall=3)
                                             table['Deviance',c('R_hat','n_eff')] <- ''
-                                            tableGrob(table,theme=ttheme_minimal(base_family="Times",rowhead=list(fg_params=list(parse=TRUE))))
+                                            tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
         output_list$mcmc_hist_list <- lapply(m_obj,function(m){
             params <- get_param_names(class(m),m$run_info$c_param)
@@ -137,10 +127,10 @@ get_report_components <- function(x,type=1){
                        acceptance_rate=format(m$acceptance_rate,digits=2))
         })
         mcmc_table <- t(do.call('rbind',mcmc_table))
-        output_list$mcmc_table <- tableGrob(mcmc_table,theme=ttheme_minimal(base_family="Times"))
+        output_list$mcmc_table <- tableGrob(mcmc_table,theme=ttheme_minimal())
         tour_table <- t_obj$summary[c("round","game","model","DIC","P","winner")]
         tour_table[c('DIC','P')] <- round(tour_table[c('DIC','P')],digits=2)
-        output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(base_family="Times"),rows=NULL)
+        output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(),rows=NULL)
         output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
         output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
                                            plot_grob(x,type='convergence_diagnostics')
@@ -159,12 +149,12 @@ get_report_pages_fun <- function(x,type=1){
                                       nrow=2,
                                       as.table=TRUE,
                                       heights=c(5,3),
-                                      top=textGrob(report_components$obj_class,gp=gpar(fontfamily="Times",fontsize=22,facetype='bold')))
-        predict_mat <- arrangeGrob(report_components$p_mat,
+                                      top=textGrob(report_components$obj_class,gp=gpar(fontsize=22,facetype='bold')))
+        predict_mat <- arrangeGrob(report_components$p_mat_list,     # thu ert her !!!
                                    nrow=1,
                                    as.table=TRUE,
                                    heights=c(1),
-                                   top=textGrob(paste0('Rating curve predictions for ',report_components$obj_class),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+                                   top=textGrob(paste0('Rating curve predictions for different stage measurments\nthe rows change in decimeter increments while\nthe columns change in centimeter increments',report_components$obj_class),gp=gpar(fontsize=22,facetype='bold')))
         report_pages <- list(main_page_plot,predict_mat)
     }else{
         main_page_plots <- lapply(names(report_components$main_page_plots),function(m){
@@ -173,20 +163,20 @@ get_report_pages_fun <- function(x,type=1){
                                               nrow=2,
                                               as.table=TRUE,
                                               heights=c(5,3),
-                                              top=textGrob(m,gp=gpar(fontfamily="Times",fontsize=22,facetype='bold')))
+                                              top=textGrob(m,gp=gpar(fontsize=22,facetype='bold')))
                            })
         tournament_page <- arrangeGrob(arrangeGrob(report_components$mcmc_table,report_components$tour_table,nrow=1),
                                        arrangeGrob(report_components$dev_boxplot,ncol=2),
                                        nrow=2,
                                        as.table=TRUE,
                                        heights=c(1,1),
-                                       top=textGrob('Model comparison and MCMC diagnostics',gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+                                       top=textGrob('Model comparison and MCMC diagnostics',gp=gpar(fontsize=22,facetype='bold')))
         convergence_page <- arrangeGrob(grobs=report_components$conv_diag_plots,
                                         nrow=4,
                                         as.table=TRUE)
         histogram_pages <- lapply(names(report_components$main_page_plots), function(m) {
                                   arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
-                                              top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold',fontfamily="Times")))
+                                              top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold')))
                             })
         report_pages <- list(main_page_plots,tournament_page,convergence_page,histogram_pages)
     }
