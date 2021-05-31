@@ -7,15 +7,20 @@ extract_legend<-function(a.gplot){
 }
 
 #' @importFrom ggplot2 guides theme guide_legend element_text unit
-smaller_legend <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8) {
+plot_converter <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8, model_class) {
     p +
         guides(shape = guide_legend(override.aes = list(size = pointSize)),
-               color = guide_legend(override.aes = list(size = pointSize))) +
-        theme(legend.title = element_text(size = textSize+5),
+               color = guide_legend(override.aes = list(size = pointSize),
+                                    title=model_class)) +
+        theme(legend.title = element_text(size = textSize+10),
               legend.text  = element_text(size = textSize),
-              legend.key.size = unit(spaceLegend, "lines"))
+              legend.key.size = unit(spaceLegend, "lines"),
+              axis.title.x = element_text(size = 13),
+              axis.title.y = element_text(size = 13),
+              axis.text.x = element_text(size = 10),
+              axis.text.y = element_text(size = 10),
+              legend.justification = "top")
 }
-
 #' Print tournament object
 #'
 #' Print the results of a tournament of model comparisons
