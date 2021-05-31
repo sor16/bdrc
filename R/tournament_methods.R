@@ -1,26 +1,3 @@
-#' @importFrom ggplot2 ggplot_gtable ggplot_build
-extract_legend<-function(a.gplot){
-    tmp <- ggplot_gtable(ggplot_build(a.gplot))
-    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-    legend <- tmp$grobs[[leg]]
-    return(legend)
-}
-
-#' @importFrom ggplot2 guides theme guide_legend element_text unit
-plot_converter <- function(p, pointSize = 1, textSize = 11, spaceLegend = 0.8, model_class) {
-    p +
-        guides(shape = guide_legend(override.aes = list(size = pointSize)),
-               color = guide_legend(override.aes = list(size = pointSize),
-                                    title=model_class)) +
-        theme(legend.title = element_text(size = textSize+10),
-              legend.text  = element_text(size = textSize),
-              legend.key.size = unit(spaceLegend, "lines"),
-              axis.title.x = element_text(size = 13),
-              axis.title.y = element_text(size = 13),
-              axis.text.x = element_text(size = 10),
-              axis.text.y = element_text(size = 10),
-              legend.justification = "top")
-}
 #' Print tournament object
 #'
 #' Print the results of a tournament of model comparisons
@@ -146,7 +123,7 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         plot_list <- lapply(x$contestants,function(m){
                         autoplot(m,type=type,title=class(m))
                     })
-        p <- do.call(grid.arrange,c(plot_list,ncol=2))
+        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="sigma_eps"){
         ylim_dat <- sapply(x$contestants,function(m){
                         if(grepl('0',class(m))){
@@ -160,7 +137,7 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         plot_list <- lapply(x$contestants,function(m){
             autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max)
         })
-        p <- do.call(grid.arrange,c(plot_list,ncol=2))
+        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="f"){
         ylim_dat <- sapply(x$contestants,function(m){
             if(!grepl('g',class(m))){
@@ -174,17 +151,17 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         plot_list <- lapply(x$contestants,function(m){
             autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max)
         })
-        p <- do.call(grid.arrange,c(plot_list,ncol=2))
+        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type %in% c("rating_curve","rating_curve_mean")){
         plot_list <- lapply(x$contestants,function(m){
             autoplot(m,type=type,transformed=transformed,title=class(m))
         })
-        p <- do.call(grid.arrange,c(plot_list,ncol=2))
+        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=='convergence_diagnostics'){
         plot_list <- lapply(x$contestants,function(m){
             plot_grob(m,type=type)
         })
-        p <- do.call(grid.arrange,c(plot_list,nrow=4))
+        p <- do.call(arrangeGrob,c(plot_list,nrow=4))
     }else{
         stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
     }
@@ -205,34 +182,6 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
 #ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
 
 
-
-
-
-# get_conv_diagnostics_plots <- function(m_obj){
-#     m_class <- class(m_obj)
-#     model_types <- c('gplm','gplm0','plm','plm0')
-#     if(m_class%in%model_types){
-#         m_obj <- list(m_obj)
-#         names(m_obj) <- m_class
-#     }
-#     plot_list <- lapply(m_obj,function(m){
-#         param <- get_param_names(class(m),m$run_info$c_param)
-#         p1 <- autoplot(m,type='rhat',param=param)
-#         p2 <- autoplot(m,type='autocorrelation',param=param)
-#         p1 <- smaller_legend(p1)
-#         my_legend <- extract_legend(p1)
-#         arrangeGrob(arrangeGrob(p1+theme(legend.position="none"),
-#                                 p2+theme(legend.position="none"),nrow=1),
-#                     my_legend,ncol=2,widths=c(4,1),top=textGrob(class(m),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
-#     })
-#     names(plot_list) <- names(m_obj)
-#     if(m_class=='list'){
-#         p <- grid.arrange(grobs=plot_list,nrow=4)
-#     }else{
-#         p <- plot_list[[m_class]]
-#     }
-#     return(p)
-# }
 
 
 
