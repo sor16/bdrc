@@ -134,7 +134,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @export
 plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
-    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals")
+    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics')
     if(is.null(type) || type=='deviance'){
         p <- autoplot(x,transformed=transformed)
     }else if(type=="residuals"){
@@ -175,6 +175,11 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
             autoplot(m,type=type,transformed=transformed,title=class(m))
         })
         p <- do.call(grid.arrange,c(plot_list,ncol=2))
+    }else if(type=='convergence_diagnostics'){
+        plot_list <- lapply(x$contestants,function(m){
+            plot_grob(m,type=type)
+        })
+        p <- do.call(grid.arrange,c(plot_list,nrow=4))
     }else{
         stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
     }
@@ -195,37 +200,34 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
 #ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
 
 
-#TODO: move into tournament plot function
-#' @importFrom ggplot2 autoplot theme
-#' @importFrom gridExtra grid.arrange arrangeGrob tableGrob
-#' @importFrom grid textGrob gpar
-#' @export
-get_conv_diagnostics_plots <- function(m_obj){
-    m_class <- class(m_obj)
-    model_types <- c('gplm','gplm0','plm','plm0')
-    if(m_class%in%model_types){
-        m_obj <- list(m_obj)
-        names(m_obj) <- m_class
-    }
-    plot_list <- lapply(m_obj,function(m){
-        param <- get_param_names(class(m),m$run_info$c_param)
-        p1 <- autoplot(m,type='rhat',param=param)
-        p2 <- autoplot(m,type='autocorrelation',param=param)
-        p1 <- smaller_legend(p1)
-        p2 <- smaller_legend(p2)
-        my_legend <- extract_legend(p1)
-        arrangeGrob(arrangeGrob(p1+theme(legend.position="none"),p2+theme(legend.position="none"),nrow=1),
-                                my_legend,ncol=2,widths=c(4,1),top=textGrob(class(m),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
-    })
-    names(plot_list) <- names(m_obj)
-    if(m_class=='list'){
-        p <- grid.arrange(grobs=plot_list,nrow=4)
-    }else{
-        p <- plot_list[[m_class]]
-    }
-    return(p)
-}
 
+
+
+# get_conv_diagnostics_plots <- function(m_obj){
+#     m_class <- class(m_obj)
+#     model_types <- c('gplm','gplm0','plm','plm0')
+#     if(m_class%in%model_types){
+#         m_obj <- list(m_obj)
+#         names(m_obj) <- m_class
+#     }
+#     plot_list <- lapply(m_obj,function(m){
+#         param <- get_param_names(class(m),m$run_info$c_param)
+#         p1 <- autoplot(m,type='rhat',param=param)
+#         p2 <- autoplot(m,type='autocorrelation',param=param)
+#         p1 <- smaller_legend(p1)
+#         my_legend <- extract_legend(p1)
+#         arrangeGrob(arrangeGrob(p1+theme(legend.position="none"),
+#                                 p2+theme(legend.position="none"),nrow=1),
+#                     my_legend,ncol=2,widths=c(4,1),top=textGrob(class(m),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+#     })
+#     names(plot_list) <- names(m_obj)
+#     if(m_class=='list'){
+#         p <- grid.arrange(grobs=plot_list,nrow=4)
+#     }else{
+#         p <- plot_list[[m_class]]
+#     }
+#     return(p)
+# }
 
 
 
