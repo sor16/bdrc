@@ -246,7 +246,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_line() +
             geom_point(size=1) +
             scale_x_continuous(expand=c(0,0),limits=c(1,nrow(x$autocorrelation)),labels=c(1,seq(5,nrow(x$autocorrelation),5)),breaks=c(1,seq(5,nrow(x$autocorrelation),5))) +
-            scale_y_continuous(limits=c(min(auto_dat$autocorrelation,-0.05),1)) +
+            scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$autocorrelation,-0.091),1)) +
             scale_color_manual(values=cbPalette) +
             theme_bdrc()
     }
@@ -270,9 +270,11 @@ plot_grob <- function(x,type,transformed=F){
     }else if(type=='convergence_diagnostics'){
         convergence_types <- c('rhat','autocorrelation')
         plot_list <- lapply(convergence_types,function(ty){
-            plot_fun(x,type=ty) + guides(color=guide_legend(title=paste0(class(x),'\nparameters')))
+            plot_fun(x,type=ty)
         })
-        legend <- extract_legend(smaller_legend(plot_list[[1]]))
+        plot_list[[1]] <- plot_converter(plot_list[[1]],model_class=class(x))
+        plot_list[[2]] <- plot_converter(plot_list[[2]],model_class=class(x))
+        legend <- extract_legend(plot_list[[1]])
         p <- arrangeGrob(arrangeGrob(plot_list[[1]]+theme(legend.position="none"),
                                      plot_list[[2]]+theme(legend.position="none"),nrow=1),
                          legend,ncol=2,widths=c(4,1))
@@ -280,7 +282,7 @@ plot_grob <- function(x,type,transformed=F){
     return(p)
 }
 ## TODO: add support for stage values below data but above median of c
-predict_fun <- function(object,newdata=NULL){
+predict_fun <- function(object,newdata=NULL,wide=FALSE){
     if(is.null(newdata)){
         merged_data <- merge(object$rating_curve,object$data,by.x='h',by.y=all.vars(object$formula)[2])
         pred_dat <- merged_data[,c('h','lower','median','upper')]
@@ -307,6 +309,9 @@ predict_fun <- function(object,newdata=NULL){
         median_pred <- stats::approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
         upper_pred <- stats::approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
         pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
+        if(wide==TRUE){
+            pred_dat <- predict_wider(pred_dat)
+        }
     }
     return(pred_dat)
 }
@@ -441,8 +446,8 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' predict(plm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.plm0 <- function(object,newdata=NULL,...){
-    predict_fun(object,newdata)
+predict.plm0 <- function(object,newdata=NULL,wide=FALSE,...){
+    predict_fun(object,newdata,wide)
 }
 
 #' Print plm object
@@ -578,8 +583,8 @@ plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,.
 #' predict(plm.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.plm <- function(object,newdata=NULL,...){
-    predict_fun(object,newdata)
+predict.plm <- function(object,newdata=NULL,wide=FALSE,...){
+    predict_fun(object,newdata,wide)
 }
 
 #' Print gplm0 object
@@ -713,8 +718,8 @@ plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL
 #' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.gplm0 <- function(object,newdata=NULL,...){
-    predict_fun(object,newdata)
+predict.gplm0 <- function(object,newdata=NULL,wide=FALSE,...){
+    predict_fun(object,newdata,wide)
 }
 
 #' Print gplm object
@@ -850,6 +855,6 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
 #' }
 #' @export
-predict.gplm <- function(object,newdata=NULL,...){
-    predict_fun(object,newdata)
+predict.gplm <- function(object,newdata=NULL,wide=FALSE,...){
+    predict_fun(object,newdata,wide)
 }
