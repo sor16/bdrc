@@ -75,10 +75,15 @@ tournament <- function(formula=NULL,data=NULL,...) {
         }
     }else{
         args <- list()
+        cat('Running tournament:\n')
         args$gplm <- gplm(formula, data, ...)
+        cat('25% - gplm finished\n')
         args$gplm0 <- gplm0(formula, data, ...)
+        cat('50% - gplm0 finished\n')
         args$plm <- plm(formula, data, ...)
+        cat('75% - plm finished\n')
         args$plm0 <- plm0(formula, data, ...)
+        cat('100% - plm0 finished\n')
     }
     round1 <- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){
