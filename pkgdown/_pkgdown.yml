@@ -32,6 +32,8 @@ reference:
     - autoplot.plm0
     - plot.plm0
     - predict.plm0
+    - get_report_pages.plm0
+    - get_report.plm0
 
   - title: Methods for plm objects
     contents:
@@ -40,6 +42,8 @@ reference:
     - autoplot.plm
     - plot.plm
     - predict.plm
+    - get_report_pages.plm
+    - get_report.plm
 
   - title: Methods for gplm0 objects
     contents:
@@ -48,6 +52,8 @@ reference:
     - autoplot.gplm0
     - plot.gplm0
     - predict.gplm0
+    - get_report_pages.gplm0
+    - get_report.gplm0
 
   - title: Methods for gplm objects
     contents:
@@ -56,6 +62,8 @@ reference:
     - autoplot.gplm
     - plot.gplm
     - predict.gplm
+    - get_report_pages.gplm
+    - get_report.gplm
 
   - title: Methods for tournament objects
     contents:
@@ -63,6 +71,8 @@ reference:
     - summary.tournament
     - autoplot.tournament
     - plot.tournament
+    - get_report_pages.tournament
+    - get_report.tournament
 
   - title: Data manipulation functions
     contents:
