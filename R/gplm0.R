@@ -71,6 +71,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- gplm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
+    param_names <- get_param_names('gplm0',c_param)
     #prepare S3 model object to be returned
     result_obj=list()
     attr(result_obj, "class") <- "gplm0"
@@ -103,7 +104,9 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique_sorted)
     result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique_sorted)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
-    row.names(result_obj$param_summary) <- get_param_names('gplm0',c_param)
+    result_obj$param_summary$n_eff_samples <- MCMC_output_list$num_effective_samples
+    result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
+    row.names(result_obj$param_summary) <- param_names
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
@@ -111,11 +114,9 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
-    names(autocorrelation_df) <- get_param_names('gplm0',c_param)
+    names(autocorrelation_df) <- param_names
     autocorrelation_df$lag <- 1:nrow(autocorrelation_df)
-    result_obj$autocorrelation <- autocorrelation_df[,c('lag',get_param_names('gplm0',c_param))]
-    result_obj$num_effective_samples <- data.frame(param=get_param_names('gplm0',c_param),num_effective_samples=MCMC_output_list$num_effective_samples)
-    result_obj$r_hat <- data.frame(param=get_param_names('gplm0',c_param),r_hat=MCMC_output_list$r_hat)
+    result_obj$autocorrelation <- autocorrelation_df[,c('lag',param_names)]
     # store other information
     result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
