@@ -139,7 +139,7 @@ get_report_components <- function(x,type=1){
         tour_table[c('DIC','P')] <- round(tour_table[c('DIC','P')],digits=2)
         output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(base_family="Times"),rows=NULL)
         output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
-        output_list$conv_diag_plots <- get_conv_diagnostics_plots(m_obj)
+        output_list$conv_diag_plots <- plot(t_obj,type='convergence_diagnostics')
     }
     return(output_list)
 }
