@@ -486,6 +486,27 @@ B_splines <- function(ZZ){
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+predict_wider <- function(p_dat){
+  p_dat <- p_dat[,c('h','median')]
+  p_dat$decimal <- floor(p_dat$h*10)/10
+  first_decimal <- length(p_dat$decimal[p_dat$decimal==p_dat$decimal[1]])
+  if(first_decimal!=10) {
+    n <- 10-first_decimal
+    top_rows <- data.frame(h=sapply(n:1,function(x) p_dat$h[1]-0.01*x),median=rep(0,n),decimal=rep(p_dat$decimal[1],n))
+    p_dat <- rbind(top_rows,p_dat)
+  }
+  last_decimal <- length(p_dat$decimal[p_dat$decimal==p_dat$decimal[length(p_dat$decimal)]])
+  if(last_decimal!=10){
+    m <- 10-last_decimal
+    bot_rows <- data.frame(h=sapply(1:m,function(x) p_dat$h[length(p_dat$h)]+0.01*x),median=rep(NA,m),decimal=rep(p_dat$decimal[length(p_dat$decimal)],m))
+    p_dat <- rbind(p_dat,bot_rows)
+  }
+  p_mat <- lapply(unique(p_dat$decimal),function(d) p_dat$median[p_dat$decimal==d])
+  p_mat <- do.call('rbind',p_mat)
+  rownames(p_mat) <- unique(p_dat$decimal)
+  colnames(p_mat) <- seq(0,0.09,by=0.01)
+  return(p_mat)
+}
 
 #' @importFrom stats median
 get_residuals_dat <- function(m){
