@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ```
 A discharge rating curve (drc) is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it's used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different dishcarge rating curve models are implemented in this R package using a Bayesian hierarchical model:
 
-* plm() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model
+* plm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice
 
 * plm() - Power-law model with variance that may vary with stage
 
@@ -111,7 +111,7 @@ plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
 ```
 
 ## Customization of models
-There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and I want to calculate the rating curve for stage values up to 2.5 m, then  my function call would look like this
+There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 2.5 m, then your function call would look like this
 ```{r,cache=T,results}
 gplm.fit.known_c <- gplm(Q~W,V316_river,c_param=0.75,h_max=2.5)
 summary(gplm.fit.known_c)
