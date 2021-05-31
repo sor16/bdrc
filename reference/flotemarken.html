@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict method for plm fit — predict.plm • bdrc</title>
+<title>Flotemarken river in Sweden — flotemarken • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Predict method for plm fit — predict.plm" />
-<meta property="og:description" content="Print the results of a  object" />
+<meta property="og:title" content="Flotemarken river in Sweden — flotemarken" />
+<meta property="og:description" content="Paired stage (W) and discharge measurements (Q) from Flotemarken river in Sweden" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,51 +137,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict method for plm fit</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/plm_methods.R'><code>R/plm_methods.R</code></a></small>
-    <div class="hidden name"><code>predict.plm.Rd</code></div>
+    <h1>Flotemarken river in Sweden</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>flotemarken.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Print the results of a  object</p>
+    <p>Paired stage (W) and discharge measurements (Q) from Flotemarken river in Sweden</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for plm</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, wide <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='va'>flotemarken</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>object</th>
-      <td><p>an object of class "plm"</p></td>
-    </tr>
-    <tr>
-      <th>newdata</th>
-      <td><p>a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>not used in this function</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>numeric vector of discharge values for the stage values given in newdata</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>A data frame with columns:</p><dl>
+ <dt>W</dt><dd><p>Measurements of river stage</p></dd>
+ <dt>Q</dt><dd><p>Measurements of river discharge</p></dd>
 
-    <div class='dont-index'><p><code><a href='plm.html'>plm</a></code> for fitting the plm model,<code><a href='summary.plm.html'>summary.plm</a></code> for summaries, <code>predict.plm</code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='plot.plm.html'>plot.plm</a></code> to help visualize the full posterior distributions.</p></div>
+</dl>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm.html'>plm</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span>,h_max<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='co'>#predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>plm.fit</span>,newdata<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,by<span class='op'>=</span><span class='fl'>0.01</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div></pre>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Swedish Meteorological and Hydrological Institute <a href='http://www.smhi.se'>http://www.smhi.se</a></p>
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
