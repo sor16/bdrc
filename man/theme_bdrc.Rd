@@ -4,7 +4,7 @@
 \alias{theme_bdrc}
 \title{Custom bdrc theme}
 \usage{
-theme_bdrc()
+theme_bdrc(..., scaling = 1)
 }
 \value{
 returns a theme object for the package

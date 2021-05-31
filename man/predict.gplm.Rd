@@ -4,7 +4,7 @@
 \alias{predict.gplm}
 \title{Predict method for gplm fit}
 \usage{
-\method{predict}{gplm}(object, newdata = NULL, ...)
+\method{predict}{gplm}(object, newdata = NULL, wide = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class "gplm"}

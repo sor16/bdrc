@@ -4,7 +4,7 @@
 \alias{predict.plm}
 \title{Predict method for plm fit}
 \usage{
-\method{predict}{plm}(object, newdata = NULL, ...)
+\method{predict}{plm}(object, newdata = NULL, wide = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class "plm"}
