@@ -32,6 +32,9 @@ predict_matrix <- function(x){
     return(p_mat)
 }
 
+
+
+
 #' @importFrom stats quantile
 #' @importFrom ggplot2 autoplot scale_x_continuous scale_y_continuous
 #' @importFrom gridExtra tableGrob ttheme_minimal
@@ -139,7 +142,9 @@ get_report_components <- function(x,type=1){
         tour_table[c('DIC','P')] <- round(tour_table[c('DIC','P')],digits=2)
         output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(base_family="Times"),rows=NULL)
         output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
-        output_list$conv_diag_plots <- plot(t_obj,type='convergence_diagnostics')
+        output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
+                                           plot_grob(x,type='convergence_diagnostics')
+                                       })
     }
     return(output_list)
 }
@@ -176,9 +181,9 @@ get_report_pages_fun <- function(x,type=1){
                                        as.table=TRUE,
                                        heights=c(1,1),
                                        top=textGrob('Model comparison and MCMC diagnostics',gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
-        convergence_page <- arrangeGrob(report_components$conv_diag_plots,
-                                        as.table=TRUE,
-                                        top=textGrob('',gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+        convergence_page <- arrangeGrob(grobs=report_components$conv_diag_plots,
+                                        nrow=4,
+                                        as.table=TRUE)
         histogram_pages <- lapply(names(report_components$main_page_plots), function(m) {
                                   arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
                                               top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold',fontfamily="Times")))
