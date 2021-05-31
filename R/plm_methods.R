@@ -259,7 +259,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
 
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom grid textGrob gpar
-#' @importFrom ggplot2 theme
+#' @importFrom ggplot2 theme guides guide_legend
 plot_grob <- function(x,type,transformed=F){
     if(type=='collage'){
         collage_types <- c('rating_curve','residuals','f','sigma_eps')
@@ -270,12 +270,12 @@ plot_grob <- function(x,type,transformed=F){
     }else if(type=='convergence_diagnostics'){
         convergence_types <- c('rhat','autocorrelation')
         plot_list <- lapply(convergence_types,function(ty){
-            plot_fun(x,type=ty)
+            plot_fun(x,type=ty) + guides(color=guide_legend(title=paste0(class(x),'\nparameters')))
         })
         legend <- extract_legend(smaller_legend(plot_list[[1]]))
         p <- arrangeGrob(arrangeGrob(plot_list[[1]]+theme(legend.position="none"),
                                      plot_list[[2]]+theme(legend.position="none"),nrow=1),
-                         legend,ncol=2,widths=c(4,1),top=textGrob(class(x),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+                         legend,ncol=2,widths=c(4,1))
     }
     return(p)
 }
