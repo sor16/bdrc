@@ -258,12 +258,25 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
 
 
 #' @importFrom gridExtra arrangeGrob
-plot_collage <- function(x,transformed=F){
-    types <- c('rating_curve','residuals','f','sigma_eps')
-    plot_list <- lapply(types,function(ty){
-        plot_fun(x,type=ty,transformed=transformed)
-    })
-    p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(types)))))
+#' @importFrom grid textGrob gpar
+#' @importFrom ggplot2 theme
+plot_grob <- function(x,type,transformed=F){
+    if(type=='collage'){
+        collage_types <- c('rating_curve','residuals','f','sigma_eps')
+        plot_list <- lapply(collage_types,function(ty){
+            plot_fun(x,type=ty,transformed=transformed)
+        })
+        p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(collage_types)))))
+    }else if(type=='convergence_diagnostics'){
+        convergence_types <- c('rhat','autocorrelation')
+        plot_list <- lapply(convergence_types,function(ty){
+            plot_fun(x,type=ty)
+        })
+        legend <- extract_legend(smaller_legend(plot_list[[1]]))
+        p <- arrangeGrob(arrangeGrob(plot_list[[1]]+theme(legend.position="none"),
+                                     plot_list[[2]]+theme(legend.position="none"),nrow=1),
+                         legend,ncol=2,widths=c(4,1),top=textGrob(class(x),gp=gpar(fontsize=22,facetype='bold',fontfamily="Times")))
+    }
     return(p)
 }
 ## TODO: add support for stage values below data but above median of c
@@ -276,8 +289,17 @@ predict_fun <- function(object,newdata=NULL){
             stop('newdata must be a vector of type "numeric" or NULL')
         }
         if(any(is.na(newdata))){
-            stop('newdata must include NA')
+            stop('newdata must not include NA')
         }
+        # if(is.null(object$run_info$c_param)){
+        #     if(any(newdata<median(object$c_posterior) | newdata>max(object$rating_curve$h))){
+        #         stop('newdata must contain values within the range from the point of zero flow (median of c_posterior) to the highest stage value used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
+        #     }
+        # }else{
+        #     if(any(newdata<object$run_info$c_param | newdata>max(object$rating_curve$h))){
+        #         stop('newdata must contain values within the range from the point of zero flow (c_param) to the highest stage value used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
+        #     }
+        # }
         if(any(newdata<min(object$rating_curve$h) | newdata>max(object$rating_curve$h))){
             stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
         }
@@ -389,11 +411,15 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    if(is.null(type) || type!='collage'){
+    legal_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%legal_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else{
-        p <- plot_collage(x,transformed=transformed)
+    }else if(type=='collage'){
+        p <- plot_grob(x,type=type,transformed=transformed)
+        grid.draw(p)
+    }else if(type=='convergence_diagnostics'){
+        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -522,11 +548,15 @@ autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NU
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    if(is.null(type) || type!='collage'){
+    legal_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%legal_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else{
-        p <- plot_collage(x,transformed=transformed)
+    }else if(type=='collage'){
+        p <- plot_grob(x,type=type,transformed=transformed)
+        grid.draw(p)
+    }else if(type=='convergence_diagnostics'){
+        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -653,11 +683,15 @@ autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    if(is.null(type) || type!='collage'){
+    legal_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%legal_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else{
-        p <- plot_collage(x,transformed=transformed)
+    }else if(type=='collage'){
+        p <- plot_grob(x,type=type,transformed=transformed)
+        grid.draw(p)
+    }else if(type=='convergence_diagnostics'){
+        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -786,11 +820,15 @@ autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    if(is.null(type) || type!='collage'){
+    legal_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%legal_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else{
-        p <- plot_collage(x,transformed=transformed)
+    }else if(type=='collage'){
+        p <- plot_grob(x,type=type,transformed=transformed)
+        grid.draw(p)
+    }else if(type=='convergence_diagnostics'){
+        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
