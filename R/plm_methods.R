@@ -20,18 +20,30 @@ summary_fun <- function(x){
 #' @return returns a theme object for the package
 #' @export
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
-theme_bdrc <- function(){
+theme_bdrc <- function(...,scaling=1){
+    title_size <- scaling*16
+    text_size <- scaling*12
+    plot_title_size=scaling*18
     theme_classic() %+replace%
         theme( #text = element_text(family="Times", face="plain"),
                strip.background = element_blank(),
-               strip.text.x = element_text(size = 16),
-               axis.title.x = element_text(size=16),
-               axis.title.y = element_text(size=16,angle=90),
-               axis.text.x = element_text(size=12),
-               axis.text.y = element_text(size=12),
-               legend.text=element_text(size=12),
-               legend.title=element_text(size=16),
-               plot.title=element_text(size=18))
+               strip.text.x = element_text(size = title_size),
+               axis.title.x = element_text(size=title_size),
+               axis.title.y = element_text(size=title_size,angle=90),
+               axis.text.x = element_text(size=text_size),
+               axis.text.y = element_text(size=text_size),
+               legend.text=element_text(size=text_size),
+               legend.title=element_text(size=text_size),
+               plot.title=element_text(size=plot_title_size),
+               ...)
+}
+
+#' @importFrom ggplot2 ggplot_gtable ggplot_build
+extract_legend<-function(a.gplot){
+    tmp <- ggplot_gtable(ggplot_build(a.gplot))
+    leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+    legend <- tmp$grobs[[leg]]
+    return(legend)
 }
 
 #' Plot bdrc model objects
@@ -58,7 +70,7 @@ theme_bdrc <- function(){
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
     cbPalette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
-    legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','rhat','autocorrelation')
+    legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','r_hat','autocorrelation')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
     }
@@ -120,8 +132,6 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
             plot_dat <- merge(x[[type]],x$data,by.x='h',by.y=all.vars(x$formula)[2])
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
-
-            # plot_dat$log_Q <- log(plot_dat$Q)
             plot_dat$log_Q <- log(plot_dat[, all.vars(x$formula)[1]])
 
             plot_dat$log_lower <- log(plot_dat$lower)
@@ -228,27 +238,32 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             theme_bdrc()
-    }else if(type=='rhat'){
+    }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
+        #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
+        y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
-            geom_hline(yintercept = 1.1,linetype='dashed') +
-            geom_line() +
-            scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
-            scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
-            scale_color_manual(values=cbPalette) +
-            theme_bdrc()
+             geom_hline(yintercept = 1.1,linetype='dashed') +
+             geom_line() +
+             scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
+             scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
+             scale_color_manual(values=cbPalette,name=class(x)) +
+             xlab('Iteration') +
+             ylab(parse(text=y_lab)) +
+             theme_bdrc()
     }else if(type=='autocorrelation'){
-        auto_dat <- x$autocorrelation
-        param <- get_param_names(class(x),x$run_info$c_param)
-        auto_dat <- reshape(auto_dat,varying=param,v.names="autocorrelation",timevar="parameters",times=param,new.row.names=1:(length(param)*nrow(auto_dat)),direction="long")
-        p <- ggplot(data=auto_dat, aes(x=.data$lag,y=.data$autocorrelation,color=.data$parameters)) +
-            geom_hline(yintercept=0) +
-            geom_line() +
-            geom_point(size=1) +
-            scale_x_continuous(expand=c(0,0),limits=c(1,nrow(x$autocorrelation)),labels=c(1,seq(5,nrow(x$autocorrelation),5)),breaks=c(1,seq(5,nrow(x$autocorrelation),5))) +
-            scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$autocorrelation,-0.091),1)) +
-            scale_color_manual(values=cbPalette) +
-            theme_bdrc()
+        auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
+        max_lag <- nrow(x$autocorrelation)
+        p <- ggplot(data=auto_dat, aes(x=.data$lag,y=.data$corr,color=.data$param)) +
+             geom_hline(yintercept=0) +
+             geom_line() +
+             geom_point(size=1) +
+             scale_x_continuous(expand=c(0,0),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
+             scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$corr,-1/11),1)) +
+             scale_color_manual(values=cbPalette,name=class(x)) +
+             xlab('Lag') +
+             ylab('Autocorrelation') +
+             theme_bdrc()
     }
     if(!is.null(title)){
         p <- p + ggtitle(title)
@@ -258,7 +273,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
 
 
 #' @importFrom gridExtra arrangeGrob
-#' @importFrom grid textGrob gpar
+#' @importFrom grid textGrob gpar unit
 #' @importFrom ggplot2 theme guides guide_legend
 plot_grob <- function(x,type,transformed=F){
     if(type=='collage'){
@@ -268,15 +283,19 @@ plot_grob <- function(x,type,transformed=F){
         })
         p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(collage_types)))))
     }else if(type=='convergence_diagnostics'){
-        convergence_types <- c('rhat','autocorrelation')
-        plot_list <- lapply(convergence_types,function(ty){
-            plot_fun(x,type=ty)
-        })
-        plot_list[[1]] <- plot_converter(plot_list[[1]],model_class=class(x))
-        plot_list[[2]] <- plot_converter(plot_list[[2]],model_class=class(x))
-        legend <- extract_legend(plot_list[[1]])
-        p <- arrangeGrob(arrangeGrob(plot_list[[1]]+theme(legend.position="none"),
-                                     plot_list[[2]]+theme(legend.position="none"),nrow=1),
+        autocorrelation_plot <- plot_fun(x,type='autocorrelation') +
+                                theme_bdrc(legend.key.size = unit(0.8, "lines"),
+                                           legend.justification = "top",
+                                           legend.key.width = unit(0.5,"cm"),
+                                           scaling=0.82)
+        r_hat_plot <- plot_fun(x,type='r_hat') +
+                      theme_bdrc(legend.key.size = unit(0.8, "lines"),
+                                 legend.justification = "top",
+                                 legend.key.width = unit(1,"cm"),
+                                 scaling=0.82)
+        legend <- extract_legend(r_hat_plot)
+        p <- arrangeGrob(arrangeGrob(r_hat_plot+theme(legend.position="none"),
+                                     autocorrelation_plot+theme(legend.position="none"),nrow=1),
                          legend,ncol=2,widths=c(4,1))
     }
     return(p)
@@ -293,23 +312,16 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
         if(any(is.na(newdata))){
             stop('newdata must not include NA')
         }
-        # if(is.null(object$run_info$c_param)){
-        #     if(any(newdata<median(object$c_posterior) | newdata>max(object$rating_curve$h))){
-        #         stop('newdata must contain values within the range from the point of zero flow (median of c_posterior) to the highest stage value used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
-        #     }
-        # }else{
-        #     if(any(newdata<object$run_info$c_param | newdata>max(object$rating_curve$h))){
-        #         stop('newdata must contain values within the range from the point of zero flow (c_param) to the highest stage value used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
-        #     }
-        # }
-        if(any(newdata<min(object$rating_curve$h) | newdata>max(object$rating_curve$h))){
+        c_param <- if(is.null(object$run_info$c_param)) median(object$c_posterior) else object$run_info$c_param
+        if(any(newdata>max(object$rating_curve$h))){
             stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
         }
         lower_pred <- stats::approx(object$rating_curve$h,object$rating_curve$lower,xout=newdata)$y
         median_pred <- stats::approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
         upper_pred <- stats::approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
         pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
-        if(wide==TRUE){
+        pred_dat[is.na(pred_dat)] <- 0
+        if(wide){
             pred_dat <- predict_wider(pred_dat)
         }
     }
@@ -416,15 +428,12 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    legal_types <- c('collage','convergence_diagnostics')
-    if(is.null(type) || !(type%in%legal_types)){
+    grob_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else if(type=='collage'){
+    }else{
         p <- plot_grob(x,type=type,transformed=transformed)
-        grid.draw(p)
-    }else if(type=='convergence_diagnostics'){
-        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -553,15 +562,12 @@ autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NU
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    legal_types <- c('collage','convergence_diagnostics')
-    if(is.null(type) || !(type%in%legal_types)){
+    grob_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else if(type=='collage'){
+    }else{
         p <- plot_grob(x,type=type,transformed=transformed)
-        grid.draw(p)
-    }else if(type=='convergence_diagnostics'){
-        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -688,15 +694,12 @@ autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    legal_types <- c('collage','convergence_diagnostics')
-    if(is.null(type) || !(type%in%legal_types)){
+    grob_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else if(type=='collage'){
+    }else{
         p <- plot_grob(x,type=type,transformed=transformed)
-        grid.draw(p)
-    }else if(type=='convergence_diagnostics'){
-        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
@@ -825,15 +828,12 @@ autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    legal_types <- c('collage','convergence_diagnostics')
-    if(is.null(type) || !(type%in%legal_types)){
+    grob_types <- c('collage','convergence_diagnostics')
+    if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
         print(p)
-    }else if(type=='collage'){
+    }else{
         p <- plot_grob(x,type=type,transformed=transformed)
-        grid.draw(p)
-    }else if(type=='convergence_diagnostics'){
-        p <- plot_grob(x,type=type)
         grid.draw(p)
     }
 }
