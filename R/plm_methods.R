@@ -240,6 +240,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
+        param_expr <- parse(text=get_param_expression(param))
         #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
@@ -247,12 +248,13 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
              geom_line() +
              scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
              scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
-             scale_color_manual(values=cbPalette,name=class(x)) +
+             scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
              theme_bdrc()
     }else if(type=='autocorrelation'){
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
+        param_expr <- parse(text=get_param_expression(param))
         max_lag <- nrow(x$autocorrelation)
         p <- ggplot(data=auto_dat, aes(x=.data$lag,y=.data$corr,color=.data$param)) +
              geom_hline(yintercept=0) +
@@ -260,7 +262,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
              geom_point(size=1) +
              scale_x_continuous(expand=c(0,0),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
              scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$corr,-1/11),1)) +
-             scale_color_manual(values=cbPalette,name=class(x)) +
+             scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Lag') +
              ylab('Autocorrelation') +
              theme_bdrc()
