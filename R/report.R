@@ -212,7 +212,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
 #'                       \item{1}{ produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.
+#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
@@ -314,7 +314,7 @@ get_report_pages.gplm <- function(x,type=1,...){
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
 #'                       \item{1}{ produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.
+#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
@@ -339,7 +339,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
 #'                       \item{1}{ produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve, from the results of a model object, or if input class is "tournament", to the most approriate model, as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.
+#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
@@ -450,7 +450,7 @@ get_report.gplm <- function(x,path=NULL,type=1,...){
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
 #'                       \item{1}{ produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve, from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.
+#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.

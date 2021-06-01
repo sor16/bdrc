@@ -46,7 +46,7 @@ extract_legend<-function(a.gplot){
     return(legend)
 }
 
-#' @importFrom sacles extended_breaks
+#' @importFrom scales extended_breaks
 histogram_breaks <-function(x){
     default_breaks <- extended_breaks()(x)
     if((max(default_breaks)-min(default_breaks)) < 0.01){
