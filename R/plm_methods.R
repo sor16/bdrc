@@ -46,6 +46,15 @@ extract_legend<-function(a.gplot){
     return(legend)
 }
 
+#' @importFrom sacles extended_breaks
+histogram_breaks <-function(x){
+    default_breaks <- extended_breaks()(x)
+    if((max(default_breaks)-min(default_breaks)) < 0.01){
+        return(median(default_breaks))
+    }else{
+        return(default_breaks)
+    }
+}
 #' Plot bdrc model objects
 #'
 #' Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
@@ -120,6 +129,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
         p <- ggplot(plot_dat,aes(x=.data$value)) +
             geom_histogram(bins=50,fill="#0072B5FF") +
             facet_wrap(~name_expr,scales='free',labeller=label_parsed) +
+            scale_x_continuous(breaks=histogram_breaks) +
             xlab('') +
             ylab('') +
             theme_bdrc()
