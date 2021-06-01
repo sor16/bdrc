@@ -7,11 +7,12 @@ predict_matrix <- function(x){
     min_rc_h <- ceiling(min_rc_h*100)/100
     grid_max <- x$run_info$h_max
     p_mat <- predict(x,newdata=seq(min_rc_h,grid_max,by=0.01),wide=TRUE)
-    p_mat <- round(p_mat,digits=3)
+    p_mat <- format(round(p_mat,digits=3),nsmall=3)
     p_mat_grob <- tableGrob(p_mat,theme=ttheme_minimal(core=list(bg_params = list(fill = blues9[1:2], col=NA),
-                                                   fg_params=list(fontface=3)),
-                                                   colhead=list(fg_params=list(col="black",fontface=2L)),
-                                                   rowhead=list(fg_params=list(col="black",fontface=2L))))
+                                                       fg_params=list(fontface=3)),
+                                                       colhead=list(fg_params=list(col="black",fontface=2L)),
+                                                       rowhead=list(fg_params=list(col="black",fontface=2L)),
+                                                       base_size = 10))
     # split_row <- 6
     # n_pages <- ceiling(nrow(p_mat)/split_row)
     # if(n_pages>1){
@@ -190,7 +191,7 @@ get_report_pages_fun <- function(x,type=1){
 }
 
 #' @importFrom grDevices pdf dev.off
-save_report <- function(report_pages,path=NULL,paper='a4',width=8,height=11){
+save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
     if(is.null(path)){
         path <- 'report.pdf'
     }
