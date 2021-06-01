@@ -220,7 +220,7 @@ get_param_expression <- function(param){
                 'z_1'='z[1]','z_2'='z[2]','z_3'='z[3]',
                 'z_4'='z[4]','z_5'='z[5]','z_6'='z[6]')
   param_expr <- expr_vec[param]
-  if(is.na(param_expr)){
+  if(any(is.na(param_expr))){
     stop('param not found')
   }
   return(param_expr)
