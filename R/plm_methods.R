@@ -119,7 +119,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
         plot_dat$chain <- factor(as.character(plot_dat$chain),levels=1:max(plot_dat$chain))
         p <- ggplot(plot_dat,aes(x=.data$value)) +
             geom_histogram(bins=50,fill="#0072B5FF") +
-            facet_wrap(~name_expr,scales='free',labeller = label_parsed) +
+            facet_wrap(~name_expr,scales='free',labeller=label_parsed) +
             xlab('') +
             ylab('') +
             theme_bdrc()
