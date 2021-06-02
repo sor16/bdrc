@@ -17,6 +17,8 @@ summary_fun <- function(x){
 
 #' Custom bdrc theme
 #'
+#' @param ... not used in this function
+#' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
 #' @export
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
@@ -456,6 +458,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' Print the results of a  object
 #' @param object an object of class "plm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
@@ -590,6 +593,7 @@ plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,.
 #' Print the results of a  object
 #' @param object an object of class "plm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
@@ -722,6 +726,7 @@ plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL
 #' Print the results of a  object
 #' @param object an object of class "gplm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
@@ -856,6 +861,7 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' Print the results of a  object
 #' @param object an object of class "gplm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
