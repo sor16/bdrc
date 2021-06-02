@@ -15,7 +15,8 @@ Imports:
     ggplot2,
     grid,
     gridExtra,
-    rlang
+    rlang,
+    scales
 Suggests:
     testthat,
     knitr,

@@ -6,6 +6,11 @@
 \usage{
 theme_bdrc(..., scaling = 1)
 }
+\arguments{
+\item{...}{not used in this function}
+
+\item{scaling}{a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.}
+}
 \value{
 returns a theme object for the package
 }

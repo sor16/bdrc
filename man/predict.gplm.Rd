@@ -11,6 +11,8 @@
 
 \item{newdata}{a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.}
 
+\item{wide}{a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.}
+
 \item{...}{not used in this function}
 }
 \value{

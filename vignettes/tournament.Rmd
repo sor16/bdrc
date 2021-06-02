@@ -13,8 +13,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=14, 
-  fig.height=8, 
+  fig.width=8, 
+  fig.height=6, 
   fig.path='figs-tournament/',
   fig.align='center',
   prompt=T
@@ -78,7 +78,7 @@ plot(t_obj,type='residuals')
 ```
 
 The main difference of te four models lies in the modelling of the power law exponent ($f(h)$) the variance on the data level ($\sigma^2_{\varepsilon}$). Thus it is insightful to look at the posterior of the power law exponent for the different models
-```{r}
+```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='f')
 ```
 and the variance on the data level
@@ -88,7 +88,7 @@ plot(t_obj,type='sigma_eps')
 
 ## Customizing tournaments
 There are ways to customize the tournament further. If the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. Assume 0.75 m is the known value of $c$ and you want to run a tournament with c fixed for all models. Then you could write
-```{r,cache=T,results}
+```{r,cache=T}
 t_obj_known_c <- tournament(formula=Q~W,data=V316_river,c_param=0.75)
 summary(t_obj_known_c )
 ```

@@ -124,6 +124,7 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(F
     return(result_obj)
 }
 
+#' @importFrom stats optim
 plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
     RC=priors('plm',c_param)
@@ -150,7 +151,7 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     RC$theta_length <- if(is.null(RC$c)) 8 else 7
     theta_init <- rep(0,RC$theta_length)
     loss_fun  <-  function(th) {-density_fun(th,RC)$p}
-    optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     theta_m <- optim_obj$par
     H <- optim_obj$hessian
     proposal_scaling <- 2.38^2/RC$theta_length
@@ -189,6 +190,7 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     return(output_list)
 }
 
+#' @importFrom stats rnorm dlnorm
 plm.density_evaluation_known_c <- function(theta,RC){
     log_sig_eta <- theta[1]
     eta_1 <- theta[2]
@@ -208,18 +210,19 @@ plm.density_evaluation_known_c <- function(theta,RC){
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
     W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
 
-    D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
+    D=-2*sum(log(dlnorm(exp(RC$y),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
+#' @importFrom stats rnorm dlnorm
 plm.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eta <- theta[2]
@@ -242,18 +245,19 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
     W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%stats::rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
 
-    D=-2*sum(log(stats::dlnorm(exp(RC$y),yp,sqrt(varr))))
+    D=-2*sum(log(dlnorm(exp(RC$y),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
+#' @importFrom stats dlnorm
 plm.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
   if(!is.null(RC$c)){
@@ -276,10 +280,11 @@ plm.calc_Dhat <- function(theta,RC){
   x=RC$mu_x+RC$Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
 
-  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
   return(D)
 }
 
+#' @importFrom stats rnorm
 plm.predict_u_known_c <- function(theta,x,RC){
     log_sig_eta2 <- theta[1]
     eta_1 <- theta[2]
@@ -292,10 +297,11 @@ plm.predict_u_known_c <- function(theta,x,RC){
     X <- cbind(rep(1,m),l)
     #sample from the posterior of discharge y
     yp_u <- c(X%*%x)
-    ypo_u <- yp_u  + stats::rnorm(m) * sqrt(varr_u)
+    ypo_u <- yp_u  + rnorm(m) * sqrt(varr_u)
     return(list('y_post'=yp_u,'y_post_pred'=ypo_u,'sigma_eps'=varr_u))
 }
 
+#' @importFrom stats rnorm
 plm.predict_u_unknown_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     zeta=theta[1]
@@ -313,7 +319,7 @@ plm.predict_u_unknown_c <- function(theta,x,RC){
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior of discharge y
     yp_u <- c(X%*%x)
-    ypo_u = yp_u + stats::rnorm(m_above_c) * sqrt(varr_u[above_c])
+    ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
     return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u),'sigma_eps'=varr_u))
 }
 

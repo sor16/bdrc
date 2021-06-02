@@ -124,7 +124,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     result_obj$run_info <- MCMC_output_list$run_info
     return(result_obj)
 }
-
+#' @importFrom stats dist optim
 gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('gplm0',c_param)
     RC$y <- rbind(as.matrix(y),RC$mu_b)
@@ -136,7 +136,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
     RC$n <- length(RC$h)
     RC$n_unique <- length(RC$h_unique)
     RC$A <- create_A(RC$h)
-    RC$dist <- as.matrix(stats::dist(c(RC$h_unique)))
+    RC$dist <- as.matrix(dist(c(RC$h_unique)))
 
     RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
     RC$B <- B_splines(t(RC$h_tild)/RC$h_tild[length(RC$h_tild)])
@@ -158,7 +158,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
     RC$theta_length <- if(is.null(RC$c)) 4 else 3
     theta_init <- rep(0,RC$theta_length)
     loss_fun  <-  function(th) {-density_fun(th,RC)$p}
-    optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     theta_m <- optim_obj$par
     H <- optim_obj$hessian
     proposal_scaling <- 2.38^2/RC$theta_length
@@ -200,6 +200,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=re
     return(output_list)
 }
 
+#' @importFrom stats rnorm dlnorm
 gplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     log_sig_b <- theta[2]
@@ -224,17 +225,18 @@ gplm0.density_evaluation_known_c <- function(theta,RC){
       pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
 
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(RC$n_unique+2)
-    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(stats::rnorm(RC$n)),0)
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
+    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
+#' @importFrom stats rnorm dlnorm
 gplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
@@ -259,18 +261,19 @@ gplm0.density_evaluation_unknown_c <- function(theta,RC){
       pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
       pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(RC$n_unique+2)
-    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(stats::rnorm(RC$n)),0)
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
+    sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
 
-    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
+#' @importFrom stats dlnorm
 gplm0.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
   if(!is.null(RC$c)){
@@ -296,10 +299,10 @@ gplm0.calc_Dhat <- function(theta,RC){
   x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
 
-  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
   return(D)
 }
-
+#' @importFrom stats rnorm dist
 gplm0.predict_u_known_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     #store particular hyperparameter values
@@ -314,7 +317,7 @@ gplm0.predict_u_known_c <- function(theta,x,RC){
     #combine stages from data with unobserved stages
     h_all=c(RC$h_unique,RC$h_u)
     #calculating distance matrix for h_all
-    dist_mat=as.matrix(stats::dist(h_all))
+    dist_mat=as.matrix(dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
     sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
@@ -326,7 +329,7 @@ gplm0.predict_u_known_c <- function(theta,x,RC){
     mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
     Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
     #a sample from posterior of beta_u drawn
-    beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+    beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
     #buidling blocks of the explanatory matrix X calculated
     l=log(RC$h_u-RC$c)
     X=cbind(rep(1,m),l,diag(l))
@@ -335,10 +338,11 @@ gplm0.predict_u_known_c <- function(theta,x,RC){
     yp_u <- c(X%*%x_u)
     #make sure the log discharge at point of zero discharge is -Inf
     yp_u[1] <- -Inf
-    ypo_u = yp_u + stats::rnorm(m) * sqrt(varr_u)
+    ypo_u = yp_u + rnorm(m) * sqrt(varr_u)
     return(list('x'=beta_u,'y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
+#' @importFrom stats rnorm dist
 gplm0.predict_u_unknown_c <- function(theta,x,RC){
     #store particular hyperparameter values
     zeta <- theta[1]
@@ -352,7 +356,7 @@ gplm0.predict_u_unknown_c <- function(theta,x,RC){
     #combine stages from data with unobserved stages
     h_all=c(RC$h_unique,RC$h_u)
     #calculating distance matrix for h_all
-    dist_mat=as.matrix(stats::dist(h_all))
+    dist_mat=as.matrix(dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
     sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
@@ -364,7 +368,7 @@ gplm0.predict_u_unknown_c <- function(theta,x,RC){
     mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
     Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
     #a sample from posterior of beta_u drawn
-    beta_u=as.numeric(mu_x_u) + stats::rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+    beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
     above_c <- -(exp(zeta)-RC$h_min) < RC$h_u
     m_above_c <- sum(above_c)
     #buidling blocks of the explanatory matrix X calculated
@@ -374,6 +378,6 @@ gplm0.predict_u_unknown_c <- function(theta,x,RC){
     x_u=c(x[1:2],beta_u[above_c])
     #sample from the posterior of discharge y
     yp_u <- c(X%*%x_u)
-    ypo_u = yp_u + stats::rnorm(m_above_c) * sqrt(varr_u[above_c])
+    ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
     return(list('x'=beta_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }

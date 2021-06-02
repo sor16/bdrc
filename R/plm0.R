@@ -110,6 +110,7 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     return(result_obj)
 }
 
+#' @importFrom stats optim
 plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- priors('plm0',c_param)
     RC$y <- as.matrix(y)
@@ -132,7 +133,7 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     RC$theta_length <- if(is.null(RC$c)) 2 else 1
     theta_init <- rep(0,RC$theta_length)
     loss_fun <- function(theta) {-density_fun(theta,RC)$p}
-    optim_obj <- stats::optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+    optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
     theta_m <- optim_obj$par
     H <- optim_obj$hessian
     proposal_scaling <- 2.38^2/RC$theta_length
@@ -166,6 +167,7 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     return(output_list)
 }
 
+#' @importFrom stats rnorm dlnorm
 plm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     l=c(log(RC$h-RC$c))
@@ -181,16 +183,17 @@ plm0.density_evaluation_known_c <- function(theta,RC){
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(length(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
+#' @importFrom stats rnorm dlnorm
 plm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
@@ -207,17 +210,18 @@ plm0.density_evaluation_unknown_c <- function(theta,RC){
     pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
-    x_u=RC$mu_x+t(chol(Sig_x))%*%stats::rnorm(length(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(stats::rnorm(RC$n))
+    x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
     x=as.matrix(x_u-t(W)%*%solve(L,sss))
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
-    ypo=yp+as.matrix(stats::rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
+    D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
 
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
+#' @importFrom stats dlnorm
 plm0.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
   if(!is.null(RC$c)){
@@ -235,10 +239,11 @@ plm0.calc_Dhat <- function(theta,RC){
   w=solve(L,RC$y-X%*%RC$mu_x)
   x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
-  D=-2*sum(log(stats::dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
+  D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
   return(D)
 }
 
+#' @importFrom stats rnorm
 plm0.predict_u_known_c <- function(theta,x,RC){
   #collecting parameters from the MCMC sample
   log_sig_eps2 = theta[1]
@@ -248,10 +253,11 @@ plm0.predict_u_known_c <- function(theta,x,RC){
   X=cbind(rep(1,m),l)
   #sample from the posterior predictive distr of y
   yp_u <- c(X%*%x)
-  ypo_u <- yp_u + stats::rnorm(m) * sqrt(exp(log_sig_eps2))
+  ypo_u <- yp_u + rnorm(m) * sqrt(exp(log_sig_eps2))
   return(list('y_post'=yp_u,'y_post_pred'=ypo_u))
 }
 
+#' @importFrom stats rnorm
 plm0.predict_u_unknown_c <- function(theta,x,RC){
     #collecting parameters from the MCMC sample
     zeta=theta[1]
@@ -264,7 +270,7 @@ plm0.predict_u_unknown_c <- function(theta,x,RC){
     X=cbind(rep(1,m_above_c),l)
     #sample from the posterior predictive distr of y
     yp_u <- c(X%*%x)
-    ypo_u = yp_u + stats::rnorm(m_above_c) * sqrt(exp(log_sig_eps2))
+    ypo_u = yp_u + rnorm(m_above_c) * sqrt(exp(log_sig_eps2))
     return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }
 

@@ -20,7 +20,6 @@ summary_fun <- function(x){
 #' @param ... not used in this function
 #' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
-#' @export
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
 theme_bdrc <- function(...,scaling=1){
     title_size <- scaling*16
@@ -316,6 +315,7 @@ plot_grob <- function(x,type,transformed=F){
     return(p)
 }
 ## TODO: add support for stage values below data but above median of c
+#' @importFrom stats approx
 predict_fun <- function(object,newdata=NULL,wide=FALSE){
     if(is.null(newdata)){
         merged_data <- merge(object$rating_curve,object$data,by.x='h',by.y=all.vars(object$formula)[2])
@@ -331,9 +331,9 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
         if(any(newdata>max(object$rating_curve$h))){
             stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
         }
-        lower_pred <- stats::approx(object$rating_curve$h,object$rating_curve$lower,xout=newdata)$y
-        median_pred <- stats::approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
-        upper_pred <- stats::approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
+        lower_pred <- approx(object$rating_curve$h,object$rating_curve$lower,xout=newdata)$y
+        median_pred <- approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
+        upper_pred <- approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
         pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
         pred_dat[is.na(pred_dat)] <- 0
         if(wide){

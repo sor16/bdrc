@@ -83,6 +83,7 @@ calc_variogram <- function(i,param_mat,burnin=2000,nr_iter=20000){
   rowSums((param_mat[,(i+1):ncol(param_mat)] - param_mat[,1:(ncol(param_mat)-i)])^2)
 }
 
+#' @importFrom stats rnorm runif
 run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20000,burnin=2000,thin=5,T_max=30){
     theta_mat <- matrix(0,nrow=RC$theta_length,ncol=nr_iter)
     output_list <- initiate_output_list(RC$desired_output,nr_iter)
@@ -91,10 +92,10 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     density_eval_old <- density_eval_m
     acceptance_vec <- rep(F,nr_iter)
     for(i in 1:nr_iter){
-        theta_new <- theta_old+solve(t(RC$LH),stats::rnorm(RC$theta_length,0,1))
+        theta_new <- theta_old+solve(t(RC$LH),rnorm(RC$theta_length,0,1))
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
-        if (logR>log(stats::runif(1))){
+        if (logR>log(runif(1))){
             acceptance_vec[i] <- T
             theta_old <- theta_new
             density_eval_old <- density_eval_new
@@ -130,7 +131,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     output_list$acceptance_vec <- t(as.matrix(acceptance_vec))
     return(output_list)
 }
-
+#' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
 get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_chains=4,nr_iter=20000,burnin=2000,thin=5,T_max=30){
   #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
   if(num_chains>4){
@@ -147,15 +148,15 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
       # use 2 cores in CRAN/Travis/AppVeyor
       num_cores <- 2L
     } else {
-      num_cores <- min(parallel::detectCores(),num_chains)
+      num_cores <- min(detectCores(),num_chains)
     }
-    cl <- parallel::makeCluster(num_cores,setup_strategy='sequential')
-    parallel::clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-    parallel::clusterExport(cl,c('run_MCMC','initiate_output_list','pri','calc_variogram',
-                                 'theta_m','RC','density_fun','unobserved_prediction_fun',
-                                 'parallel','nr_iter','burnin','thin','T_max'),envir = environment())
-    MCMC_output_list <- parallel::parLapply(cl,1:num_chains,run_MCMC_wrapper)
-    parallel::stopCluster(cl)
+    cl <- makeCluster(num_cores,setup_strategy='sequential')
+    clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
+    clusterExport(cl,c('run_MCMC','initiate_output_list','pri','calc_variogram',
+                       'theta_m','RC','density_fun','unobserved_prediction_fun',
+                       'parallel','nr_iter','burnin','thin','T_max'),envir = environment())
+    MCMC_output_list <- parLapply(cl,1:num_chains,run_MCMC_wrapper)
+    stopCluster(cl)
   }else{
     MCMC_output_list <- lapply(1:num_chains,run_MCMC_wrapper)
   }
@@ -177,11 +178,12 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
   return(output_list)
 }
 
+#' @importFrom stats quantile
 get_MCMC_summary <- function(X,h=NULL){
     summary_dat <- apply(X,1,function(x) {
-                      c(stats::quantile(x,probs=0.025,na.rm=T),
-                        stats::quantile(x,probs=0.5,na.rm=T),
-                        stats::quantile(x,probs=0.975,na.rm=T))
+                      c(quantile(x,probs=0.025,na.rm=T),
+                        quantile(x,probs=0.5,na.rm=T),
+                        quantile(x,probs=0.975,na.rm=T))
                     })
     summary_dat <- as.data.frame(t(summary_dat))
     names(summary_dat) <- c('lower','median','upper')

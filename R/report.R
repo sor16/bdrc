@@ -1,5 +1,6 @@
 ### TODO: Option in the predict function?? I.e. an help function for predict method. Ath aukastafi. Titill á töflu
 #' @importFrom gridExtra tableGrob ttheme_minimal
+#' @importFrom stats predict
 predict_matrix <- function(x){
     # c_param <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
     # c_param <- ceiling(c_param*100)/100
@@ -8,7 +9,7 @@ predict_matrix <- function(x){
     grid_max <- x$run_info$h_max
     p_mat <- predict(x,newdata=seq(min_rc_h,grid_max,by=0.01),wide=TRUE)
     p_mat <- format(round(p_mat,digits=3),nsmall=3)
-    p_mat_grob <- tableGrob(p_mat,theme=ttheme_minimal(core=list(bg_params = list(fill = blues9[1:2], col=NA),
+    p_mat_grob <- tableGrob(p_mat,theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),
                                                        fg_params=list(fontface=3)),
                                                        colhead=list(fg_params=list(col="black",fontface=2L)),
                                                        rowhead=list(fg_params=list(col="black",fontface=2L)),

@@ -1,7 +1,7 @@
 test_stage_indep_param <- function(mod,param){
     expect_true(is.double(mod[[paste0(param,'_posterior')]]))
     expect_equal(length(mod[[paste0(param,'_posterior')]]),mod$run_info$num_chains*((mod$run_info$nr_iter-mod$run_info$burnin)/mod$run_info$thin + 1))
-    expect_equal(unname(unlist(mod$param_summary[param,])),unname(quantile(mod[[paste0(param,'_posterior')]],probs=c(0.025,0.5,0.975))))
+    expect_equal(unname(unlist(mod$param_summary[param,c('lower','median','upper')])),unname(quantile(mod[[paste0(param,'_posterior')]],probs=c(0.025,0.5,0.975))))
 }
 
 test_stage_dep_component <- function(mod,component){

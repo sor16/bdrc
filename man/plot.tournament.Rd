@@ -21,7 +21,7 @@
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{title}{of the plot. Defaults to NULL, i.e. no title}
+\item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
 Compare the four models from the tournament object in multiple ways
