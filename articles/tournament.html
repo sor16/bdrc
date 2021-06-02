@@ -177,17 +177,17 @@
 <a href="#compare-different-components-of-the-models" class="anchor"></a>Compare different components of the models</h2>
 <p>To visualize the results from the tournament first we can plot the deviance posterior distribution of the different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the deviance distribution we write</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'deviance'</span>) <span class="co">#note that type defaults to deviance</span></span></code></pre></div>
-<p><img src="figs-tournament/unnamed-chunk-7-1.png" width="1344" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>rating curves using the plot function</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'rating_curve'</span>)</span></code></pre></div>
-<p><img src="figs-tournament/unnamed-chunk-8-1.png" width="1344" style="display: block; margin: auto;"> Another useful plot is the residual plot</p>
+<p><img src="figs-tournament/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"> Another useful plot is the residual plot</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
-<p><img src="figs-tournament/unnamed-chunk-9-1.png" width="1344" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The main difference of te four models lies in the modelling of the power law exponent (<span class="math inline">\(f(h)\)</span>) the variance on the data level (<span class="math inline">\(\sigma^2_{\varepsilon}\)</span>). Thus it is insightful to look at the posterior of the power law exponent for the different models</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'f'</span>)</span></code></pre></div>
-<p><img src="figs-tournament/unnamed-chunk-10-1.png" width="1344" style="display: block; margin: auto;"> and the variance on the data level</p>
+<p><img src="figs-tournament/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"> and the variance on the data level</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
-<p><img src="figs-tournament/unnamed-chunk-11-1.png" width="1344" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="customizing-tournaments" class="section level2">
 <h2 class="hasAnchor">

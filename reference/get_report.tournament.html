@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict method for gplm0 fit — predict.gplm0 • bdrc</title>
+<title>Get tournament report — get_report.tournament • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Predict method for gplm0 fit — predict.gplm0" />
-<meta property="og:description" content="Print the results of a  object" />
+<meta property="og:title" content="Get tournament report — get_report.tournament" />
+<meta property="og:description" content="Save a pdf report of a tournament object" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,53 +137,52 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict method for gplm0 fit</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/plm_methods.R'><code>R/plm_methods.R</code></a></small>
-    <div class="hidden name"><code>predict.gplm0.Rd</code></div>
+    <h1>Get tournament report</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/report.R'><code>R/report.R</code></a></small>
+    <div class="hidden name"><code>get_report.tournament.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Print the results of a  object</p>
+    <p>Save a pdf report of a tournament object</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for gplm0</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>object</span>, newdata <span class='op'>=</span> <span class='cn'>NULL</span>, wide <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='co'># S3 method for tournament</span>
+<span class='fu'><a href='get_report.html'>get_report</a></span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>an object of class "gplm0"</p></td>
+      <th>x</th>
+      <td><p>an object of class "tournament".</p></td>
     </tr>
     <tr>
-      <th>newdata</th>
-      <td><p>a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.</p></td>
+      <th>path</th>
+      <td><p>a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.</p></td>
     </tr>
     <tr>
-      <th>wide</th>
-      <td><p>a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.</p></td>
+      <th>type</th>
+      <td><p>an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are</p><ul>
+<li><p>1 produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve, from the results of the most approriate model for a given data set, as determined by <code><a href='tournament.html'>tournament</a></code>.</p></li>
+<li><p>2 produces a 10 page report from the results of all four models; <code><a href='plm0.html'>plm0</a></code>, <code><a href='plm.html'>plm</a></code>, <code><a href='gplm0.html'>gplm0</a></code> and <code><a href='gplm.html'>gplm</a></code>. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>not used in this function</p></td>
+      <td><p>further arguments passed to other methods (currently unused).</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>numeric vector of discharge values for the stage values given in newdata</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='gplm0.html'>gplm0</a></code> for fitting the gplm0 model,<code><a href='summary.gplm0.html'>summary.gplm0</a></code> for summaries, <code>predict.gplm0</code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='plot.gplm0.html'>plot.gplm0</a></code> to help visualize the full posterior distributions.</p></div>
+    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> for running a tournament,<code><a href='summary.tournament.html'>summary.tournament</a></code> for summaries.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>bunnerviken</span><span class='op'>)</span>
 <span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>gplm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gplm0.html'>gplm0</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span>,h_max<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='co'>#predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span><span class='va'>gplm0.fit</span>,newdata<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>2</span>,by<span class='op'>=</span><span class='fl'>0.01</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>bunnerviken</span><span class='op'>)</span>
+<span class='fu'><a href='get_report.html'>get_report</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div></pre>
   </div>
