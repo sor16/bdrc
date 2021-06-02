@@ -250,12 +250,13 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
+        rhat_dat$Rhat[rhat_dat$Rhat<1 | rhat_dat$Rhat>2] <- NA
         param_expr <- parse(text=get_param_expression(param))
         #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
              geom_hline(yintercept = 1.1,linetype='dashed') +
-             geom_line() +
+             geom_line(na.rm = T) +
              scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
              scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
@@ -270,7 +271,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
              geom_hline(yintercept=0) +
              geom_line() +
              geom_point(size=1) +
-             scale_x_continuous(expand=c(0,0),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
+             scale_x_continuous(expand=c(0,1),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
              scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$corr,-1/11),1)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Lag') +
@@ -305,7 +306,7 @@ plot_grob <- function(x,type,transformed=F){
                                  legend.justification = "top",
                                  legend.key.width = unit(1,"cm"),
                                  scaling=0.82)
-        legend <- extract_legend(r_hat_plot)
+        legend <- extract_legend(autocorrelation_plot)
         p <- arrangeGrob(arrangeGrob(r_hat_plot+theme(legend.position="none"),
                                      autocorrelation_plot+theme(legend.position="none"),nrow=1),
                          legend,ncol=2,widths=c(4,1))
