@@ -96,7 +96,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'   \item{"residuals"}{ to plot the log residuals}
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title of the plot. Defaults to NULL, i.e. no title
+#' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{summary.tournament}} for summaries
 #' @examples
 #' \dontrun{

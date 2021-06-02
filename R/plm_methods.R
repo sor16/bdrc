@@ -17,6 +17,8 @@ summary_fun <- function(x){
 
 #' Custom bdrc theme
 #'
+#' @param ... not used in this function
+#' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
 #' @export
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
@@ -250,12 +252,13 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
+        rhat_dat$Rhat[rhat_dat$Rhat<1 | rhat_dat$Rhat>2] <- NA
         param_expr <- parse(text=get_param_expression(param))
         #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
              geom_hline(yintercept = 1.1,linetype='dashed') +
-             geom_line() +
+             geom_line(na.rm = T) +
              scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
              scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
@@ -270,7 +273,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
              geom_hline(yintercept=0) +
              geom_line() +
              geom_point(size=1) +
-             scale_x_continuous(expand=c(0,0),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
+             scale_x_continuous(expand=c(0,1),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
              scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$corr,-1/11),1)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Lag') +
@@ -305,7 +308,7 @@ plot_grob <- function(x,type,transformed=F){
                                  legend.justification = "top",
                                  legend.key.width = unit(1,"cm"),
                                  scaling=0.82)
-        legend <- extract_legend(r_hat_plot)
+        legend <- extract_legend(autocorrelation_plot)
         p <- arrangeGrob(arrangeGrob(r_hat_plot+theme(legend.position="none"),
                                      autocorrelation_plot+theme(legend.position="none"),nrow=1),
                          legend,ncol=2,widths=c(4,1))
@@ -455,6 +458,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' Print the results of a  object
 #' @param object an object of class "plm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
@@ -589,6 +593,7 @@ plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,.
 #' Print the results of a  object
 #' @param object an object of class "plm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
@@ -721,6 +726,7 @@ plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL
 #' Print the results of a  object
 #' @param object an object of class "gplm0"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
@@ -855,6 +861,7 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,
 #' Print the results of a  object
 #' @param object an object of class "gplm"
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
 #' @param ... not used in this function
 #' @return numeric vector of discharge values for the stage values given in newdata
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
