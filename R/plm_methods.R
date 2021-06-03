@@ -20,7 +20,7 @@ summary_fun <- function(x){
 #' @param ... not used in this function
 #' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
-#' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
+#' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank element_rect
 theme_bdrc <- function(...,scaling=1){
     title_size <- scaling*16
     text_size <- scaling*12
@@ -33,9 +33,10 @@ theme_bdrc <- function(...,scaling=1){
                axis.title.y = element_text(size=title_size,angle=90),
                axis.text.x = element_text(size=text_size),
                axis.text.y = element_text(size=text_size),
-               legend.text=element_text(size=text_size),
-               legend.title=element_text(size=text_size),
-               plot.title=element_text(size=plot_title_size),
+               legend.text = element_text(size=text_size),
+               legend.title = element_text(size=text_size),
+               plot.title = element_text(size=plot_title_size),
+               panel.border = element_rect(colour="black",fill=NA),
                ...)
 }
 
