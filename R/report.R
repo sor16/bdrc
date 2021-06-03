@@ -193,14 +193,19 @@ get_report_pages_fun <- function(x,type=1){
 
 #' @importFrom grDevices pdf dev.off
 save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
+    message <- 'The report was saved at the following location:\n'
     if(is.null(path)){
         path <- 'report.pdf'
+        complete_message <- paste0(message,getwd(),'/',path)
+    }else{
+        complete_message <- paste0(message,path)
     }
     pdf(file=path,paper=paper,width=width,height=height)
     for(i in 1:length(report_pages)){
         grid.arrange(report_pages[[i]],as.table=T)
     }
-    dev.off()
+    invisible(dev.off())
+    cat(complete_message)
 }
 
 #### S3 methods
