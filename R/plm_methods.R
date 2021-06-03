@@ -251,7 +251,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
-        rhat_dat$Rhat[rhat_dat$Rhat<1 | rhat_dat$Rhat>2] <- NA
+        rhat_dat$Rhat[rhat_dat$Rhat<1] <- 1
+        rhat_dat$Rhat[rhat_dat$Rhat>2] <- 2
         param_expr <- parse(text=get_param_expression(param))
         #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
