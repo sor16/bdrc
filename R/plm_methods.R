@@ -198,7 +198,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(x=.data$h,y=.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(0,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
             scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='beta'){
