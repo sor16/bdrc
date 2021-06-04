@@ -78,7 +78,7 @@ get_report_components <- function(x,type=1){
     max_res <- max(res_dat)
     lim_list <- lapply(posterior_list,function(df){
                     data.frame(rating_curve_x_min=0,rating_curve_x_max=1.01*max(quantile(df[df$h==max(df$h),]$rating_curve,0.975),max(q_dat)),
-                               rating_curve_y_min=median(df$c),rating_curve_y_max=1.01*max(df$h)-0.01*min(df$h),
+                               rating_curve_y_min=NA,rating_curve_y_max=1.01*max(df$h)-0.01*min(df$h),
                                residuals_y_min=1.1*(-max_res),residuals_y_max=1.1*max_res,
                                residuals_x_min=NA,residuals_x_max=NA,
                                sigma_eps_x_min=min(df$h),sigma_eps_x_max=max(df$h),
@@ -92,8 +92,8 @@ get_report_components <- function(x,type=1){
     output_list$main_page_plots <- lapply(m_obj,function(m){
                                         pt_plot_list <- lapply(main_plot_types,function(pt){
                                                             autoplot(m,type=pt) +
-                                                                scale_x_continuous(limits = c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]]))) +
-                                                                scale_y_continuous(limits = c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])))
+                                                                scale_x_continuous(limits = c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),expand=c(0,0)) +
+                                                                scale_y_continuous(limits = c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])),expand=c(0,0,0.01,0))
                                                         })
                                         do.call('arrangeGrob',pt_plot_list)
                                     })
@@ -149,7 +149,7 @@ get_report_components <- function(x,type=1){
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom grid textGrob
 get_report_pages_fun <- function(x,type=1){
-    report_components <- get_report_components(x,type=type)
+    report_components <- suppressMessages(get_report_components(x,type=type))
     if(type==1){
         main_page_plot <- arrangeGrob(report_components$main_page_plots[[1]],
                                       report_components$main_page_table[[1]],
