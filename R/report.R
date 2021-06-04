@@ -157,7 +157,7 @@ get_report_pages_fun <- function(x,type=1){
                                       as.table=TRUE,
                                       heights=c(5,3),
                                       top=textGrob(report_components$obj_class,gp=gpar(fontsize=22,facetype='bold')))
-        predict_mat <- arrangeGrob(report_components$p_mat_list,     # thu ert her !!!
+        predict_mat <- arrangeGrob(report_components$p_mat_list,
                                    nrow=1,
                                    as.table=TRUE,
                                    heights=c(1),
