@@ -13,12 +13,12 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path='figs-introduction/',
+  #fig.path='figs-introduction/',
   fig.align='center',
   prompt=T
 )
 ```
-A discharge rating curve (drc) is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it's used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different dishcarge rating curve models are implemented in this R package using a Bayesian hierarchical model:
+A discharge rating curve (drc) is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it's used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different discharge rating curve models are implemented in this R package using a Bayesian hierarchical model:
 
 * plm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice
 
@@ -40,7 +40,7 @@ data(V316_river)
 V316_river
 ```
 ## Fit a discharge rating curve
-It is very simple to fit a drc. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:
+It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:
 
 ```{r, cache=T}
 gplm.fit <- gplm(Q~W,data=V316_river)
@@ -69,7 +69,7 @@ Since $c$ is a strictly positive parameter, it is transformed during Bayesian in
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='histogram',param='c',transformed=T)
 ```
-The function takes in any number of comma separated character vectors of parameter names. To visualize the posterior distribution of many parameters at once we can for instance write
+the param argument can also be a vector of different parameter names. To visualize the posterior distribution of many parameters at once we can for instance write
 
 ```{r, fig.width=8, fig.height=3}
 plot(gplm.fit,type='histogram',param=c('a','c'))
@@ -84,18 +84,18 @@ Similairily, writing 'latent_parameters' plots the latent parameters in one plot
 plot(gplm.fit,type='histogram',param='hyperparameters',transformed=T)
 ```
 
-Finally, we can visualize certain components of the drc models that may vary with stage, the power-law exponent $f$ and the standard deviation on the data level $\sigma_{\varepsilon}$. gplm0 and gplm generalize the power law exponent, model it as a function of stage $f(h)=b+\beta(h)$, while in plm and plm model the exponent as a fixed constant $f(h)=b$. We can plot the exponent with
+Finally, we can visualize certain components of the drc models that may vary with stage, the power-law exponent $f$ and the standard deviation on the data level $\sigma_{\varepsilon}$. gplm0 and gplm generalize the power law exponent, model it as a function of stage $f(h)=b+\beta(h)$, while in plm and plm model the exponent is a fixed constant $f(h)=b$. We can plot the exponent with
 
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='f')
 ```
-plm and gplm model the standard deviation, $\sigma_{\varepsilon}$ on the data level as a function of stage, namely as a linear combination of B-splines functions, while plm and gplm0 model the variance as a fixed constant. We can plot the standard deviation by writing
+plm and gplm model the standard deviation, $\sigma_{\varepsilon}$ on the data level as a function of stage, namely as a linear combination of B-splines functions, while plm and gplm0 model the variance is a fixed constant. We can plot the standard deviation by writing
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='sigma_eps')
 ```
 
 ## Assessing model fitness and convergence
-The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot and tracing plots. The residuals are presented as a function of $log(h-c)$ as the model is linear (or generalized linear) on that scale. 
+The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot, tracing plots, autocorrelation plot and the Gelman-Rubin statistic. The residuals are presented as a function of $log(h-c)$ as the model is linear (or generalized linear) on that scale. 
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='residuals')
 ```
@@ -109,6 +109,16 @@ To plot a trace plot for all hyperparameters, you write similiarily as above
 ```{r, fig.width=10, fig.height=6}
 plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
 ```
+
+To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize $\hat{R}$ as presented by Gelman and Rubin with:
+```{r}
+plot(gplm.fit,type='r_hat')
+```
+And finally autocorrelation of parameters can be assessed with
+```{r}
+plot(gplm.fit,type='autocorrelation')
+```
+
 
 ## Customization of models
 There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 2.5 m, then your function call would look like this
