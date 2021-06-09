@@ -79,7 +79,8 @@ histogram_breaks <-function(x){
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
-plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
+plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    args <- list(...)
     cbPalette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','r_hat','autocorrelation')
     if(!(type %in% legal_types)){
@@ -155,8 +156,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_median)) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed') +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed') +
-                scale_y_continuous(expand=c(0.01,0)) +
-                scale_x_continuous(expand=c(0.01,0)) +
+                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0.01,0)) +
+                scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
@@ -170,8 +171,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$median,y=.data$h)) +
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed') +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed') +
-                scale_x_continuous(expand=c(0.01,0),limits=c(0,max(x$rating_curve$upper,x$data$Q))) +
-                scale_y_continuous(expand=c(0.01,0)) +
+                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(0,max(x$rating_curve$upper,x$data$Q)),expand=c(0.01,0)) +
+                scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
@@ -198,8 +199,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(x=.data$h,y=.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
-            scale_x_continuous(expand=c(0,0)) +
+            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
@@ -216,8 +217,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
-            scale_x_continuous(expand=c(0,0)) +
+            scale_x_continuous(if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='f'){
         #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
@@ -241,8 +242,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
-            scale_x_continuous(expand=c(0,0)) +
+            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
@@ -258,8 +259,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_abline(intercept=0,slope=0,size=1.1) +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(expand=c(0.01,0.01)) +
-            scale_y_continuous(limits=c(-resid_lim,resid_lim)) +
+            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0.01,0.01)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(-resid_lim,resid_lim)) +
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
@@ -271,8 +272,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
              geom_hline(yintercept=1.1,linetype='dashed') +
              geom_line(na.rm=T) +
-             scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
-             scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
+             scale_x_continuous(limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000),expand=c(0,0)) +
+             scale_y_continuous(limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2),expand=c(0,0)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
@@ -285,15 +286,15 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
              geom_hline(yintercept=0) +
              geom_line() +
              geom_point(size=1) +
-             scale_x_continuous(expand=c(0,1),limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5))) +
-             scale_y_continuous(expand=c(0,0),limits=c(min(auto_dat$corr,-1/11),1)) +
+             scale_x_continuous(limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5)),expand=c(0,1)) +
+             scale_y_continuous(limits=c(min(auto_dat$corr,-1/11),1),expand=c(0,0)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
              xlab('Lag') +
              ylab('Autocorrelation') +
              theme_bdrc()
     }
-    if(!is.null(title)){
-        p <- p + ggtitle(title)
+    if(!is.null(args$title)){
+        p <- p + ggtitle(args$title)
     }
     return(p)
 }
@@ -303,12 +304,12 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
 #' @importFrom grid textGrob gpar unit
 #' @importFrom ggplot2 theme guides guide_legend
 plot_grob <- function(x,type,transformed=F){
-    if(type=='collage'){
-        collage_types <- c('rating_curve','residuals','f','sigma_eps')
-        plot_list <- lapply(collage_types,function(ty){
+    if(type=='panel'){
+        panel_types <- c('rating_curve','residuals','f','sigma_eps')
+        plot_list <- lapply(panel_types,function(ty){
             plot_fun(x,type=ty,transformed=transformed)
         })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(collage_types)))))
+        p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(panel_types)))))
     }else if(type=='convergence_diagnostics'){
         autocorrelation_plot <- plot_fun(x,type='autocorrelation') +
                                 theme_bdrc(legend.key.size = unit(0.8, "lines"),
@@ -409,8 +410,12 @@ summary.plm0 <- function(object,...){
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @return returns an object of class ggplot2.
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries of model parameters, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
@@ -421,8 +426,8 @@ summary.plm0 <- function(object,...){
 #' autoplot(plm0.fit)
 #' }
 #' @export
-autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
+autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
 #' Plot plm0 fit
@@ -442,8 +447,12 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -455,10 +464,10 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    grob_types <- c('collage','convergence_diagnostics')
+plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -544,8 +553,12 @@ summary.plm <- function(object,...){
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries of model parameters, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
@@ -556,8 +569,8 @@ summary.plm <- function(object,...){
 #' autoplot(plm.fit)
 #' }
 #' @export
-autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
+autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
 #' Plot plm fit
@@ -577,8 +590,12 @@ autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NU
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -590,10 +607,10 @@ autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NU
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    grob_types <- c('collage','convergence_diagnostics')
+plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -677,8 +694,12 @@ summary.gplm0 <- function(object,...){
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries of model parameters, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
@@ -689,8 +710,8 @@ summary.gplm0 <- function(object,...){
 #' autoplot(gplm0.fit)
 #' }
 #' @export
-autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
+autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
 #' Plot gplm0 fit
@@ -710,8 +731,12 @@ autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -723,10 +748,10 @@ autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    grob_types <- c('collage','convergence_diagnostics')
+plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -811,8 +836,12 @@ summary.gplm <- function(object,...){
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @return returns an object of class ggplot2
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries of model parameters, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
@@ -823,8 +852,8 @@ summary.gplm <- function(object,...){
 #' autoplot(gplm.fit)
 #' }
 #' @export
-autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title)
+autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
 #' Plot gplm fit
@@ -845,8 +874,12 @@ autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods. Currently supports:
+#'                     \itemize{
+#'                       \item{"title"}{ a character denoting the title of the plot}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                     }
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
 #' \dontrun{
@@ -858,10 +891,10 @@ autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=N
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL,...){
-    grob_types <- c('collage','convergence_diagnostics')
+plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+    grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)

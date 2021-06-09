@@ -29,7 +29,7 @@ plm(
 \value{
 plm returns an object of class "plm". An object of class "plm" is a list containing the following components: \cr
 \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
+\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.}
 \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
 \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\epsilon}}}
 \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
@@ -49,6 +49,7 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{D_hat}}{deviance at the median value of the parameters}
 \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
 \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+\item{\code{autocorrelation_dat}}{A data frame with the autocorrelation of each parameter for different lags.}
 \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
 \item{\code{data}}{data provided by the user.}

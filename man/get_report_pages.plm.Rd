@@ -2,19 +2,19 @@
 % Please edit documentation in R/report.R
 \name{get_report_pages.plm}
 \alias{get_report_pages.plm}
-\title{Get plm fit report pages}
+\title{Get report pages}
 \usage{
 \method{get_report_pages}{plm}(x, type = 1, ...)
 }
 \arguments{
 \item{x}{an object of class "plm".}
 
-\item{type}{an integer to determine whether to get the pages from report type 1 or 2. Only type 1 is permissible for an object of class "plm" which produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve.}
+\item{type}{an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Get a list of the grob objects used to by \code{\link{get_report}} create a pdf report.
+Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
 }
 \examples{
 \dontrun{
@@ -25,5 +25,5 @@ grob_object_list <- get_report_pages(plm.fit)
 }
 }
 \seealso{
-\code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
+\code{\link{get_report}} for generating and saving a report.
 }
