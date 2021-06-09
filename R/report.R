@@ -65,9 +65,9 @@ get_report_components <- function(x,type=1){
     q_dat <- m_obj[[1]]$data[[all.vars(m_obj[[1]]$formula)[1]]]
     posterior_list <- lapply(m_obj,function(m){
                             if(is.null(m$run_info$c_param)){
-                                post_dat <- spread_draws(m,'rating_curve','f','sigma_eps','c')
+                                post_dat <- spread_draws(m,'rating_curve','c')
                             }else{
-                                post_dat <- spread_draws(m,'rating_curve','f','sigma_eps')
+                                post_dat <- spread_draws(m,'rating_curve')
                                 post_dat$c <- m$run_info$c_param
                             }
                             post_dat[post_dat$h>=min(h_dat) & post_dat$h<=max(h_dat),]
@@ -76,24 +76,46 @@ get_report_components <- function(x,type=1){
                     max(abs(get_residuals_dat(m_obj[[x]])[,c('r_median','r_lower','r_upper')]))
                })
     max_res <- max(res_dat)
-    lim_list <- lapply(posterior_list,function(df){
+    lim_list <- lapply(names(posterior_list),function(m_class){
+                    df <- posterior_list[[m_class]]
+                    if(m_class%in%c('gplm','gplm0')){
+                        if(m_class=='gplm'){
+                            sigma_eps_y_max <- max(m_obj[[m_class]][['sigma_eps_summary']][['upper']])
+                            f_y_max <- max(m_obj[[m_class]][['f_summary']][['upper']])
+                            f_y_min <- min(m_obj[[m_class]][['f_summary']][['lower']])
+                        }else{
+                            sigma_eps_y_max <- m_obj[[m_class]][['param_summary']]['sigma_eps','upper']
+                            f_y_max <- max(m_obj[[m_class]][['f_summary']][['upper']])
+                            f_y_min <- min(m_obj[[m_class]][['f_summary']][['lower']])
+                        }
+                    }else{
+                        if(m_class=='plm'){
+                            sigma_eps_y_max <- max(m_obj[[m_class]][['sigma_eps_summary']][['upper']])
+                            f_y_max <- m_obj[[m_class]][['param_summary']]['b','upper']
+                            f_y_min <- m_obj[[m_class]][['param_summary']]['b','lower']
+                        }else{
+                            sigma_eps_y_max <- m_obj[[m_class]][['param_summary']]['sigma_eps','upper']
+                            f_y_max <- m_obj[[m_class]][['param_summary']]['b','upper']
+                            f_y_min <- m_obj[[m_class]][['param_summary']]['b','lower']
+                        }
+                    }
                     data.frame(rating_curve_x_min=0,rating_curve_x_max=1.01*max(quantile(df[df$h==max(df$h),]$rating_curve,0.975),max(q_dat)),
                                rating_curve_y_min=NA,rating_curve_y_max=1.01*max(df$h)-0.01*min(df$h),
                                residuals_y_min=1.1*(-max_res),residuals_y_max=1.1*max_res,
                                residuals_x_min=NA,residuals_x_max=NA,
                                sigma_eps_x_min=min(df$h),sigma_eps_x_max=max(df$h),
-                               sigma_eps_y_min=0,sigma_eps_y_max=max(df$sigma_eps),
+                               sigma_eps_y_min=0,sigma_eps_y_max=1.1*sigma_eps_y_max,
                                f_x_min=min(df$h),f_x_max=max(df$h),
-                               f_y_min=min(df$f,1),f_y_max=max(df$f,3.5))
+                               f_y_min=0.9*min(f_y_min,1),f_y_max=1.1*max(f_y_max,3.5))
                 })
     lim_dat <- do.call('rbind',lim_list)
     output_list <- list()
     main_plot_types <- c('rating_curve','residuals','sigma_eps','f')
     output_list$main_page_plots <- lapply(m_obj,function(m){
                                         pt_plot_list <- lapply(main_plot_types,function(pt){
-                                                            autoplot(m,type=pt) +
-                                                                scale_x_continuous(limits = c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),expand=c(0,0)) +
-                                                                scale_y_continuous(limits = c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])),expand=c(0,0,0.01,0))
+                                                            suppressMessages(autoplot(m,type=pt) +
+                                                                         scale_x_continuous(limits = c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),expand=c(0,0)) +
+                                                                         scale_y_continuous(limits = c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])),expand=c(0,0,0.01,0)))
                                                         })
                                         do.call('arrangeGrob',pt_plot_list)
                                     })
