@@ -216,7 +216,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(min(1,min(plot_dat$lower)),max(3.5,max(plot_dat$upper))),expand=c(0,0)) +
+            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
             scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='f'){
@@ -241,7 +241,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_y_continuous(limits=c(min(1,min(plot_dat$lower)),max(3.5,max(plot_dat$upper))),expand=c(0,0)) +
+            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
             scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='residuals'){
@@ -349,9 +349,9 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
         upper_pred <- approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
         pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
         pred_dat[is.na(pred_dat)] <- 0
-        if(wide){
-            pred_dat <- predict_wider(pred_dat)
-        }
+    }
+    if(wide){
+        pred_dat <- predict_wider(pred_dat)
     }
     return(pred_dat)
 }
