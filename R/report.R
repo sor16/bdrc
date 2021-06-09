@@ -106,7 +106,7 @@ get_report_components <- function(x,type=1){
                                sigma_eps_x_min=min(df$h),sigma_eps_x_max=max(df$h),
                                sigma_eps_y_min=0,sigma_eps_y_max=1.1*sigma_eps_y_max,
                                f_x_min=min(df$h),f_x_max=max(df$h),
-                               f_y_min=0.9*min(f_y_min,1),f_y_max=1.1*max(f_y_max,3.5))
+                               f_y_min=min(0.9*f_y_min,1),f_y_max=max(1.1*f_y_max,3.5))
                 })
     lim_dat <- do.call('rbind',lim_list)
     output_list <- list()
