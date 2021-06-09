@@ -20,7 +20,7 @@ summary_fun <- function(x){
 #' @param ... not used in this function
 #' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
-#' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank
+#' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank element_rect
 theme_bdrc <- function(...,scaling=1){
     title_size <- scaling*16
     text_size <- scaling*12
@@ -33,9 +33,10 @@ theme_bdrc <- function(...,scaling=1){
                axis.title.y = element_text(size=title_size,angle=90),
                axis.text.x = element_text(size=text_size),
                axis.text.y = element_text(size=text_size),
-               legend.text=element_text(size=text_size),
-               legend.title=element_text(size=text_size),
-               plot.title=element_text(size=plot_title_size),
+               legend.text = element_text(size=text_size),
+               legend.title = element_text(size=text_size),
+               plot.title = element_text(size=plot_title_size),
+               panel.border = element_rect(colour="black",fill=NA),
                ...)
 }
 
@@ -101,7 +102,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             plot_dat$name_expr <- factor(plot_dat$name,levels=param_levels,labels=sapply(param_levels,get_param_expression))
             plot_dat$chain <- factor(as.character(plot_dat$chain),levels=1:max(plot_dat$chain))
             p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value,col=.data$chain)) +
-                geom_path() +
+                geom_path(alpha=0.7) +
                 facet_wrap(~name_expr,scales='free',labeller = label_parsed) +
                 scale_color_manual(values=c("#BC3C29FF","#0072B5FF","#E18727FF","#20854EFF"),
                                    name='Chain number') +
@@ -112,7 +113,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             param_expr <- get_param_expression(params)
             plot_dat$chain_name <- paste0('Chain nr ',plot_dat$chain)
             p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value)) +
-                geom_path(col="#0072B5FF") +
+                geom_path(col="#0072B5FF",alpha=0.7) +
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
@@ -131,6 +132,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_histogram(bins=50,fill="#0072B5FF") +
             facet_wrap(~name_expr,scales='free',labeller=label_parsed) +
             scale_x_continuous(breaks=histogram_breaks) +
+            scale_y_continuous(expand=c(0,0,0.05,0)) +
             xlab('') +
             ylab('') +
             theme_bdrc()
@@ -153,7 +155,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_median)) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed') +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed') +
-                #scale_y_continuous(expand=c(0.01,0)) +
+                scale_y_continuous(expand=c(0.01,0)) +
+                scale_x_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
@@ -167,8 +170,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
                 geom_path(aes(x=.data$median,y=.data$h)) +
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed') +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed') +
-                #scale_x_continuous(expand=c(0,0)) +
-                #scale_y_continuous(expand=c(0.01,0)) +
+                scale_x_continuous(expand=c(0.01,0),limits=c(0,max(x$rating_curve$upper,x$data$Q))) +
+                scale_y_continuous(expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 theme_bdrc()
@@ -195,6 +198,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(x=.data$h,y=.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
+            scale_y_continuous(limits=c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
+            scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
@@ -211,6 +216,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
+            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
+            scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='f'){
         #to generate label - latex2exp::TeX('$\\textit{h}\\lbrack\\textit{m}\\rbrack$','character')
@@ -234,9 +241,12 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
+            scale_y_continuous(limits=c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
+            scale_x_continuous(expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
+        resid_lim <- max(abs(resid_dat$r_lower),resid_dat$r_upper,abs(resid_dat$r_median))
         #to generate label - latex2exp::TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$",'character')
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
         #to generate label - latex2exp::TeX("$log(\\textit{h - \\hat{c}})$",'character')
@@ -248,16 +258,19 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,title=NULL){
             geom_abline(intercept=0,slope=0,size=1.1) +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
+            scale_x_continuous(expand=c(0.01,0.01)) +
+            scale_y_continuous(limits=c(-resid_lim,resid_lim)) +
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
-        rhat_dat$Rhat[rhat_dat$Rhat<1 | rhat_dat$Rhat>2] <- NA
+        rhat_dat$Rhat[rhat_dat$Rhat<1] <- 1
+        rhat_dat$Rhat[rhat_dat$Rhat>2] <- 2
         param_expr <- parse(text=get_param_expression(param))
         #to generate label - latex2exp::TeX("$\\textit{\\hat{R}}$",'character')
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
-             geom_hline(yintercept = 1.1,linetype='dashed') +
-             geom_line(na.rm = T) +
+             geom_hline(yintercept=1.1,linetype='dashed') +
+             geom_line(na.rm=T) +
              scale_y_continuous(expand=c(0,0),limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2)) +
              scale_x_continuous(expand=c(0,0),limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000)) +
              scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
@@ -336,9 +349,9 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
         upper_pred <- approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
         pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
         pred_dat[is.na(pred_dat)] <- 0
-        if(wide){
-            pred_dat <- predict_wider(pred_dat)
-        }
+    }
+    if(wide){
+        pred_dat <- predict_wider(pred_dat)
     }
     return(pred_dat)
 }
