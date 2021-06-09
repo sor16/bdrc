@@ -78,6 +78,7 @@ get_report_components <- function(x,type=1){
     max_res <- max(res_dat)
     lim_list <- lapply(names(posterior_list),function(m_class){
                     df <- posterior_list[[m_class]]
+                    #Af hverju svona stór if setning fyrir þetta? Consider if(grepl('0',m_class))
                     if(m_class%in%c('gplm','gplm0')){
                         if(m_class=='gplm'){
                             sigma_eps_y_max <- max(m_obj[[m_class]][['sigma_eps_summary']][['upper']])
@@ -113,9 +114,8 @@ get_report_components <- function(x,type=1){
     main_plot_types <- c('rating_curve','residuals','sigma_eps','f')
     output_list$main_page_plots <- lapply(m_obj,function(m){
                                         pt_plot_list <- lapply(main_plot_types,function(pt){
-                                                            suppressMessages(autoplot(m,type=pt) +
-                                                                         scale_x_continuous(limits = c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),expand=c(0,0)) +
-                                                                         scale_y_continuous(limits = c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])),expand=c(0,0,0.01,0)))
+                                                            autoplot(m,type=pt,xlim=c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),
+                                                                     ylim=c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])))
                                                         })
                                         do.call('arrangeGrob',pt_plot_list)
                                     })
@@ -128,7 +128,7 @@ get_report_components <- function(x,type=1){
                                             table <- format(round(table,digits=3),nsmall=3)
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
-        output_list$p_mat_list <- predict_matrix(x)
+        output_list$p_mat_list <- predict_matrix(m_obj[[1]])
 
         output_list$obj_class <- class(m_obj[[1]])
     }else{
@@ -171,7 +171,7 @@ get_report_components <- function(x,type=1){
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom grid textGrob
 get_report_pages_fun <- function(x,type=1){
-    report_components <- suppressMessages(get_report_components(x,type=type))
+    report_components <- get_report_components(x,type=type)
     if(type==1){
         main_page_plot <- arrangeGrob(report_components$main_page_plots[[1]],
                                       report_components$main_page_table[[1]],
