@@ -126,8 +126,9 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         max_res <- max(res_dat)
         ylim_max <- 1.1*max_res
         plot_list <- lapply(x$contestants,function(m){
-            suppressMessages(autoplot(m,type=type,title=class(m)) + ylim(-ylim_max,ylim_max))
-                    })
+
+            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
+        })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="sigma_eps"){
         ylim_dat <- sapply(x$contestants,function(m){
@@ -140,7 +141,7 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         ylim_min <- 0
         ylim_max <- 1.1*max(ylim_dat)
         plot_list <- lapply(x$contestants,function(m){
-            suppressMessages(autoplot(m,type=type,title=class(m)) + scale_y_continuous(limits=c(ylim_min,ylim_max),expand=c(0,0)))
+            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
         })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="f"){
@@ -154,7 +155,7 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         ylim_min <- min(1,0.9*ylim_dat[1,])
         ylim_max <- max(3.5,1.1*ylim_dat[2,])
         plot_list <- lapply(x$contestants,function(m){
-            supressMessages(autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max))
+            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
         })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type %in% c("rating_curve","rating_curve_mean")){

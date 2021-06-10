@@ -4,14 +4,7 @@
 \alias{autoplot.gplm0}
 \title{Autoplot gplm0 fit}
 \usage{
-\method{autoplot}{gplm0}(
-  x,
-  type = "rating_curve",
-  param = NULL,
-  transformed = F,
-  title = NULL,
-  ...
-)
+\method{autoplot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
 }
 \arguments{
 \item{x}{an object of class "gplm0"}
@@ -32,9 +25,12 @@
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{title}{a character denoting the title of the plot. Defaults to NULL, i.e. no title.}
-
-\item{...}{further arguments passed to other methods (currently unused).}
+\item{...}{further arguments passed to other methods. Currently supports:
+\itemize{
+  \item{"title"}{ a character denoting the title of the plot}
+  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+  \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+}}
 }
 \value{
 returns an object of class ggplot2

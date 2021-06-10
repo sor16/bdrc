@@ -2,7 +2,7 @@
 % Please edit documentation in R/report.R
 \name{get_report_pages.tournament}
 \alias{get_report_pages.tournament}
-\title{Get tournament report pages}
+\title{Get report pages}
 \usage{
 \method{get_report_pages}{tournament}(x, type = 1, ...)
 }
@@ -11,14 +11,14 @@
 
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 \itemize{
-   \item{1}{ produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
-   \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
+   \item{1}{Type 1 report consists of two pages and displays only the results of the winning model if the tournament provided. The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+   \item{2}{Type 2 report consists of ten pages. The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Get a list of the grob objects used by \code{\link{get_report}} to create a pdf report.
+Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
 }
 \examples{
 \dontrun{
@@ -29,5 +29,5 @@ grob_object_list <- get_report_pages(t_obj)
 }
 }
 \seealso{
-\code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
+\code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 }
