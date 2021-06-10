@@ -124,10 +124,9 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
             max(abs(get_residuals_dat(x$contestants[[m]])[,c('r_median','r_lower','r_upper')]))
         })
         max_res <- max(res_dat)
-        ylim_min <- 1.1*max_res
-        ylim_max <- 1.1*(-max_res)
+        ylim_max <- 1.1*max_res
         plot_list <- lapply(x$contestants,function(m){
-            suppressMessages(autoplot(m,type=type,title=class(m)) + ylim(ylim_min,ylim_max))
+            suppressMessages(autoplot(m,type=type,title=class(m)) + ylim(-ylim_max,ylim_max))
                     })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="sigma_eps"){
