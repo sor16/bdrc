@@ -127,7 +127,7 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         ylim_max <- 1.1*max_res
         plot_list <- lapply(x$contestants,function(m){
 
-            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
+            autoplot(m,type=type,title=class(m),ylim=c(-ylim_max,ylim_max))
         })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=="sigma_eps"){
