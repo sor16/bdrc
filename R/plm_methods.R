@@ -247,7 +247,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
-        resid_lim <- max(abs(resid_dat$r_lower),resid_dat$r_upper,abs(resid_dat$r_median))
+        resid_lim <- 1.1*max(abs(resid_dat$r_lower),resid_dat$r_upper,abs(resid_dat$r_median))
         #to generate label - latex2exp::TeX("$log(\\textit{Q})-log(\\textit{\\hat{Q}})$",'character')
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
         #to generate label - latex2exp::TeX("$log(\\textit{h - \\hat{c}})$",'character')
