@@ -14,6 +14,7 @@ priors <- function(model,c_param=NULL) {
     RC$p_ab <- 0;
     RC$nugget <- 10^-8
     if(is.null(c_param)){
+        #RC$lambda_c <- 1;   # prior temp fix
         RC$lambda_c <- 2;
     }else{
         RC$c <- c_param
@@ -486,11 +487,10 @@ B_splines <- function(ZZ){
 }
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 predict_wider <- function(p_dat){
   p_dat <- p_dat[,c('h','median')]
-  p_dat$decimal <- floor(p_dat$h*10)/10
+  str_h <- format(p_dat$h)
+  p_dat$decimal <- as.numeric(substr(str_h,1,nchar(str_h)-1))
   first_decimal <- length(p_dat$decimal[p_dat$decimal==p_dat$decimal[1]])
   if(first_decimal!=10) {
     n <- 10-first_decimal
@@ -509,6 +509,7 @@ predict_wider <- function(p_dat){
   colnames(p_mat) <- seq(0,0.09,by=0.01)
   return(p_mat)
 }
+
 
 #' @importFrom stats median
 get_residuals_dat <- function(m){
