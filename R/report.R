@@ -1,38 +1,6 @@
-### TODO: Option in the predict function?? I.e. an help function for predict method. Ath aukastafi. Titill á töflu
-#' @importFrom gridExtra tableGrob ttheme_minimal
-#' @importFrom stats predict
-predict_matrix <- function(x){
-    # c_param <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
-    # c_param <- ceiling(c_param*100)/100
-    min_rc_h <- min(x$rating_curve[,'h'])
-    min_rc_h <- ceiling(min_rc_h*100)/100
-    grid_max <- x$run_info$h_max
-    p_mat <- predict(x,newdata=seq(min_rc_h,grid_max,by=0.01),wide=TRUE)
-    p_mat <- format(round(p_mat,digits=3),nsmall=3)
-    p_mat_grob <- tableGrob(p_mat,theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),
-                                                       fg_params=list(fontface=3)),
-                                                       colhead=list(fg_params=list(col="black",fontface=2L)),
-                                                       rowhead=list(fg_params=list(col="black",fontface=2L)),
-                                                       base_size = 10))
-    # split_row <- 6
-    # n_pages <- ceiling(nrow(p_mat)/split_row)
-    # if(n_pages>1){
-    #     split_points <- seq(split_row,floor(nrow(p_mat)/split_row)*split_row,by=split_row)
-    #     idx_vectors <- unname(split(seq(1,nrow(p_mat)), cumsum(seq_along(seq(1,nrow(p_mat))) %in% split_points)))
-    #     p_mat_list <- lapply(idx_vectors,function(x){
-    #                       format(p_mat[x,],nsmall=3)
-    #                   })
-    # }
-    # p_mat_list <- lapply(p_mat_list,function(x){
-    #                   tableGrob(x,theme=ttheme_minimal(core=list(bg_params = list(fill = blues9[1:2], col=NA),fg_params=list(fontface=3)),
-    #                                                        colhead=list(fg_params=list(col="black",fontface=2L)),
-    #                                                        rowhead=list(fg_params=list(col="black",fontface=2L))))
-    #                })
-    return(p_mat_grob)
-}
 
 
-#' @importFrom stats quantile
+#' @importFrom stats quantile predict
 #' @importFrom ggplot2 autoplot scale_x_continuous scale_y_continuous
 #' @importFrom gridExtra tableGrob ttheme_minimal
 #' @importFrom grid textGrob
@@ -128,7 +96,12 @@ get_report_components <- function(x,type=1){
                                             table <- format(round(table,digits=3),nsmall=3)
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
-        output_list$p_mat_list <- predict_matrix(m_obj[[1]])
+        p_mat <- predict(m_obj[[1]],wide=TRUE)
+        output_list$p_mat_list <- tableGrob(format(round(p_mat,digits=3),nsmall=3),
+                                            theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),fg_params=list(fontface=3)),
+                                                                 colhead=list(fg_params=list(col="black",fontface=2L)),
+                                                                 rowhead=list(fg_params=list(col="black",fontface=2L)),
+                                                                 base_size = 10))
 
         output_list$obj_class <- class(m_obj[[1]])
     }else{

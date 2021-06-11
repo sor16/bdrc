@@ -328,29 +328,32 @@ plot_grob <- function(x,type,transformed=F){
     }
     return(p)
 }
-## TODO: add support for stage values below data but above median of c
+
 #' @importFrom stats approx
 predict_fun <- function(object,newdata=NULL,wide=FALSE){
-    if(is.null(newdata)){
-        merged_data <- merge(object$rating_curve,object$data,by.x='h',by.y=all.vars(object$formula)[2])
-        pred_dat <- merged_data[,c('h','lower','median','upper')]
+    if(wide){
+        if(!is.null(newdata)){
+            stop('newdata must be NULL when wide is TRUE.')
+        }else{
+            newdata <- seq(ceiling(min(object$rating_curve$h)*100)/100,floor(max(object$rating_curve$h)*100)/100,by=0.01)
+        }
     }else{
-        if(class(newdata) !='numeric'){
-            stop('newdata must be a vector of type "numeric" or NULL')
-        }
-        if(any(is.na(newdata))){
-            stop('newdata must not include NA')
-        }
-        c_param <- if(is.null(object$run_info$c_param)) median(object$c_posterior) else object$run_info$c_param
-        if(any(newdata>max(object$rating_curve$h))){
-            stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
-        }
-        lower_pred <- approx(object$rating_curve$h,object$rating_curve$lower,xout=newdata)$y
-        median_pred <- approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
-        upper_pred <- approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
-        pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
-        pred_dat[is.na(pred_dat)] <- 0
+        newdata <- object$rating_curve$h
     }
+    if(class(newdata) !='numeric'){
+        stop('newdata must be a vector of type "numeric" or NULL')
+    }
+    if(any(is.na(newdata))){
+        stop('newdata must not include NA')
+    }
+    if(any(newdata>max(object$rating_curve$h))){
+        stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
+    }
+    lower_pred <- approx(object$rating_curve$h,object$rating_curve$lower,xout=newdata)$y
+    median_pred <- approx(object$rating_curve$h,object$rating_curve$median,xout=newdata)$y
+    upper_pred <- approx(object$rating_curve$h,object$rating_curve$upper,xout=newdata)$y
+    pred_dat <- data.frame(h=newdata,lower=lower_pred,median=median_pred,upper=upper_pred)
+    pred_dat[is.na(pred_dat)] <- 0
     if(wide){
         pred_dat <- predict_wider(pred_dat)
     }
