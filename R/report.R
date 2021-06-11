@@ -29,65 +29,10 @@ get_report_components <- function(x,type=1){
         m_obj <- list(x)
         names(m_obj) <- class(x)
     }
-    h_dat <- m_obj[[1]]$data[[all.vars(m_obj[[1]]$formula)[2]]]
-    q_dat <- m_obj[[1]]$data[[all.vars(m_obj[[1]]$formula)[1]]]
-    posterior_list <- lapply(m_obj,function(m){
-                            if(is.null(m$run_info$c_param)){
-                                post_dat <- spread_draws(m,'rating_curve','c')
-                            }else{
-                                post_dat <- spread_draws(m,'rating_curve')
-                                post_dat$c <- m$run_info$c_param
-                            }
-                            post_dat[post_dat$h>=min(h_dat) & post_dat$h<=max(h_dat),]
-                      })
-    res_dat <- sapply(names(m_obj),function(x){
-                    max(abs(get_residuals_dat(m_obj[[x]])[,c('r_median','r_lower','r_upper')]))
-               })
-    max_res <- max(res_dat)
-    lim_list <- lapply(names(posterior_list),function(m_class){
-                    df <- posterior_list[[m_class]]
-                    #Af hverju svona stór if setning fyrir þetta? Consider if(grepl('0',m_class))
-                    if(m_class%in%c('gplm','gplm0')){
-                        if(m_class=='gplm'){
-                            sigma_eps_y_max <- max(m_obj[[m_class]][['sigma_eps_summary']][['upper']])
-                            f_y_max <- max(m_obj[[m_class]][['f_summary']][['upper']])
-                            f_y_min <- min(m_obj[[m_class]][['f_summary']][['lower']])
-                        }else{
-                            sigma_eps_y_max <- m_obj[[m_class]][['param_summary']]['sigma_eps','upper']
-                            f_y_max <- max(m_obj[[m_class]][['f_summary']][['upper']])
-                            f_y_min <- min(m_obj[[m_class]][['f_summary']][['lower']])
-                        }
-                    }else{
-                        if(m_class=='plm'){
-                            sigma_eps_y_max <- max(m_obj[[m_class]][['sigma_eps_summary']][['upper']])
-                            f_y_max <- m_obj[[m_class]][['param_summary']]['b','upper']
-                            f_y_min <- m_obj[[m_class]][['param_summary']]['b','lower']
-                        }else{
-                            sigma_eps_y_max <- m_obj[[m_class]][['param_summary']]['sigma_eps','upper']
-                            f_y_max <- m_obj[[m_class]][['param_summary']]['b','upper']
-                            f_y_min <- m_obj[[m_class]][['param_summary']]['b','lower']
-                        }
-                    }
-                    data.frame(rating_curve_x_min=0,rating_curve_x_max=1.01*max(quantile(df[df$h==max(df$h),]$rating_curve,0.975),max(q_dat)),
-                               rating_curve_y_min=NA,rating_curve_y_max=1.01*max(df$h)-0.01*min(df$h),
-                               residuals_y_min=1.1*(-max_res),residuals_y_max=1.1*max_res,
-                               residuals_x_min=NA,residuals_x_max=NA,
-                               sigma_eps_x_min=min(df$h),sigma_eps_x_max=max(df$h),
-                               sigma_eps_y_min=0,sigma_eps_y_max=1.1*sigma_eps_y_max,
-                               f_x_min=min(df$h),f_x_max=max(df$h),
-                               f_y_min=min(0.9*f_y_min,1),f_y_max=max(1.1*f_y_max,3.5))
-                })
-    lim_dat <- do.call('rbind',lim_list)
     output_list <- list()
     main_plot_types <- c('rating_curve','residuals','sigma_eps','f')
-    output_list$main_page_plots <- lapply(m_obj,function(m){
-                                        pt_plot_list <- lapply(main_plot_types,function(pt){
-                                                            autoplot(m,type=pt,xlim=c(min(lim_dat[[paste0(pt,'_x_min')]]),max(lim_dat[[paste0(pt,'_x_max')]])),
-                                                                     ylim=c(min(lim_dat[[paste0(pt,'_y_min')]]),max(lim_dat[[paste0(pt,'_y_max')]])))
-                                                        })
-                                        do.call('arrangeGrob',pt_plot_list)
-                                    })
     if(type==1){
+        output_list$main_page_plots <- plot_grob(m_obj[[1]],type='panel')
         output_list$main_page_table <- lapply(m_obj,function(m){
                                             param <- get_param_names(class(m),m$run_info$c_param)
                                             table <- rbind(m$param_summary[,c('lower','median','upper')],c(m$Deviance_summary))
@@ -105,6 +50,7 @@ get_report_components <- function(x,type=1){
 
         output_list$obj_class <- class(m_obj[[1]])
     }else{
+        output_list$main_page_plots <- plot_tournament_grob(t_obj)
         output_list$main_page_table <- lapply(m_obj,function(m){
                                             param <- get_param_names(class(m),m$run_info$c_param)
                                             table <- rbind(m$param_summary,data.frame(m$Deviance_summary,r_hat=NA,n_eff_samples=NA))
@@ -146,7 +92,7 @@ get_report_components <- function(x,type=1){
 get_report_pages_fun <- function(x,type=1){
     report_components <- get_report_components(x,type=type)
     if(type==1){
-        main_page_plot <- arrangeGrob(report_components$main_page_plots[[1]],
+        main_page_plot <- arrangeGrob(report_components$main_page_plots,
                                       report_components$main_page_table[[1]],
                                       nrow=2,
                                       as.table=TRUE,

@@ -110,73 +110,102 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' plot(t_obj,type='sigma_eps')
 #' plot(t_obj,type='residuals')
 #' }
-#' @importFrom ggplot2 ylim scale_y_continuous
-#' @importFrom gridExtra grid.arrange
 #' @importFrom grid grid.draw
+#' @importFrom grid.extra grid.arrange
 #' @export
 plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
-    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics')
+    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','game_results')
     if(is.null(type) || type=='deviance'){
         p <- autoplot(x,transformed=transformed)
-    }else if(type=="residuals"){
-        res_dat <- sapply(names(x$contestants),function(m){
-            max(abs(get_residuals_dat(x$contestants[[m]])[,c('r_median','r_lower','r_upper')]))
-        })
-        max_res <- max(res_dat)
-        ylim_max <- 1.1*max_res
-        plot_list <- lapply(x$contestants,function(m){
-
-            autoplot(m,type=type,title=class(m),ylim=c(-ylim_max,ylim_max))
-        })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
-    }else if(type=="sigma_eps"){
-        ylim_dat <- sapply(x$contestants,function(m){
-                        if(grepl('0',class(m))){
-                            m$param_summary['sigma_eps','upper']
-                        }else{
-                            max(m$sigma_eps_summary$upper)
-                        }
-                    })
-        ylim_min <- 0
-        ylim_max <- 1.1*max(ylim_dat)
-        plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
-        })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
-    }else if(type=="f"){
-        ylim_dat <- sapply(x$contestants,function(m){
-            if(!grepl('g',class(m))){
-                c(m$param_summary['b','lower'],m$param_summary['b','upper'])
-            }else{
-                c(min(m$f_summary$lower),max(m$f_summary$upper))
-            }
-        })
-        ylim_min <- min(1,0.9*ylim_dat[1,])
-        ylim_max <- max(3.5,1.1*ylim_dat[2,])
-        plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=type,title=class(m),ylim=c(ylim_min,ylim_max))
-        })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
-    }else if(type %in% c("rating_curve","rating_curve_mean")){
-        plot_list <- lapply(x$contestants,function(m){
-            autoplot(m,type=type,transformed=transformed,title=class(m))
-        })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=2))
-    }else if(type=='convergence_diagnostics'){
-        plot_list <- lapply(x$contestants,function(m){
-            plot_grob(m,type=type)
-        })
-        p <- do.call(arrangeGrob,c(plot_list,nrow=4))
+    }else if(type%in%legal_types){
+        p <- plot_tournament_grob(x,type=type,transformed=F,...)
     }else{
         stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
     }
     if('ggplot' %in% class(p)){
         print(p)
     }else{
-        grid.draw(p)
+        if(type=='panel'){
+            grid.arrange(p[[type]][[class(x$winner)]])
+        }else{
+            grid.draw(p[[type]])
+        }
     }
 }
+
+#' @importFrom ggplot2 autoplot
+#' @importFrom gridExtra arrangeGrob
+plot_tournament_grob <- function(x,type='panel',transformed=F){
+    ylim_types <- c('sigma_eps','f','panel','game_results','residuals')
+    if(type%in%ylim_types){
+        ylim_dat <- lapply(x$contestants,function(m){
+            if(grepl('0',class(m))){
+                sig_ylim <- c( min=0, max=1.1*m$param_summary['sigma_eps','upper'] )
+            }else{
+                sig_ylim <- c( min=0, max=1.1*max(m$sigma_eps_summary$upper) )
+            }
+            if(grepl('g',class(m))){
+                f_ylim <- c( min=min(1,0.9*min(m$f_summary$lower)), max=max(3.5,1.1*max(m$f_summary$upper)) )
+            }else{
+                f_ylim <- c( min=min(1,0.9*m$param_summary['b','lower']), max=max(3.5,1.1*m$param_summary['b','upper']) )
+            }
+            max_res <- 1.1*max(abs(get_residuals_dat(m)[,c('r_median','r_lower','r_upper')]))
+            data.frame(sigma_eps_min=sig_ylim[1],sigma_eps_max=sig_ylim[2],f_min=f_ylim[1],f_max=f_ylim[2],residuals_min=-max_res,residuals_max=max_res)
+        })
+        ylim_dat <- do.call('rbind',ylim_dat)
+        ylim_dat <- sapply(colnames(ylim_dat),function(col){
+            if(grepl('min',col)){
+                min(ylim_dat[,col])
+            }else{
+                max(ylim_dat[,col])
+            }
+        })
+        ylim_dat <- c(ylim_dat,rating_curve_min=NA,rating_curve_max=NA)
+    }
+    grob_list <- list()
+    if(type=="residuals"){
+        plot_list <- lapply(x$contestants,function(m){
+            autoplot(m,type=type,title=class(m),ylim=ylim_dat[c('residuals_min','residuals_max')])
+        })
+        grob_list <- do.call(arrangeGrob,c(plot_list,ncol=2))
+    }else if(type=="sigma_eps"){
+        plot_list <- lapply(x$contestants,function(m){
+            autoplot(m,type=type,title=class(m),ylim=ylim_dat[c('sigma_eps_min','sigma_eps_max')])
+        })
+        grob_list <- do.call(arrangeGrob,c(plot_list,ncol=2))
+    }else if(type=="f"){
+        plot_list <- lapply(x$contestants,function(m){
+            autoplot(m,type=type,title=class(m),ylim=ylim_dat[c('f_min','f_max')])
+        })
+        grob_list <- do.call(arrangeGrob,c(plot_list,ncol=2))
+    }else if(type %in% c("rating_curve","rating_curve_mean")){
+        plot_list <- lapply(x$contestants,function(m){
+            autoplot(m,type=type,transformed=transformed,title=class(m))
+        })
+        grob_list <- do.call(arrangeGrob,c(plot_list,ncol=2))
+    }else if(type=='convergence_diagnostics'){
+        plot_list <- lapply(x$contestants,function(m){
+            plot_grob(m,type=type)
+        })
+        grob_list <- do.call(arrangeGrob,c(plot_list,nrow=4))
+    }else if(type=='panel'){
+        panel_types <- c('rating_curve','residuals','f','sigma_eps')
+        grob_list <- lapply(x$contestants,function(m){
+            plot_list <- lapply(panel_types,function(ty){
+                ylim_vec <- ylim_dat[c(paste0(ty,'_min'),paste0(ty,'_max'))]
+                plot_fun(m,type=ty,transformed=transformed,param=NULL,ylim=ylim_vec)
+            })
+            p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(panel_types)))))
+        })
+    }else if(type=='game_results'){
+        #grob_list[[type]] <- game_results_grob(x)
+    }
+    return(grob_list)
+}
+
+
+
 
 #Idea, create graphical plot for tournament games
 #df <- data.frame(round=c(1,1,1,1,2,2,3),
@@ -186,7 +215,6 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
 #                 yloc=c(seq(0,3,by=1),c(0.5,2.5),1.5))
 # seg_dat <- data.frame(x1=c(c(xloc[1:4]),y))
 #ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
-
 
 
 
