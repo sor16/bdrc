@@ -1,138 +1,24 @@
-#' Print tournament object
-#'
-#' Print the results of a tournament of model comparisons
-#' @param x an object of class "tournament"
-#' @param ... not used in this function
-#' @seealso \code{\link{summary.tournament}} for summaries
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
-#' print(t_obj)
-#' }
-#' @export
-print.tournament <- function(x,...){
-    cat(paste0('Tournament with winner ',class(x$winner)))
-}
-
-#' Print summary of tournament object
-#'
-#' Print the summary of a tournament of model comparisons
-#' @param object an object of class "tournament"
-#' @param ... not used in this function
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
-#' summary(t_obj)
-#' }
-#' @export
-summary.tournament <- function(object,...){
-    object$summary
-}
-
-#' Autoplot - Comparison of models in tournament
-#'
-#' Compare the four models from the tournament object in different ways
-#'
-#' @param x an object of class "tournament"
-#' @param type a character denoting what type of plot should be drawn. Possible types are
-#' \itemize{
-#'  \item{"deviance"}{ to plot the rating curve on original scale.}
-#' }
-#' @param ... not used in this function
-#' @seealso \code{\link{summary.tournament}} for summaries
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
-#' autoplot(t_obj)
-#' }
-#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
-#' @importFrom rlang .data
-#' @export
-autoplot.tournament <- function(x,type='deviance',...){
-    args <- list(...)
-    legal_types <- c('deviance')
-    if(!(type %in% legal_types)){
-        stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
-    }else if(type=="deviance"){
-        deviance_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),D=c(m$Deviance_posterior))
-        })
-        deviance_post_dat <- do.call(rbind,deviance_post_dat)
-        DIC_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),DIC=c(m$DIC))
-        })
-        DIC_dat <- do.call(rbind,DIC_dat)
-        p <- ggplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D)) +
-             geom_boxplot(size=.4,color="black",outlier.size=0.1,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
-             stat_boxplot(geom='errorbar',width=0.4) +
-             geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
-             geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
-             theme_bdrc() +
-             xlab('') +
-             ylab('Deviance')
-    }
+#' @importFrom ggplot2 autoplot
+plot_tournament_fun <- function(x,type='deviance'){
+    deviance_post_dat <- lapply(x$contestants,function(m){
+        data.frame(model=class(m),D=c(m$Deviance_posterior))
+    })
+    deviance_post_dat <- do.call(rbind,deviance_post_dat)
+    DIC_dat <- lapply(x$contestants,function(m){
+        data.frame(model=class(m),DIC=c(m$DIC))
+    })
+    DIC_dat <- do.call(rbind,DIC_dat)
+    p <- ggplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D)) +
+         geom_boxplot(size=.4,color="black",outlier.size=0.1,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
+         stat_boxplot(geom='errorbar',width=0.4) +
+         geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
+         geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
+         theme_bdrc() +
+         xlab('') +
+         ylab('Deviance')
     return(p)
 }
 
-
-#' Plot comparison of models in tournament
-#'
-#' Compare the four models from the tournament object in multiple ways
-#'
-#' @param x an object of class "tournament"
-#' @param type a character denoting what type of plot should be drawn. Possible types are
-#' \itemize{
-#'   \item{"deviance"}{ to plot the rating curve on original scale.}
-#'   \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'   \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'   \item{"f"}{ to plot the power-law exponent}
-#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'   \item{"residuals"}{ to plot the log residuals}
-#'  }
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{summary.tournament}} for summaries
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
-#' plot(t_obj)
-#' plot(t_obj,type='rating_curve_log')
-#' plot(t_obj,type='deviance')
-#' plot(t_obj,type='f')
-#' plot(t_obj,type='sigma_eps')
-#' plot(t_obj,type='residuals')
-#' }
-#' @importFrom grid grid.draw
-#' @importFrom grid.extra grid.arrange
-#' @export
-plot.tournament <- function(x,type='deviance',transformed=F,...){
-    args <- list(...)
-    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','game_results')
-    if(is.null(type) || type=='deviance'){
-        p <- autoplot(x,transformed=transformed)
-    }else if(type%in%legal_types){
-        p <- plot_tournament_grob(x,type=type,transformed=F,...)
-    }else{
-        stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
-    }
-    if('ggplot' %in% class(p)){
-        print(p)
-    }else{
-        if(type=='panel'){
-            grid.arrange(p[[type]][[class(x$winner)]])
-        }else{
-            grid.draw(p[[type]])
-        }
-    }
-}
 
 #' @importFrom ggplot2 autoplot
 #' @importFrom gridExtra arrangeGrob
@@ -196,7 +82,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
                 ylim_vec <- ylim_dat[c(paste0(ty,'_min'),paste0(ty,'_max'))]
                 plot_fun(m,type=ty,transformed=transformed,param=NULL,ylim=ylim_vec)
             })
-            p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(panel_types)))))
+            p <- do.call('arrangeGrob',c(plot_list,ncol=round(sqrt(length(panel_types)))))
         })
     }else if(type=='game_results'){
         #grob_list[[type]] <- game_results_grob(x)
@@ -204,8 +90,126 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
     return(grob_list)
 }
 
+#' Print tournament object
+#'
+#' Print the results of a tournament of model comparisons
+#' @param x an object of class "tournament"
+#' @param ... not used in this function
+#' @seealso \code{\link{summary.tournament}} for summaries
+#' @examples
+#' \dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' t_obj <- tournament(f,V316_river)
+#' print(t_obj)
+#' }
+#' @export
+print.tournament <- function(x,...){
+    cat(paste0('Tournament with winner ',class(x$winner)))
+}
+
+#' Print summary of tournament object
+#'
+#' Print the summary of a tournament of model comparisons
+#' @param object an object of class "tournament"
+#' @param ... not used in this function
+#' @examples
+#' \dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' t_obj <- tournament(f,V316_river)
+#' summary(t_obj)
+#' }
+#' @export
+summary.tournament <- function(object,...){
+    object$summary
+}
+
+#' Autoplot - Comparison of models in tournament
+#'
+#' Compare the four models from the tournament object in different ways
+#'
+#' @param x an object of class "tournament"
+#' @param type a character denoting what type of plot should be drawn. Possible types are
+#' \itemize{
+#'  \item{"deviance"}{ to plot the rating curve on original scale.}
+#' }
+#' @param ... not used in this function
+#' @seealso \code{\link{summary.tournament}} for summaries
+#' @examples
+#' \dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' t_obj <- tournament(f,V316_river)
+#' autoplot(t_obj)
+#' }
+#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
+#' @importFrom rlang .data
+#' @export
+autoplot.tournament <- function(x,type='deviance',...){
+    args <- list(...)
+    legal_types <- c('deviance')
+    if(!(type %in% legal_types)){
+        stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
+    }else if(type=="deviance"){
+        p <- plot_tournament_fun(x,type=type)
+    }
+    return(p)
+}
 
 
+#' Plot comparison of models in tournament
+#'
+#' Compare the four models from the tournament object in multiple ways
+#'
+#' @param x an object of class "tournament"
+#' @param type a character denoting what type of plot should be drawn. Possible types are
+#' \itemize{
+#'   \item{"deviance"}{ to plot the rating curve on original scale.}
+#'   \item{"rating_curve"}{ to plot the rating curve on original scale.}
+#'   \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
+#'   \item{"f"}{ to plot the power-law exponent}
+#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
+#'   \item{"residuals"}{ to plot the log residuals}
+#'  }
+#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param ... further arguments passed to other methods (currently unused).
+#' @seealso \code{\link{summary.tournament}} for summaries
+#' @examples
+#' \dontrun{
+#' data(V316_river)
+#' f <- Q~W
+#' t_obj <- tournament(f,V316_river)
+#' plot(t_obj)
+#' plot(t_obj,type='rating_curve_log')
+#' plot(t_obj,type='deviance')
+#' plot(t_obj,type='f')
+#' plot(t_obj,type='sigma_eps')
+#' plot(t_obj,type='residuals')
+#' }
+#' @importFrom grid grid.draw
+#' @importFrom grid.extra grid.arrange
+#' @export
+plot.tournament <- function(x,type='deviance',transformed=F,...){
+    args <- list(...)
+    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','game_results')
+    if(is.null(type) || type=='deviance'){
+        p <- autoplot(x,transformed=transformed)
+    }else if(type%in%legal_types){
+        p <- plot_tournament_grob(x,type=type,transformed=F,...)
+    }else{
+        stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
+    }
+    if('ggplot' %in% class(p)){
+        print(p)
+    }else{
+        if(type=='panel'){
+            grid.draw(p[[type]][[class(x$winner)]])
+        }else{
+            grid.draw(p[[type]])
+        }
+    }
+}
 
 #Idea, create graphical plot for tournament games
 #df <- data.frame(round=c(1,1,1,1,2,2,3),
