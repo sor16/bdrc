@@ -84,6 +84,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
             })
             p <- do.call('arrangeGrob',c(plot_list,ncol=round(sqrt(length(panel_types)))))
         })
+        names(grob_list) <- sapply(x$contestants,class)
     }else if(type=='game_results'){
         #grob_list[[type]] <- game_results_grob(x)
     }
@@ -194,9 +195,9 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
     legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','game_results')
     if(is.null(type) || type=='deviance'){
-        p <- autoplot(x,transformed=transformed)
+        p <- autoplot(x,type=type)
     }else if(type%in%legal_types){
-        p <- plot_tournament_grob(x,type=type,transformed=F,...)
+        p <- plot_tournament_grob(x,type=type,transformed=transformed,...)
     }else{
         stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
     }
@@ -204,22 +205,9 @@ plot.tournament <- function(x,type='deviance',transformed=F,...){
         print(p)
     }else{
         if(type=='panel'){
-            grid.draw(p[[type]][[class(x$winner)]])
+            grid.draw(p[[class(x$winner)]])
         }else{
-            grid.draw(p[[type]])
+            grid.draw(p)
         }
     }
 }
-
-#Idea, create graphical plot for tournament games
-#df <- data.frame(round=c(1,1,1,1,2,2,3),
-#                 game=c(1,1,2,2,1,1,1),
-#                 model=c(c('plm0','plm','gplm0','gplm'),c('plm0','gplm'),'plm0'),
-#                 xloc=c(rep(0,4),rep(1,2),2),
-#                 yloc=c(seq(0,3,by=1),c(0.5,2.5),1.5))
-# seg_dat <- data.frame(x1=c(c(xloc[1:4]),y))
-#ggplot(df) + geom_text(aes(x=xloc,y=yloc,label=model),size=10) + theme_classic() + theme(line=element_blank(),text=element_blank())
-
-
-
-
