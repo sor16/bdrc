@@ -1,5 +1,3 @@
-
-
 #' @importFrom stats quantile predict
 #' @importFrom ggplot2 autoplot scale_x_continuous scale_y_continuous
 #' @importFrom gridExtra tableGrob ttheme_minimal
