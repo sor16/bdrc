@@ -92,6 +92,10 @@ There are ways to customize the tournament further. If the parameter of zero dis
 t_obj_known_c <- tournament(formula=Q~W,data=V316_river,c_param=0.75)
 summary(t_obj_known_c )
 ```
+One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this is plm0:
+```{r}
+plot(t_obj_known_c,type='panel',transformed=T)
+```
 
 
 

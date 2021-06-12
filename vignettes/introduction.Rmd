@@ -129,7 +129,7 @@ summary(gplm.fit.known_c)
 one neat way to geta visualization summary of your model is to use the 'collage' option in the plot method:
 
 ```{r, fig.width=8, fig.height=6,results='hide'}
-plot(gplm.fit.known_c,type='collage',transformed=T)
+plot(gplm.fit.known_c,type='panel',transformed=T)
 ```
 
 ## Prediction for an equally spaced grid of stages
