@@ -189,7 +189,7 @@
     <p>gplm returns an object of class "gplm". An object of class "gplm" is a list containing the following components:</p>
 <dt><code>rating_curve</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the rating curve.</p></dd>
  <dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the mean of the rating curve.</p></dd>
- <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters.</p></dd>
+ <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.</p></dd>
  <dt><code>f_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(f(h)\).</p></dd>
  <dt><code>beta_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\beta(h)\).</p></dd>
  <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\sigma_\epsilon(h)\).</p></dd>
@@ -215,6 +215,7 @@
  <dt><code>D_hat</code></dt><dd><p>deviance at the median value of the parameters</p></dd>
  <dt><code>num_effective_param</code></dt><dd><p>number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat</p></dd>
  <dt><code>DIC</code></dt><dd><p>Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters</p></dd>
+ <dt><code>autocorrelation_dat</code></dt><dd><p>A data frame with the autocorrelation of each parameter for different lags.</p></dd>
  <dt><code>acceptance_rate</code></dt><dd><p>proportion of accepted samples in the thinned MCMC chain (excluding burn-in).</p></dd>
  <dt><code>formula</code></dt><dd><p>object of type "formula" provided by the user.</p></dd>
  <dt><code>data</code></dt><dd><p>data provided by the user.</p></dd>
@@ -232,6 +233,7 @@ Bayesian inference is based on the posterior density and summary statistics such
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
+<p>A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor &amp; Francis Group, 2014.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='summary.gplm.html'>summary.gplm</a></code> for summaries, <code><a href='predict.gplm.html'>predict.gplm</a></code> for prediction and <code><a href='plot.gplm.html'>plot.gplm</a></code> for plots. <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='gather_draws.html'>gather_draws</a></code> are also useful to aid further visualization of the full posterior distributions.</p></div>
