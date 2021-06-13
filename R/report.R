@@ -78,6 +78,7 @@ get_report_components <- function(x,type=1){
         tour_table[c('DIC','P')] <- round(tour_table[c('DIC','P')],digits=2)
         output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(),rows=NULL)
         output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
+        output_list$game_results <- plot_tournament_grob(t_obj,type='game_results')
         output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
                                            plot_grob(x,type='convergence_diagnostics')
                                        })
@@ -112,8 +113,11 @@ get_report_pages_fun <- function(x,type=1){
                                               heights=c(5,3),
                                               top=textGrob(m,gp=gpar(fontsize=22,facetype='bold')))
                            })
-        tournament_page <- arrangeGrob(arrangeGrob(report_components$mcmc_table,report_components$tour_table,nrow=1),
-                                       arrangeGrob(report_components$dev_boxplot,ncol=2),
+        tournament_page <- arrangeGrob(arrangeGrob(report_components$dev_boxplot,
+                                                   arrangeGrob(report_components$mcmc_table,
+                                                               report_components$tour_table,nrow=2),
+                                                   ncol=2),
+                                       report_components$game_results,
                                        nrow=2,
                                        as.table=TRUE,
                                        heights=c(1,1),
