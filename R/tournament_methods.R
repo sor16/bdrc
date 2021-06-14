@@ -18,7 +18,7 @@ plot_tournament_fun <- function(x,type='deviance'){
             theme_bdrc() +
             xlab('') +
             ylab('Deviance')
-    }else if(type=='game_results'){
+    }else if(type=='tournament_results'){
         loc_pts <- data.frame(x=c(seq(0,3),0.5,2.5,1.5),
                               y=c(rep(0,4),1,1,2),
                               xend=c(0.5,0.5,2.5,2.5,1.5,1.5,NA),
@@ -59,7 +59,7 @@ plot_tournament_fun <- function(x,type='deviance'){
 #' @importFrom ggplot2 autoplot
 #' @importFrom gridExtra arrangeGrob
 plot_tournament_grob <- function(x,type='panel',transformed=F){
-    ylim_types <- c('sigma_eps','f','panel','game_results','residuals')
+    ylim_types <- c('sigma_eps','f','panel','tournament_results','residuals')
     if(type%in%ylim_types){
         ylim_dat <- lapply(x$contestants,function(m){
             if(grepl('0',class(m))){
@@ -121,8 +121,8 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
             p <- do.call('arrangeGrob',c(plot_list,ncol=round(sqrt(length(panel_types)))))
         })
         names(grob_list) <- sapply(x$contestants,class)
-    }else if(type=='game_results'){
-        grob_list <- plot_tournament_fun(x,type='game_results')
+    }else if(type=='tournament_results'){
+        grob_list <- plot_tournament_fun(x,type='tournament_results')
     }
     return(grob_list)
 }
@@ -229,7 +229,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @export
 plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
-    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','game_results')
+    legal_types <- c("deviance","rating_curve","rating_curve_mean","sigma_eps","f","residuals",'convergence_diagnostics','panel','tournament_results')
     if(is.null(type) || type=='deviance'){
         p <- autoplot(x,type=type)
     }else if(type%in%legal_types){
