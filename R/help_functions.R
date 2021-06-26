@@ -242,27 +242,6 @@ get_args_rollout <- function(args,param_vec){
   return(unique(rollout))
 }
 
-# get_param_expression <- function(param){
-#   expr_vec <- c('a'='\\textit{a}','b'='\\textit{b}','c'='\\textit{c}','sigma_eps'='\\sigma_\\epsilon',
-#                 'sigma_beta'='\\sigma_\\beta','phi_beta'='\\phi_\\beta',
-#                 'sigma_eta'='\\sigma_\\eta','eta_1'='\\eta_1','eta_2'='\\eta_2',
-#                 'eta_3'='\\eta_3','eta_4'='\\eta_4','eta_5'='\\eta_5',
-#                 'eta_6'='\\eta_6','log(a)'='\\log(\\textit{a})','log(h_min-c)'='\\log(\\textit{h_{min}-c})',
-#                 '2log(sigma_eps)'='\\log(\\sigma_{\\epsilon}^2)',
-#                 'log(sigma_beta)'='\\log(\\sigma_{\\beta})',
-#                 'log(phi_beta)'='\\log(\\phi_{\\beta})',
-#                 'log(sigma_eta)'='\\log(\\sigma_{\\eta})',
-#                 'z_1'='\\textit{z_1}','z_2'='\\textit{z_2}','z_3'='\\textit{z_3}',
-#                 'z_4'='\\textit{z_4}','z_5'='\\textit{z_5}','z_6'='\\textit{z_6}')
-#   param_expr <- paste0('$',expr_vec[param],'$')
-#   param_expr <- latex2exp::TeX(param_expr,output = 'character')
-#   #param_expr <- latex2exp::latex2exp(param_expr,output = 'character')
-#   if(is.na(param_expr)){
-#     stop('param not found')
-#   }
-#   return(param_expr)
-# }
-
 get_parameter_levels <- function(param_vec){
     order_vec <- c('a'=1,'log(a)'=2,'b'=3,'c'=4,'log(h_min-c)'=5,'sigma_eps'=6,
                    '2log(sigma_eps)'=7,'sigma_beta'=8,'log(sigma_beta)'=9,
