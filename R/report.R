@@ -284,8 +284,8 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
-#'                       \item{1}{ produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
+#'                       \item{1}{ produces a list of two grob objects, the first grob object consists of a plot panel and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by \code{\link{tournament}}.}
+#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot panel and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
@@ -305,7 +305,7 @@ get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
 #' Save a pdf report of an object
 #' @param x an object of class "plm0".
 #' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm0" which produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve.
+#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm0" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
@@ -327,7 +327,7 @@ get_report.plm0 <- function(x,path=NULL,type=1,...){
 #' Save a pdf report of an object
 #' @param x an object of class "plm".
 #' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm" which produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve.
+#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
@@ -349,7 +349,7 @@ get_report.plm <- function(x,path=NULL,type=1,...){
 #' Save a pdf report of an object
 #' @param x an object of class "gplm0".
 #' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm0" which produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve.
+#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm0" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
@@ -371,7 +371,7 @@ get_report.gplm0 <- function(x,path=NULL,type=1,...){
 #' Save a pdf report of an object
 #' @param x an object of class "gplm".
 #' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm" which produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve.
+#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
@@ -395,8 +395,8 @@ get_report.gplm <- function(x,path=NULL,type=1,...){
 #' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
-#'                       \item{1}{ produces a two page report consisting of a plot collage, a parameter summary table and a tabular rating curve, from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot collage and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.}
+#'                       \item{1}{ produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve, from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
+#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot panel and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
