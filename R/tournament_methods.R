@@ -115,7 +115,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
                   text=element_blank(),
                   plot.margin=unit(c(0,1,-0.5,3),"cm"),
                   legend.position="none")
-        residual_plots <- plot_tournament_grob(t_obj,type='residuals')
+        residual_plots <- plot_tournament_grob(x,type='residuals')
         p <- arrangeGrob(game_results,arrangeGrob(grobs=residual_plots$grobs,ncol=4),nrow=2,heights=c(1,1))
     }else{
         stop('type is not recognized.')
