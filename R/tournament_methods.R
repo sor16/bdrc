@@ -189,7 +189,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' plot(t_obj,type='residuals')
 #' }
 #' @importFrom grid grid.draw
-#' @importFrom grid.extra grid.arrange
+#' @importFrom gridExtra grid.arrange
 #' @export
 plot.tournament <- function(x,type='deviance',transformed=F,...){
     args <- list(...)
