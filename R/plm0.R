@@ -147,7 +147,7 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     H <- optim_obj$hessian
     proposal_scaling <- 2.38^2/RC$theta_length
     RC$LH <- t(chol(H))/sqrt(proposal_scaling)
-    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
+    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c) #stroka ut
     if(is.null(h_max)){
       h_max <- RC$h_max
     }
