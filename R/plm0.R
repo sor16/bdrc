@@ -131,6 +131,13 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
         density_fun <- plm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- plm0.predict_u_unknown_c
     }
+    # if(criteria & is.null(c_param)){
+    #   warning('Dataset lacks measurements near point of zero flow. Model infers upper bound of point of zero flow. See run info to access this upper bound.')
+    #   #MLE
+    #   #h_min=MLE+1
+    # }else{
+    #   h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
+    # }
     #determine proposal density
     RC$theta_length <- if(is.null(RC$c)) 2 else 1
     theta_init <- rep(0,RC$theta_length)
