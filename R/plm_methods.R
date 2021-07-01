@@ -194,7 +194,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
@@ -232,7 +232,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,min(plot_dat$lower)),max(3.5,max(plot_dat$upper))),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
@@ -243,8 +243,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         p <- ggplot(data=resid_dat) +
             geom_hline(yintercept=0,size=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
             geom_path(aes(.data$`log(h-c_hat)`,.data$m_lower),linetype='solid',alpha=0.95,size=.3) +
             geom_path(aes(.data$`log(h-c_hat)`,.data$m_upper),linetype='solid',alpha=0.95,size=.3) +
             xlab(parse(text=x_lab)) +
