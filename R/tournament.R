@@ -3,18 +3,19 @@
 #' evaluate_game uses the Bayes factor of two models to determine whether one model favors the other
 #'
 #' @param m a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"
+#' @param winning_criteria a numerical value between 0 and 1 which sets the threshold for which the probability of the first model in the list, given the data and calculated using Bayes factor, must exceed for it to be declared the better model of the two. This value defaults to 0.75.
 #' @return
 #' A data.frame with the summary of the results of the game
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 #'
 #' @seealso \code{\link{tournament}}
-evaluate_game <- function(m){
+evaluate_game <- function(m,winning_criteria=0.75){
     B_vec <- sapply(m,function(x) 1/mean(exp(0.5*x$Deviance_posterior)))
     BF <- B_vec[1]/B_vec[2]
     PR_m1 <- 1/(1+(1/BF))
     DIC_vec <- sapply(m,function(x) x$DIC)
     num_eff_param <- sapply(m,function(x) x$num_effective_param)
-    winner <- ifelse(PR_m1>=0.75,1,2)
+    winner <- ifelse(PR_m1>=winning_criteria,1,2)
     data.frame(model=sapply(m,class),
                B=B_vec,
                DIC=DIC_vec,
@@ -30,6 +31,7 @@ evaluate_game <- function(m){
 #'
 #' @param ... if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
+#' @param winning_criteria a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of that model is somewhat ambiguous.
 #' @param data data.frame containing the variables specified in formula.
 #' @details  TODO
 #' @return
@@ -51,7 +53,7 @@ evaluate_game <- function(m){
 #' plot(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,...) {
+tournament <- function(formula=NULL,data=NULL,winning_criteria=0.75,...) {
     args <- list(...)
     error_msg <- 'Please provide either formula and data (name arguments explicitly) or four model objects of types gplm, gplm0, plm and plm0.'
     if(!inherits(formula,'formula') | !is.data.frame(data)){
@@ -87,7 +89,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
     }
     round1 <- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){
-                    game_df <- evaluate_game(round1[[i]])
+                    game_df <- evaluate_game(round1[[i]],winning_criteria)
                     round_df <- data.frame(round=1,game=i)
                     cbind(round_df,game_df)
                   })
@@ -97,7 +99,7 @@ tournament <- function(formula=NULL,data=NULL,...) {
     round2 <- lapply(1:length(round1),function(i){
         round1[[i]][[which(round1_res$winner[round1_res$game==i])]]
     })
-    round2_res <- cbind(data.frame(round=2,game=3),evaluate_game(round2))
+    round2_res <- cbind(data.frame(round=2,game=3),evaluate_game(round2,winning_criteria))
     round2_winner <- round2_res$model[round2_res$winner]
     out_obj <- list()
     attr(out_obj, "class") <- "tournament"
