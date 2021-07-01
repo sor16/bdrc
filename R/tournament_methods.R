@@ -37,7 +37,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
         }else{
             f_ylim <- c( min=min(1,0.9*m$param_summary['b','lower']), max=max(3.5,1.1*m$param_summary['b','upper']) )
         }
-        max_res <- 1.1*max(abs(get_residuals_dat(m)[,c('r_median','r_lower','r_upper')]))
+        max_res <- 1.1*max(abs(get_residuals_dat(m)[,c('m_upper','m_lower','r_median','r_lower','r_upper')]),na.rm=TRUE)
         data.frame(sigma_eps_min=sig_ylim[1],sigma_eps_max=sig_ylim[2],f_min=f_ylim[1],f_max=f_ylim[2],residuals_min=-max_res,residuals_max=max_res)
     })
     ylim_dat <- do.call('rbind',ylim_dat)
