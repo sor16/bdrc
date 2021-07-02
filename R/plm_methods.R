@@ -243,10 +243,10 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         p <- ggplot(data=resid_dat) +
             geom_hline(yintercept=0,size=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,method='loess',formula='y~x') +
-            geom_path(aes(.data$`log(h-c_hat)`,.data$m_lower),linetype='solid',alpha=0.95,size=.3) +
-            geom_path(aes(.data$`log(h-c_hat)`,.data$m_upper),linetype='solid',alpha=0.95,size=.3) +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=0.1,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=0.1,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expand_vector) +
