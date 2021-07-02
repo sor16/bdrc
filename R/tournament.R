@@ -31,9 +31,9 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #'
 #' @param ... if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
-#' @param winning_criteria a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of that model is somewhat ambiguous.
+#' @param winning_criteria a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous.
 #' @param data data.frame containing the variables specified in formula.
-#' @details  TODO
+#' @details tournament is a three part model comparison method which uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparison sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm") exceeds the "winning_criteria" then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor and assuming a priori that the two models were equally likely [see Jeffreys (1961) and Kass and Raftery (1995)].
 #' @return
 #' An object of type "tournament" with the following elements
 #' \describe{
@@ -43,6 +43,8 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #' }
 #'
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
+#' @references H. Jeffreys, Theory of Probability, 3rd edn. (Oxford University Press, Oxford, 1961)
+#' @references R. Kass, A. Raftery, Bayes Factors. Journal of the American Statistical Association 90, 773–795 (1995)
 #'
 #' @seealso \code{\link{summary.tournament}}
 #' @examples
