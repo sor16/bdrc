@@ -1,6 +1,6 @@
 print_fun <- function(x){
     cat(paste0(class(x)," - Call:\n"),
-        paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n", sep = "")
+        paste(deparse(x$formula), collapse = "\n"), "\n")
 }
 
 summary_fun <- function(x){
@@ -77,7 +77,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2 or Grob object.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){

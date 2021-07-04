@@ -8,6 +8,7 @@
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 #'
 #' @seealso \code{\link{tournament}}
+#' @keywords internal
 evaluate_game <- function(m){
     B_vec <- sapply(m,function(x) 1/mean(exp(0.5*x$Deviance_posterior)))
     BF <- B_vec[1]/B_vec[2]
@@ -44,7 +45,7 @@ evaluate_game <- function(m){
 #'
 #' @seealso \code{\link{summary.tournament}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(V316_river)
 #' f <- Q~W
 #' t_obj <- tournament(f,V316_river)

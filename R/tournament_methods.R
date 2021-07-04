@@ -98,19 +98,11 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
                                x=c(loc_pts$x[1:4],0.8*(loc_pts$x[5:6]-1.5)+1.5),
                                y=loc_pts$y[1:6]+0.5)
         game_results <- ggplot() +
-            geom_segment(data=loc_pts[1:6,],aes(x=x,y=y,xend=xend,yend=yend)) +
-            geom_text(data=prob_dat, aes(x=x,y=y,label=P,color=winner,size=7)) +
+            geom_segment(data=loc_pts[1:6,],aes(x=.data$x,y=.data$y,xend=.data$xend,yend=.data$yend)) +
+            geom_text(data=prob_dat, aes(x=.data$x,y=.data$y,label=.data$P,color=.data$winner,size=7)) +
+            geom_label(data=loc_pts[5:7,],aes(x=.data$x,y=.data$y,label=.data$model),label.padding=unit(0.5,"lines"),label.size=0,color="Black",fill="white",size=6) +
             scale_colour_manual(values = c("red", "green3")) +
             theme_classic() +
-            geom_label(data=loc_pts[5:7,],
-                       label=loc_pts$model[5:7],
-                       x=loc_pts$x[5:7],
-                       y=loc_pts$y[5:7],
-                       label.padding=unit(0.5,"lines"),
-                       label.size=0,
-                       color="Black",
-                       fill="white",
-                       size=6) +
             theme(line=element_blank(),
                   text=element_blank(),
                   plot.margin=unit(c(0,1,-0.5,3),"cm"),
@@ -123,17 +115,17 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
     return(p)
 }
 
-#' Print tournament object
+#' Print method for discharge rating curve tournament
 #'
-#' Print the results of a tournament of model comparisons
+#' Print the results of a tournament of discharge rating curve model comparisons
 #' @param x an object of class "tournament"
 #' @param ... not used in this function
-#' @seealso \code{\link{summary.tournament}} for summaries
+#' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' t_obj <- tournament(Q~W,halla)
+#' t_obj
 #' print(t_obj)
 #' }
 #' @export
@@ -141,16 +133,16 @@ print.tournament <- function(x,...){
     cat(paste0('Tournament with winner ',class(x$winner)))
 }
 
-#' Print summary of tournament object
+#' Summary method for a discharge rating curve tournament
 #'
 #' Print the summary of a tournament of model comparisons
 #' @param object an object of class "tournament"
 #' @param ... not used in this function
+#' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' t_obj <- tournament(Q~W,halla)
 #' summary(t_obj)
 #' }
 #' @export
@@ -158,9 +150,9 @@ summary.tournament <- function(object,...){
     object$summary
 }
 
-#' Autoplot - Comparison of models in tournament
+#' Autoplot method for discharge rating curve tournament
 #'
-#' Compare the four models from the tournament object in different ways
+#' Compare the four discharge rating curves from the tournament object in different ways
 #'
 #' @param x an object of class "tournament"
 #' @param type a character denoting what type of plot should be drawn. Possible types are
@@ -168,12 +160,11 @@ summary.tournament <- function(object,...){
 #'  \item{"deviance"}{ to plot the rating curve on original scale.}
 #' }
 #' @param ... not used in this function
-#' @seealso \code{\link{summary.tournament}} for summaries
+#' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' t_obj <- tournament(Q~W,halla)
 #' autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
@@ -191,7 +182,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 }
 
 
-#' Plot comparison of models in tournament
+#' Plot method for discharge rating curve tournament
 #'
 #' Compare the four models from the tournament object in multiple ways
 #'
@@ -204,21 +195,22 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'   \item{"f"}{ to plot the power-law exponent}
 #'   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
 #'   \item{"residuals"}{ to plot the log residuals}
+#'   \item{"residuals"}{ to plot tournament results visually, game for game}
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{summary.tournament}} for summaries
+#' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' t_obj <- tournament(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' t_obj <- tournament(Q~W,halla)
 #' plot(t_obj)
-#' plot(t_obj,type='rating_curve_log')
+#' plot(t_obj,transformed=T)
 #' plot(t_obj,type='deviance')
 #' plot(t_obj,type='f')
 #' plot(t_obj,type='sigma_eps')
 #' plot(t_obj,type='residuals')
+#' plot(t_obj,type='tournament_results')
 #' }
 #' @importFrom grid grid.draw
 #' @importFrom gridExtra grid.arrange
