@@ -28,7 +28,7 @@ tournament compares four rating curve models of different complexities and deter
 TODO
 }
 \examples{
-\dontrun{
+\donttest{
 data(V316_river)
 f <- Q~W
 t_obj <- tournament(f,V316_river)

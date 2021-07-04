@@ -2,34 +2,54 @@
 % Please edit documentation in R/plm_methods.R
 \name{predict.plm0}
 \alias{predict.plm0}
-\title{Predict method for plm0 fit}
+\alias{predict.plm}
+\alias{predict.gplm0}
+\alias{predict.gplm}
+\title{Predict method for discharge rating curves}
 \usage{
 \method{predict}{plm0}(object, newdata = NULL, wide = FALSE, ...)
+
+\method{predict}{plm}(object, newdata = NULL, wide = FALSE, ...)
+
+\method{predict}{gplm0}(object, newdata = NULL, wide = FALSE, ...)
+
+\method{predict}{gplm}(object, newdata = NULL, wide = FALSE, ...)
 }
 \arguments{
-\item{object}{an object of class "plm0"}
+\item{object}{an object of class "plm0", "plm", "gplm0" or "gplm".}
 
 \item{newdata}{a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.}
 
-\item{wide}{a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.}
+\item{wide}{a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.}
 
 \item{...}{not used in this function}
 }
 \value{
-numeric vector of discharge values for the stage values given in newdata
+an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=T, a matrix as described above (see wide parameter) is returned.
 }
 \description{
-Print the results of a  object
+Predict the discharge for given stage values based on a discharge rating curve result object.
 }
+\section{Functions}{
+\itemize{
+\item \code{predict.plm0}: Predict method for plm0
+
+\item \code{predict.plm}: Predict method for plm
+
+\item \code{predict.gplm0}: Predict method for gplm0
+
+\item \code{predict.gplm}: Predict method for gplm
+}}
+
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-plm0.fit <- plm0(f,V316_river,h_max=2)
+\donttest{
+data(halla)
+plm0.fit <- plm0(Q~W,halla,h_max=9)
 #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-predict(plm0.fit,newdata=seq(1,2,by=0.01))
+predict(plm0.fit,newdata=seq(8,9,by=0.01))
+predict(plm0.fit,wide=T)
 }
 }
 \seealso{
-\code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+\code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 }

@@ -42,11 +42,11 @@ plm0 returns an object of class "plm0". An object of class "plm0" is a list cont
 \item{\code{D_hat}}{deviance at the median value of the parameters}
 \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
 \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
-\item{\code{autocorrelation_dat}}{A data frame with the autocorrelation of each parameter for different lags.}
+\item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
 \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
-\item{\code{data}}{data provided by the user.}
-\item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
+\item{\code{data}}{data provided by the user, ordered by stage.}
+\item{\code{run_info}}{Information about the input arguments and the specific parameters used in the MCMC chain.}
 }
 \description{
 plm0 is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power Law Model with constant variance as described in Hrafnkelsson et al. See "Details" for a more elaborate description of the model.
@@ -60,7 +60,7 @@ where \eqn{\epsilon} follows a normal distribution with mean zero and variance \
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
-\dontrun{
+\donttest{
 data(V316_river)
 set.seed(1)
 formula <- Q~W

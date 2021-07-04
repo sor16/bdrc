@@ -2,13 +2,20 @@
 % Please edit documentation in R/plm_methods.R
 \name{plot.plm0}
 \alias{plot.plm0}
-\title{Plot plm0 fit}
+\alias{plot.plm}
+\alias{plot.gplm0}
+\alias{plot.gplm}
+\title{Plot method for discharge rating curves}
 \usage{
 \method{plot}{plm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{plot}{plm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{plot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{plot}{gplm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
 }
 \arguments{
-\item{x}{an object of class "plm0".}
-
 \item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
    \item{"rating_curve"}{ to plot the rating curve.}
@@ -19,6 +26,7 @@
    \item{"residuals"}{ to plot the log residuals.}
    \item{"trace"}{ to plot trace plots of parameters given in param.}
    \item{"histogram"}{ to plot histograms of parameters given in param.}
+   \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
 }}
 
 \item{param}{a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
@@ -31,18 +39,38 @@
   \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
   \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }}
+
+\item{an}{object of class "plm0", "plm", "gplm0" or "gplm".}
 }
 \description{
-Print the results of a  object
+Visualize discharge rating curve result objects
 }
+\section{Functions}{
+\itemize{
+\item \code{plot.plm0}: Plot method for plm0
+
+\item \code{plot.plm}: Plot method for plm
+
+\item \code{plot.gplm0}: Plot method for gplm0
+
+\item \code{plot.gplm}: Plot method for gplm
+}}
+
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-plm0.fit <- plm0(f,V316_river)
+\donttest{
+data(halla)
+plm0.fit <- plm0(Q~W,halla)
 plot(plm0.fit)
+plot(plm0.fit,transformed=T)
+plot(plm0.fit,type='histogram',param='c')
+plot(plm0.fit,type='histogram',param='c',transformed=T)
+plot(plm0.fit,type='histogram',param='hyperparameters')
+plot(plm0.fit,type='histogram',param='latent_parameters')
+plot(plm0.fit,type='residuals')
+plot(plm0.fit,type='f')
+plot(plm0.fit,type='sigma_eps')
 }
 }
 \seealso{
-\code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+\code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 }

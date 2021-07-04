@@ -2,12 +2,21 @@
 % Please edit documentation in R/plm_methods.R
 \name{autoplot.plm0}
 \alias{autoplot.plm0}
-\title{Autoplot plm0 fit}
+\alias{autoplot.plm}
+\alias{autoplot.gplm0}
+\alias{autoplot.gplm}
+\title{Autoplot method for discharge rating curves}
 \usage{
 \method{autoplot}{plm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{autoplot}{plm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{autoplot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+
+\method{autoplot}{gplm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
 }
 \arguments{
-\item{x}{an object of class "plm0".}
+\item{x}{an object of class "plm0","plm","gplm0" or "gplm".}
 
 \item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
@@ -36,16 +45,34 @@
 returns an object of class ggplot2.
 }
 \description{
-Uses ggplot2 to plot plm0 object
+Visualize discharge rating curve result objects
 }
+\section{Functions}{
+\itemize{
+\item \code{autoplot.plm0}: Autoplot method for plm0
+
+\item \code{autoplot.plm}: Autoplot method for plm
+
+\item \code{autoplot.gplm0}: Autoplot method for gplm0
+
+\item \code{autoplot.gplm}: Autoplot method for gplm
+}}
+
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-plm0.fit <- plm0(f,V316_river)
+\donttest{
+data(halla)
+plm0.fit <- plm0(Q~W,halla)
 autoplot(plm0.fit)
+autoplot(plm0.fit,transformed=T)
+autoplot(plm0.fit,type='histogram',param='c')
+autoplot(plm0.fit,type='histogram',param='c',transformed=T)
+autoplot(plm0.fit,type='histogram',param='hyperparameters')
+autoplot(plm0.fit,type='histogram',param='latent_parameters')
+autoplot(plm0.fit,type='residuals')
+autoplot(plm0.fit,type='f')
+autoplot(plm0.fit,type='sigma_eps')
 }
 }
 \seealso{
-\code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries of model parameters, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+\code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 }

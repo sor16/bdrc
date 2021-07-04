@@ -1,6 +1,6 @@
 print_fun <- function(x){
-    cat("\nCall:\n",
-        paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n\n", sep = "")
+    cat(paste0(class(x)," - Call:\n"),
+        paste(deparse(x$formula), sep = "\n", collapse = "\n"), "\n", sep = "")
 }
 
 summary_fun <- function(x){
@@ -21,6 +21,7 @@ summary_fun <- function(x){
 #' @param scaling a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.
 #' @return returns a theme object for the package
 #' @importFrom ggplot2 %+replace% theme_classic theme element_text element_blank element_rect
+#' @keywords internal
 theme_bdrc <- function(...,scaling=1){
     title_size <- scaling*16
     text_size <- scaling*12
@@ -360,46 +361,47 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
     return(pred_dat)
 }
 
-#' Print plm0 object
+#' Print method for discharge rating curves
 #'
-#' Print the results of a plm0 object
-#' @param x an object of class "plm0"
+#' Print a discharge rating curve result object
+#' @param x an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param ... not used in this function
-#' @seealso \code{\link{plm0}} for fitting the plm0 model, \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' plm0.fit <- plm0(Q~W,V316_river)
+#' plm0.fit
 #' print(plm0.fit)
 #' }
+#' @describeIn print.plm0 Print method for plm0
 #' @export
 print.plm0 <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing plm0 fit
+#' Summary method for discharge rating curves
 #'
-#' Summarize the results of a plm0 object
-#' @param object an object of class "plm0"
+#' Summarize a discharge rating curve result object
+#' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param ... Not used for this function
-#' @seealso \code{\link{plm0}} for fitting the plm0 model, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' plm0.fit <- plm0(Q~W,V316_river)
 #' summary(plm0.fit)
 #' }
+#' @describeIn summary.plm0 Summary method for plm0
 #' @export
 summary.plm0 <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot plm0 fit
+#' Autoplot method for discharge rating curves
 #'
-#' Uses ggplot2 to plot plm0 object
-#' @param x an object of class "plm0".
+#' Visualize discharge rating curve result objects
+#' @param x an object of class "plm0","plm","gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -420,23 +422,31 @@ summary.plm0 <- function(object,...){
 #'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 #'                     }
 #' @return returns an object of class ggplot2.
-#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries of model parameters, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' plm0.fit <- plm0(Q~W,halla)
 #' autoplot(plm0.fit)
+#' autoplot(plm0.fit,transformed=T)
+#' autoplot(plm0.fit,type='histogram',param='c')
+#' autoplot(plm0.fit,type='histogram',param='c',transformed=T)
+#' autoplot(plm0.fit,type='histogram',param='hyperparameters')
+#' autoplot(plm0.fit,type='histogram',param='latent_parameters')
+#' autoplot(plm0.fit,type='residuals')
+#' autoplot(plm0.fit,type='f')
+#' autoplot(plm0.fit,type='sigma_eps')
 #' }
+#' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @export
 autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
-#' Plot plm0 fit
+#' Plot method for discharge rating curves
 #'
-#' Print the results of a  object
-#' @param x an object of class "plm0".
+#' Visualize discharge rating curve result objects
+#' @param an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -447,6 +457,7 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #'                       \item{"residuals"}{ to plot the log residuals.}
 #'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
 #'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
+#'                       \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
@@ -456,14 +467,22 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 #'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 #'                     }
-#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' \donttest{
+#' data(halla)
+#' plm0.fit <- plm0(Q~W,halla)
 #' plot(plm0.fit)
+#' plot(plm0.fit,transformed=T)
+#' plot(plm0.fit,type='histogram',param='c')
+#' plot(plm0.fit,type='histogram',param='c',transformed=T)
+#' plot(plm0.fit,type='histogram',param='hyperparameters')
+#' plot(plm0.fit,type='histogram',param='latent_parameters')
+#' plot(plm0.fit,type='residuals')
+#' plot(plm0.fit,type='f')
+#' plot(plm0.fit,type='sigma_eps')
 #' }
+#' @describeIn plot.plm0 Plot method for plm0
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
@@ -478,135 +497,49 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     }
 }
 
-#' Predict method for plm0 fit
+#' Predict method for discharge rating curves
 #'
-#' Print the results of a  object
-#' @param object an object of class "plm0"
+#' Predict the discharge for given stage values based on a discharge rating curve result object.
+#' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
-#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
+#' @param wide a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.
 #' @param ... not used in this function
-#' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+#' @return an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=T, a matrix as described above (see wide parameter) is returned.
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river,h_max=2)
+#' \donttest{
+#' data(halla)
+#' plm0.fit <- plm0(Q~W,halla,h_max=9)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(plm0.fit,newdata=seq(1,2,by=0.01))
+#' predict(plm0.fit,newdata=seq(8,9,by=0.01))
+#' predict(plm0.fit,wide=T)
 #' }
+#' @describeIn predict.plm0 Predict method for plm0
 #' @export
 predict.plm0 <- function(object,newdata=NULL,wide=FALSE,...){
     predict_fun(object,newdata,wide)
 }
 
-#' Print plm object
-#'
-#' Print the results of a plm object
-#' @param x an object of class "plm"
-#' @param ... not used in this function
-#' @return gplm0 returns an object of class "plm"\cr\cr
-#' @seealso \code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm.fit <- plm(f,V316_river)
-#' print(plm.fit)
-#' }
+#' @describeIn print.plm0 Print method for plm
 #' @export
 #'
 print.plm <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing plm fit
-#'
-#' Summarize the results of a plm object
-#' @param object an object of class "plm"
-#' @param ... not used in this function
-#' @return gplm0 returns an object of class "plm"\cr\cr
-#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm.fit <- plm(f,V316_river)
-#' summary(plm.fit)
-#' }
+#' @describeIn summary.plm0 Summary method for plm
 #' @export
 summary.plm <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot plm fit
-#'
-#' Uses ggplot2 to plot plm object
-#' @param x an object of class "plm"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @return returns an object of class ggplot2
-#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries of model parameters, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm.fit <- plm(f,V316_river)
-#' autoplot(plm.fit)
-#' }
+#' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
 autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
-#' Plot plm fit
-#'
-#' Print the results of a  object
-#' @param x an object of class "plm"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm.fit <- plm(f,V316_river)
-#' plot(plm.fit)
-#' }
+#' @describeIn plot.plm0 Plot method for plm
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
@@ -621,133 +554,31 @@ plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     }
 }
 
-#' Predict method for plm fit
-#'
-#' Print the results of a  object
-#' @param object an object of class "plm"
-#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
-#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
-#' @param ... not used in this function
-#' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' plm.fit <- plm(f,V316_river,h_max=2)
-#' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(plm.fit,newdata=seq(1,2,by=0.01))
-#' }
+#' @describeIn predict.plm0 Predict method for plm
 #' @export
 predict.plm <- function(object,newdata=NULL,wide=FALSE,...){
     predict_fun(object,newdata,wide)
 }
 
-#' Print gplm0 object
-#'
-#' Print the results of a gplm0 object
-#' @param x an object of class "gplm0"
-#' @param ... not used in this function
-#' @seealso \code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river)
-#' print(gplm0.fit)
-#' }
+#' @describeIn print.plm0 Print method for gplm0
 #' @export
 print.gplm0 <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing gplm0 fit
-#'
-#' Summarize the results of a gplm0 object
-#' @param object an object of class "gplm0"
-#' @param ... not used in this function
-#' @return gplm0 returns an object of class "plm"\cr\cr
-#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river)
-#' summary(gplm0.fit)
-#' }
+#' @describeIn summary.plm0 Summary method for gplm0
 #' @export
 summary.gplm0 <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot gplm0 fit
-#'
-#' Uses ggplot2 to plot gplm0 object
-#' @param x an object of class "gplm0"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @return returns an object of class ggplot2
-#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries of model parameters, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river)
-#' autoplot(gplm0.fit)
-#' }
+#' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
 autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
-#' Plot gplm0 fit
-#'
-#' Print the results of a  object
-#' @param x an object of class "gplm0"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river)
-#' plot(gplm0.fit)
-#' }
+#' @describeIn plot.plm0 Plot method for gplm0
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
@@ -762,135 +593,31 @@ plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     }
 }
 
-#' Predict method for gplm0 fit
-#'
-#' Print the results of a  object
-#' @param object an object of class "gplm0"
-#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
-#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
-#' @param ... not used in this function
-#' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river,h_max=2)
-#' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
-#' }
+#' @describeIn predict.plm0 Predict method for gplm0
 #' @export
 predict.gplm0 <- function(object,newdata=NULL,wide=FALSE,...){
     predict_fun(object,newdata,wide)
 }
 
-#' Print gplm object
-#'
-#' Print the results of a gplm object
-#' @param x an object of class "gplm"
-#' @param ... not used in this function
-#' @seealso \code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,V316_river)
-#' print(gplm.fit)
-#' }
+#' @describeIn print.plm0 Print method for gplm
 #' @export
 print.gplm <- function(x,...){
     print_fun(x)
 }
 
-#' Summarizing plm fit
-#'
-#' Summarize the results of a gplm object
-#' @param object an object of class "gplm"
-#' @param ... not used in this function
-#' @return gplm0 returns an object of class "plm"\cr\cr
-#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,V316_river)
-#' summary(gplm.fit)
-#' }
+#' @describeIn summary.plm0 Summary method for gplm
 #' @export
 summary.gplm <- function(object,...){
     summary_fun(object)
 }
 
-#' Autoplot gplm fit
-#'
-#' Uses ggplot2 to plot gplm object
-#'
-#' @param x an object of class "gplm"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @return returns an object of class ggplot2
-#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries of model parameters, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,V316_river)
-#' autoplot(gplm.fit)
-#' }
+#' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
 autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
-#' Plot gplm fit
-#'
-#' Print the results of a  object
-#'
-#' @param x an object of class "gplm"
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                     }
-#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,V316_river)
-#' plot(gplm.fit)
-#' }
+#' @describeIn plot.plm0 Plot method for gplm
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
@@ -905,23 +632,7 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     }
 }
 
-#' Predict method for gplm fit
-#'
-#' Print the results of a  object
-#' @param object an object of class "gplm"
-#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
-#' @param wide a logical statement determining weather to produce a wide prediction output. If TRUE, then only the predictions median values are presented as a tabular rating curve, with stage changing in decimeter increments with each row and centimeter increments with each column.
-#' @param ... not used in this function
-#' @return numeric vector of discharge values for the stage values given in newdata
-#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \dontrun{
-#' data(V316_river)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,V316_river,h_max=2)
-#' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(gplm0.fit,newdata=seq(1,2,by=0.01))
-#' }
+#' @describeIn predict.plm0 Predict method for gplm
 #' @export
 predict.gplm <- function(object,newdata=NULL,wide=FALSE,...){
     predict_fun(object,newdata,wide)
