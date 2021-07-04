@@ -29,17 +29,17 @@
 #' \item{\code{D_hat}}{deviance at the median value of the parameters}
 #' \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
 #' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
-#' \item{\code{autocorrelation_dat}}{A data frame with the autocorrelation of each parameter for different lags.}
+#' \item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
 #' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
-#' \item{\code{data}}{data provided by the user.}
-#' \item{\code{run_info}}{Information about the specific parameters used in the MCMC chain.}
+#' \item{\code{data}}{data provided by the user, ordered by stage.}
+#' \item{\code{run_info}}{Information about the input arguments and the specific parameters used in the MCMC chain.}
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
 #' preprint 2010.04769
 #' @references A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor & Francis Group, 2014.
 #' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(V316_river)
 #' set.seed(1)
 #' formula <- Q~W
@@ -60,6 +60,7 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     formula_args <- all.vars(formula)
     stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
     model_dat <- as.data.frame(data[,formula_args])
+    forcepoint <- forcepoint[order(model_dat[,2,drop=T])]
     model_dat <- model_dat[order(model_dat[,2,drop=T]),]
     Q <- model_dat[,1,drop=T]
     h <- model_dat[,2,drop=T]

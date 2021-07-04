@@ -1,10 +1,3 @@
-#' Prior parameter specification
-#'
-#'@param model character denoting which model to get the fixed values of parameters of prior distributions. One of plm0,plm,gplm0,gplm
-#'@param c_param The value of the parameter c, the stage at zero discharge. NULL if unknown
-#'@return
-#'The priors are based from data from rivers of a given country.If you want to add your country to this function,
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 priors <- function(model,c_param=NULL) {
     RC=list()
     #Prior parameters for all models
@@ -42,19 +35,6 @@ priors <- function(model,c_param=NULL) {
     return(RC)
 }
 
-#'Linking unique water level measurements to actual
-#'water level measurements
-#'
-#'Adist links unique water level measurements (\strong{h'}) to actual
-#'water level measurements (h) such that \strong{h}=\strong{Ah'}.
-#'from the measurements.
-#'@param h numeric vector of stage measurements in meters
-#'@return
-#'\itemize{
-#'\item A: Matrix \strong{A} linking unique water level measurements (\strong{h'}) to actual
-#'water level measurements (h) such that \strong{h}=\strong{Ah'}
-#'}
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 create_A <- function(h){
     n <- length(h)
     A=matrix(0,nrow=n,ncol=length(unique(h)))
@@ -253,42 +233,6 @@ get_parameter_levels <- function(param_vec){
 
 get_transformed_param <- function(v,param_name,mod,...){
   args <- list(...)
-  if(param_name=='a'){
-    out_v <- log(v)
-    names(out_v) <- rep('log(a)',length(v))
-  }else if(param_name=='b'){
-    out_v <- v
-    names(out_v) <- rep('b',length(v))
-  }else if(param_name=='c'){
-    out_v <- log(args$h_min-v)
-    names(out_v) <- rep('log(h_min-c)',length(v))
-  }else if(param_name=='sigma_eps'){
-    out_v <- 2*log(v)
-    names(out_v) <- rep('2log(sigma_eps)',length(v))
-  }else if(param_name=='sigma_beta'){
-    out_v <- log(v)
-    names(out_v) <- rep('log(sigma_beta)',length(v))
-  }else if(param_name=='phi_beta'){
-    out_v <- log(v)
-    names(out_v) <- rep('log(phi_beta)',length(v))
-  }else if(param_name=='sigma_eta'){
-    out_v <- log(v)
-    names(out_v) <- rep('log(sigma_eta)',length(v))
-  }else if(param_name=='eta_1'){
-    out_v <- v
-    names(out_v) <- rep('eta_1',length(v))
-  }else if(param_name %in% paste0('eta_',2:6)){
-    eta_nr <- as.numeric(unlist(strsplit(param_name,split='_'))[2])
-    out_v <- v-mod[[paste0('eta_',eta_nr-1,'_posterior')]]
-    names(out_v) <- rep(paste0('z_',eta_nr-1),length(v))
-  }else{
-    stop('param not found')
-  }
-  return(out_v)
-}
-
-get_transformed_param <- function(v,param_name,mod,...){
-  args <- list(...)
   # fun_vec <- c('a'=log,
   #              'b'=identity,
   #              'c'=function(x,h_min) log())
@@ -324,11 +268,6 @@ get_transformed_param <- function(v,param_name,mod,...){
     stop('param not found')
   }
   return(out_v)
-}
-
-
-transform_theta <- function(theta,theta_names){
-
 }
 
 get_desired_output <- function(model,RC){
@@ -368,19 +307,6 @@ pri <- function(type,...){
   return(p)
 }
 
-
-#'Unobserved stages
-#'
-#'h_unobserved returns the stages that are needed to make an equally spaced grid of stages from data of stages.
-#'
-#'@param RC list which must include the stage values h,h_min and h_max
-#'@param h_min minimum stage of rating curve.
-#'@param h_max maximum stage of rating curve.
-#'@return h_unobserved returns a list of vectors, h_u and h_u_tild. h_u is a vector of unobserved stage values
-#' needed to make an equally spaced grid of stages. h_u_tild is a vector which is calculated by h_u-min(h_unique) needed to input into B_splines.
-#' The unobserved stages are lower or higher than that of the data, take the same value in h_u_tild as the minimum value and maximum value of the
-#' data respectively. This is done to ensure constant variance below and above observed data.
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson and Sigurdur M. Gardarson (2015) \emph{Bayesian Generalized Rating Curves}
 h_unobserved <- function(RC,h_min=NA,h_max=NA){
   h_u=NULL
   h=100*c(RC$h) #work in cm
@@ -403,14 +329,6 @@ h_unobserved <- function(RC,h_min=NA,h_max=NA){
   return(h_u)
 }
 
-#'B-splines in a generalized rating curve
-#'
-#'A function to calculate the B-splines in a rating curve. When calculating error variance of log discharge in a rating curve the data depends on stage. It is modeled as an exponential of a B-splines curve of order 4,
-#'with 2 interior knots and 6 basis functions.
-#'
-#'@param ZZ A numeric matrix of dimension 1xn where n is number of osbervations. The input is calculated as follows:
-#'(h-min(h)) divided by last element of the resulting vector, where h is stage observations.
-#'@return The function returns a linear combination of scaled B-spline basis functions for every stage observation.
 B_splines <- function(ZZ){
   #The number of equally spaced interior knots.
   kx=2
