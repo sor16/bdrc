@@ -76,7 +76,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2 or Grob object.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_smooth geom_histogram geom_abline geom_hline facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
@@ -143,7 +143,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
             c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
             h_min <- min(x$data[[all.vars(x$formula)[2]]])
-            plot_dat <- merge(filter(x[[type]],h>=h_min),x$data,by.x='h',by.y=all.vars(x$formula)[2],all.x=TRUE)
+            plot_dat <- merge(x[[type]][x[[type]]$h>=h_min,],x$data,by.x='h',by.y=all.vars(x$formula)[2],all.x=TRUE)
             plot_dat[,'log(h-c_hat)'] <- log(plot_dat$h-c_hat)
             plot_dat$log_Q <- log(plot_dat[, all.vars(x$formula)[1]])
 
@@ -154,7 +154,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_median),alpha=0.95) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed',alpha=0.95) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed',alpha=0.95) +
-                geom_point(aes(x=.data$`log(h-c_hat)`,y=.data$log_Q), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
+                geom_point(data=plot_dat[!is.na(plot_dat$log_Q),],aes(x=.data$`log(h-c_hat)`,y=.data$log_Q), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
                 scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0.01,0)) +
                 scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
@@ -243,10 +243,10 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         p <- ggplot(data=resid_dat) +
             geom_hline(yintercept=0,size=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.1,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=0.1,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=0.1,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=0.3,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=0.3,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expand_vector) +
