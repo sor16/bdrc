@@ -407,25 +407,6 @@ predict_wider <- function(p_dat){
   return(p_mat)
 }
 
-
-#' #' @importFrom stats median
-#' get_residuals_dat <- function(m){
-#'   resid_dat <- merge(m$rating_curve[,c('h','median','lower','upper')],m$data,by.x='h',by.y=all.vars(m$formula)[2])
-#'   if('sigma_eps_summary' %in% names(m)){
-#'     resid_dat <- merge(resid_dat,m$sigma_eps_summary[,c('h','median')],by = 'h')
-#'     names(resid_dat) <- c('h','r_median','r_lower','r_upper','Q','sigma_eps')
-#'   }else{
-#'     resid_dat$sigma_eps <- m$param_summary['sigma_eps','median']
-#'   }
-#'   c_hat <- if(is.null(m$run_info$c_param)) median(m$c_posterior) else m$run_info$c_param
-#'   resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
-#'   resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$r_median)
-#'   resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
-#'   resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
-#'   return(resid_dat)
-#' }
-
-
 #' @importFrom stats median
 get_residuals_dat <- function(m){
   h_min <- min(m$data[[all.vars(m$formula)[2]]])

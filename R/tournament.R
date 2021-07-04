@@ -56,7 +56,7 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #' plm.fit <- plm(Q~W,halla)
 #' gplm0.fit <- gplm0(Q~W,halla)
 #' gplm.fit <- gplm(Q~W,halla)
-#'
+#' t_obj <- tournament(gplm.fit,gplm0.fit,plm.fit,plm0.fit,winning_criteria=0.95)
 #' }
 #' @export
 tournament <- function(formula=NULL,data=NULL,...,winning_criteria=0.75) {

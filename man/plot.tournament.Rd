@@ -2,9 +2,9 @@
 % Please edit documentation in R/tournament_methods.R
 \name{plot.tournament}
 \alias{plot.tournament}
-\title{Plot comparison of models in tournament}
+\title{Plot method for discharge rating curve tournament}
 \usage{
-\method{plot}{tournament}(x, type = "deviance", transformed = F, ...)
+\method{plot}{tournament}(x, type = "panel", transformed = F, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
@@ -17,6 +17,7 @@
   \item{"f"}{ to plot the power-law exponent}
   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
   \item{"residuals"}{ to plot the log residuals}
+  \item{"residuals"}{ to plot tournament results visually, game for game}
  }}
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
@@ -27,18 +28,18 @@
 Compare the four models from the tournament object in multiple ways
 }
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-t_obj <- tournament(f,V316_river)
+\donttest{
+data(halla)
+t_obj <- tournament(Q~W,halla)
 plot(t_obj)
-plot(t_obj,type='rating_curve_log')
+plot(t_obj,transformed=T)
 plot(t_obj,type='deviance')
 plot(t_obj,type='f')
 plot(t_obj,type='sigma_eps')
 plot(t_obj,type='residuals')
+plot(t_obj,type='tournament_results')
 }
 }
 \seealso{
-\code{\link{summary.tournament}} for summaries
+\code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 }

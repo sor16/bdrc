@@ -2,26 +2,46 @@
 % Please edit documentation in R/plm_methods.R
 \name{print.plm0}
 \alias{print.plm0}
-\title{Print plm0 object}
+\alias{print.plm}
+\alias{print.gplm0}
+\alias{print.gplm}
+\title{Print method for discharge rating curves}
 \usage{
 \method{print}{plm0}(x, ...)
+
+\method{print}{plm}(x, ...)
+
+\method{print}{gplm0}(x, ...)
+
+\method{print}{gplm}(x, ...)
 }
 \arguments{
-\item{x}{an object of class "plm0"}
+\item{x}{an object of class "plm0", "plm", "gplm0" or "gplm".}
 
 \item{...}{not used in this function}
 }
 \description{
-Print the results of a plm0 object
+Print a discharge rating curve result object
 }
+\section{Functions}{
+\itemize{
+\item \code{print.plm0}: Print method for plm0
+
+\item \code{print.plm}: Print method for plm
+
+\item \code{print.gplm0}: Print method for gplm0
+
+\item \code{print.gplm}: Print method for gplm
+}}
+
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-plm0.fit <- plm0(f,V316_river)
+\donttest{
+data(halla)
+plm0.fit <- plm0(Q~W,V316_river)
+plm0.fit
 print(plm0.fit)
 }
 }
 \seealso{
-\code{\link{plm0}} for fitting the plm0 model, \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+\code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 }

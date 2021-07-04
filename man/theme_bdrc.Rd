@@ -17,3 +17,4 @@ returns a theme object for the package
 \description{
 Custom bdrc theme
 }
+\keyword{internal}

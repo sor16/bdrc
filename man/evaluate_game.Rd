@@ -4,10 +4,12 @@
 \alias{evaluate_game}
 \title{Compare two models using Bayes factor}
 \usage{
-evaluate_game(m)
+evaluate_game(m, winning_criteria = 0.75)
 }
 \arguments{
 \item{m}{a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"}
+
+\item{winning_criteria}{a numerical value between 0 and 1 which sets the threshold for which the probability of the first model in the list, given the data and calculated using Bayes factor, must exceed for it to be declared the better model of the two. This value defaults to 0.75.}
 }
 \value{
 A data.frame with the summary of the results of the game
@@ -20,4 +22,5 @@ B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the po
 }
 \seealso{
 \code{\link{tournament}}
+#' @keywords internal
 }

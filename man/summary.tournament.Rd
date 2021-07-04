@@ -2,7 +2,7 @@
 % Please edit documentation in R/tournament_methods.R
 \name{summary.tournament}
 \alias{summary.tournament}
-\title{Print summary of tournament object}
+\title{Summary method for a discharge rating curve tournament}
 \usage{
 \method{summary}{tournament}(object, ...)
 }
@@ -15,10 +15,12 @@
 Print the summary of a tournament of model comparisons
 }
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-t_obj <- tournament(f,V316_river)
+\donttest{
+data(halla)
+t_obj <- tournament(Q~W,halla)
 summary(t_obj)
 }
+}
+\seealso{
+\code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 }

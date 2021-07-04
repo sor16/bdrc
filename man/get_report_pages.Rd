@@ -2,17 +2,32 @@
 % Please edit documentation in R/report.R
 \name{get_report_pages}
 \alias{get_report_pages}
+\alias{get_report_pages.plm0}
+\alias{get_report_pages.plm}
+\alias{get_report_pages.gplm0}
+\alias{get_report_pages.gplm}
+\alias{get_report_pages.tournament}
 \title{Get report pages}
 \usage{
 get_report_pages(x, type = 1, ...)
+
+\method{get_report_pages}{plm0}(x, type = 1, ...)
+
+\method{get_report_pages}{plm}(x, type = 1, ...)
+
+\method{get_report_pages}{gplm0}(x, type = 1, ...)
+
+\method{get_report_pages}{gplm}(x, type = 1, ...)
+
+\method{get_report_pages}{tournament}(x, type = 1, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".}
 
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 \itemize{
-   \item{1}{Type 1 report consists of two pages and displays only the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
-   \item{2}{Type 2 report consists of ten pages and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+   \item{1 - }{produces a two page report and displays only the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+   \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
 \item{...}{further arguments passed to other methods (currently unused).}
@@ -20,12 +35,26 @@ get_report_pages(x, type = 1, ...)
 \description{
 Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{plm0}: Get report pages for plm0 result object
+
+\item \code{plm}: Get report pages for plm result object
+
+\item \code{gplm0}: Get report pages for gplm0 result object
+
+\item \code{gplm}: Get report pages for gplm result object
+
+\item \code{tournament}: Get report pages for discharge rating curve tournament result object
+}}
+
 \examples{
-\dontrun{
+\donttest{
 data(bunnerviken)
-f <- Q~W
-t_obj <- tournament(f,bunnerviken)
-grob_object_list <- get_report_pages(t_obj)
+plm0.fit <- plm0(Q~W,bunnerviken)
+plm0_pages <- get_report_pages(plm0.fit)
+t_obj <- tournament(Q~W,bunnerviken)
+tournament_pages <- get_report_pages(t_obj,type=2)
 }
 }
 \seealso{
