@@ -4,7 +4,7 @@
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form y~x where y is discharge in \eqn{m^3/s} and x is stage in \eqn{m} (it is very important that the data is in the correct units).
 #' @param data data.frame containing the variables specified in formula.
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
-#' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in data is selected as an upper bound.
+#' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
 #' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #'
@@ -29,24 +29,24 @@
 #' \item{\code{D_hat}}{deviance at the median value of the parameters}
 #' \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
 #' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
-#' \item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
+#' \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 #' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
 #' \item{\code{data}}{data provided by the user, ordered by stage.}
-#' \item{\code{run_info}}{Information about the input arguments and the specific parameters used in the MCMC chain.}
+#' \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
 #' preprint 2010.04769
 #' @references A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor & Francis Group, 2014.
 #' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \donttest{
-#' data(V316_river)
+#' data(halla)
 #' set.seed(1)
 #' formula <- Q~W
-#' plm0.fit <- plm0(formula,V316_river)
+#' plm0.fit <- plm0(formula,halla)
 #' summary(plm0.fit)
 #' plot(plm0.fit)
-#' plm0.fit_known_c <- plm0(formula,V316_river,c_param=0.75,h_max=2)
+#' plm0.fit_known_c <- plm0(formula,halla,c_param=0.75,h_max=2)
 #' summary(plm0.fit_known_c)
 #' plot(plm0.fit_known_c)
 #' }

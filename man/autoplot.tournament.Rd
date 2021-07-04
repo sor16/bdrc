@@ -11,10 +11,10 @@
 
 \item{type}{a character denoting what type of plot should be drawn. Possible types are
 \itemize{
- \item{"deviance"}{ to plot the rating curve on original scale.}
+ \item{"deviance"}{ to plot the deviance of the four models.}
 }}
 
-\item{...}{not used in this function}
+\item{...}{further arguments passed to other methods.}
 }
 \description{
 Compare the four discharge rating curves from the tournament object in different ways

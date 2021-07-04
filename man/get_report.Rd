@@ -7,7 +7,7 @@
 \alias{get_report.gplm0}
 \alias{get_report.gplm}
 \alias{get_report.tournament}
-\title{Get report pages}
+\title{Report for a discharge rating curve or tournament}
 \usage{
 get_report(x, path = NULL, type = 1, ...)
 
@@ -26,14 +26,14 @@ get_report(x, path = NULL, type = 1, ...)
 
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 \itemize{
-   \item{1 - }{produces a two page report and displays only the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+   \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
    \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
+Save a pdf file with a report of a discharge rating curve object or tournament
 }
 \section{Methods (by class)}{
 \itemize{

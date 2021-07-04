@@ -22,5 +22,5 @@ B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the po
 }
 \seealso{
 \code{\link{tournament}}
-#' @keywords internal
 }
+\keyword{internal}

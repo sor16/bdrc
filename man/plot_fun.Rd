@@ -34,3 +34,4 @@ returns an object of class ggplot2.
 \description{
 Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
 }
+\keyword{internal}

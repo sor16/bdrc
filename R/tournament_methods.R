@@ -157,9 +157,9 @@ summary.tournament <- function(object,...){
 #' @param x an object of class "tournament"
 #' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
-#'  \item{"deviance"}{ to plot the rating curve on original scale.}
+#'  \item{"deviance"}{ to plot the deviance of the four models.}
 #' }
-#' @param ... not used in this function
+#' @param ... further arguments passed to other methods.
 #' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
@@ -189,16 +189,16 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @param x an object of class "tournament"
 #' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
-#'   \item{"deviance"}{ to plot the rating curve on original scale.}
-#'   \item{"rating_curve"}{ to plot the rating curve on original scale.}
-#'   \item{"rating_curve_mean"}{ to plot the rating curve on a log scale.}
-#'   \item{"f"}{ to plot the power-law exponent}
-#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level}
-#'   \item{"residuals"}{ to plot the log residuals}
-#'   \item{"residuals"}{ to plot tournament results visually, game for game}
+#'   \item{"deviance"}{ to plot the deviance of the four models.}
+#'   \item{"rating_curve"}{ to plot the rating curve.}
+#'   \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
+#'   \item{"f"}{ to plot the power-law exponent.}
+#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
+#'   \item{"residuals"}{ to plot the log residuals.}
+#'   \item{"residuals"}{ to plot tournament results visually, game for game.}
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param ... further arguments passed to other methods.
 #' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
