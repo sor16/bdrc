@@ -135,11 +135,12 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     RC$h <- h
     RC$h_min <- min(RC$h)
     RC$h_max <- max(RC$h)
-    RC$h_tild <- RC$h-RC$h_min
     RC$n <- length(h)
 
     RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
-    RC$B <- B_splines(t(RC$h_tild)/RC$h_tild[length(RC$h_tild)])
+
+    h_tilde <- RC$h-min(RC$h)
+    RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
 
     RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint]=1/RC$n
@@ -233,7 +234,7 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
     z <- theta[4:8]
     lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-    l=c(log(RC$h_tild+exp(zeta)))
+    l=c(log(RC$h-RC$h_min+exp(zeta)))
 
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
     if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
@@ -272,7 +273,7 @@ plm.calc_Dhat <- function(theta,RC){
   z <- theta_median[4:8]
   lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  l=c(log(RC$h_tild+exp(zeta)))
+  l=c(log(RC$h-RC$h_min+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability

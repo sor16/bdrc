@@ -155,8 +155,17 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
   RC$y <- rbind(as.matrix(y),RC$mu_b)
   RC$h <- as.matrix(h)
   RC$h_min <- min(RC$h)
+  if(is.null(RC$c)){
+    c_upr <- plm0(Q~W,data.frame(Q=exp(y),W=h))$param_summary['c','upper']
+    if(RC$h_min-c_upr>2){
+      warning(paste0('Dataset lacks measurements near point of zero flow. Model infers upper bound of point of zero flow. See run info to access this upper bound.',c_upr))
+      RC$h_min <- c_upr
+      alter <- TRUE
+    }else{
+      alter <- FALSE
+    }
+  }
   RC$h_max <- max(RC$h)
-  RC$h_tild <- RC$h-RC$h_min
   RC$h_unique <- unique(RC$h)
   RC$n <- length(RC$h)
   RC$n_unique <- length(RC$h_unique)
@@ -165,7 +174,9 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
 
   RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
   RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
-  RC$B <- B_splines(t(RC$h_tild)/RC$h_tild[length(RC$h_tild)])
+
+  h_tilde <- RC$h-min(RC$h)
+  RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
   RC$epsilon <- rep(1,RC$n)
 
   RC$epsilon[forcepoint] <- 1/RC$n
@@ -189,7 +200,15 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
   H <- optim_obj$hessian
   proposal_scaling <- 2.38^2/RC$theta_length
   RC$LH <- t(chol(H))/sqrt(proposal_scaling)
-  h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
+  if(is.null(RC$c)){
+    if(alter){
+      h_min <- c_upr-exp(theta_m[1])
+    }else{
+      h_min <- min(RC$h)-exp(theta_m[1])
+    }
+  }else{
+    h_min <- RC$c
+  }
   if(is.null(h_max)){
     h_max <- RC$h_max
   }
@@ -198,14 +217,14 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
   }
   RC$h_u <- h_unobserved(RC,h_min,h_max)
   RC$n_u <- length(RC$h_u)
-  h_u_std <- ifelse(RC$h_u < RC$h_min,0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-RC$h_min)/(RC$h_max-RC$h_min)))
+  h_u_std <- ifelse(RC$h_u < min(RC$h),0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
   RC$B_u <- B_splines(h_u_std)
   #determine length of each part of the output, in addition to theta
   RC$desired_output <- get_desired_output('gplm',RC)
   output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
-                                           unobserved_prediction_fun=unobserved_prediction_fun,
-                                           parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
-                                           burnin=burnin,thin=thin)
+                                      unobserved_prediction_fun=unobserved_prediction_fun,
+                                      parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                      burnin=burnin,thin=thin)
   #Calculate Dhat
   output_list$D_hat <- gplm.calc_Dhat(output_list$theta,RC)
   #refinement of list elements
@@ -281,7 +300,7 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  l=c(log(RC$h_tild+exp(zeta)))
+  l=c(log(RC$h-RC$h_min+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
@@ -330,7 +349,7 @@ gplm.calc_Dhat <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  l=c(log(RC$h_tild+exp(zeta)))
+  l=c(log(RC$h-RC$h_min+exp(zeta)))
 
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability

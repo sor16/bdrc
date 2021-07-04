@@ -408,22 +408,40 @@ predict_wider <- function(p_dat){
 }
 
 
+#' #' @importFrom stats median
+#' get_residuals_dat <- function(m){
+#'   resid_dat <- merge(m$rating_curve[,c('h','median','lower','upper')],m$data,by.x='h',by.y=all.vars(m$formula)[2])
+#'   if('sigma_eps_summary' %in% names(m)){
+#'     resid_dat <- merge(resid_dat,m$sigma_eps_summary[,c('h','median')],by = 'h')
+#'     names(resid_dat) <- c('h','r_median','r_lower','r_upper','Q','sigma_eps')
+#'   }else{
+#'     resid_dat$sigma_eps <- m$param_summary['sigma_eps','median']
+#'   }
+#'   c_hat <- if(is.null(m$run_info$c_param)) median(m$c_posterior) else m$run_info$c_param
+#'   resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
+#'   resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$r_median)
+#'   resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
+#'   resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
+#'   return(resid_dat)
+#' }
+
+
 #' @importFrom stats median
 get_residuals_dat <- function(m){
-  resid_dat <- merge(m$rating_curve[,c('h','median')],m$data,by.x='h',by.y=all.vars(m$formula)[2],)
-  if('sigma_eps_summary' %in% names(m)){
-    resid_dat <- merge(resid_dat,m$sigma_eps_summary[,c('h','median')],by = 'h')
-    names(resid_dat) <- c('h','median','Q','sigma_eps')
-  }else{
-    resid_dat$sigma_eps <- m$param_summary['sigma_eps','median']
-  }
+  h_min <- min(m$data[[all.vars(m$formula)[2]]])
+  rc_dat <- merge(m$rating_curve_mean[,c('h','median','lower','upper')],m$rating_curve[,c('h','median','lower','upper')],by.x='h',by.y='h')
+  resid_dat <- merge(rc_dat[rc_dat$h>=h_min,],m$data,by.x='h',by.y=all.vars(m$formula)[2],all.x=TRUE)
+  colnames(resid_dat) <- c('h','rcm_median','rcm_lower','rcm_upper','rc_median','rc_lower','rc_upper','Q')
   c_hat <- if(is.null(m$run_info$c_param)) median(m$c_posterior) else m$run_info$c_param
   resid_dat[,'log(h-c_hat)'] <- log(resid_dat$h-c_hat)
-  resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$median)
-  resid_dat$r_lower <- -1.96*resid_dat$sigma_eps
-  resid_dat$r_upper <- 1.96*resid_dat$sigma_eps
+  resid_dat$r_median <- log(resid_dat$Q)-log(resid_dat$rc_median)
+  resid_dat$m_lower <- log(resid_dat$rcm_lower)-log(resid_dat$rcm_median)
+  resid_dat$m_upper <- log(resid_dat$rcm_upper)-log(resid_dat$rcm_median)
+  resid_dat$r_lower <- log(resid_dat$rc_lower)-log(resid_dat$rc_median)
+  resid_dat$r_upper <- log(resid_dat$rc_upper)-log(resid_dat$rc_median)
   return(resid_dat)
 }
+
 
 #' @importFrom stats var
 chain_statistics <- function(chains){
@@ -468,4 +486,7 @@ get_rhat_dat <- function(m,param,smoothness=20){
   rhat_dat <- do.call('rbind',rhat_dat)
   return(rhat_dat)
 }
+
+
+
 

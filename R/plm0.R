@@ -120,7 +120,6 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     RC$h <- h
     RC$h_min <- min(RC$h)
     RC$h_max <- max(RC$h)
-    RC$h_tild <- RC$h-RC$h_min
     RC$n <- length(h)
     RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint]=1/RC$n
@@ -132,13 +131,6 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
         density_fun <- plm0.density_evaluation_unknown_c
         unobserved_prediction_fun <- plm0.predict_u_unknown_c
     }
-    # if(criteria & is.null(c_param)){
-    #   warning('Dataset lacks measurements near point of zero flow. Model infers upper bound of point of zero flow. See run info to access this upper bound.')
-    #   #MLE
-    #   #h_min=MLE+1
-    # }else{
-    #   h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
-    # }
     #determine proposal density
     RC$theta_length <- if(is.null(RC$c)) 2 else 1
     theta_init <- rep(0,RC$theta_length)
@@ -148,7 +140,7 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     H <- optim_obj$hessian
     proposal_scaling <- 2.38^2/RC$theta_length
     RC$LH <- t(chol(H))/sqrt(proposal_scaling)
-    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c) #stroka ut
+    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
     if(is.null(h_max)){
       h_max <- RC$h_max
     }
@@ -189,8 +181,7 @@ plm0.density_evaluation_known_c <- function(theta,RC){
     X=cbind(rep(1,length(l)),l)
     L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
     w=solve(L,RC$y-X%*%RC$mu_x)
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
-      pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
+    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se)
 
     W=solve(L,X%*%Sig_x)
     x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(length(RC$mu_x))
