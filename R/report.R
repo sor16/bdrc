@@ -164,7 +164,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' t_obj <- tournament(f,bunnerviken)
@@ -182,7 +182,7 @@ get_report_pages <- function(x,type=1,...) UseMethod("get_report_pages")
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(halla)
 #' f <- Q~W
 #' plm0.fit <- plm0(f,halla)
@@ -202,7 +202,7 @@ get_report_pages.plm0 <- function(x,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(lisjobacken)
 #' f <- Q~W
 #' plm.fit <- plm(f,lisjobacken)
@@ -222,7 +222,7 @@ get_report_pages.plm <- function(x,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(flotemarken)
 #' f <- Q~W
 #' gplm0.fit <- gplm0(f,flotemarken)
@@ -242,7 +242,7 @@ get_report_pages.gplm0 <- function(x,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' gplm.fit <- gplm(f,bunnerviken)
@@ -266,7 +266,7 @@ get_report_pages.gplm <- function(x,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' t_obj <- tournament(f,bunnerviken)
@@ -290,7 +290,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' t_obj <- tournament(f,bunnerviken)
@@ -309,7 +309,7 @@ get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(halla)
 #' f <- Q~W
 #' plm0.fit <- plm0(f,halla)
@@ -331,7 +331,7 @@ get_report.plm0 <- function(x,path=NULL,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(lisjobacken)
 #' f <- Q~W
 #' plm.fit <- plm(f,lisjobacken)
@@ -353,7 +353,7 @@ get_report.plm <- function(x,path=NULL,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(flotemarken)
 #' f <- Q~W
 #' gplm0.fit <- gplm0(f,flotemarken)
@@ -375,7 +375,7 @@ get_report.gplm0 <- function(x,path=NULL,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' gplm.fit <- gplm(f,bunnerviken)
@@ -401,7 +401,7 @@ get_report.gplm <- function(x,path=NULL,type=1,...){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(bunnerviken)
 #' f <- Q~W
 #' t_obj <- tournament(f,bunnerviken)
