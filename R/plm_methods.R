@@ -81,6 +81,7 @@ histogram_breaks <-function(x){
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
+#' @keywords internal
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     args <- list(...)
     cbPalette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
@@ -351,6 +352,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
     return(pred_dat)
 }
 
+
 #' Print method for discharge rating curves
 #'
 #' Print a discharge rating curve result object
@@ -408,8 +410,8 @@ summary.plm0 <- function(object,...){
 #' @param ... further arguments passed to other methods. Currently supports:
 #'                     \itemize{
 #'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 #'                     }
 #' @return returns an object of class ggplot2.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
@@ -436,7 +438,7 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' Plot method for discharge rating curves
 #'
 #' Visualize discharge rating curve result objects
-#' @param an object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param x object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -454,8 +456,8 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @param ... further arguments passed to other methods. Currently supports:
 #'                     \itemize{
 #'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 #'                     }
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples

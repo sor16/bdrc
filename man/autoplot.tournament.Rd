@@ -2,7 +2,7 @@
 % Please edit documentation in R/tournament_methods.R
 \name{autoplot.tournament}
 \alias{autoplot.tournament}
-\title{Autoplot - Comparison of models in tournament}
+\title{Autoplot method for discharge rating curve tournament}
 \usage{
 \method{autoplot}{tournament}(x, type = "deviance", ...)
 }
@@ -11,22 +11,21 @@
 
 \item{type}{a character denoting what type of plot should be drawn. Possible types are
 \itemize{
- \item{"deviance"}{ to plot the rating curve on original scale.}
+ \item{"deviance"}{ to plot the deviance of the four models.}
 }}
 
-\item{...}{not used in this function}
+\item{...}{further arguments passed to other methods.}
 }
 \description{
-Compare the four models from the tournament object in different ways
+Compare the four discharge rating curves from the tournament object in different ways
 }
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-t_obj <- tournament(f,V316_river)
+\donttest{
+data(halla)
+t_obj <- tournament(Q~W,halla)
 autoplot(t_obj)
 }
 }
 \seealso{
-\code{\link{summary.tournament}} for summaries
+\code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 }

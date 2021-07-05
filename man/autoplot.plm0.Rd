@@ -37,8 +37,8 @@
 \item{...}{further arguments passed to other methods. Currently supports:
 \itemize{
   \item{"title"}{ a character denoting the title of the plot}
-  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-  \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+  \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }}
 }
 \value{

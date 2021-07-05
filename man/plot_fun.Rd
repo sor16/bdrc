@@ -19,6 +19,7 @@ plot_fun(x, type = "rating_curve", param = NULL, transformed = F, ...)
    \item{"residuals"}{ to plot the log residuals.}
    \item{"trace"}{ to plot trace plots of parameters given in param.}
    \item{"histogram"}{ to plot histograms of parameters given in param.}
+   \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
 }}
 
 \item{param}{a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
@@ -28,8 +29,9 @@ plot_fun(x, type = "rating_curve", param = NULL, transformed = F, ...)
 \item{title}{a character denoting the title of the plot. Defaults to NULL, i.e. no title.}
 }
 \value{
-returns an object of class ggplot2 or Grob object.
+returns an object of class ggplot2.
 }
 \description{
 Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
 }
+\keyword{internal}

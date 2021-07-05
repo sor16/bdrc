@@ -2,7 +2,7 @@
 % Please edit documentation in R/tournament_methods.R
 \name{print.tournament}
 \alias{print.tournament}
-\title{Print tournament object}
+\title{Print method for discharge rating curve tournament}
 \usage{
 \method{print}{tournament}(x, ...)
 }
@@ -12,16 +12,16 @@
 \item{...}{not used in this function}
 }
 \description{
-Print the results of a tournament of model comparisons
+Print the results of a tournament of discharge rating curve model comparisons
 }
 \examples{
-\dontrun{
-data(V316_river)
-f <- Q~W
-t_obj <- tournament(f,V316_river)
+\donttest{
+data(halla)
+t_obj <- tournament(Q~W,halla)
+t_obj
 print(t_obj)
 }
 }
 \seealso{
-\code{\link{summary.tournament}} for summaries
+\code{\link{tournament}} to run a dishcarge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 }

@@ -20,7 +20,7 @@ plm(
 
 \item{c_param}{stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.}
 
-\item{h_max}{maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in data is selected as an upper bound.}
+\item{h_max}{maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.}
 
 \item{parallel}{logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
@@ -49,11 +49,11 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{D_hat}}{deviance at the median value of the parameters}
 \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
 \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
-\item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
+\item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
 \item{\code{data}}{data provided by the user, ordered by stage.}
-\item{\code{run_info}}{Information about the input arguments and the specific parameters used in the MCMC chain.}
+\item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 }
 \description{
 plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power Law Model with variance that may vary with stage as described in Hrafnkelsson et al. See "Details" for a more elaborate description of the model.
@@ -68,13 +68,13 @@ Bayesian inference is based on the posterior density and summary statistics such
 }
 \examples{
 \donttest{
-data(V316_river)
+data(halla)
 set.seed(1)
 formula <- Q~W
-plm.fit <- plm(formula,V316_river)
+plm.fit <- plm(formula,halla)
 summary(plm.fit)
 plot(plm.fit)
-plm.fit_known_c <- plm(formula,V316_river,c_param=0.75,h_max=2)
+plm.fit_known_c <- plm(formula,halla,c_param=0.75,h_max=2)
 summary(plm.fit_known_c)
 plot(plm.fit_known_c)
 }

@@ -2,29 +2,58 @@
 % Please edit documentation in R/report.R
 \name{get_report}
 \alias{get_report}
-\title{Get report pages}
+\alias{get_report.plm0}
+\alias{get_report.plm}
+\alias{get_report.gplm0}
+\alias{get_report.gplm}
+\alias{get_report.tournament}
+\title{Report for a discharge rating curve or tournament}
 \usage{
 get_report(x, path = NULL, type = 1, ...)
+
+\method{get_report}{plm0}(x, path = NULL, type = 1, ...)
+
+\method{get_report}{plm}(x, path = NULL, type = 1, ...)
+
+\method{get_report}{gplm0}(x, path = NULL, type = 1, ...)
+
+\method{get_report}{gplm}(x, path = NULL, type = 1, ...)
+
+\method{get_report}{tournament}(x, path = NULL, type = 1, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".}
 
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 \itemize{
-   \item{1}{ produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by \code{\link{tournament}}.}
-   \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
+   \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+   \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
+Save a pdf file with a report of a discharge rating curve object or tournament
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{plm0}: Get report for plm0 result object
+
+\item \code{plm}: Get report for plm result object
+
+\item \code{gplm0}: Get report for gplm0 result object
+
+\item \code{gplm}: Get report for gplm
+
+\item \code{tournament}: Get report for discharge rating curve tournament
+}}
+
 \examples{
-\dontrun{
+\donttest{
 data(bunnerviken)
-f <- Q~W
-t_obj <- tournament(f,bunnerviken)
+plm0.fit <- plm0(Q~W,bunnerviken)
+get_report(plm0.fit)
+t_obj <- tournament(Q~W,bunnerviken)
 get_report(t_obj)
 }
 }

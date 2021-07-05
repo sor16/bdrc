@@ -16,6 +16,8 @@
 \method{plot}{gplm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
 }
 \arguments{
+\item{x}{object of class "plm0", "plm", "gplm0" or "gplm".}
+
 \item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
    \item{"rating_curve"}{ to plot the rating curve.}
@@ -36,11 +38,9 @@
 \item{...}{further arguments passed to other methods. Currently supports:
 \itemize{
   \item{"title"}{ a character denoting the title of the plot}
-  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-  \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+  \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }}
-
-\item{an}{object of class "plm0", "plm", "gplm0" or "gplm".}
 }
 \description{
 Visualize discharge rating curve result objects

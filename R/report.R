@@ -152,261 +152,109 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 }
 
 #### S3 methods
-#' Get report pages
+#' Report pages for a discharge rating curve or tournament
 #'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
+#' Get a list the pages of a report of a discharge rating curve object or tournament
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
-#'                       \item{1}{Type 1 report consists of two pages and displays only the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
-#'                       \item{2}{Type 2 report consists of ten pages and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+#'                       \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+#'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
 #' \donttest{
 #' data(bunnerviken)
-#' f <- Q~W
-#' t_obj <- tournament(f,bunnerviken)
-#' grob_object_list <- get_report_pages(t_obj)
+#' plm0.fit <- plm0(Q~W,bunnerviken)
+#' plm0_pages <- get_report_pages(plm0.fit)
+#' t_obj <- tournament(Q~W,bunnerviken)
+#' tournament_pages <- get_report_pages(t_obj,type=2)
 #' }
 #' @export
 get_report_pages <- function(x,type=1,...) UseMethod("get_report_pages")
 
-
-#' Get report pages
-#'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
-#' @param x an object of class "plm0".
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm0". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{get_report}} for generating and saving a report.
-#' @examples
-#' \donttest{
-#' data(halla)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,halla)
-#' grob_object_list <- get_report_pages(plm0.fit)
-#' }
+#' @describeIn get_report_pages Get report pages for plm0 result object
 #' @export
 get_report_pages.plm0 <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-
-#' Get report pages
-#'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
-#' @param x an object of class "plm".
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{get_report}} for generating and saving a report.
-#' @examples
-#' \donttest{
-#' data(lisjobacken)
-#' f <- Q~W
-#' plm.fit <- plm(f,lisjobacken)
-#' grob_object_list <- get_report_pages(plm.fit)
-#' }
+#' @describeIn get_report_pages Get report pages for plm result object
 #' @export
 get_report_pages.plm <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-
-#' Get report pages
-#'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
-#' @param x an object of class "gplm0".
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm0". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{get_report}} for generating and saving a report.
-#' @examples
-#' \donttest{
-#' data(flotemarken)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,flotemarken)
-#' grob_object_list <- get_report_pages(gplm0.fit)
-#' }
+#' @describeIn get_report_pages Get report pages for gplm0 result object
 #' @export
 get_report_pages.gplm0 <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-
-#' Get report pages
-#'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
-#' @param x an object of class "gplm"
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{get_report}} for generating and saving a report.
-#' @examples
-#' \donttest{
-#' data(bunnerviken)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,bunnerviken)
-#' grob_object_list <- get_report_pages(gplm.fit)
-#' }
+#' @describeIn get_report_pages Get report pages for gplm result object
 #' @export
 get_report_pages.gplm <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-
-#' Get report pages
-#'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
-#' @param x an object of class "tournament".
-#' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
-#'                    \itemize{
-#'                       \item{1}{Type 1 report consists of two pages and displays only the results of the winning model if the tournament provided. The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
-#'                       \item{2}{Type 2 report consists of ten pages. The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
-#'                    }
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
-#' @examples
-#' \donttest{
-#' data(bunnerviken)
-#' f <- Q~W
-#' t_obj <- tournament(f,bunnerviken)
-#' grob_object_list <- get_report_pages(t_obj)
-#' }
+#' @describeIn get_report_pages Get report pages for discharge rating curve tournament result object
 #' @export
 get_report_pages.tournament <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-
-#' Get report pages
+#' Report for a discharge rating curve or tournament
 #'
-#' Get a list of the grob objects the make up the pages of the report generated with \code{\link{get_report}}.
+#' Save a pdf file with a report of a discharge rating curve object or tournament
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
-#'                       \item{1}{ produces a list of two grob objects, the first grob object consists of a plot panel and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a list of ten grob objects, the first four grob objects consist of plot panel and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.}
+#'                       \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+#'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{
 #' data(bunnerviken)
-#' f <- Q~W
-#' t_obj <- tournament(f,bunnerviken)
+#' plm0.fit <- plm0(Q~W,bunnerviken)
+#' get_report(plm0.fit)
+#' t_obj <- tournament(Q~W,bunnerviken)
 #' get_report(t_obj)
 #' }
 #' @export
 get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
 
-
-#' Get plm0 fit report
-#'
-#' Save a pdf report of an object
-#' @param x an object of class "plm0".
-#' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm0" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{plm0}} for fitting the plm0 model,\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \donttest{
-#' data(halla)
-#' f <- Q~W
-#' plm0.fit <- plm0(f,halla)
-#' get_report(plm0.fit)
-#' }
+#' @describeIn get_report Get report for plm0 result object
 #' @export
 get_report.plm0 <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-
-#' Get plm fit report as pdf file
-#'
-#' Save a pdf report of an object
-#' @param x an object of class "plm".
-#' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "plm" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{plm}} for fitting the plm model,\code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
-#' @examples
-#' \donttest{
-#' data(lisjobacken)
-#' f <- Q~W
-#' plm.fit <- plm(f,lisjobacken)
-#' get_report(plm.fit)
-#' }
+#' @describeIn get_report Get report for plm result object
 #' @export
 get_report.plm <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-
-#' Get gplm0 fit report as pdf file
-#'
-#' Save a pdf report of an object
-#' @param x an object of class "gplm0".
-#' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm0" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{gplm0}} for fitting the gplm0 model,\code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
-#' @examples
-#' \donttest{
-#' data(flotemarken)
-#' f <- Q~W
-#' gplm0.fit <- gplm0(f,flotemarken)
-#' get_report(gplm0.fit)
-#' }
+#' @describeIn get_report Get report for gplm0 result object
 #' @export
 get_report.gplm0 <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-
-#' Get gplm fit report as pdf file
-#'
-#' Save a pdf report of an object
-#' @param x an object of class "gplm".
-#' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm" which produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve.
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{gplm}} for fitting the gplm model,\code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm}} to help visualize the full posterior distributions.
-#' @examples
-#' \donttest{
-#' data(bunnerviken)
-#' f <- Q~W
-#' gplm.fit <- gplm(f,bunnerviken)
-#' get_report(gplm.fit)
-#' }
+#' @describeIn get_report Get report for gplm
 #' @export
 get_report.gplm <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-
-#' Get tournament report
-#'
-#' Save a pdf report of a tournament object
-#' @param x an object of class "tournament".
-#' @param path a valid path to store the pdf report. Defaults to save report at working directory as report.pdf.
-#' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
-#'                    \itemize{
-#'                       \item{1}{ produces a two page report consisting of a plot panel, a parameter summary table and a tabular rating curve, from the results of the most approriate model for a given data set, as determined by \code{\link{tournament}}.}
-#'                       \item{2}{ produces a 10 page report from the results of all four models; \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}}. The first four pages show a plot panel and the parameter summary table for the four models. The fifth page is a model comparison page, the sixth is a covergence diagnostics page and the last four pages show the histograms of the estimated parameters in the four models.}
-#'                    }
-#' @param ... further arguments passed to other methods (currently unused).
-#' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries.
-#' @examples
-#' \donttest{
-#' data(bunnerviken)
-#' f <- Q~W
-#' t_obj <- tournament(f,bunnerviken)
-#' get_report(t_obj)
-#' }
+#' @describeIn get_report Get report for discharge rating curve tournament
 #' @export
 get_report.tournament <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
