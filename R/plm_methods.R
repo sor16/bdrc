@@ -84,7 +84,7 @@ histogram_breaks <-function(x){
 #' @keywords internal
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
     args <- list(...)
-    cbPalette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
+    color_palette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','r_hat','autocorrelation')
     if(!(type %in% legal_types)){
         stop(cat(paste('Type argument not recognized. Possible types are:\n -',paste(legal_types,collapse='\n - '))))
@@ -266,7 +266,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
              geom_line(na.rm=T) +
              scale_x_continuous(limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000),expand=c(0,0)) +
              scale_y_continuous(limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2),expand=c(0,0)) +
-             scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
+             scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
              theme_bdrc()
@@ -280,7 +280,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
              geom_point(size=1) +
              scale_x_continuous(limits=c(1,max_lag),labels=c(1,seq(5,max_lag,5)),breaks=c(1,seq(5,max_lag,5)),expand=c(0,1)) +
              scale_y_continuous(limits=c(min(auto_dat$corr,-1/11),1),expand=c(0,0)) +
-             scale_color_manual(values=cbPalette,name=class(x),labels=param_expr) +
+             scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Lag') +
              ylab('Autocorrelation') +
              theme_bdrc()
