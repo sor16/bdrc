@@ -78,7 +78,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous label_parsed ggtitle xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab
 #' @importFrom rlang .data
 #' @importFrom stats median
 plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
@@ -238,8 +238,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
-        resid_lim <- 1.05*max(abs(resid_dat$r_lower),resid_dat$r_upper,abs(resid_dat$r_median),na.rm=TRUE)
-        expand_vector <- c(diff(range(abs(resid_dat[,c('r_upper','r_median')]),na.rm=TRUE)),diff(range(resid_dat$`log(h-c_hat)`)))*0.01
+        resid_range <- range(resid_dat[,c('r_upper','r_median','r_median','m_lower','m_upper')],na.rm=TRUE)
+        resid_lim <- 1.05*max(abs(resid_range))
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
         x_lab <- "paste('','log','(','',italic(paste('h',phantom() - phantom(),'',hat(paste('c')))),')','','')"
         p <- ggplot(data=resid_dat) +
@@ -251,7 +251,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=0.3,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expand_vector) +
+            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(-resid_lim,resid_lim)) +
             theme_bdrc()
     }else if(type=='r_hat'){
