@@ -1,47 +1,47 @@
-#' Bunnerviken river in Sweden
+#' Kallstorp stream gauging station in Sweden
 #'
-#' Paired stage (W) and discharge measurements (Q) from Bunnerviken river in Sweden
+#' Paired stage (W) and discharge measurements (Q) from Kallstorp stream gauging station in Sweden
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of river stage}
-#'  \item{Q}{Measurements of river discharge}
+#'  \item{W}{Measurements of water stage}
+#'  \item{Q}{Measurements of water discharge}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
-"bunnerviken"
+"kallstorp"
 
-#' Flotemarken river in Sweden
+#' Krokfors stream gauging station in Sweden
 #'
-#' Paired stage (W) and discharge measurements (Q) from Flotemarken river in Sweden
+#' Paired stage (W) and discharge measurements (Q) from Krokfors stream gauging station in Sweden
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of river stage}
-#'  \item{Q}{Measurements of river discharge}
+#'  \item{W}{Measurements of water stage}
+#'  \item{Q}{Measurements of water discharge}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
-"flotemarken"
+"krokfors"
 
-#' Lisjobacken river in Sweden
+#' Spanga stream gauging station in Sweden
 #'
-#' Paired stage (W) and discharge measurements (Q) from Lisjobacken river in Sweden
+#' Paired stage (W) and discharge measurements (Q) from Spanga stream gauging station in Sweden
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of river stage}
-#'  \item{Q}{Measurements of river discharge}
+#'  \item{W}{Measurements of water stage}
+#'  \item{Q}{Measurements of water discharge}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
-"lisjobacken"
+"spanga"
 
-#' Halla river in Sweden
+#' Skogsliden stream gauging station in Sweden
 #'
-#' Paired stage (W) and discharge measurements (Q) from Halla river in Sweden
+#' Paired stage (W) and discharge measurements (Q) from Skogsliden stream gauging station in Sweden
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of river stage}
-#'  \item{Q}{Measurements of river discharge}
+#'  \item{W}{Measurements of water stage}
+#'  \item{Q}{Measurements of water discharge}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
-"halla"
+"skogsliden"
