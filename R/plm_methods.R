@@ -171,7 +171,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed',alpha=0.95) +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed',alpha=0.95) +
                 geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]]), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(0,max(x$rating_curve$upper,x$data$Q)),expand=c(0.01,0)) +
+                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=0.01)) +
+                #scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(0,max(x$rating_curve$upper,x$data$Q)),expand=c(0.01,0)) +
                 scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
@@ -239,21 +240,21 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
-        resid_range <- range(resid_dat[,c('r_upper','r_median','r_median','m_lower','m_upper')],na.rm=TRUE)
-        resid_lim <- 1.05*max(abs(resid_range))
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
         x_lab <- "paste('','log','(','',italic(paste('h',phantom() - phantom(),'',hat(paste('c')))),')','','')"
+        method <- 'loess'
+        span <- 0.3
         p <- ggplot(data=resid_dat) +
             geom_hline(yintercept=0,size=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=0.3,se=FALSE,color='black',linetype='dashed',size=0.5,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=0.3,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=0.3,se=FALSE,color='black',linetype='solid',size=0.3,alpha=0.95,method='loess',formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',size=0.3,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',size=0.3,alpha=0.95,method=method,formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(-resid_lim,resid_lim)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
