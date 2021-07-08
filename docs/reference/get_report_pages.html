@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Get report pages — get_report_pages" />
-<meta property="og:description" content="Get a list of the grob objects used by get_report to create a pdf report." />
+<meta property="og:description" content="Get a list of the grob objects the make up the pages of the report generated with get_report." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -143,7 +143,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Get a list of the grob objects used by <code><a href='get_report.html'>get_report</a></code> to create a pdf report.</p>
+    <p>Get a list of the grob objects the make up the pages of the report generated with <code><a href='get_report.html'>get_report</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_report_pages</span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span></pre>
@@ -157,9 +157,9 @@
     </tr>
     <tr>
       <th>type</th>
-      <td><p>an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are</p><ul>
-<li><p>1 produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by <code><a href='tournament.html'>tournament</a></code>.</p></li>
-<li><p>2 produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.</p></li>
+      <td><p>an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are</p><ul>
+<li><p>1Type 1 report consists of two pages and displays only the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.</p></li>
+<li><p>2Type 2 report consists of ten pages and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -170,7 +170,7 @@
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> for running a tournament,<code><a href='summary.tournament.html'>summary.tournament</a></code> for summaries.</p></div>
+    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> for running a tournament,<code><a href='summary.tournament.html'>summary.tournament</a></code> for summaries and <code><a href='get_report.html'>get_report</a></code> for generating and saving a report of a tournament object.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>

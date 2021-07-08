@@ -188,7 +188,7 @@
 
     <p>plm returns an object of class "plm". An object of class "plm" is a list containing the following components: <br /></p>
 <dt><code>rating_curve</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the rating curve.</p></dd>
-<dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the mean of the rating curve.</p></dd>
+<dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.</p></dd>
 <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters.</p></dd>
 <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior of \(\sigma_{\epsilon}\)</p></dd>
 <dt><code>Deviance_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the deviance.</p></dd>
@@ -208,6 +208,7 @@
 <dt><code>D_hat</code></dt><dd><p>deviance at the median value of the parameters</p></dd>
 <dt><code>num_effective_param</code></dt><dd><p>number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat</p></dd>
 <dt><code>DIC</code></dt><dd><p>Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters</p></dd>
+<dt><code>autocorrelation_dat</code></dt><dd><p>A data frame with the autocorrelation of each parameter for different lags.</p></dd>
 <dt><code>acceptance_rate</code></dt><dd><p>proportion of accepted samples in the thinned MCMC chain (excluding burn-in).</p></dd>
 <dt><code>formula</code></dt><dd><p>object of type "formula" provided by the user.</p></dd>
 <dt><code>data</code></dt><dd><p>data provided by the user.</p></dd>

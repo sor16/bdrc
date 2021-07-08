@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get gplm0 fit report pages — get_report_pages.gplm0 • bdrc</title>
+<title>Get report pages — get_report_pages.gplm0 • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Get gplm0 fit report pages — get_report_pages.gplm0" />
-<meta property="og:description" content="Get a list of the grob objects used by get_report to create a pdf report." />
+<meta property="og:title" content="Get report pages — get_report_pages.gplm0" />
+<meta property="og:description" content="Get a list of the grob objects the make up the pages of the report generated with get_report." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,13 +137,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get gplm0 fit report pages</h1>
+    <h1>Get report pages</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/report.R'><code>R/report.R</code></a></small>
     <div class="hidden name"><code>get_report_pages.gplm0.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get a list of the grob objects used by <code><a href='get_report.html'>get_report</a></code> to create a pdf report.</p>
+    <p>Get a list of the grob objects the make up the pages of the report generated with <code><a href='get_report.html'>get_report</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for gplm0</span>
@@ -158,7 +158,7 @@
     </tr>
     <tr>
       <th>type</th>
-      <td><p>an integer to determine whether to get the pages from report type 1 or 2. Only type 1 is permissible for an object of class "gplm0" which produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve.</p></td>
+      <td><p>an integer denoting what type of report is to be produced. Only type 1 is permissible for an object of class "gplm0". Type 1 report consists of two pages. The first page contains a panel of four plots and a summary of the posterior distributions of the paraters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -168,7 +168,7 @@
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='gplm0.html'>gplm0</a></code> for fitting the gplm0 model,<code><a href='summary.gplm0.html'>summary.gplm0</a></code> for summaries, <code><a href='predict.gplm0.html'>predict.gplm0</a></code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='plot.gplm0.html'>plot.gplm0</a></code> to help visualize the full posterior distributions.</p></div>
+    <div class='dont-index'><p><code><a href='get_report.html'>get_report</a></code> for generating and saving a report.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
