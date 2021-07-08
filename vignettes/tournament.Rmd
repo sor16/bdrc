@@ -38,13 +38,13 @@ This vignette explores the ways you can compare the fit of the different dischar
 
 To learn more about the four models, see Hrafnkelsson et al. To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament function allows you to compare the fit of these four models on the same data and determine which one suits best to the river you are analysing. The tournament is a set of two rounds. The first round consists of two games, one where plm0 and plm are compared and the other where gplm0 and gplm are compared. The winner of each of the two games in round 1 qualify for round 2 where the remaining two models are compared and the winner determined. The comparison of two models is performed by computing the Bayes factor and subsequently the probability of each model given the data. There is a hierarchy in complexity of the models s.t. plm0 < plm < gplm0 < gplm in terms of complexity. For a more complex model to win a game of two models, the probability of model given data must by larger than 0.75. This favors the simpler model except when there is overwhelming evidence of the benefit of the more complex model. As in the introduction vignette, we will use a dataset from a river called x in Sweden that comes with the package:
 ```{r, data}
-data(V316_river)
-V316_river
+data(kallstorp)
+kallstorp
 ```
-The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to run our first tournament:
-```{r}
+The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in kallstorp, a column named Q includes are discharge measurements and W the stage measurements. We are ready to run our first tournament:
+```{r, cache=T}
 set.seed(1)
-t_obj <- tournament(Q~W,V316_river)
+t_obj <- tournament(Q~W,kallstorp)
 ```
 The function both runs the four models for you and runs the tournament. It's worth mentioning that if you have already run your models of the four different kinds, plm0, plm, gplm0 and gplm and stored them in objects plm0.fit,plm.fit,gplm0.fit and gplm.fit, you can alternatively run the tournament very efficiently in the following way:
 ```{r,eval=F}
@@ -87,12 +87,12 @@ plot(t_obj,type='sigma_eps')
 ```
 
 ## Customizing tournaments
-There are ways to customize the tournament further. If the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. Assume 0.75 m is the known value of $c$ and you want to run a tournament with c fixed for all models. Then you could write
+There are ways to customize the tournament further. If the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. Assume 22.35 m is the known value of $c$ and you want to run a tournament with c fixed for all models. Then you could write
 ```{r,cache=T}
-t_obj_known_c <- tournament(formula=Q~W,data=V316_river,c_param=0.75)
-summary(t_obj_known_c )
+t_obj_known_c <- tournament(formula=Q~W,data=kallstorp,c_param=22.35)
+summary(t_obj_known_c)
 ```
-One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this is plm0:
+One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm:
 ```{r}
 plot(t_obj_known_c,type='panel',transformed=T)
 ```

@@ -36,14 +36,14 @@ library(ggplot2)
 ```
 We will use a dataset from a river called x in Sweden that comes with the package:
 ```{r, data}
-data(V316_river)
-V316_river
+data(kallstorp)
+kallstorp
 ```
 ## Fit a discharge rating curve
-It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:
+It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in kallstorp, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:
 
 ```{r, cache=T}
-gplm.fit <- gplm(Q~W,data=V316_river)
+gplm.fit <- gplm(Q~W,data=kallstorp)
 ```
 gplm returns an object of class "gplm" which we can summarise and visualize using familiar functions such as
 
@@ -111,19 +111,19 @@ plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
 ```
 
 To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize $\hat{R}$ as presented by Gelman and Rubin with:
-```{r}
+```{r,fig.width=8, fig.height=6}
 plot(gplm.fit,type='r_hat')
 ```
 And finally autocorrelation of parameters can be assessed with
-```{r}
+```{r,fig.width=8, fig.height=6}
 plot(gplm.fit,type='autocorrelation')
 ```
 
 
 ## Customization of models
-There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 2.5 m, then your function call would look like this
+There are ways to customize the gplm further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 22.35 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 24 m, then your function call would look like this
 ```{r,cache=T,results}
-gplm.fit.known_c <- gplm(Q~W,V316_river,c_param=0.75,h_max=2.5)
+gplm.fit.known_c <- gplm(Q~W,kallstorp,c_param=22.35,h_max=24)
 summary(gplm.fit.known_c)
 ```
 one neat way to geta visualization summary of your model is to use the 'collage' option in the plot method:
@@ -135,7 +135,7 @@ plot(gplm.fit.known_c,type='panel',transformed=T)
 ## Prediction for an equally spaced grid of stages
 To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which the Bayesian inference was performed
 ```{r}
-h_grid <- seq(0.75,2.0,by=0.01)
+h_grid <- seq(22.35,24,by=0.01)
 rating_curve_h_grid <- predict(gplm.fit.known_c,newdata=h_grid)
 print(rating_curve_h_grid)
 ```
