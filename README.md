@@ -13,7 +13,7 @@ status](https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg)](https://
 
 The package implements the following Bayesian hierarchical discharge
 rating curve models for paired measurements of stage and discharge in
-rivers described in Hrafnkelsson et al.:
+rivers as described in Hrafnkelsson et al.:
 
 `plm0()` - Power-law model with constant variance
 
@@ -37,15 +37,16 @@ devtools::install_github("sor16/bdrc")
 
 It is very simple to fit a discharge rating curve with the *bdrc*
 package. All you need are two mandatory input arguments, formula and
-data. The formula is of the form y~x where y is discharge in \(m^3/s\)
-and x is stage in \(m\) (it is very important that the data is in the
-correct units). data is a data.frame which must include x and y as
-column names. As an example we will use data from the swedish river
-*Halla* which is one of the dataset that comes with the package. In this
-table, the Q column denotes discharge while W denotes stage:
+data. The formula is of the form y\~x where y is discharge in
+*m*<sup>3</sup>/*s* and x is stage in *m* (it is very important that the
+data is in the correct units). data is a data.frame which must include x
+and y as column names. As an example we, will use data from the swedish
+gauging station *Krokfors*, which is one of the datasets that come with
+the package. In this table, the Q column denotes discharge while W
+denotes stage:
 
 ``` r
-gplm.fit <- gplm(Q~W,halla)
+gplm.fit <- gplm(Q~W,krokfors)
 ```
 
 To dig deeper into the functionality of the package and the different
