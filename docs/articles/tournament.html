@@ -63,13 +63,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -78,7 +72,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -92,7 +86,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="tournament_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Tournament - Model comparison</h1>
@@ -106,9 +100,9 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="co">#load the packages needed for this vignette</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co">#load the packages needed for this vignette</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">library</span>(bdrc)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(ggplot2)</span></code></pre></div>
 <p>This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:</p>
 <ul>
 <li><p>plm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice</p></li>
@@ -117,98 +111,121 @@
 <li><p>gplm() - Generalized power-law model with variance that may vary with stage</p></li>
 </ul>
 <p>To learn more about the four models, see Hrafnkelsson et al. To learn about how to run the models on your data see the <a href="introduction.html">introduction vignette</a>. The tournament function allows you to compare the fit of these four models on the same data and determine which one suits best to the river you are analysing. The tournament is a set of two rounds. The first round consists of two games, one where plm0 and plm are compared and the other where gplm0 and gplm are compared. The winner of each of the two games in round 1 qualify for round 2 where the remaining two models are compared and the winner determined. The comparison of two models is performed by computing the Bayes factor and subsequently the probability of each model given the data. There is a hierarchy in complexity of the models s.t. plm0 &lt; plm &lt; gplm0 &lt; gplm in terms of complexity. For a more complex model to win a game of two models, the probability of model given data must by larger than 0.75. This favors the simpler model except when there is overwhelming evidence of the benefit of the more complex model. As in the introduction vignette, we will use a dataset from a river called x in Sweden that comes with the package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(V316_river)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="op">&gt;</span><span class="st"> </span>V316_river</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt;         W     Q</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; 1  1.2380  8.05</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; 2  1.2470  8.37</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; 3  1.2520  8.68</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; 4  1.2660  8.59</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; 5  1.2680  8.38</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; 6  1.2770 10.50</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt; 7  1.2800  9.33</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co">#&gt; 8  1.2800  9.50</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt; 9  1.2830  9.29</span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt; 10 1.2860  7.61</span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; 11 1.2960 10.20</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; 12 1.3000 10.10</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; 13 1.3010  9.58</span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; 14 1.3100 10.35</span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; 15 1.3250 11.20</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt; 16 1.3390 10.30</span></a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt; 17 1.3450 11.10</span></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt; 18 1.3520 10.90</span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 19 1.3540 12.40</span></a>
-<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#&gt; 20 1.3850 14.20</span></a>
-<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="co">#&gt; 21 1.4125 16.80</span></a>
-<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="co">#&gt; 22 1.4130 15.20</span></a>
-<a class="sourceLine" id="cb2-26" data-line-number="26"><span class="co">#&gt; 23 1.4670 18.50</span></a>
-<a class="sourceLine" id="cb2-27" data-line-number="27"><span class="co">#&gt; 24 1.4700 19.10</span></a>
-<a class="sourceLine" id="cb2-28" data-line-number="28"><span class="co">#&gt; 25 1.4800 19.40</span></a>
-<a class="sourceLine" id="cb2-29" data-line-number="29"><span class="co">#&gt; 26 1.5660 24.40</span></a>
-<a class="sourceLine" id="cb2-30" data-line-number="30"><span class="co">#&gt; 27 1.6260 27.50</span></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co">#&gt; 28 1.6300 29.60</span></a>
-<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co">#&gt; 29 1.6580 31.70</span></a></code></pre></div>
-<p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in <span class="math inline">\(m^3/s\)</span> and x is stage in <span class="math inline">\(m\)</span> (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,V316_river)</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Running tournament:</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; 25% - gplm finished</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; 50% - gplm0 finished</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 75% - plm finished</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; 100% - plm0 finished</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(kallstorp)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> kallstorp</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         W        Q</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  22.398  0.00260</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  22.431  0.01150</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  22.483  0.04800</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  22.486  0.06710</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  22.520  0.16400</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  22.528  0.12000</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7  22.541  0.18800</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  22.554  0.19200</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9  22.559  0.17300</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 22.585  0.36200</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 22.623  0.40100</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 22.639  0.59000</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 22.642  0.70200</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 22.642  0.67738</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 22.657  0.70357</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 22.660  0.70600</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17 22.661  0.70300</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18 22.678  0.77400</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19 22.689  0.75900</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20 22.736  1.63800</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21 22.761  1.42800</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22 22.761  1.42000</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23 22.776  1.89700</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24 22.800  1.85200</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25 22.813  2.47160</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 22.813  1.94800</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 22.819  2.35200</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28 22.833  2.11000</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29 22.840  2.59850</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 22.863  2.95200</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31 22.870  2.76600</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32 22.905  3.59000</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33 22.908  3.35000</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34 22.945  4.33325</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35 22.985  4.88000</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36 23.017  5.54200</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37 23.043  6.15100</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38 23.131  7.04000</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39 23.134  7.47900</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40 23.209  8.23800</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41 23.241  9.18400</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42 23.278  9.25100</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43 23.290  9.02000</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44 23.346 10.28600</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45 23.439 10.59400</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46 23.440 11.86000</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47 23.447 11.85000</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48 23.700 15.93000</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49 23.810 18.39400</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50 23.892 22.60000</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51 23.923 22.10000</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52 23.924 21.60000</span></span></code></pre></div>
+<p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in <span class="math inline">\(m^3/s\)</span> and x is stage in <span class="math inline">\(m\)</span> (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in kallstorp, a column named Q includes are discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(Q<span class="sc">~</span>W,kallstorp)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running tournament:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25% - gplm finished</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75% - plm finished</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100% - plm0 finished</span></span></code></pre></div>
 <p>The function both runs the four models for you and runs the tournament. It’s worth mentioning that if you have already run your models of the four different kinds, plm0, plm, gplm0 and gplm and stored them in objects plm0.fit,plm.fit,gplm0.fit and gplm.fit, you can alternatively run the tournament very efficiently in the following way:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(plm0.fit,plm.fit,gplm0.fit,gplm.fit)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(plm0.fit,plm.fit,gplm0.fit,gplm.fit)</span></code></pre></div>
 <p>The printing method is very simple and gives you the name of the winner</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>t_obj <span class="co"># or alternatively print(t_obj)</span></a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; Tournament with winner plm0</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="co"># or alternatively print(t_obj)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Tournament with winner gplm</span></span></code></pre></div>
 <p>For a more detailed summary of the results of the tournament write</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt;   round game model            B      DIC num_eff_param         P winner</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; 1     1    1  gplm 3.363093e-18 78.60748      2.131466 0.5953329  FALSE</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; 2     1    1 gplm0 2.286003e-18 79.14988      2.296661 0.4046671   TRUE</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; 3     1    2   plm 2.179334e-18 78.51795      2.590610 0.5257880  FALSE</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 4     1    2  plm0 1.965557e-18 79.03463      2.735172 0.4742120   TRUE</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 5     2    3 gplm0 2.286003e-18 79.14988      2.296661 0.5376857  FALSE</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 6     2    3  plm0 1.965557e-18 79.03463      2.735172 0.4623143   TRUE</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(t_obj)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B       DIC num_eff_param            P winner</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 2.271853e+04 -35.41581      6.787448 8.334062e-01   TRUE</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 4.541322e+03 -23.31167      6.526374 1.665938e-01  FALSE</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 8.986909e-11  44.25068      2.980818 6.595547e-01  FALSE</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 4.638813e-11  45.37560      3.329517 3.404453e-01   TRUE</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3  gplm 2.271853e+04 -35.41581      6.787448 1.000000e+00   TRUE</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 4.638813e-11  45.37560      3.329517 1.998401e-15  FALSE</span></span></code></pre></div>
 <p>Notice here that in round 1, plm was the winner in the first game and gplm in the second. Finally plm was favoured in round 2 and thus determined the tournament winner, the most adequate model for the data at hand.</p>
 <div id="compare-different-components-of-the-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compare-different-components-of-the-models" class="anchor"></a>Compare different components of the models</h2>
 <p>To visualize the results from the tournament first we can plot the deviance posterior distribution of the different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the deviance distribution we write</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'deviance'</span>) <span class="co">#note that type defaults to deviance</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'deviance'</span>) <span class="co">#note that type defaults to deviance</span></span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>rating curves using the plot function</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'rating_curve'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'rating_curve'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"> Another useful plot is the residual plot</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'residuals'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The main difference of te four models lies in the modelling of the power law exponent (<span class="math inline">\(f(h)\)</span>) the variance on the data level (<span class="math inline">\(\sigma^2_{\varepsilon}\)</span>). Thus it is insightful to look at the posterior of the power law exponent for the different models</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'f'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'f'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"> and the variance on the data level</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="customizing-tournaments" class="section level2">
 <h2 class="hasAnchor">
 <a href="#customizing-tournaments" class="anchor"></a>Customizing tournaments</h2>
-<p>There are ways to customize the tournament further. If the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that parameter to the known value in the model. Assume 0.75 m is the known value of <span class="math inline">\(c\)</span> and you want to run a tournament with c fixed for all models. Then you could write</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>t_obj_known_c &lt;-<span class="st"> </span><span class="kw">tournament</span>(<span class="dt">formula=</span>Q<span class="op">~</span>W,<span class="dt">data=</span>V316_river,<span class="dt">c_param=</span><span class="fl">0.75</span>)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; Running tournament:</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; 25% - gplm finished</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; 50% - gplm0 finished</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; 75% - plm finished</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; 100% - plm0 finished</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj_known_c )</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt;   round game model            B      DIC num_eff_param         P winner</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; 1     1    1  gplm 4.854275e-18 77.44833      2.159365 0.7106041  FALSE</span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; 2     1    1 gplm0 1.976920e-18 78.03827      2.360465 0.2893959   TRUE</span></a>
-<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co">#&gt; 3     1    2   plm 5.081637e-18 77.48274      2.227437 0.5074212  FALSE</span></a>
-<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="co">#&gt; 4     1    2  plm0 4.932996e-18 77.86499      2.311817 0.4925788   TRUE</span></a>
-<a class="sourceLine" id="cb12-13" data-line-number="13"><span class="co">#&gt; 5     2    3 gplm0 1.976920e-18 78.03827      2.360465 0.2860990  FALSE</span></a>
-<a class="sourceLine" id="cb12-14" data-line-number="14"><span class="co">#&gt; 6     2    3  plm0 4.932996e-18 77.86499      2.311817 0.7139010   TRUE</span></a></code></pre></div>
-<p>One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj_known_c,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<p>There are ways to customize the tournament further. If the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that parameter to the known value in the model. Assume 22.35 m is the known value of <span class="math inline">\(c\)</span> and you want to run a tournament with c fixed for all models. Then you could write</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj_known_c <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="at">formula=</span>Q<span class="sc">~</span>W,<span class="at">data=</span>kallstorp,<span class="at">c_param=</span><span class="fl">22.35</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running tournament:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25% - gplm finished</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75% - plm finished</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100% - plm0 finished</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(t_obj_known_c)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B       DIC num_eff_param          P winner</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 6.518178e+05 -38.01112      6.276466 0.84420776   TRUE</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 1.202881e+05 -24.83318      5.763799 0.15579224  FALSE</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 9.217053e-16  55.14466      3.542567 0.96601859   TRUE</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 3.242262e-17  73.30634      2.276437 0.03398141  FALSE</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3  gplm 6.518178e+05 -38.01112      6.276466 1.00000000   TRUE</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3   plm 9.217053e-16  55.14466      3.542567 0.00000000  FALSE</span></span></code></pre></div>
+<p>One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj_known_c,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
   </div>

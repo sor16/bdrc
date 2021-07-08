@@ -63,13 +63,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -78,7 +72,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -92,7 +86,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="introduction_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction</h1>
@@ -114,73 +108,96 @@
 <li><p>gplm() - Generalized power-law model with variance that may vary with stage</p></li>
 </ul>
 <p>For further details about the different models, see x. The models differ in their complexity and the gplm is the most flexible and complex model. We will focus on the use of gplm throughout this introduction vignette and explore the different ways to fit the gplm and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="co">#load the packages needed for this vignette</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co">#load the packages needed for this vignette</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">library</span>(bdrc)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(ggplot2)</span></code></pre></div>
 <p>We will use a dataset from a river called x in Sweden that comes with the package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(V316_river)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="op">&gt;</span><span class="st"> </span>V316_river</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt;         W     Q</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; 1  1.2380  8.05</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; 2  1.2470  8.37</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; 3  1.2520  8.68</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; 4  1.2660  8.59</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; 5  1.2680  8.38</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; 6  1.2770 10.50</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt; 7  1.2800  9.33</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co">#&gt; 8  1.2800  9.50</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt; 9  1.2830  9.29</span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt; 10 1.2860  7.61</span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; 11 1.2960 10.20</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; 12 1.3000 10.10</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; 13 1.3010  9.58</span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; 14 1.3100 10.35</span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; 15 1.3250 11.20</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt; 16 1.3390 10.30</span></a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt; 17 1.3450 11.10</span></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt; 18 1.3520 10.90</span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 19 1.3540 12.40</span></a>
-<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#&gt; 20 1.3850 14.20</span></a>
-<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="co">#&gt; 21 1.4125 16.80</span></a>
-<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="co">#&gt; 22 1.4130 15.20</span></a>
-<a class="sourceLine" id="cb2-26" data-line-number="26"><span class="co">#&gt; 23 1.4670 18.50</span></a>
-<a class="sourceLine" id="cb2-27" data-line-number="27"><span class="co">#&gt; 24 1.4700 19.10</span></a>
-<a class="sourceLine" id="cb2-28" data-line-number="28"><span class="co">#&gt; 25 1.4800 19.40</span></a>
-<a class="sourceLine" id="cb2-29" data-line-number="29"><span class="co">#&gt; 26 1.5660 24.40</span></a>
-<a class="sourceLine" id="cb2-30" data-line-number="30"><span class="co">#&gt; 27 1.6260 27.50</span></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co">#&gt; 28 1.6300 29.60</span></a>
-<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co">#&gt; 29 1.6580 31.70</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(kallstorp)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> kallstorp</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         W        Q</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  22.398  0.00260</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  22.431  0.01150</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  22.483  0.04800</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  22.486  0.06710</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  22.520  0.16400</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  22.528  0.12000</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7  22.541  0.18800</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  22.554  0.19200</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9  22.559  0.17300</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 22.585  0.36200</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 22.623  0.40100</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 22.639  0.59000</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 22.642  0.70200</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 22.642  0.67738</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 22.657  0.70357</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 22.660  0.70600</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17 22.661  0.70300</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18 22.678  0.77400</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19 22.689  0.75900</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20 22.736  1.63800</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21 22.761  1.42800</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22 22.761  1.42000</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23 22.776  1.89700</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24 22.800  1.85200</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25 22.813  2.47160</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 22.813  1.94800</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 22.819  2.35200</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28 22.833  2.11000</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29 22.840  2.59850</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 22.863  2.95200</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31 22.870  2.76600</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32 22.905  3.59000</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33 22.908  3.35000</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34 22.945  4.33325</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35 22.985  4.88000</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36 23.017  5.54200</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37 23.043  6.15100</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38 23.131  7.04000</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39 23.134  7.47900</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40 23.209  8.23800</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41 23.241  9.18400</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42 23.278  9.25100</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43 23.290  9.02000</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44 23.346 10.28600</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45 23.439 10.59400</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46 23.440 11.86000</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47 23.447 11.85000</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48 23.700 15.93000</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49 23.810 18.39400</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50 23.892 22.60000</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51 23.923 22.10000</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52 23.924 21.60000</span></span></code></pre></div>
 <div id="fit-a-discharge-rating-curve" class="section level2">
 <h2 class="hasAnchor">
 <a href="#fit-a-discharge-rating-curve" class="anchor"></a>Fit a discharge rating curve</h2>
-<p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in <span class="math inline">\(m^3/s\)</span> and x is stage in <span class="math inline">\(m\)</span> (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in V316_river, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>gplm.fit &lt;-<span class="st"> </span><span class="kw">gplm</span>(Q<span class="op">~</span>W,<span class="dt">data=</span>V316_river)</a></code></pre></div>
+<p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in <span class="math inline">\(m^3/s\)</span> and x is stage in <span class="math inline">\(m\)</span> (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in kallstorp, a column named Q includes are discharge measurements and W the stage measurements. We are ready to fit a drc using the gplm function:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,<span class="at">data=</span>kallstorp)</span></code></pre></div>
 <p>gplm returns an object of class “gplm” which we can summarise and visualize using familiar functions such as</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(gplm.fit)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Formula: </span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  Q ~ W</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; Latent parameters:</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; a 23.74      45.96      54.76      </span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; b  1.83       1.84       1.84      </span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">#&gt; Hyperparameters:</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt; c            0.55680   0.8570       0.944   </span></a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; sigma_beta   0.00501   0.1417       0.773   </span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; phi_beta     0.50184  16.6874    6042.652   </span></a>
-<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; sigma_eta    0.00375   0.0885       0.484   </span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt; eta_1       -5.81894  -5.2651      -4.609   </span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt; eta_2       -7.14255  -5.2252      -3.426   </span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt; eta_3       -8.05317  -5.4585      -2.672   </span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt; eta_4       -8.81311  -5.6843      -2.206   </span></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt; eta_5       -9.58083  -5.8032      -1.758   </span></a>
-<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">#&gt; eta_6      -10.16377  -5.8954      -1.415   </span></a>
-<a class="sourceLine" id="cb4-22" data-line-number="22"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-23" data-line-number="23"><span class="co">#&gt; DIC: 78.67452</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Formula: </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 9.82       10.44      11.20      </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; b 1.83        1.83       1.84      </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; c           22.34054  22.358     22.371     </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta   0.26729   0.516      1.073     </span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta     0.33850   0.741      1.515     </span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta    0.00798   0.397      0.958     </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1       -4.77893  -4.162     -3.186     </span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2       -5.89518  -4.219     -2.879     </span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3       -7.62393  -5.578     -3.183     </span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4       -9.00221  -6.576     -3.010     </span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5       -9.71591  -6.851     -2.694     </span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -10.35455  -6.976     -2.266     </span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: -35.11683</span></span></code></pre></div>
 <p>and</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>We will dive deeper into visualizing the “gplm” object in the next sections.</p>
 </div>
@@ -188,140 +205,152 @@
 <h2 class="hasAnchor">
 <a href="#visualizing-posterior-distributions-of-different-parameters" class="anchor"></a>Visualizing posterior distributions of different parameters</h2>
 <p>The bdrc package provides several tools to visualize the results from the drc model and can give insight into the physical properties of the river at hand. For instance, the hyperparameter <span class="math inline">\(c\)</span> corresponds to the stage of zero discharge. To visualize the posterior of <span class="math inline">\(c\)</span>, we can write</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'histogram'</span>,<span class="dt">param=</span><span class="st">'c'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'c'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;"> Since <span class="math inline">\(c\)</span> is a strictly positive parameter, it is transformed during Bayesian inference s.t. it has support on the real line with <span class="math inline">\(\zeta=log(h_{min}-c)\)</span>. To plot the transformed posterior we write</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'histogram'</span>,<span class="dt">param=</span><span class="st">'c'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'c'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"> the param argument can also be a vector of different parameter names. To visualize the posterior distribution of many parameters at once we can for instance write</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'histogram'</span>,<span class="dt">param=</span><span class="kw">c</span>(<span class="st">'a'</span>,<span class="st">'c'</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="fu">c</span>(<span class="st">'a'</span>,<span class="st">'c'</span>))</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"> There is a shorthand to visualize all hyperparameters at once</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'histogram'</span>,<span class="dt">param=</span><span class="st">'hyperparameters'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;"> Similairily, writing ‘latent_parameters’ plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'histogram'</span>,<span class="dt">param=</span><span class="st">'hyperparameters'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>Finally, we can visualize certain components of the drc models that may vary with stage, the power-law exponent <span class="math inline">\(f\)</span> and the standard deviation on the data level <span class="math inline">\(\sigma_{\varepsilon}\)</span>. gplm0 and gplm generalize the power law exponent, model it as a function of stage <span class="math inline">\(f(h)=b+\beta(h)\)</span>, while in plm and plm model the exponent is a fixed constant <span class="math inline">\(f(h)=b\)</span>. We can plot the exponent with</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'f'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'f'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"> plm and gplm model the standard deviation, <span class="math inline">\(\sigma_{\varepsilon}\)</span> on the data level as a function of stage, namely as a linear combination of B-splines functions, while plm and gplm0 model the variance is a fixed constant. We can plot the standard deviation by writing</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="assessing-model-fitness-and-convergence" class="section level2">
 <h2 class="hasAnchor">
 <a href="#assessing-model-fitness-and-convergence" class="anchor"></a>Assessing model fitness and convergence</h2>
 <p>The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot, tracing plots, autocorrelation plot and the Gelman-Rubin statistic. The residuals are presented as a function of <span class="math inline">\(log(h-c)\)</span> as the model is linear (or generalized linear) on that scale.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'residuals'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"> The traceplots are most meaningful on the transformed scale. To plot a trace plot for a single parameter, write</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'trace'</span>,<span class="dt">param=</span><span class="st">'c'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'c'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-14-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>To plot a trace plot for all hyperparameters, you write similiarily as above</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'trace'</span>,<span class="dt">param=</span><span class="st">'hyperparameters'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-15-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize <span class="math inline">\(\hat{R}\)</span> as presented by Gelman and Rubin with:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'r_hat'</span>)</a></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-16-1.png" width="700" style="display: block; margin: auto;"> And finally autocorrelation of parameters can be assessed with</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit,<span class="dt">type=</span><span class="st">'autocorrelation'</span>)</a></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-17-1.png" width="700" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'r_hat'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;"> And finally autocorrelation of parameters can be assessed with</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'autocorrelation'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="customization-of-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#customization-of-models" class="anchor"></a>Customization of models</h2>
-<p>There are ways to customize the gplm further. In some instances, the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 0.75 m is the known value of <span class="math inline">\(c\)</span> and you want to calculate the rating curve for stage values up to 2.5 m, then your function call would look like this</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>gplm.fit.known_c &lt;-<span class="st"> </span><span class="kw">gplm</span>(Q<span class="op">~</span>W,V316_river,<span class="dt">c_param=</span><span class="fl">0.75</span>,<span class="dt">h_max=</span><span class="fl">2.5</span>)</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(gplm.fit.known_c)</a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; Formula: </span></a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt;  Q ~ W</span></a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt; Latent parameters:</span></a>
-<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></a>
-<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="co">#&gt; a 35.02      38.24      41.32      </span></a>
-<a class="sourceLine" id="cb18-9" data-line-number="9"><span class="co">#&gt; b  1.83       1.84       1.84      </span></a>
-<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb18-11" data-line-number="11"><span class="co">#&gt; Hyperparameters:</span></a>
-<a class="sourceLine" id="cb18-12" data-line-number="12"><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></a>
-<a class="sourceLine" id="cb18-13" data-line-number="13"><span class="co">#&gt; sigma_beta   0.14217   0.3207       0.802   </span></a>
-<a class="sourceLine" id="cb18-14" data-line-number="14"><span class="co">#&gt; phi_beta     0.44450  15.9516    8201.079   </span></a>
-<a class="sourceLine" id="cb18-15" data-line-number="15"><span class="co">#&gt; sigma_eta    0.00242   0.0848       0.469   </span></a>
-<a class="sourceLine" id="cb18-16" data-line-number="16"><span class="co">#&gt; eta_1       -5.84902  -5.2993      -4.677   </span></a>
-<a class="sourceLine" id="cb18-17" data-line-number="17"><span class="co">#&gt; eta_2       -7.16061  -5.2419      -3.366   </span></a>
-<a class="sourceLine" id="cb18-18" data-line-number="18"><span class="co">#&gt; eta_3       -8.05881  -5.4521      -2.784   </span></a>
-<a class="sourceLine" id="cb18-19" data-line-number="19"><span class="co">#&gt; eta_4       -8.84995  -5.6882      -2.351   </span></a>
-<a class="sourceLine" id="cb18-20" data-line-number="20"><span class="co">#&gt; eta_5       -9.54548  -5.8367      -1.878   </span></a>
-<a class="sourceLine" id="cb18-21" data-line-number="21"><span class="co">#&gt; eta_6      -10.19557  -5.8982      -1.334   </span></a>
-<a class="sourceLine" id="cb18-22" data-line-number="22"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb18-23" data-line-number="23"><span class="co">#&gt; DIC: 77.61864</span></a></code></pre></div>
+<p>There are ways to customize the gplm further. In some instances, the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 22.35 m is the known value of <span class="math inline">\(c\)</span> and you want to calculate the rating curve for stage values up to 24 m, then your function call would look like this</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,kallstorp,<span class="at">c_param=</span><span class="fl">22.35</span>,<span class="at">h_max=</span><span class="dv">24</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit.known_c)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Formula: </span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 9.77       10.35      11.07      </span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; b 1.83        1.84       1.84      </span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta   0.32710   0.594      1.207     </span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta     0.37478   0.820      1.695     </span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta    0.00656   0.336      0.936     </span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1       -4.83549  -4.250     -3.296     </span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2       -5.99644  -4.193     -2.711     </span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3       -7.61219  -5.527     -2.611     </span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4       -9.03752  -6.461     -2.238     </span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5       -9.84873  -6.722     -1.978     </span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -10.41056  -6.796     -1.691     </span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: -34.12913</span></span></code></pre></div>
 <p>one neat way to geta visualization summary of your model is to use the ‘collage’ option in the plot method:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(gplm.fit.known_c,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit.known_c,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="prediction-for-an-equally-spaced-grid-of-stages" class="section level2">
 <h2 class="hasAnchor">
 <a href="#prediction-for-an-equally-spaced-grid-of-stages" class="anchor"></a>Prediction for an equally spaced grid of stages</h2>
 <p>To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from <span class="math inline">\(c\)</span> and h_max are accepted, as that is the range in which the Bayesian inference was performed</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="op">&gt;</span><span class="st"> </span>h_grid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="fl">0.75</span>,<span class="fl">2.0</span>,<span class="dt">by=</span><span class="fl">0.01</span>)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="op">&gt;</span><span class="st"> </span>rating_curve_h_grid &lt;-<span class="st"> </span><span class="kw">predict</span>(gplm.fit.known_c,<span class="dt">newdata=</span>h_grid)</a>
-<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="op">&gt;</span><span class="st"> </span><span class="kw">print</span>(rating_curve_h_grid)</a>
-<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt;           h       lower       median       upper</span></a>
-<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt; 1  0.750000  0.00000000   0.00000000   0.0000000</span></a>
-<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt; 2  0.800000  0.03074243   0.04795237   0.1303313</span></a>
-<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; 3  0.850000  0.15977058   0.22492026   0.4609612</span></a>
-<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co">#&gt; 4  0.900000  0.41954077   0.55514412   0.9583040</span></a>
-<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="co">#&gt; 5  0.950000  0.83090623   1.05457728   1.5780384</span></a>
-<a class="sourceLine" id="cb20-10" data-line-number="10"><span class="co">#&gt; 6  1.000000  1.40711113   1.73385293   2.4138330</span></a>
-<a class="sourceLine" id="cb20-11" data-line-number="11"><span class="co">#&gt; 7  1.050000  2.15319557   2.59963574   3.3582516</span></a>
-<a class="sourceLine" id="cb20-12" data-line-number="12"><span class="co">#&gt; 8  1.100000  3.07848339   3.66230388   4.5488294</span></a>
-<a class="sourceLine" id="cb20-13" data-line-number="13"><span class="co">#&gt; 9  1.150000  4.20582259   4.93323957   5.9143725</span></a>
-<a class="sourceLine" id="cb20-14" data-line-number="14"><span class="co">#&gt; 10 1.200000  5.51367510   6.40983953   7.5026782</span></a>
-<a class="sourceLine" id="cb20-15" data-line-number="15"><span class="co">#&gt; 11 1.238000  6.60218931   7.67377308   8.9775799</span></a>
-<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="co">#&gt; 12 1.247000  6.88972646   7.99938494   9.2880720</span></a>
-<a class="sourceLine" id="cb20-17" data-line-number="17"><span class="co">#&gt; 13 1.252000  7.04868315   8.17843191   9.4705061</span></a>
-<a class="sourceLine" id="cb20-18" data-line-number="18"><span class="co">#&gt; 14 1.266000  7.48964185   8.68724359  10.0772605</span></a>
-<a class="sourceLine" id="cb20-19" data-line-number="19"><span class="co">#&gt; 15 1.268000  7.58690217   8.76486019  10.1685893</span></a>
-<a class="sourceLine" id="cb20-20" data-line-number="20"><span class="co">#&gt; 16 1.277000  7.83842275   9.11538266  10.4976642</span></a>
-<a class="sourceLine" id="cb20-21" data-line-number="21"><span class="co">#&gt; 17 1.280000  7.98999151   9.22223776  10.7069664</span></a>
-<a class="sourceLine" id="cb20-22" data-line-number="22"><span class="co">#&gt; 18 1.283000  8.06906035   9.33033424  10.8010871</span></a>
-<a class="sourceLine" id="cb20-23" data-line-number="23"><span class="co">#&gt; 19 1.286000  8.16920651   9.44156302  10.9072913</span></a>
-<a class="sourceLine" id="cb20-24" data-line-number="24"><span class="co">#&gt; 20 1.296000  8.46586654   9.84190786  11.4304494</span></a>
-<a class="sourceLine" id="cb20-25" data-line-number="25"><span class="co">#&gt; 21 1.300000  8.65562737  10.01924912  11.6453848</span></a>
-<a class="sourceLine" id="cb20-26" data-line-number="26"><span class="co">#&gt; 22 1.301000  8.69201613  10.06084537  11.6223403</span></a>
-<a class="sourceLine" id="cb20-27" data-line-number="27"><span class="co">#&gt; 23 1.310000  9.01585843  10.43775426  12.0545399</span></a>
-<a class="sourceLine" id="cb20-28" data-line-number="28"><span class="co">#&gt; 24 1.325000  9.57640994  11.06145756  12.8350141</span></a>
-<a class="sourceLine" id="cb20-29" data-line-number="29"><span class="co">#&gt; 25 1.339000 10.12218985  11.65356298  13.4495262</span></a>
-<a class="sourceLine" id="cb20-30" data-line-number="30"><span class="co">#&gt; 26 1.345000 10.35815535  11.93547213  13.8001137</span></a>
-<a class="sourceLine" id="cb20-31" data-line-number="31"><span class="co">#&gt; 27 1.352000 10.59799379  12.24800080  14.1661063</span></a>
-<a class="sourceLine" id="cb20-32" data-line-number="32"><span class="co">#&gt; 28 1.354000 10.68873052  12.33705743  14.2750428</span></a>
-<a class="sourceLine" id="cb20-33" data-line-number="33"><span class="co">#&gt; 29 1.385000 11.97798756  13.79993403  15.9133937</span></a>
-<a class="sourceLine" id="cb20-34" data-line-number="34"><span class="co">#&gt; 30 1.412500 13.18111826  15.20856709  17.5413326</span></a>
-<a class="sourceLine" id="cb20-35" data-line-number="35"><span class="co">#&gt; 31 1.413000 13.17106857  15.23400967  17.5829663</span></a>
-<a class="sourceLine" id="cb20-36" data-line-number="36"><span class="co">#&gt; 32 1.431000 14.02777460  16.15138116  18.6761851</span></a>
-<a class="sourceLine" id="cb20-37" data-line-number="37"><span class="co">#&gt; 33 1.449000 14.80512046  17.14178218  19.7822405</span></a>
-<a class="sourceLine" id="cb20-38" data-line-number="38"><span class="co">#&gt; 34 1.467000 15.71286451  18.17635980  21.0055029</span></a>
-<a class="sourceLine" id="cb20-39" data-line-number="39"><span class="co">#&gt; 35 1.470000 15.85203003  18.31430025  21.1577798</span></a>
-<a class="sourceLine" id="cb20-40" data-line-number="40"><span class="co">#&gt; 36 1.480000 16.28862978  18.88171053  21.8451950</span></a>
-<a class="sourceLine" id="cb20-41" data-line-number="41"><span class="co">#&gt; 37 1.508667 17.83393457  20.59210084  23.7121059</span></a>
-<a class="sourceLine" id="cb20-42" data-line-number="42"><span class="co">#&gt; 38 1.537333 19.30361500  22.40214195  25.9697366</span></a>
-<a class="sourceLine" id="cb20-43" data-line-number="43"><span class="co">#&gt; 39 1.566000 20.86428067  24.26016600  27.9314407</span></a>
-<a class="sourceLine" id="cb20-44" data-line-number="44"><span class="co">#&gt; 40 1.586000 22.02481186  25.64557410  29.7179096</span></a>
-<a class="sourceLine" id="cb20-45" data-line-number="45"><span class="co">#&gt; 41 1.606000 23.22879090  27.01621327  31.4473569</span></a>
-<a class="sourceLine" id="cb20-46" data-line-number="46"><span class="co">#&gt; 42 1.626000 24.37794548  28.49576494  32.8439992</span></a>
-<a class="sourceLine" id="cb20-47" data-line-number="47"><span class="co">#&gt; 43 1.630000 24.58807445  28.76302669  33.3031929</span></a>
-<a class="sourceLine" id="cb20-48" data-line-number="48"><span class="co">#&gt; 44 1.658000 26.47365999  30.84061418  35.8476352</span></a>
-<a class="sourceLine" id="cb20-49" data-line-number="49"><span class="co">#&gt; 45 1.704778 29.41923956  34.47916537  40.1040525</span></a>
-<a class="sourceLine" id="cb20-50" data-line-number="50"><span class="co">#&gt; 46 1.751556 32.46201541  38.33421233  44.8774797</span></a>
-<a class="sourceLine" id="cb20-51" data-line-number="51"><span class="co">#&gt; 47 1.798333 35.63975785  42.46924804  49.8964068</span></a>
-<a class="sourceLine" id="cb20-52" data-line-number="52"><span class="co">#&gt; 48 1.845111 39.02747189  46.81152033  55.2124464</span></a>
-<a class="sourceLine" id="cb20-53" data-line-number="53"><span class="co">#&gt; 49 1.891889 42.49393768  51.29452695  61.0397413</span></a>
-<a class="sourceLine" id="cb20-54" data-line-number="54"><span class="co">#&gt; 50 1.938667 46.46568069  56.09786027  66.8862354</span></a>
-<a class="sourceLine" id="cb20-55" data-line-number="55"><span class="co">#&gt; 51 1.985444 49.86723242  61.08915059  73.3627745</span></a>
-<a class="sourceLine" id="cb20-56" data-line-number="56"><span class="co">#&gt; 52 2.032222 53.62634552  66.44894521  80.3674691</span></a>
-<a class="sourceLine" id="cb20-57" data-line-number="57"><span class="co">#&gt; 53 2.079000 57.21218250  71.93721777  87.2608067</span></a>
-<a class="sourceLine" id="cb20-58" data-line-number="58"><span class="co">#&gt; 54 2.125778 60.65152326  77.55180425  95.1010653</span></a>
-<a class="sourceLine" id="cb20-59" data-line-number="59"><span class="co">#&gt; 55 2.172556 64.96215918  83.63328057 102.7512091</span></a>
-<a class="sourceLine" id="cb20-60" data-line-number="60"><span class="co">#&gt; 56 2.219333 68.93893511  89.87534252 111.0292447</span></a>
-<a class="sourceLine" id="cb20-61" data-line-number="61"><span class="co">#&gt; 57 2.266111 72.76587827  96.31151254 119.6761206</span></a>
-<a class="sourceLine" id="cb20-62" data-line-number="62"><span class="co">#&gt; 58 2.312889 77.33685467 102.81881956 129.0720415</span></a>
-<a class="sourceLine" id="cb20-63" data-line-number="63"><span class="co">#&gt; 59 2.359667 81.33088327 109.85044215 138.3009201</span></a>
-<a class="sourceLine" id="cb20-64" data-line-number="64"><span class="co">#&gt; 60 2.406444 84.56005065 116.97931673 148.4343616</span></a>
-<a class="sourceLine" id="cb20-65" data-line-number="65"><span class="co">#&gt; 61 2.453222 89.80072391 124.43026751 158.5898259</span></a>
-<a class="sourceLine" id="cb20-66" data-line-number="66"><span class="co">#&gt; 62 2.500000 92.98358838 132.24713946 169.5976166</span></a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">22.35</span>,<span class="dv">24</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> rating_curve_h_grid <span class="ot">&lt;-</span> <span class="fu">predict</span>(gplm.fit.known_c,<span class="at">newdata=</span>h_grid)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">print</span>(rating_curve_h_grid)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           h        lower       median        upper</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1  22.35000  0.000000000  0.000000000  0.000000000</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  22.39800  0.001964254  0.002687489  0.003724395</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  22.43100  0.009481645  0.012511461  0.016549842</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  22.44833  0.017003595  0.022338255  0.029332319</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  22.46567  0.027987132  0.036390560  0.047489714</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  22.48300  0.042894139  0.055556979  0.071992790</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7  22.48600  0.046033309  0.059443684  0.077069197</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  22.52000  0.091065884  0.117375528  0.150141858</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9  22.52800  0.104931289  0.134572748  0.173121957</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 22.54100  0.129831622  0.166695994  0.213043120</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 22.55400  0.158665291  0.203824224  0.260296021</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 22.55900  0.170583801  0.219397950  0.278640120</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 22.58500  0.243794708  0.311085677  0.399694320</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 22.62300  0.384334512  0.487196623  0.617894949</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 22.63900  0.456414110  0.574884040  0.727503794</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 22.64200  0.468052578  0.593601849  0.749034766</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17 22.65700  0.548861571  0.686873659  0.862706534</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18 22.66000  0.560635008  0.706561003  0.890360599</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19 22.66100  0.562462855  0.711636348  0.889349467</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20 22.67800  0.664576384  0.831477385  1.046037946</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21 22.68900  0.727590180  0.916868599  1.142819407</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22 22.73600  1.053775872  1.322432957  1.638208446</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23 22.76100  1.267787402  1.573625105  1.959400049</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24 22.77600  1.406121848  1.738084975  2.152254666</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25 22.80000  1.630595161  2.015108499  2.484825235</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 22.81300  1.766975073  2.175259547  2.690700477</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 22.81900  1.825378917  2.257125458  2.774938013</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28 22.83300  1.968353555  2.429045185  3.010972470</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29 22.84000  2.051990748  2.524034481  3.117312364</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 22.86300  2.308171485  2.842977596  3.506251420</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31 22.87000  2.387646086  2.951905123  3.597008891</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32 22.90500  2.815228940  3.467305129  4.247674848</span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33 22.90800  2.888061356  3.519120264  4.303866330</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34 22.94500  3.347288378  4.099509550  4.973699949</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35 22.98500  3.855667915  4.751447407  5.772994492</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36 23.01700  4.288675591  5.295072363  6.415195607</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37 23.04300  4.669781256  5.720818031  6.952148487</span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38 23.07233  5.066895269  6.196889373  7.503238246</span></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39 23.10167  5.470455501  6.679711251  8.098014148</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40 23.13100  5.858521855  7.142117416  8.643262399</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41 23.13400  5.911901000  7.180442646  8.693707913</span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42 23.15900  6.244561994  7.573654013  9.136118176</span></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43 23.18400  6.577650209  7.967024468  9.613358347</span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44 23.20900  6.902570831  8.331216158 10.027602537</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45 23.24100  7.305501848  8.799245315 10.604416391</span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46 23.27800  7.762596387  9.318268196 11.308420560</span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47 23.29000  7.886055437  9.501794428 11.470282375</span></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48 23.30867  8.110302950  9.763552440 11.875210647</span></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49 23.32733  8.338833080 10.019202990 12.202208812</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50 23.34600  8.594803735 10.267890383 12.486249429</span></span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51 23.37700  8.967231314 10.733441087 13.024949053</span></span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52 23.40800  9.361282226 11.167749493 13.622542063</span></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 53 23.43900  9.709736937 11.610138667 14.161752166</span></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 54 23.44000  9.754879078 11.608744963 14.282010271</span></span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 55 23.44700  9.878786574 11.729661194 14.361240598</span></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 56 23.48314 10.264402641 12.296811113 15.071820637</span></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 57 23.51929 10.748716275 12.844046691 15.774770648</span></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 58 23.55543 11.251748060 13.450269081 16.552780964</span></span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 59 23.59157 11.705354271 14.065727555 17.282173057</span></span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 60 23.62771 12.259377003 14.734741382 18.171584476</span></span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 61 23.66386 12.897008028 15.472178404 18.949971542</span></span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 62 23.70000 13.522711836 16.215884089 19.839318566</span></span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 63 23.72750 14.008339297 16.832005135 20.549016476</span></span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 64 23.75500 14.521196302 17.453047155 21.144688462</span></span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 65 23.78250 15.100479041 18.103810512 21.970316997</span></span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 66 23.81000 15.593499428 18.838705297 22.907092755</span></span>
+<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 67 23.83733 16.230760846 19.572186848 23.523980647</span></span>
+<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 68 23.86467 16.762974111 20.331478793 24.456057835</span></span>
+<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 69 23.89200 17.378589658 21.122374196 25.519956481</span></span>
+<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 70 23.92300 17.998036082 22.049041606 26.675140107</span></span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 71 23.92400 18.037184997 22.083524766 26.765877997</span></span>
+<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 72 23.94933 18.423509112 22.868050844 27.766176262</span></span>
+<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 73 23.97467 19.049828102 23.676166317 28.892411813</span></span>
+<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 74 24.00000 19.482966870 24.471735363 30.174410914</span></span></code></pre></div>
 </div>
   </div>
 

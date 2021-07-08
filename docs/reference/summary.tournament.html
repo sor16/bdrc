@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Print summary of tournament object — summary.tournament • bdrc</title>
+<title>Summary method for a discharge rating curve tournament — summary.tournament • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Print summary of tournament object — summary.tournament" />
+<meta property="og:title" content="Summary method for a discharge rating curve tournament — summary.tournament" />
 <meta property="og:description" content="Print the summary of a tournament of model comparisons" />
 <meta property="og:image" content="/logo.png" />
 
@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -120,7 +114,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -137,7 +131,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Print summary of tournament object</h1>
+    <h1>Summary method for a discharge rating curve tournament</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/tournament_methods.R'><code>R/tournament_methods.R</code></a></small>
     <div class="hidden name"><code>summary.tournament.Rd</code></div>
     </div>
@@ -162,14 +156,26 @@
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> to run a dishcarge rating curve tournament and <code><a href='plot.tournament.html'>plot.tournament</a></code> for visualizing the mode comparison</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-<span class='op'>}</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Running tournament:
+#&gt; 25% - gplm finished
+#&gt; 50% - gplm0 finished
+#&gt; 75% - plm finished
+#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
+#&gt; 1     1    1  gplm 4.007971e-02 -1.5623636      6.143381 0.5790441616  FALSE
+#&gt; 2     1    1 gplm0 2.913731e-02 -0.7230154      6.416168 0.4209558384   TRUE
+#&gt; 3     1    2   plm 2.197139e-06 23.7427166      2.992841 0.9335632249   TRUE
+#&gt; 4     1    2  plm0 1.563588e-07 23.3603985      2.945563 0.0664367751  FALSE
+#&gt; 5     2    3 gplm0 2.913731e-02 -0.7230154      6.416168 0.9999245993   TRUE
+#&gt; 6     2    3   plm 2.197139e-06 23.7427166      2.992841 0.0000754007  FALSE</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

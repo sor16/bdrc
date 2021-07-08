@@ -25,7 +25,7 @@ reference:
     contents:
     - tournament
 
-  - title: Methods for plm0 objects
+  - title: Methods for model objects
     contents:
     - print.plm0
     - summary.plm0
@@ -34,36 +34,6 @@ reference:
     - predict.plm0
     - get_report_pages.plm0
     - get_report.plm0
-
-  - title: Methods for plm objects
-    contents:
-    - print.plm
-    - summary.plm
-    - autoplot.plm
-    - plot.plm
-    - predict.plm
-    - get_report_pages.plm
-    - get_report.plm
-
-  - title: Methods for gplm0 objects
-    contents:
-    - print.gplm0
-    - summary.gplm0
-    - autoplot.gplm0
-    - plot.gplm0
-    - predict.gplm0
-    - get_report_pages.gplm0
-    - get_report.gplm0
-
-  - title: Methods for gplm objects
-    contents:
-    - print.gplm
-    - summary.gplm
-    - autoplot.gplm
-    - plot.gplm
-    - predict.gplm
-    - get_report_pages.gplm
-    - get_report.gplm
 
   - title: Methods for tournament objects
     contents:
@@ -81,17 +51,17 @@ reference:
 
   - title: Data
     contents:
-    - bunnerviken
-    - flotemarken
-    - halla
-    - lisjobacken
+    - skogsliden
+    - spanga
+    - krokfors
+    - kallstorp
 articles:
   - title: Articles
     navbar: ~
     contents:
+    - background
     - introduction
     - tournament
-    - advanced_visualization
 
 navbar:
   title: ~
@@ -107,10 +77,6 @@ navbar:
         href: articles/introduction.html
       - text: Tournament - Model Comparison
         href: articles/tournament.html
-      - text: Advanced Visualization
-        href: articles/advanced_visualization.html
-    - text: Shiny App
-      href: articles/shiny_app.html
     - text: News
       href: news/index.html
 

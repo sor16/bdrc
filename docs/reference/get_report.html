@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get report pages — get_report • bdrc</title>
+<title>Report for a discharge rating curve or tournament — get_report • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Get report pages — get_report" />
-<meta property="og:description" content="Get a list of the grob objects the make up the pages of the report generated with get_report." />
+<meta property="og:title" content="Report for a discharge rating curve or tournament — get_report" />
+<meta property="og:description" content="Save a pdf file with a report of a discharge rating curve object or tournament" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -120,7 +114,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -137,16 +131,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get report pages</h1>
+    <h1>Report for a discharge rating curve or tournament</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/report.R'><code>R/report.R</code></a></small>
     <div class="hidden name"><code>get_report.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Get a list of the grob objects the make up the pages of the report generated with <code>get_report</code>.</p>
+    <p>Save a pdf file with a report of a discharge rating curve object or tournament</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for plm0</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for plm</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm0</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for tournament</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>x</span>, path <span class='op'>=</span> <span class='cn'>NULL</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,8 +167,8 @@
     <tr>
       <th>type</th>
       <td><p>an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are</p><ul>
-<li><p>1 produces a list of two grob objects, the first grob object consists of a plot collage and parameter summary table, the second a tabular rating curve from the results of a model object, or if input class is "tournament", then the most approriate model as determined by <code><a href='tournament.html'>tournament</a></code>.</p></li>
-<li><p>2 produces a list of ten grob objects, the first four grob objects consist of plot collage and parameter summary table for the four models, the fifth object consists of model comparison plots and tables, the sixth consists of convergence diagnostics plots, and the final four grob objects consist of histogram plots of the estmated parameters for the four models.</p></li>
+<li><p>1 - produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.</p></li>
+<li><p>2 - produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -168,17 +177,34 @@
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
+
+    
+<ul>
+<li><p><code>plm0</code>: Get report for plm0 result object</p></li>
+<li><p><code>plm</code>: Get report for plm result object</p></li>
+<li><p><code>gplm0</code>: Get report for gplm0 result object</p></li>
+<li><p><code>gplm</code>: Get report for gplm</p></li>
+<li><p><code>tournament</code>: Get report for discharge rating curve tournament</p></li>
+</ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>get_report</code> for generating and saving a report.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>bunnerviken</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>bunnerviken</span><span class='op'>)</span>
-<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-<span class='op'>}</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>skogsliden</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>skogsliden</span><span class='op'>)</span>
+<span class='fu'>get_report</span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; The report was saved at the following location:
+#&gt; /Users/solviro/Documents/R/Rennslislyklalikan/bdrc/docs/reference/report.pdf</div><div class='input'><span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>skogsliden</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Running tournament:
+#&gt; 25% - gplm finished
+#&gt; 50% - gplm0 finished
+#&gt; 75% - plm finished
+#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'>get_report</span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; The report was saved at the following location:
+#&gt; /Users/solviro/Documents/R/Rennslislyklalikan/bdrc/docs/reference/report.pdf</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

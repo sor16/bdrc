@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summarizing plm0 fit — summary.plm0 • bdrc</title>
+<title>Summary method for discharge rating curves — summary.plm0 • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Summarizing plm0 fit — summary.plm0" />
-<meta property="og:description" content="Summarize the results of a plm0 object" />
+<meta property="og:title" content="Summary method for discharge rating curves — summary.plm0" />
+<meta property="og:description" content="Summarize a discharge rating curve result object" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -120,7 +114,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -137,16 +131,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summarizing plm0 fit</h1>
+    <h1>Summary method for discharge rating curves</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/plm_methods.R'><code>R/plm_methods.R</code></a></small>
     <div class="hidden name"><code>summary.plm0.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Summarize the results of a plm0 object</p>
+    <p>Summarize a discharge rating curve result object</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for plm0</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for plm</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm0</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,7 +157,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>an object of class "plm0"</p></td>
+      <td><p>an object of class "plm0", "plm", "gplm0" or "gplm".</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -162,17 +165,25 @@
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>summary.plm0</code>: Summary method for plm0</p></li>
+<li><p><code>summary.plm</code>: Summary method for plm</p></li>
+<li><p><code>summary.gplm0</code>: Summary method for gplm0</p></li>
+<li><p><code>summary.gplm</code>: Summary method for gplm</p></li>
+</ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code> for fitting the plm0 model, <code><a href='predict.plm0.html'>predict.plm0</a></code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='plot.plm0.html'>plot.plm0</a></code> to help visualize the full posterior distributions.</p></div>
+    <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code>, <code><a href='plm.html'>plm</a></code>, <code><a href='gplm0.html'>gplm0</a></code> and <code><a href='gplm.html'>gplm</a></code> for fitting a discharge rating curve. It is also useful to look at <code><a href='plot.plm0.html'>plot.plm0</a></code>, <code><a href='plot.plm0.html'>plot.plm</a></code>, <code><a href='plot.plm0.html'>plot.gplm0</a></code> and <code><a href='plot.plm0.html'>plot.gplm</a></code> to help visualize all aspects of the fitted discharge rating curve. Additionally, <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='spread_draws.html'>spread_draws</a></code> help working directly with the MCMC samples.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
-<span class='op'>}</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>V316_river</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in "data.frame" %in% class(data): object 'V316_river' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in summary(plm0.fit): object 'plm0.fit' not found</span></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -120,7 +114,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sor16/bdrc/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -146,7 +140,7 @@
     <p>evaluate_game uses the Bayes factor of two models to determine whether one model favors the other</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evaluate_game</span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>evaluate_game</span><span class='op'>(</span><span class='va'>m</span>, winning_criteria <span class='op'>=</span> <span class='fl'>0.75</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,6 +148,10 @@
     <tr>
       <th>m</th>
       <td><p>a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"</p></td>
+    </tr>
+    <tr>
+      <th>winning_criteria</th>
+      <td><p>a numerical value between 0 and 1 which sets the threshold for which the probability of the first model in the list, given the data and calculated using Bayes factor, must exceed for it to be declared the better model of the two. This value defaults to 0.75.</p></td>
     </tr>
     </table>
 
