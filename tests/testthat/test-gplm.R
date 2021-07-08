@@ -2,17 +2,17 @@ context('gplm')
 
 test_that("gplm can handle different inputs", {
     expect_error(gplm(Q~W,c(1,2,3)))
-    expect_error(gplm('Q~W',V316_river))
-    expect_error(gplm(V~W,V316_river))
-    expect_error(gplm(Q~W+X,V316_river))
-    expect_error(gplm(Q~W,V316_river,c_param=1.5)) # c_param higher than lowest stage measurements
-    expect_error(gplm(Q~W,V316_river,c_param=1L)) # c_param not double
-    expect_error(gplm(Q~W,V316_river,h_max=1.3)) #h_max lower than highest stage measurement
+    expect_error(gplm('Q~W',krokfors))
+    expect_error(gplm(V~W,krokfors))
+    expect_error(gplm(Q~W+X,krokfors))
+    expect_error(gplm(Q~W,krokfors,c_param=min(krokfors$W)+0.5)) # c_param higher than lowest stage measurements
+    expect_error(gplm(Q~W,krokfors,c_param=1L)) # c_param not double
+    expect_error(gplm(Q~W,krokfors,h_max=max(krokfors$W)-0.5)) #h_max lower than highest stage measurement
     skip_on_cran()
-    V316_river_new_names <- V316_river
-    names(V316_river_new_names) <- c('t1','t2')
+    krokfors_new_names <- krokfors
+    names(krokfors_new_names) <- c('t1','t2')
     set.seed(1)
-    gplm.fit_new_names <- gplm(t2~t1,V316_river_new_names,parallel=F)
+    gplm.fit_new_names <- gplm(t2~t1,krokfors_new_names,parallel=F)
     expect_equal(gplm.fit_new_names$rating_curve,gplm.fit$rating_curve)
 })
 
@@ -44,7 +44,7 @@ test_that("the gplm object with unknown c is in tact", {
     test_stage_dep_component(gplm.fit,'sigma_eps')
     #Other information
     expect_equal(gplm.fit$formula,Q~W)
-    expect_equal(gplm.fit$data,V316_river[order(V316_river$W),c('Q','W')])
+    expect_equal(gplm.fit$data,krokfors[order(krokfors$W),c('Q','W')])
 })
 
 test_that("the gplm object with known c with a maximum stage value is in tact", {
@@ -75,7 +75,7 @@ test_that("the gplm object with known c with a maximum stage value is in tact", 
     test_stage_dep_component(gplm.fit,'f')
     test_stage_dep_component(gplm.fit,'sigma_eps')
     #check if maxmimum stage was in line with output
-    expect_equal(max(gplm.fit_known_c$rating_curve$h),2)
+    expect_equal(max(gplm.fit_known_c$rating_curve$h),h_extrap)
     expect_true(max(diff(gplm.fit_known_c$rating_curve$h))<=(0.05+1e-9)) # added tolerance
 })
 

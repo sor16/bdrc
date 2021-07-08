@@ -1,21 +1,23 @@
-data(V316_river)
-V316_river <- V316_river[(1:nrow(V316_river))%%2==0,]
+data(krokfors)
+krokfors <- krokfors[(1:nrow(krokfors))%%4==0,]
+h_extrap <- 10
+known_c <- 7.8
 RNGversion('3.5.0')
 set.seed(1)
-plm0.fit <- plm0(Q~W,V316_river,parallel=F)
+plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 set.seed(1)
-plm0.fit_known_c <- plm0(Q~W,V316_river,c_param=0.8,h_max=2,parallel=F)
+plm0.fit_known_c <- plm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
 set.seed(1)
-plm.fit <- plm(Q~W,V316_river,parallel=F)
+plm.fit <- plm(Q~W,krokfors,parallel=F)
 set.seed(1)
-plm.fit_known_c <- plm(Q~W,V316_river,c_param=0.8,h_max=2,parallel=F)
+plm.fit_known_c <- plm(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
 set.seed(1)
-gplm0.fit <- gplm0(Q~W,V316_river,parallel=F)
+gplm0.fit <- gplm0(Q~W,krokfors,parallel=F)
 set.seed(1)
-gplm0.fit_known_c <- gplm0(Q~W,V316_river,c_param=0.8,h_max=2,parallel=F)
+gplm0.fit_known_c <- gplm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
 set.seed(1)
-gplm.fit <- gplm(Q~W,V316_river,parallel=F)
+gplm.fit <- gplm(Q~W,krokfors,parallel=F)
 set.seed(1)
-gplm.fit_known_c <- gplm(Q~W,V316_river,c_param=0.8,h_max=2,parallel=F)
+gplm.fit_known_c <- gplm(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
 
 t_obj <- tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit)

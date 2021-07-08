@@ -1,6 +1,6 @@
 context('plm general functions')
 r_version <- getRversion()
-r_release <- r_version >= 4.0 & r_version < 4.1 # Note: will need updating when new version is released, and then a rerun locally of plots
+r_release <- r_version >= 4.1 & r_version < 4.2 # Note: will need updating when new version is released, and then a rerun locally of plots
 test_that("trace plots have known output", {
     skip_if(!r_release)
     expect_doppelganger('plm0_trace_plot_hyperparameters',autoplot(plm0.fit,type='trace','hyperparameters'))
@@ -100,7 +100,4 @@ test_that("residuals has known output", {
     expect_doppelganger('gplm0_residuals',autoplot(gplm0.fit,type='residuals'))
     expect_doppelganger('gplm_residuals',autoplot(gplm.fit,type='residuals'))
 })
-
-
-
 
