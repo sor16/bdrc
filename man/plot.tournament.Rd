@@ -29,8 +29,8 @@ Compare the four models from the tournament object in multiple ways
 }
 \examples{
 \donttest{
-data(halla)
-t_obj <- tournament(Q~W,halla)
+data(krokfors)
+t_obj <- tournament(Q~W,krokfors)
 plot(t_obj)
 plot(t_obj,transformed=T)
 plot(t_obj,type='deviance')

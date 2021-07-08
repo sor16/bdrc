@@ -1,29 +1,28 @@
-#' Generalized Power Law Model
+#' Generalized power-law model
 #'
-#' gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized Power Law Model with variance that may vary with stage as described in Hrafnkelsson et al. See "Details" for a more elaborate description of the model.
-#'
-#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form y~x where y is discharge in \eqn{m^3/s} and x is stage in \eqn{m} (it is very important that the data is in the correct units).
+#' gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See "Details" for a more elaborate description of the model.
+#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \eqn{y}~\eqn{x} where \eqn{y} is discharge in m\eqn{^3/}s and \eqn{x} is stage in m (it is very important that the data is in the correct units).
 #' @param data data.frame containing the variables specified in formula.
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
 #' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
-#' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #'
-#' @details The generalized power-law model is of the form
+#' @details The Generalized power-law model is of the form
 #' \deqn{Q=a(h-c)^{f(h)}}
-#' where \eqn{Q} is discharge, \eqn{h} is stage, \eqn{a} and \eqn{c} are unknown constants and \eqn{f} is a function of  \eqn{h}, referred to as the generalized power-law exponent.\cr\cr
-#' The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function \eqn{f} is modelled at the latent level as a fixed constant b plus a continuous stochastic process which is assumed to be twice differentiable. The model is on a logarithmic scale
-#' \deqn{log(Q_i) = log(a) + (b + \beta(h_i)) log(h_i - c) + \epsilon_i,     i = 1,...,n}
-#' where \eqn{\epsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\epsilon(h_i)^2} that can vary with stage. The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}. The error variance, \eqn{\sigma_\epsilon^2(h)}, of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
+#' where \eqn{Q} is discharge, \eqn{h} is stage, \eqn{a} and \eqn{c} are unknown constants and \eqn{f} is a function of  \eqn{h}, referred to as the Generalized power-law exponent.\cr\cr
+#' The Generalized power-law model is here presented as a Bayesian hierarchical model. The function \eqn{f} is modelled at the latent level as a fixed constant \eqn{b} plus a continuous stochastic process, \eqn{\beta(h)}, which is assumed to be twice differentiable. The model is on a logarithmic scale
+#' \deqn{\log(Q_i) = \log(a) + (b + \beta(h_i)) \log(h_i - c) + \varepsilon_i,     i = 1,...,n}
+#' where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 #' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 #' @return
 #' gplm returns an object of class "gplm". An object of class "gplm" is a list containing the following components:
 #'  \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
 #'  \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve.}
-#'  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.}
+#'  \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
 #'  \item{\code{f_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{f(h)}.}
 #'  \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\beta(h)}.}
-#'  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\epsilon(h)}.}
+#'  \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of \eqn{\sigma_\varepsilon(h)}.}
 #'  \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
 #'  \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.}
 #'  \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.}
@@ -41,31 +40,31 @@
 #'  \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6} excluding burn-in samples.}
 #'  \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)} excluding burn-in samples.}
 #'  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burnin samples.}
-#'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\epsilon(h)} excluding burnin samples.}
+#'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\varepsilon(h)} excluding burnin samples.}
 #'  \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-#'  \item{\code{D_hat}}{deviance at the median value of the parameters}
-#'  \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
-#'  \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+#'  \item{\code{D_hat}}{deviance at the median value of the parameters.}
+#'  \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
+#'  \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.}
 #'  \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 #'  \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #'  \item{\code{formula}}{object of type "formula" provided by the user.}
 #'  \item{\code{data}}{data provided by the user, ordered by stage.}
 #'  \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 #'
-#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
-#' @references A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor & Francis Group, 2014.
+#' @references Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
+#' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
 #'
 #' @seealso \code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction and \code{\link{plot.gplm}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
 #'
 #' @examples
 #' \donttest{
-#' data(halla)
+#' data(krokfors)
 #' set.seed(1)
 #' formula <- Q~W
-#' gplm.fit <- gplm(formula,halla)
+#' gplm.fit <- gplm(formula,krokfors)
 #' summary(gplm.fit)
 #' plot(gplm.fit)
-#' gplm.fit_known_c <- gplm(formula,halla,c_param=0.75,h_max=2)
+#' gplm.fit_known_c <- gplm(formula,krokfors,c_param=0.75,h_max=2)
 #' summary(gplm.fit_known_c)
 #' plot(gplm.fit_known_c)
 #' }

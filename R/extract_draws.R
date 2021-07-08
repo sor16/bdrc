@@ -9,13 +9,13 @@
 #'\code{iter}
 #'\code{param}
 #'\code{value}
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
-#'@seealso \code{\link{plm0}},\code{\link{plm}},\code{\link{gplm0}},\code{\link{gplm}} for further information on parameters
+#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769
+#'@seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for further information on parameters
 #'@examples
 #'\dontrun{
-#' data(V316_river)
+#' data(krokfors)
 #' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' plm0.fit <- plm0(f,krokfors)
 #' hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 #' head(hyp_samples)
 #' rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
@@ -54,13 +54,13 @@ spread_draws <- function(mod,...,transformed=F){
 #'\code{iter}
 #'\code{param}
 #'\code{value}
-#'@references Birgir Hrafnkelsson, Helgi Sigurdarson, & Sigurdur M. Gardarsson. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.
-#'@seealso \code{\link{plm0}},\code{\link{plm}},\code{\link{gplm0}},\code{\link{gplm}} for further information on parameters
+#' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769
+#'@seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for further information on parameters
 #'@examples
 #'\dontrun{
-#' data(V316_river)
+#' data(krokfors)
 #' f <- Q~W
-#' plm0.fit <- plm0(f,V316_river)
+#' plm0.fit <- plm0(f,krokfors)
 #' hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 #' head(hyp_samples)
 #' rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')

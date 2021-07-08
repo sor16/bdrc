@@ -123,8 +123,8 @@ plot_tournament_grob <- function(x,type='panel',transformed=F){
 #' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
 #' \donttest{
-#' data(halla)
-#' t_obj <- tournament(Q~W,halla)
+#' data(krokfors)
+#' t_obj <- tournament(Q~W,krokfors)
 #' t_obj
 #' print(t_obj)
 #' }
@@ -141,8 +141,8 @@ print.tournament <- function(x,...){
 #' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
 #' \donttest{
-#' data(halla)
-#' t_obj <- tournament(Q~W,halla)
+#' data(krokfors)
+#' t_obj <- tournament(Q~W,krokfors)
 #' summary(t_obj)
 #' }
 #' @export
@@ -163,8 +163,8 @@ summary.tournament <- function(object,...){
 #' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
-#' data(halla)
-#' t_obj <- tournament(Q~W,halla)
+#' data(krokfors)
+#' t_obj <- tournament(Q~W,krokfors)
 #' autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
@@ -202,8 +202,8 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
-#' data(halla)
-#' t_obj <- tournament(Q~W,halla)
+#' data(krokfors)
+#' t_obj <- tournament(Q~W,krokfors)
 #' plot(t_obj)
 #' plot(t_obj,transformed=T)
 #' plot(t_obj,type='deviance')

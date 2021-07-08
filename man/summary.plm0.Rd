@@ -36,7 +36,7 @@ Summarize a discharge rating curve result object
 
 \examples{
 \donttest{
-data(halla)
+data(krokfors)
 plm0.fit <- plm0(Q~W,V316_river)
 summary(plm0.fit)
 }

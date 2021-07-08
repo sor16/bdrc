@@ -2,7 +2,7 @@
 % Please edit documentation in R/plm.R
 \name{plm}
 \alias{plm}
-\title{Power Law Model}
+\title{Power-law model}
 \usage{
 plm(
   formula,
@@ -14,7 +14,7 @@ plm(
 )
 }
 \arguments{
-\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form y~x where y is discharge in \eqn{m^3/s} and x is stage in \eqn{m} (it is very important that the data is in the correct units).}
+\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \eqn{y}~\eqn{x} where \eqn{y} is discharge in m\eqn{^3/}s and \eqn{x} is stage in m (it is very important that the data is in the correct units).}
 
 \item{data}{data.frame containing the variables specified in formula.}
 
@@ -24,21 +24,21 @@ plm(
 
 \item{parallel}{logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
-\item{forcepoint}{logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
+\item{forcepoint}{logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
 \value{
 plm returns an object of class "plm". An object of class "plm" is a list containing the following components: \cr
 \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.}
+\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
 \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-\item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\epsilon}}}
+\item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\varepsilon}}.}
 \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
 \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
 \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
 \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
 \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
 \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
-\item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\epsilon}}.}
+\item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\varepsilon}}.}
 \item{\code{eta_1_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_1}.}
 \item{\code{eta_2_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_2}.}
 \item{\code{eta_3_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_3}.}
@@ -46,9 +46,9 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
 \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
 \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
-\item{\code{D_hat}}{deviance at the median value of the parameters}
-\item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat}
-\item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters}
+\item{\code{D_hat}}{deviance at the median value of the parameters.}
+\item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
+\item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.}
 \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 \item{\code{formula}}{object of type "formula" provided by the user.}
@@ -56,34 +56,34 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 }
 \description{
-plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power Law Model with variance that may vary with stage as described in Hrafnkelsson et al. See "Details" for a more elaborate description of the model.
+plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power-Law model with variance that variance with stage as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
 }
 \details{
-The power-law model, which is commonly used in hydraulic practice, is of the form
+The Power-law model, which is commonly used in hydraulic practice, is of the form
 \deqn{Q=a(h-c)^{b}}
-where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants. It is presented here as a Bayesian hierarchical model. The model is on a logarithmic scale
-\deqn{log(Q_i) = log(a) + b log(h_i - c) + \epsilon_i,     i = 1,...,n}
-where \eqn{\epsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\epsilon(h_i)^2} that can vary with stage. The error variance, \eqn{\sigma_\epsilon^2(h)}, of the log-discharge data is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
+where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants.\cr\cr
+The Power-law model is presented here as a Bayesian hierarchical model. The model is on a logarithmic scale
+\deqn{\log(Q_i) = \log(a) + b \log(h_i - c) + \varepsilon_i,     i = 1,...,n}
+where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
 \donttest{
-data(halla)
+data(krokfors)
 set.seed(1)
 formula <- Q~W
-plm.fit <- plm(formula,halla)
+plm.fit <- plm(formula,krokfors)
 summary(plm.fit)
 plot(plm.fit)
-plm.fit_known_c <- plm(formula,halla,c_param=0.75,h_max=2)
+plm.fit_known_c <- plm(formula,krokfors,c_param=0.75,h_max=2)
 summary(plm.fit_known_c)
 plot(plm.fit_known_c)
 }
 }
 \references{
-B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv
-preprint 2010.04769
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
 
-A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor & Francis Group, 2014.
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
 }
 \seealso{
 \code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.

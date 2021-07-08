@@ -165,10 +165,10 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
 #' \donttest{
-#' data(bunnerviken)
-#' plm0.fit <- plm0(Q~W,bunnerviken)
+#' data(skogsliden)
+#' plm0.fit <- plm0(Q~W,skogsliden)
 #' plm0_pages <- get_report_pages(plm0.fit)
-#' t_obj <- tournament(Q~W,bunnerviken)
+#' t_obj <- tournament(Q~W,skogsliden)
 #' tournament_pages <- get_report_pages(t_obj,type=2)
 #' }
 #' @export
@@ -217,10 +217,10 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{
-#' data(bunnerviken)
-#' plm0.fit <- plm0(Q~W,bunnerviken)
+#' data(skogsliden)
+#' plm0.fit <- plm0(Q~W,skogsliden)
 #' get_report(plm0.fit)
-#' t_obj <- tournament(Q~W,bunnerviken)
+#' t_obj <- tournament(Q~W,skogsliden)
 #' get_report(t_obj)
 #' }
 #' @export

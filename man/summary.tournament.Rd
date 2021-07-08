@@ -16,8 +16,8 @@ Print the summary of a tournament of model comparisons
 }
 \examples{
 \donttest{
-data(halla)
-t_obj <- tournament(Q~W,halla)
+data(krokfors)
+t_obj <- tournament(Q~W,krokfors)
 summary(t_obj)
 }
 }

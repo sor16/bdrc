@@ -362,7 +362,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(halla)
+#' data(krokfors)
 #' plm0.fit <- plm0(Q~W,V316_river)
 #' plm0.fit
 #' print(plm0.fit)
@@ -381,7 +381,7 @@ print.plm0 <- function(x,...){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(halla)
+#' data(krokfors)
 #' plm0.fit <- plm0(Q~W,V316_river)
 #' summary(plm0.fit)
 #' }
@@ -411,15 +411,15 @@ summary.plm0 <- function(object,...){
 #' @param ... further arguments passed to other methods. Currently supports:
 #'                     \itemize{
 #'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{  numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
+#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
 #'                     }
 #' @return returns an object of class ggplot2.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(halla)
-#' plm0.fit <- plm0(Q~W,halla)
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
 #' autoplot(plm0.fit)
 #' autoplot(plm0.fit,transformed=T)
 #' autoplot(plm0.fit,type='histogram',param='c')
@@ -457,14 +457,14 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @param ... further arguments passed to other methods. Currently supports:
 #'                     \itemize{
 #'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
-#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
+#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
 #'                     }
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(halla)
-#' plm0.fit <- plm0(Q~W,halla)
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
 #' plot(plm0.fit)
 #' plot(plm0.fit,transformed=T)
 #' plot(plm0.fit,type='histogram',param='c')
@@ -501,8 +501,8 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(halla)
-#' plm0.fit <- plm0(Q~W,halla,h_max=9)
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,h_max=9)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
 #' predict(plm0.fit,newdata=seq(8,9,by=0.01))
 #' predict(plm0.fit,wide=T)

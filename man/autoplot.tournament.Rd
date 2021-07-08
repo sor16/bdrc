@@ -21,8 +21,8 @@ Compare the four discharge rating curves from the tournament object in different
 }
 \examples{
 \donttest{
-data(halla)
-t_obj <- tournament(Q~W,halla)
+data(krokfors)
+t_obj <- tournament(Q~W,krokfors)
 autoplot(t_obj)
 }
 }

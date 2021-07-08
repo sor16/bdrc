@@ -16,8 +16,8 @@ Print the results of a tournament of discharge rating curve model comparisons
 }
 \examples{
 \donttest{
-data(halla)
-t_obj <- tournament(Q~W,halla)
+data(krokfors)
+t_obj <- tournament(Q~W,krokfors)
 t_obj
 print(t_obj)
 }
