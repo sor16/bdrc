@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot plm0 fit — plot.plm0 • bdrc</title>
+<title>Plot method for discharge rating curves — plot.plm0 • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Plot plm0 fit — plot.plm0" />
-<meta property="og:description" content="Print the results of a  object" />
+<meta property="og:title" content="Plot method for discharge rating curves — plot.plm0" />
+<meta property="og:description" content="Visualize discharge rating curve result objects" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -137,16 +131,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot plm0 fit</h1>
+    <h1>Plot method for discharge rating curves</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/plm_methods.R'><code>R/plm_methods.R</code></a></small>
     <div class="hidden name"><code>plot.plm0.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Print the results of a  object</p>
+    <p>Visualize discharge rating curve result objects</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for plm0</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"rating_curve"</span>, param <span class='op'>=</span> <span class='cn'>NULL</span>, transformed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for plm</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"rating_curve"</span>, param <span class='op'>=</span> <span class='cn'>NULL</span>, transformed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm0</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"rating_curve"</span>, param <span class='op'>=</span> <span class='cn'>NULL</span>, transformed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S3 method for gplm</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='st'>"rating_curve"</span>, param <span class='op'>=</span> <span class='cn'>NULL</span>, transformed <span class='op'>=</span> <span class='cn'>F</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,7 +157,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>an object of class "plm0".</p></td>
+      <td><p>object of class "plm0", "plm", "gplm0" or "gplm".</p></td>
     </tr>
     <tr>
       <th>type</th>
@@ -167,6 +170,7 @@
 <li><p>"residuals" to plot the log residuals.</p></li>
 <li><p>"trace" to plot trace plots of parameters given in param.</p></li>
 <li><p>"histogram" to plot histograms of parameters given in param.</p></li>
+<li><p>"panel" to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"</p></li>
 </ul></td>
     </tr>
     <tr>
@@ -181,23 +185,39 @@
       <th>...</th>
       <td><p>further arguments passed to other methods. Currently supports:</p><ul>
 <li><p>"title" a character denoting the title of the plot</p></li>
-<li><p>"xlim" numeric vector of length 2, denoting the limits on the x axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".</p></li>
-<li><p>"ylim"  numeric vector of length 2, denoting the limits on the y axis of the plot. Only active for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".</p></li>
+<li><p>"xlim" numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"<br />,"sigma_eps","residuals".</p></li>
+<li><p>"ylim" numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"<br />,"sigma_eps","residuals".</p></li>
 </ul></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code>plot.plm0</code>: Plot method for plm0</p></li>
+<li><p><code>plot.plm</code>: Plot method for plm</p></li>
+<li><p><code>plot.gplm0</code>: Plot method for gplm0</p></li>
+<li><p><code>plot.gplm</code>: Plot method for gplm</p></li>
+</ul>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code> for fitting the plm0 model,<code><a href='summary.plm0.html'>summary.plm0</a></code> for summaries, <code><a href='predict.plm0.html'>predict.plm0</a></code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code>plot.plm0</code> to help visualize the full posterior distributions.</p></div>
+    <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code>, <code><a href='plm.html'>plm</a></code>, <code><a href='gplm0.html'>gplm0</a></code> and <code><a href='gplm.html'>gplm</a></code> for fitting a discharge rating curve and <code><a href='summary.plm0.html'>summary.plm0</a></code>, <code><a href='summary.plm0.html'>summary.plm</a></code>, <code><a href='summary.plm0.html'>summary.gplm0</a></code> and <code><a href='summary.plm0.html'>summary.gplm</a></code> for summaries. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='gather_draws.html'>gather_draws</a></code> to work directly with the MCMC samples.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='img'><img src='plot.plm0-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,transformed<span class='op'>=</span><span class='cn'>T</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'histogram'</span>,param<span class='op'>=</span><span class='st'>'c'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'histogram'</span>,param<span class='op'>=</span><span class='st'>'c'</span>,transformed<span class='op'>=</span><span class='cn'>T</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'histogram'</span>,param<span class='op'>=</span><span class='st'>'hyperparameters'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-5.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'histogram'</span>,param<span class='op'>=</span><span class='st'>'latent_parameters'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-6.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'residuals'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-7.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'f'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-8.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>plm0.fit</span>,type<span class='op'>=</span><span class='st'>'sigma_eps'</span><span class='op'>)</span>
+</div><div class='img'><img src='plot.plm0-9.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

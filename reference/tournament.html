@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -146,7 +140,7 @@
     <p>tournament compares four rating curve models of different complexities and determines which model is the most adequate</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tournament</span><span class='op'>(</span>formula <span class='op'>=</span> <span class='cn'>NULL</span>, data <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>tournament</span><span class='op'>(</span>formula <span class='op'>=</span> <span class='cn'>NULL</span>, data <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span>, winning_criteria <span class='op'>=</span> <span class='fl'>0.75</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -163,34 +157,47 @@
       <th>...</th>
       <td><p>if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.</p></td>
     </tr>
+    <tr>
+      <th>winning_criteria</th>
+      <td><p>a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of type "tournament" with the following elements</p><dl>
  <dt><code>summary</code></dt><dd><p>a data frame with information on reults of the different games in the tournament.</p></dd>
- <dt><code>contestants</code></dt><dd><p>model objects of types "plm0","plm","bpglm0" and "gplm" being compared.</p></dd>
+ <dt><code>contestants</code></dt><dd><p>model objects of types "plm0","plm","gplm0" and "gplm" being compared.</p></dd>
  <dt><code>winner</code></dt><dd><p>model object of the tournament winner.</p></dd>
 
 </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>TODO</p>
+    <p>Tournament is a comparison method based on three matches that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor and assuming a priori that the two models were equally likely [see Jeffreys (1961) and Kass and Raftery (1995)].</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
+<p>Jeffreys, H. (1961). Theory of Probability, Third Edition. Oxford University Press.</p>
+<p>Kass, R., and A. Raftery, A. (1995) Bayes Factors. Journal of the American Statistical Association, 90, 773-795.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='summary.tournament.html'>summary.tournament</a></code></p></div>
+    <div class='dont-index'><p><code><a href='summary.tournament.html'>summary.tournament</a></code> and <code><a href='plot.tournament.html'>plot.tournament</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
-<span class='va'>f</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span><span class='va'>f</span>,<span class='va'>V316_river</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-<span class='op'>}</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Running tournament:
+#&gt; 25% - gplm finished
+#&gt; 50% - gplm0 finished
+#&gt; 75% - plm finished
+#&gt; 100% - plm0 finished</div><div class='input'><span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm.html'>plm</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>gplm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gplm0.html'>gplm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gplm.html'>gplm</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span><span class='va'>gplm.fit</span>,<span class='va'>gplm0.fit</span>,<span class='va'>plm.fit</span>,<span class='va'>plm0.fit</span>,winning_criteria<span class='op'>=</span><span class='fl'>0.95</span><span class='op'>)</span>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

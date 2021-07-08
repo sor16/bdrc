@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generalized Power Law Model — gplm • bdrc</title>
+<title>Generalized power-law model — gplm • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Generalized Power Law Model — gplm" />
-<meta property="og:description" content="gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized Power Law Model with variance that may vary with stage as described in Hrafnkelsson et al. See &quot;Details&quot; for a more elaborate description of the model." />
+<meta property="og:title" content="Generalized power-law model — gplm" />
+<meta property="og:description" content="gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See &quot;Details&quot; for a more elaborate description of the model." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -105,13 +105,7 @@
     <li>
       <a href="../articles/tournament.html">Tournament - Model Comparison</a>
     </li>
-    <li>
-      <a href="../articles/advanced_visualization.html">Advanced Visualization</a>
-    </li>
   </ul>
-</li>
-<li>
-  <a href="../articles/shiny_app.html">Shiny App</a>
 </li>
 <li>
   <a href="../news/index.html">News</a>
@@ -137,13 +131,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generalized Power Law Model</h1>
+    <h1>Generalized power-law model</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/gplm.R'><code>R/gplm.R</code></a></small>
     <div class="hidden name"><code>gplm.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized Power Law Model with variance that may vary with stage as described in Hrafnkelsson et al. See "Details" for a more elaborate description of the model.</p>
+    <p>gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See "Details" for a more elaborate description of the model.</p>
     </div>
 
     <pre class="usage"><span class='fu'>gplm</span><span class='op'>(</span>
@@ -160,7 +154,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>formula</th>
-      <td><p>an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form y~x where y is discharge in \(m^3/s\) and x is stage in \(m\) (it is very important that the data is in the correct units).</p></td>
+      <td><p>an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \(y\)~\(x\) where \(y\) is discharge in m\(^3/\)s and \(x\) is stage in m (it is very important that the data is in the correct units).</p></td>
     </tr>
     <tr>
       <th>data</th>
@@ -172,7 +166,7 @@
     </tr>
     <tr>
       <th>h_max</th>
-      <td><p>maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in data is selected as an upper bound.</p></td>
+      <td><p>maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.</p></td>
     </tr>
     <tr>
       <th>parallel</th>
@@ -180,7 +174,7 @@
     </tr>
     <tr>
       <th>forcepoint</th>
-      <td><p>logical vector of the same length as the number of rows in data. If an element at index i is TRUE it indicates that the rating curve should be forced through the i-th measurement. Use with care, as this will strongly influence the resulting rating curve.</p></td>
+      <td><p>logical vector of the same length as the number of rows in data. If an element at index \(i\) is TRUE it indicates that the rating curve should be forced through the \(i\)-th measurement. Use with care, as this will strongly influence the resulting rating curve.</p></td>
     </tr>
     </table>
 
@@ -189,10 +183,10 @@
     <p>gplm returns an object of class "gplm". An object of class "gplm" is a list containing the following components:</p>
 <dt><code>rating_curve</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the rating curve.</p></dd>
  <dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the mean of the rating curve.</p></dd>
- <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al.</p></dd>
+ <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).</p></dd>
  <dt><code>f_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(f(h)\).</p></dd>
  <dt><code>beta_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\beta(h)\).</p></dd>
- <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\sigma_\epsilon(h)\).</p></dd>
+ <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\sigma_\varepsilon(h)\).</p></dd>
  <dt><code>Deviance_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the deviance.</p></dd>
  <dt><code>rating_curve_posterior</code></dt><dd><p>a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.</p></dd>
  <dt><code>rating_curve_mean_posterior</code></dt><dd><p>a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.</p></dd>
@@ -210,46 +204,67 @@
  <dt><code>eta_6_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_6\) excluding burn-in samples.</p></dd>
  <dt><code>f_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(f(h)\) excluding burn-in samples.</p></dd>
  <dt><code>beta_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\beta(h)\) excluding burnin samples.</p></dd>
- <dt><code>sigma_eps_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\sigma_\epsilon(h)\) excluding burnin samples.</p></dd>
+ <dt><code>sigma_eps_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\sigma_\varepsilon(h)\) excluding burnin samples.</p></dd>
  <dt><code>Deviance_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.</p></dd>
- <dt><code>D_hat</code></dt><dd><p>deviance at the median value of the parameters</p></dd>
- <dt><code>num_effective_param</code></dt><dd><p>number of effective parameters, which is calculated as median(Deviance_posterior) - D_hat</p></dd>
- <dt><code>DIC</code></dt><dd><p>Deviance Information Criterion for the model, calculated as D_hat + 2*num_effective_parameters</p></dd>
- <dt><code>autocorrelation_dat</code></dt><dd><p>A data frame with the autocorrelation of each parameter for different lags.</p></dd>
+ <dt><code>D_hat</code></dt><dd><p>deviance at the median value of the parameters.</p></dd>
+ <dt><code>num_effective_param</code></dt><dd><p>number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.</p></dd>
+ <dt><code>DIC</code></dt><dd><p>Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.</p></dd>
+ <dt><code>autocorrelation</code></dt><dd><p>a data frame with the autocorrelation of each parameter for different lags.</p></dd>
  <dt><code>acceptance_rate</code></dt><dd><p>proportion of accepted samples in the thinned MCMC chain (excluding burn-in).</p></dd>
  <dt><code>formula</code></dt><dd><p>object of type "formula" provided by the user.</p></dd>
- <dt><code>data</code></dt><dd><p>data provided by the user.</p></dd>
- <dt><code>run_info</code></dt><dd><p>information about the specific parameters used in the MCMC chain.</p></dd>
+ <dt><code>data</code></dt><dd><p>data provided by the user, ordered by stage.</p></dd>
+ <dt><code>run_info</code></dt><dd><p>information about the input arguments and the specific parameters used in the MCMC chain.</p></dd>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The generalized power-law model is of the form
+    <p>The Generalized power-law model is of the form
 $$Q=a(h-c)^{f(h)}$$
-where \(Q\) is discharge, \(h\) is stage, \(a\) and \(c\) are unknown constants and \(f\) is a function of  \(h\), referred to as the generalized power-law exponent.<br /><br />
-The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function \(f\) is modelled at the latent level as a fixed constant b plus a continuous stochastic process which is assumed to be twice differentiable. The model is on a logarithmic scale
-$$log(Q_i) = log(a) + (b + \beta(h_i)) log(h_i - c) + \epsilon_i,     i = 1,...,n$$
-where \(\epsilon_i\) follows a normal distribution with mean zero and variance \(\sigma_\epsilon(h_i)^2\) that can vary with stage. The stochastic process \(\beta(h)\) is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \(\nu = 2.5\). The error variance, \(\sigma_\epsilon^2(h)\), of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.<br /><br />
+where \(Q\) is discharge, \(h\) is stage, \(a\) and \(c\) are unknown constants and \(f\) is a function of  \(h\), referred to as the Generalized power-law exponent.<br /><br />
+The Generalized power-law model is here presented as a Bayesian hierarchical model. The function \(f\) is modelled at the latent level as a fixed constant \(b\) plus a continuous stochastic process, \(\beta(h)\), which is assumed to be twice differentiable. The model is on a logarithmic scale
+$$\log(Q_i) = \log(a) + (b + \beta(h_i)) \log(h_i - c) + \varepsilon_i,     i = 1,...,n$$
+where \(\varepsilon_i\) follows a normal distribution with mean zero and variance \(\sigma_\varepsilon(h_i)^2\) that varies with stage. The stochastic process \(\beta(h)\) is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \(\nu = 2.5\). The error variance, \(\sigma_\varepsilon^2(h)\), of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.<br /><br />
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
-<p>A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin, Bayesian Data Analysis, Third Edition, CRC Press, Taylor &amp; Francis Group, 2014.</p>
+    <p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
+<p>Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman &amp; Hall/CRC Texts in Statistical Science. Taylor &amp; Francis.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='summary.gplm.html'>summary.gplm</a></code> for summaries, <code><a href='predict.gplm.html'>predict.gplm</a></code> for prediction and <code><a href='plot.gplm.html'>plot.gplm</a></code> for plots. <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='gather_draws.html'>gather_draws</a></code> are also useful to aid further visualization of the full posterior distributions.</p></div>
+    <div class='dont-index'><p><code><a href='summary.plm0.html'>summary.gplm</a></code> for summaries, <code><a href='predict.plm0.html'>predict.gplm</a></code> for prediction and <code><a href='plot.plm0.html'>plot.gplm</a></code> for plots. <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='gather_draws.html'>gather_draws</a></code> are also useful to aid further visualization of the full posterior distributions.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>V316_river</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>formula</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>V316_river</span><span class='op'>)</span>
+<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
-<span class='va'>gplm.fit_known_c</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>V316_river</span>,c_param<span class='op'>=</span><span class='fl'>0.75</span>,h_max<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; 
+#&gt; Formula: 
+#&gt;  Q ~ W
+#&gt; Latent parameters:
+#&gt;   lower-2.5% median-50% upper-97.5%
+#&gt; a 1.50       1.94       2.24       
+#&gt; b 1.83       1.84       1.84       
+#&gt; 
+#&gt; Hyperparameters:
+#&gt;            lower-2.5% median-50% upper-97.5%
+#&gt; c           7.7126     7.8102     7.855     
+#&gt; sigma_beta  0.4218     0.6991     1.270     
+#&gt; phi_beta    0.5540     1.1710     2.767     
+#&gt; sigma_eta   0.0044     0.0933     0.521     
+#&gt; eta_1      -4.9170    -4.2646    -3.587     
+#&gt; eta_2      -5.9918    -4.0806    -2.285     
+#&gt; eta_3      -6.9041    -4.2228    -1.655     
+#&gt; eta_4      -7.7196    -4.5050    -1.239     
+#&gt; eta_5      -8.2968    -4.6586    -0.723     
+#&gt; eta_6      -8.8076    -4.6574    -0.319     
+#&gt; 
+#&gt; DIC: -1.567564</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
+</div><div class='img'><img src='gplm-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>gplm.fit_known_c</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span>,c_param<span class='op'>=</span><span class='fl'>0.75</span>,h_max<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in gplm.inference(y = log(Q), h, c_param, h_max, parallel, forcepoint): maximum stage value must be larger than the maximum stage value in the data, which is 9.897 m</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in summary(gplm.fit_known_c): object 'gplm.fit_known_c' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in plot(gplm.fit_known_c): object 'gplm.fit_known_c' not found</span></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
