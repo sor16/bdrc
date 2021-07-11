@@ -44,9 +44,9 @@ Predict the discharge for given stage values based on a discharge rating curve r
 \examples{
 \donttest{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors,h_max=9)
+plm0.fit <- plm0(Q~W,krokfors,h_max=24)
 #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-predict(plm0.fit,newdata=seq(8,9,by=0.01))
+predict(plm0.fit,newdata=seq(23,24,by=0.01))
 predict(plm0.fit,wide=T)
 }
 }

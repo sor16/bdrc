@@ -24,6 +24,8 @@ get_report(x, path = NULL, type = 1, ...)
 \arguments{
 \item{x}{an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".}
 
+\item{path}{file path to which the pdf file of the report is saved. If NULL, the current working directory is used.}
+
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 \itemize{
    \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}

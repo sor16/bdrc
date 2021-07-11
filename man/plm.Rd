@@ -14,7 +14,7 @@ plm(
 )
 }
 \arguments{
-\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \eqn{y}~\eqn{x} where \eqn{y} is discharge in m\eqn{^3/}s and \eqn{x} is stage in m (it is very important that the data is in the correct units).}
+\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).}
 
 \item{data}{data.frame containing the variables specified in formula.}
 
@@ -28,12 +28,12 @@ plm(
 }
 \value{
 plm returns an object of class "plm". An object of class "plm" is a list containing the following components: \cr
-\item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
-\item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-\item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\varepsilon}}.}
-\item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
-\item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
+\item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior predictive distribution of the rating curve.}
+\item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
+\item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of latent- and hyperparameters.}
+\item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior of \eqn{\sigma_{\varepsilon}}.}
+\item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the deviance.}
+\item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).}
 \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
 \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
 \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
@@ -56,13 +56,13 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 }
 \description{
-plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power-Law model with variance that variance with stage as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
+plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
 }
 \details{
-The Power-law model, which is commonly used in hydraulic practice, is of the form
+The power-law model, which is commonly used in hydraulic practice, is of the form
 \deqn{Q=a(h-c)^{b}}
 where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants.\cr\cr
-The Power-law model is presented here as a Bayesian hierarchical model. The model is on a logarithmic scale
+The power-law model is here inferred by using a Bayesian hierarchical model. The model is on a logarithmic scale
 \deqn{\log(Q_i) = \log(a) + b \log(h_i - c) + \varepsilon_i,     i = 1,...,n}
 where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.

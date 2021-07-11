@@ -1,12 +1,13 @@
 Package: bdrc
 Title: Bayesian Discharge Rating Curves
 Version: 0.0.0.9002
-Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut","cph")),
+Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut","cph"),comment=c(ORCID="0000-0003-1864-9652")),
              person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut","cre"),comment=c(ORCID="0000-0002-4376-3361")),
              person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut")),
              person("Rafael", "Vias", email = "raffidv@gmail.com", role = c("aut"))
              )
-Description: Fits a discharge rating curve from paired stage and discharge measurements in a river using a Bayesian hierarchical model. The package implements four different models, two power-law rating curves and two generalized power-law rating curves as described in Hrafnkelsson et al (2020) <arXiv:2010.04769>.
+Maintainer: Solvi Rognvaldsson <solviro@gmail.com>
+Description: Fits a discharge rating curve based on the power-law and the generalized power-law from paired stage and discharge measurements from a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al (2020) <arXiv:2010.04769>.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 LazyData: true

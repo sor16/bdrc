@@ -60,17 +60,6 @@ Visualize discharge rating curve result objects
 
 \examples{
 \donttest{
-data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors)
-autoplot(plm0.fit)
-autoplot(plm0.fit,transformed=T)
-autoplot(plm0.fit,type='histogram',param='c')
-autoplot(plm0.fit,type='histogram',param='c',transformed=T)
-autoplot(plm0.fit,type='histogram',param='hyperparameters')
-autoplot(plm0.fit,type='histogram',param='latent_parameters')
-autoplot(plm0.fit,type='residuals')
-autoplot(plm0.fit,type='f')
-autoplot(plm0.fit,type='sigma_eps')
 }
 }
 \seealso{
