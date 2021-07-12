@@ -28,13 +28,13 @@ library(ggplot2)
 ```
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
-* plm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice
+```plm0() ``` - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
 
-* plm() - Power-law model with variance that may vary with stage
+```plm() ``` - Power-law model with variance that varies with stage.
 
-* gplm0() - Generalized power-law model with constant variance (hence the 0)
+```gplm0() ``` - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
-* gplm() - Generalized power-law model with variance that may vary with stage
+```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
 To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from astream gauging station called Kallstorp in Sweden that comes with the package:
 ```{r, data}
