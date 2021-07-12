@@ -208,6 +208,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #'
 #' Save a pdf file with a report of a discharge rating curve object or tournament
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
+#' @param path file path to which the pdf file of the report is saved. If NULL, the current working directory is used.
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
 #'                       \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}

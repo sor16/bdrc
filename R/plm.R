@@ -1,27 +1,27 @@
 #' Power-law model
 #'
-#' plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Power-Law model with variance that variance with stage as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
-#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \eqn{y}~\eqn{x} where \eqn{y} is discharge in m\eqn{^3/}s and \eqn{x} is stage in m (it is very important that the data is in the correct units).
+#' plm is used to fit a discharge rating curve for paired measurements of stage and discharge using a power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
+#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).
 #' @param data data.frame containing the variables specified in formula.
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
 #' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
 #' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #'
-#' @details The Power-law model, which is commonly used in hydraulic practice, is of the form
+#' @details The power-law model, which is commonly used in hydraulic practice, is of the form
 #' \deqn{Q=a(h-c)^{b}}
 #' where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants.\cr\cr
-#' The Power-law model is presented here as a Bayesian hierarchical model. The model is on a logarithmic scale
+#' The power-law model is here inferred by using a Bayesian hierarchical model. The model is on a logarithmic scale
 #' \deqn{\log(Q_i) = \log(a) + b \log(h_i - c) + \varepsilon_i,     i = 1,...,n}
 #' where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 #' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 #' @return plm returns an object of class "plm". An object of class "plm" is a list containing the following components: \cr
-#' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the rating curve.}
-#' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
-#' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of latent- and hyperparameters.}
-#' \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior of \eqn{\sigma_{\varepsilon}}.}
-#' \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% quantiles of the posterior distribution of the deviance.}
-#' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve (excluding burn-in).}
+#' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior predictive distribution of the rating curve.}
+#' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
+#' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of latent- and hyperparameters.}
+#' \item{\code{sigma_eps_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior of \eqn{\sigma_{\varepsilon}}.}
+#' \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the deviance.}
+#' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).}
 #' \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
 #' \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
 #' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
@@ -129,69 +129,25 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(F
 
 #' @importFrom stats optim
 plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-    #TODO: add error message if length(formula)!=3 or if it contains more than one covariate. Also make sure that names in formula exist in data
-    RC=priors('plm',c_param)
-    RC$y <- as.matrix(y)
-    RC$h <- h
-    RC$h_min <- min(RC$h)
-    RC$h_max <- max(RC$h)
-    RC$n <- length(h)
-
-    RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
-
-    h_tilde <- RC$h-min(RC$h)
-    RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
-
-    RC$epsilon <- rep(1,RC$n)
-    RC$epsilon[forcepoint]=1/RC$n
-    if(!is.null(RC$c)){
-        density_fun <- plm.density_evaluation_known_c
-        unobserved_prediction_fun <- plm.predict_u_known_c
-    }else{
-        density_fun <- plm.density_evaluation_unknown_c
-        unobserved_prediction_fun <- plm.predict_u_unknown_c
-    }
-    #determine proposal density
-    RC$theta_length <- if(is.null(RC$c)) 8 else 7
-    theta_init <- rep(0,RC$theta_length)
-    loss_fun  <-  function(th) {-density_fun(th,RC)$p}
-    optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
-    theta_m <- optim_obj$par
-    H <- optim_obj$hessian
-    proposal_scaling <- 2.38^2/RC$theta_length
-    RC$LH <- t(chol(H))/sqrt(proposal_scaling)
-
-    h_min <- ifelse(is.null(RC$c),min(RC$h)-exp(theta_m[1]),RC$c)
-    if(is.null(h_max)){
-      h_max <- RC$h_max
-    }
-    if(h_max<RC$h_max){
-      stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$h_max,' m'))
-    }
-    RC$h_u <- h_unobserved(RC,h_min,h_max)
-    RC$n_u <- length(RC$h_u)
-    h_u_std <- ifelse(RC$h_u < RC$h_min,0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-RC$h_min)/(RC$h_max-RC$h_min)))
-    RC$B_u <- B_splines(h_u_std)
-    #determine length of each part of the output, in addition to theta
-    RC$desired_output <- get_desired_output('plm',RC)
-    output_list <- get_MCMC_output_list(theta_m=theta_m,RC=RC,density_fun=density_fun,
-                                        unobserved_prediction_fun=unobserved_prediction_fun,
-                                        parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
-                                        burnin=burnin,thin=thin)
-    output_list$D_hat <- plm.calc_Dhat(output_list$theta,RC)
-    if(is.null(RC$c)){
-      output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
-      output_list$theta[2,] <- exp(output_list$theta[2,])
-      output_list$theta[3:8,] <- RC$P%*%output_list$theta[3:8,]
-    }else{
-      output_list$theta[1,] <- exp(output_list$theta[1,])
-      output_list$theta[2:7,] <- RC$P%*%output_list$theta[2:7,]
-    }
-    output_list$x[1,] <- exp(output_list$x[1,])
-    output_list[['h']] <- c(RC$h,RC$h_u)
-    output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
-    output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
-    return(output_list)
+  RC <- get_model_components('plm',y,h,c_param,h_max,forcepoint,h_min=NULL)
+  output_list <- get_MCMC_output_list(theta_m=RC$theta_m,RC=RC,density_fun=RC$density_fun,
+                                      unobserved_prediction_fun=RC$unobserved_prediction_fun,
+                                      parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                      burnin=burnin,thin=thin)
+  output_list$D_hat <- plm.calc_Dhat(output_list$theta,RC)
+  if(is.null(RC$c)){
+    output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
+    output_list$theta[2,] <- exp(output_list$theta[2,])
+    output_list$theta[3:8,] <- RC$P%*%output_list$theta[3:8,]
+  }else{
+    output_list$theta[1,] <- exp(output_list$theta[1,])
+    output_list$theta[2:7,] <- RC$P%*%output_list$theta[2:7,]
+  }
+  output_list$x[1,] <- exp(output_list$x[1,])
+  output_list[['h']] <- c(RC$h,RC$h_u)
+  output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
+  output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
+  return(output_list)
 }
 
 #' @importFrom stats rnorm dlnorm

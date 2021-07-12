@@ -35,6 +35,67 @@ priors <- function(model,c_param=NULL) {
     return(RC)
 }
 
+get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
+  RC <- priors(model,c_param)
+  RC$y <- as.matrix(y)
+  RC$h <- h
+  RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
+  RC$h_max <- max(RC$h)
+  RC$n <- length(h)
+  RC$epsilon <- rep(1,RC$n)
+  RC$epsilon[forcepoint]=1/RC$n
+  if(model %in% c('plm','gplm')){
+    RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
+    h_tilde <- RC$h-min(RC$h)
+    RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
+  }
+  if(model %in% c('gplm0','gplm')){
+    RC$y <- rbind(RC$y,RC$mu_b)
+    RC$h_unique <- unique(RC$h)
+    RC$n_unique <- length(RC$h_unique)
+    RC$A <- create_A(RC$h)
+    RC$dist <- as.matrix(dist(c(RC$h_unique)))
+    RC$mu_x <- as.matrix(c(RC$mu_a,RC$mu_b, rep(0,RC$n_unique)))
+    RC$Z <- cbind(t(c(0,1)),t(rep(0,RC$n_unique)))
+    RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
+    RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
+  }
+  if(!is.null(RC$c)){
+    density_fun_name <- paste0(model,'.density_evaluation_known_c')
+    unobserved_prediction_fun_name <- paste0(model,'.predict_u_known_c')
+  }else{
+    density_fun_name <- paste0(model,'.density_evaluation_unknown_c')
+    unobserved_prediction_fun_name <- paste0(model,'.predict_u_unknown_c')
+  }
+  RC$density_fun <- get(density_fun_name)
+  RC$unobserved_prediction_fun <- get(unobserved_prediction_fun_name)
+  theta_length_vec=c('plm0'=2,'plm'=8,'gplm0'=4,'gplm'=10)
+  #determine proposal density
+  RC$theta_length <- if(is.null(RC$c)) theta_length_vec[model] else theta_length_vec[model]-1
+  theta_init <- rep(0,RC$theta_length)
+  loss_fun <- function(theta) {-RC$density_fun(theta,RC)$p}
+  optim_obj <- optim(par=theta_init,loss_fun,method="L-BFGS-B",hessian=TRUE)
+  RC$theta_m <- optim_obj$par
+  RC$H <- optim_obj$hessian
+  proposal_scaling <- 2.38^2/RC$theta_length
+  RC$LH <- t(chol(RC$H))/sqrt(proposal_scaling)
+  h_min_pred <- ifelse(is.null(RC$c),RC$h_min-exp(RC$theta_m[1]),RC$c)
+  if(is.null(h_max)){
+    h_max_pred <- RC$h_max
+  }else if(h_max<RC$h_max){
+    stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$h_max,' m'))
+  }
+  RC$h_u <- h_unobserved(RC,h_min_pred,h_max_pred)
+  RC$n_u <- length(RC$h_u)
+  if(model %in% c('plm','gplm')){
+    h_u_std <- ifelse(RC$h_u < RC$h_min,0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
+    RC$B_u <- B_splines(h_u_std)
+  }
+  #determine length of each part of the output, in addition to theta
+  RC$desired_output <- get_desired_output(model,RC)
+  return(RC)
+}
+
 create_A <- function(h){
     n <- length(h)
     A=matrix(0,nrow=n,ncol=length(unique(h)))

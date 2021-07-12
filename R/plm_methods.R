@@ -331,7 +331,9 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
             newdata <- seq(ceiling(min(object$rating_curve$h)*100)/100,floor(max(object$rating_curve$h)*100)/100,by=0.01)
         }
     }else{
-        newdata <- object$rating_curve$h
+        if(is.null(newdata)){
+            newdata <- object$rating_curve$h
+        }
     }
     if(class(newdata) !='numeric'){
         stop('newdata must be a vector of type "numeric" or NULL')
@@ -418,17 +420,17 @@ summary.plm0 <- function(object,...){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
-#' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
-#' autoplot(plm0.fit)
-#' autoplot(plm0.fit,transformed=T)
-#' autoplot(plm0.fit,type='histogram',param='c')
-#' autoplot(plm0.fit,type='histogram',param='c',transformed=T)
-#' autoplot(plm0.fit,type='histogram',param='hyperparameters')
-#' autoplot(plm0.fit,type='histogram',param='latent_parameters')
-#' autoplot(plm0.fit,type='residuals')
-#' autoplot(plm0.fit,type='f')
-#' autoplot(plm0.fit,type='sigma_eps')
+# data(krokfors)
+# plm0.fit <- plm0(Q~W,krokfors)
+# autoplot(plm0.fit)
+# autoplot(plm0.fit,transformed=T)
+# autoplot(plm0.fit,type='histogram',param='c')
+# autoplot(plm0.fit,type='histogram',param='c',transformed=T)
+# autoplot(plm0.fit,type='histogram',param='hyperparameters')
+# autoplot(plm0.fit,type='histogram',param='latent_parameters')
+# autoplot(plm0.fit,type='residuals')
+# autoplot(plm0.fit,type='f')
+# autoplot(plm0.fit,type='sigma_eps')
 #' }
 #' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @export
@@ -502,9 +504,9 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors,h_max=9)
+#' plm0.fit <- plm0(Q~W,krokfors,h_max=24)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-#' predict(plm0.fit,newdata=seq(8,9,by=0.01))
+#' predict(plm0.fit,newdata=seq(23,24,by=0.01))
 #' predict(plm0.fit,wide=T)
 #' }
 #' @describeIn predict.plm0 Predict method for plm0
