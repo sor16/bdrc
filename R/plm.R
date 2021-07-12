@@ -52,10 +52,6 @@
 #' formula <- Q~W
 #' plm.fit <- plm(formula,krokfors)
 #' summary(plm.fit)
-#' plot(plm.fit)
-#' plm.fit_known_c <- plm(formula,krokfors,c_param=0.75,h_max=2)
-#' summary(plm.fit_known_c)
-#' plot(plm.fit_known_c)
 #' }
 #' @export
 plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,nrow(data))){

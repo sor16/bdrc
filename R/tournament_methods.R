@@ -165,7 +165,9 @@ summary.tournament <- function(object,...){
 #' \donttest{
 #' data(krokfors)
 #' t_obj <- tournament(Q~W,krokfors)
-#' autoplot(t_obj)
+#' summary(t_obj)
+#' plot(t_obj)
+#' #autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
@@ -215,10 +217,10 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @importFrom grid grid.draw
 #' @importFrom gridExtra grid.arrange
 #' @export
-plot.tournament <- function(x,type='panel',transformed=F,...){
+plot.tournament <- function(x,type='tournament_results',transformed=F,...){
     args <- list(...)
     legal_types <- c("deviance","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
-    if(is.null(type) || type=='deviance'){
+    if(type=='deviance'){
         p <- autoplot(x,type=type)
     }else if(type%in%legal_types){
         p <- plot_tournament_grob(x,type=type,transformed=transformed,...)

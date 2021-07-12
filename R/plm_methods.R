@@ -365,7 +365,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,V316_river)
+#' plm0.fit <- plm0(Q~W,krokfors)
 #' plm0.fit
 #' print(plm0.fit)
 #' }
@@ -384,7 +384,7 @@ print.plm0 <- function(x,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,V316_river)
+#' plm0.fit <- plm0(Q~W,krokfors)
 #' summary(plm0.fit)
 #' }
 #' @describeIn summary.plm0 Summary method for plm0
