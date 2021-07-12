@@ -14,8 +14,7 @@ status](https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg)](https://
 This software package fits a discharge rating curve based on the
 power-law and the generalized power-law from paired stage and discharge
 measurements from a given river using a Bayesian hierarchical model as
-described in Hrafnkelsson et al. (2020) &lt;arXiv:2010.04769&gt;. Four
-models are implemented:
+described in Hrafnkelsson et al. (2020). Four models are implemented:
 
 `plm0()` - Power-law model with a constant variance. This is a Bayesian
 hierarchical implementation of the most commonly used discharge rating
@@ -57,7 +56,9 @@ gplm.fit <- gplm(Q~W,krokfors)
 
 To dig deeper into the functionality of the package and the different
 ways to visualize a discharge rating curve model for your data, we
-recommend taking a look at our two vignettes. \#\# References
+recommend taking a look at our two vignettes.
+
+## References
 
 Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020).
 Generalization of the power-law rating curve using hydrodynamic theory
