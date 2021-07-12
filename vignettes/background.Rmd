@@ -57,14 +57,14 @@ where $\epsilon_i$ follows a normal distribution with mean zero and variance $\s
 ## References
 
 
-B. Hrafnkelsson, H. Sigurdarson and S. M. Gardarsson, *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling.*	arXiv:2010.04769 (2020)
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*. arXiv preprint 2010.04769.
 
-R. Clarke, *Uncertainty in the estimation of mean annual flood due to rating-curve indefinition.* Journal of Hydrology 222(1-4), 185–190 (1999)
+Clarke, R. (1999). *Uncertainty in the estimation of mean annual flood due to rating-curve indefinition.* Journal of Hydrology 222(1-4). 185–190.
 
-R. Clarke, E. Mendiondo, L. Brusa, *Uncertainties in mean discharges from two large South American rivers due to rating curve variability.* Hydrological Sciences 45(2), 221–236 (2000)
+Clarke, R., Mendiondo, E., Brusa L. (2000). *Uncertainties in mean discharges from two large South American rivers due to rating curve variability.* Hydrological Sciences 45(2). 221–236.
 
-C. Venetis, *A note on the estimation of the parameters in logarithmic stage-discharge relationships with estimates of their error.* International Association of Scientific Hydrology. Bulletin XV 2(6), 105–111 (1970)
+Venetis C. (1970). *A note on the estimation of the parameters in logarithmic stage-discharge relationships with estimates of their error.* International Association of Scientific Hydrology. Bulletin XV 2(6). 105–111. 
 
-V. Chow, *Open-Channel Hydraulics* (McGraw-Hill, New York, 1959)
+V. Chow (1959). *Open-Channel Hydraulics*. McGraw-Hill. New York.
 
-B. Matérn, *Spatial variation. Stochastic models and their application to some problems in forest surveys and other sampling investigations.* Meddelanden från statens Skogsforskningsinstitut, 49(5) (1960)
+Matérn, B. (1960). *Spatial variation. Stochastic models and their application to some problems in forest surveys and other sampling investigations.* Meddelanden från statens Skogsforskningsinstitut. 49(5).
