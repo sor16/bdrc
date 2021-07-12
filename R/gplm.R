@@ -149,16 +149,16 @@ gplm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
 
 #' @importFrom stats dist optim
 gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-  #idea:
-  RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
-  #if c_param not NULL
-  #if(RC$theta_m+1.96*sqrt(diag(solve(RC$H)))>something){
-  # c_upper=some upper value
-  #}else{
-  #   c_upper=NULL
-  # }
-  #RC <- get_model_components('gplm',y,h,c_param,h_max,forcepoint,h_min=c_upper)
-  RC <- get_model_components('gplm',y,h,c_param,h_max,forcepoint,h_min=NULL)
+  c_upper <- NULL
+  if(is.null(c_param)){
+    RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
+    c_sd <- sqrt(diag(solve(RC_plm0$H)))[1]
+    c_mode <- RC_plm0$theta_m[1]
+    if(exp(c_mode + 1.96*c_sd)> 2){
+      c_upper <- c_mode + 1.96*c_sd
+    }
+  }
+  RC <- get_model_components('gplm',y,h,c_param,h_max,forcepoint,h_min=c_upper)
   output_list <- get_MCMC_output_list(theta_m=RC$theta_m,RC=RC,density_fun=RC$density_fun,
                                       unobserved_prediction_fun=RC$unobserved_prediction_fun,
                                       parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
