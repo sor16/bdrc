@@ -24,7 +24,7 @@ Data frame with columns
 Useful to convert MCMC chain draws of particular parameters or output from the model object to a wide format for further data wrangling
 }
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 f <- Q~W
 plm0.fit <- plm0(f,krokfors)

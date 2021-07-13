@@ -2,7 +2,6 @@ data(krokfors)
 krokfors <- krokfors[(1:nrow(krokfors))%%4==0,]
 h_extrap <- 10
 known_c <- 7.8
-RNGversion('3.5.0')
 set.seed(1)
 plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 set.seed(1)

@@ -72,10 +72,6 @@ set.seed(1)
 formula <- Q~W
 gplm0.fit <- gplm0(formula,krokfors)
 summary(gplm0.fit)
-plot(gplm0.fit)
-gplm0.fit_known_c <- gplm0(formula,krokfors,c_param=0.75,h_max=2)
-summary(gplm0.fit_known_c)
-plot(gplm0.fit_known_c)
 }
 }
 \references{

@@ -12,7 +12,7 @@
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769
 #'@seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for further information on parameters
 #'@examples
-#'\dontrun{
+#'\donttest{
 #' data(krokfors)
 #' f <- Q~W
 #' plm0.fit <- plm0(f,krokfors)
@@ -57,7 +57,7 @@ spread_draws <- function(mod,...,transformed=F){
 #' @references B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769
 #'@seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for further information on parameters
 #'@examples
-#'\dontrun{
+#'\donttest{
 #' data(krokfors)
 #' f <- Q~W
 #' plm0.fit <- plm0(f,krokfors)

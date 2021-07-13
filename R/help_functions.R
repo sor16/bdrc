@@ -42,7 +42,7 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
   RC$h_max <- max(RC$h)
   RC$n <- length(h)
   RC$epsilon <- rep(1,RC$n)
-  RC$epsilon[forcepoint]=1/RC$n
+  RC$epsilon[forcepoint] <- 1/RC$n
   if(model %in% c('plm','gplm')){
     RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
     h_tilde <- RC$h-min(RC$h)
@@ -79,15 +79,16 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
   proposal_scaling <- 2.38^2/RC$theta_length
   RC$LH <- t(chol(RC$H))/sqrt(proposal_scaling)
   h_min_pred <- ifelse(is.null(RC$c),RC$h_min-exp(RC$theta_m[1]),RC$c)
-  if(is.null(h_max)){
+  h_max_pred <- h_max
+  if(is.null(h_max_pred)){
     h_max_pred <- RC$h_max
-  }else if(h_max<RC$h_max){
+  }else if(h_max_pred<RC$h_max){
     stop(paste0('maximum stage value must be larger than the maximum stage value in the data, which is ', RC$h_max,' m'))
   }
   RC$h_u <- h_unobserved(RC,h_min_pred,h_max_pred)
   RC$n_u <- length(RC$h_u)
   if(model %in% c('plm','gplm')){
-    h_u_std <- ifelse(RC$h_u < RC$h_min,0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
+    h_u_std <- ifelse(RC$h_u < min(RC$h),0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
     RC$B_u <- B_splines(h_u_std)
   }
   #determine length of each part of the output, in addition to theta
@@ -125,7 +126,7 @@ calc_variogram <- function(i,param_mat,burnin=2000,nr_iter=20000){
 }
 
 #' @importFrom stats rnorm runif
-run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20000,burnin=2000,thin=5,T_max=30){
+run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20000,burnin=2000,thin=5,T_max=50){
     theta_mat <- matrix(0,nrow=RC$theta_length,ncol=nr_iter)
     output_list <- initiate_output_list(RC$desired_output,nr_iter)
     density_eval_m <- density_fun(theta_m,RC)
@@ -173,15 +174,16 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     return(output_list)
 }
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
-get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_chains=4,nr_iter=20000,burnin=2000,thin=5,T_max=30){
+get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
   if(num_chains>4){
     stop('Max number of chains is 4. Please pick a lower number of chains')
   }
+  T_max <- 50
   run_MCMC_wrapper <- function(i){
     run_MCMC(theta_m=theta_m,RC=RC,density_fun=density_fun,
              unobserved_prediction_fun=unobserved_prediction_fun,
-             nr_iter=nr_iter,burnin=burnin,thin=thin)
+             nr_iter=nr_iter,burnin=burnin,thin=thin,T_max=T_max)
   }
   if(parallel){
     chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")

@@ -23,7 +23,9 @@ Compare the four discharge rating curves from the tournament object in different
 \donttest{
 data(krokfors)
 t_obj <- tournament(Q~W,krokfors)
-autoplot(t_obj)
+summary(t_obj)
+plot(t_obj)
+#autoplot(t_obj)
 }
 }
 \seealso{

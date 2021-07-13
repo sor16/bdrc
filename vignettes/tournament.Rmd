@@ -28,25 +28,26 @@ library(ggplot2)
 ```
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
-* plm0() - Power-law model with constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice
+```plm0() ``` - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
 
-* plm() - Power-law model with variance that may vary with stage
+```plm() ``` - Power-law model with variance that varies with stage.
 
-* gplm0() - Generalized power-law model with constant variance (hence the 0)
+```gplm0() ``` - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
-* gplm() - Generalized power-law model with variance that may vary with stage
+```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
-To learn more about the four models, see Hrafnkelsson et al. To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament function allows you to compare the fit of these four models on the same data and determine which one suits best to the river you are analysing. The tournament is a set of two rounds. The first round consists of two games, one where plm0 and plm are compared and the other where gplm0 and gplm are compared. The winner of each of the two games in round 1 qualify for round 2 where the remaining two models are compared and the winner determined. The comparison of two models is performed by computing the Bayes factor and subsequently the probability of each model given the data. There is a hierarchy in complexity of the models s.t. plm0 < plm < gplm0 < gplm in terms of complexity. For a more complex model to win a game of two models, the probability of model given data must by larger than 0.75. This favors the simpler model except when there is overwhelming evidence of the benefit of the more complex model. As in the introduction vignette, we will use a dataset from a river called x in Sweden that comes with the package:
+To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from astream gauging station called Kallstorp in Sweden that comes with the package:
 ```{r, data}
 data(kallstorp)
 kallstorp
 ```
-The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in $m^3/s$ and x is stage in $m$ (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. In our case, in kallstorp, a column named Q includes are discharge measurements and W the stage measurements. We are ready to run our first tournament:
+## Running a tournament
+The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in kallstorp, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:
 ```{r, cache=T}
 set.seed(1)
 t_obj <- tournament(Q~W,kallstorp)
 ```
-The function both runs the four models for you and runs the tournament. It's worth mentioning that if you have already run your models of the four different kinds, plm0, plm, gplm0 and gplm and stored them in objects plm0.fit,plm.fit,gplm0.fit and gplm.fit, you can alternatively run the tournament very efficiently in the following way:
+The function both runs the four models for you and runs the tournament. It's worth mentioning that if you have already run your models of the four different kinds, <tt>plm0</tt>, <tt>plm</tt>, <tt>gplm0</tt> and <tt>gplm</tt> and they are stored in objects, say <tt>plm0.fit</tt>, <tt>plm.fit</tt>, <tt>gplm0.fit</tt> and <tt>gplm.fit</tt>, you can alternatively run the tournament very efficiently in the following way:
 ```{r,eval=F}
 t_obj <- tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit)
 ```
@@ -59,44 +60,54 @@ For a more detailed summary of the results of the tournament write
 ```{r}
 summary(t_obj)
 ```
-Notice here that in round 1, plm was the winner in the first game and gplm in the second. Finally plm was favoured in round 2 and thus determined the tournament winner, the most adequate model for the data at hand.
+Notice here that in round 1, <tt>gplm</tt> is favored over <tt>gplm0</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm</tt> is deemed the tournament winner, i.e. the model that provides the best fit of the data at hand.
 
-## Compare different components of the models
-To visualize the results from the tournament first we can plot the deviance posterior distribution of the different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the deviance distribution we write
+## Comparing different components of the models
+There are several tools to visualize the different aspects of the model comparison. To get a visual summary of the results of the different games in the tournament, write
 
-```{r}
-plot(t_obj,type='deviance') #note that type defaults to deviance
+```{r, fig.width=8, fig.height=6}
+plot(t_obj) #this is equivalent to type='tournament_results'
 ```
 
-rating curves using the plot function
-```{r}
+
+Another informative wasy of comparing  different models.The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write
+
+```{r, fig.width=8, fig.height=6}
+plot(t_obj,type='deviance')
+```
+
+The red diamonds on the plot denote the DIC values for the resective models. Next, to plot rating curves from the different model, write
+```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='rating_curve')
 ```
 Another useful plot is the residual plot
-```{r}
+```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='residuals')
 ```
 
-The main difference of te four models lies in the modelling of the power law exponent ($f(h)$) the variance on the data level ($\sigma^2_{\varepsilon}$). Thus it is insightful to look at the posterior of the power law exponent for the different models
+The main difference between four models lies in the modelling of the power law exponent ($f(h)$) and the variance on the data level ($\sigma^2_{\varepsilon}$). Thus it is insightful to look at the posterior of the power law exponent for the different models
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='f')
 ```
 and the variance on the data level
-```{r}
+```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='sigma_eps')
 ```
 
 ## Customizing tournaments
-There are ways to customize the tournament further. If the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. Assume 22.35 m is the known value of $c$ and you want to run a tournament with c fixed for all models. Then you could write
+There are ways to customize the tournament further. For example, if the parameter of zero discharge, $c$, is known you  might want to fix that parameter to the known value in the model. Assume 22.35 m is the known value of $c$. Then you can directly run a tournament with the $c$ parameter fixed in all models
 ```{r,cache=T}
 t_obj_known_c <- tournament(formula=Q~W,data=kallstorp,c_param=22.35)
 summary(t_obj_known_c)
 ```
 One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm:
-```{r}
+```{r, fig.width=8, fig.height=6}
 plot(t_obj_known_c,type='panel',transformed=T)
 ```
 
 
-
+## References
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
+Jeffreys, H. (1961). Theory of Probability, Third Edition. Oxford University Press.
+Kass, R., and A. Raftery, A. (1995). Bayes Factors. Journal of the American Statistical Association, 90, 773-795.
 

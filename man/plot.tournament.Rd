@@ -4,7 +4,7 @@
 \alias{plot.tournament}
 \title{Plot method for discharge rating curve tournament}
 \usage{
-\method{plot}{tournament}(x, type = "panel", transformed = F, ...)
+\method{plot}{tournament}(x, type = "tournament_results", transformed = F, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
