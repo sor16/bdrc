@@ -174,8 +174,16 @@
 #&gt; 25% - gplm finished
 #&gt; 50% - gplm0 finished
 #&gt; 75% - plm finished
-#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'>autoplot</span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in autoplot(t_obj): could not find function "autoplot"</span></div><div class='input'><span class='co'># }</span>
+#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
+#&gt; 1     1    1  gplm 1.240206e-01 -1.4153959      6.206312 5.365823e-01  FALSE
+#&gt; 2     1    1 gplm0 1.071101e-01 -0.8651113      6.313648 4.634177e-01   TRUE
+#&gt; 3     1    2   plm 1.090093e-06 23.6166853      2.972105 9.727696e-01   TRUE
+#&gt; 4     1    2  plm0 3.051455e-08 23.3306462      2.915150 2.723037e-02  FALSE
+#&gt; 5     2    3 gplm0 1.071101e-01 -0.8651113      6.313648 9.999898e-01   TRUE
+#&gt; 6     2    3   plm 1.090093e-06 23.6166853      2.972105 1.017721e-05  FALSE</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+</div><div class='img'><img src='autoplot.tournament-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>#autoplot(t_obj)</span>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

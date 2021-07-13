@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Generalized power-law model — gplm" />
-<meta property="og:description" content="gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See &quot;Details&quot; for a more elaborate description of the model." />
+<meta property="og:description" content="gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See &quot;Details&quot; for a more elaborate description of the model." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,7 +137,7 @@
     </div>
 
     <div class="ref-description">
-    <p>gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a Generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See "Details" for a more elaborate description of the model.</p>
+    <p>gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See "Details" for a more elaborate description of the model.</p>
     </div>
 
     <pre class="usage"><span class='fu'>gplm</span><span class='op'>(</span>
@@ -154,7 +154,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>formula</th>
-      <td><p>an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \(y\)~\(x\) where \(y\) is discharge in m\(^3/\)s and \(x\) is stage in m (it is very important that the data is in the correct units).</p></td>
+      <td><p>an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form <code>y</code>~<code>x</code> where <code>y</code> is discharge in m\(^3/\)s and <code>x</code> is stage in m (it is very important that the data is in the correct units).</p></td>
     </tr>
     <tr>
       <th>data</th>
@@ -181,14 +181,14 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>gplm returns an object of class "gplm". An object of class "gplm" is a list containing the following components:</p>
-<dt><code>rating_curve</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the rating curve.</p></dd>
- <dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the mean of the rating curve.</p></dd>
- <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).</p></dd>
- <dt><code>f_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(f(h)\).</p></dd>
- <dt><code>beta_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\beta(h)\).</p></dd>
- <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of \(\sigma_\varepsilon(h)\).</p></dd>
- <dt><code>Deviance_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% quantiles of the posterior distribution of the deviance.</p></dd>
- <dt><code>rating_curve_posterior</code></dt><dd><p>a matrix containing the full thinned posterior samples of the posterior distribution of the rating curve excluding burn-in samples.</p></dd>
+<dt><code>rating_curve</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior predictive distribution of the rating curve.</p></dd>
+ <dt><code>rating_curve_mean</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of the mean of the rating curve.</p></dd>
+ <dt><code>param_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).</p></dd>
+ <dt><code>f_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of \(f(h)\).</p></dd>
+ <dt><code>beta_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of \(\beta(h)\).</p></dd>
+ <dt><code>sigma_eps_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of \(\sigma_\varepsilon(h)\).</p></dd>
+ <dt><code>Deviance_summary</code></dt><dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of the deviance.</p></dd>
+ <dt><code>rating_curve_posterior</code></dt><dd><p>a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve excluding burn-in samples.</p></dd>
  <dt><code>rating_curve_mean_posterior</code></dt><dd><p>a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve excluding burn-in samples.</p></dd>
  <dt><code>a_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(a\) excluding burn-in samples.</p></dd>
  <dt><code>b_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(b\) excluding burn-in samples.</p></dd>
@@ -217,10 +217,10 @@
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The Generalized power-law model is of the form
+    <p>The generalized power-law model is of the form
 $$Q=a(h-c)^{f(h)}$$
-where \(Q\) is discharge, \(h\) is stage, \(a\) and \(c\) are unknown constants and \(f\) is a function of  \(h\), referred to as the Generalized power-law exponent.<br /><br />
-The Generalized power-law model is here presented as a Bayesian hierarchical model. The function \(f\) is modelled at the latent level as a fixed constant \(b\) plus a continuous stochastic process, \(\beta(h)\), which is assumed to be twice differentiable. The model is on a logarithmic scale
+where \(Q\) is discharge, \(h\) is stage, \(a\) and \(c\) are unknown constants and \(f\) is a function of \(h\), referred to as the generalized power-law exponent.<br /><br />
+The generalized power-law model is here inferred by using a Bayesian hierarchical model. The function \(f\) is modelled at the latent level as a fixed constant \(b\) plus a continuous stochastic process, \(\beta(h)\), which is assumed to be twice differentiable. The model is on a logarithmic scale
 $$\log(Q_i) = \log(a) + (b + \beta(h_i)) \log(h_i - c) + \varepsilon_i,     i = 1,...,n$$
 where \(\varepsilon_i\) follows a normal distribution with mean zero and variance \(\sigma_\varepsilon(h_i)^2\) that varies with stage. The stochastic process \(\beta(h)\) is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \(\nu = 2.5\). The error variance, \(\sigma_\varepsilon^2(h)\), of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.<br /><br />
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.</p>
@@ -260,11 +260,7 @@ Bayesian inference is based on the posterior density and summary statistics such
 #&gt; eta_5      -8.2968    -4.6586    -0.723     
 #&gt; eta_6      -8.8076    -4.6574    -0.319     
 #&gt; 
-#&gt; DIC: -1.567564</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
-</div><div class='img'><img src='gplm-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='va'>gplm.fit_known_c</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span>,c_param<span class='op'>=</span><span class='fl'>0.75</span>,h_max<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in gplm.inference(y = log(Q), h, c_param, h_max, parallel, forcepoint): maximum stage value must be larger than the maximum stage value in the data, which is 9.897 m</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in summary(gplm.fit_known_c): object 'gplm.fit_known_c' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>gplm.fit_known_c</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in plot(gplm.fit_known_c): object 'gplm.fit_known_c' not found</span></div><div class='input'><span class='co'># }</span>
+#&gt; DIC: -1.567564</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
