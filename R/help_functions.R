@@ -7,7 +7,6 @@ priors <- function(model,c_param=NULL) {
     RC$p_ab <- 0;
     RC$nugget <- 10^-8
     if(is.null(c_param)){
-        #RC$lambda_c <- 1;   # prior temp fix
         RC$lambda_c <- 2;
     }else{
         RC$c <- c_param
