@@ -40,10 +40,10 @@
 #' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
 #' \donttest{
-#' data(krokfors)
+#' data(skogsliden)
 #' set.seed(1)
 #' formula <- Q~W
-#' plm0.fit <- plm0(formula,krokfors)
+#' plm0.fit <- plm0(formula,skogsliden)
 #' summary(plm0.fit)
 #' }
 #' @export

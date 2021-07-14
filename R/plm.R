@@ -47,10 +47,10 @@
 #' @seealso \code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
 #' \donttest{
-#' data(krokfors)
+#' data(spanga)
 #' set.seed(1)
 #' formula <- Q~W
-#' plm.fit <- plm(formula,krokfors)
+#' plm.fit <- plm(formula,spanga)
 #' summary(plm.fit)
 #' }
 #' @export
