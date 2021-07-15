@@ -117,7 +117,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             param_expr <- get_param_expression(params)
             plot_dat$chain_name <- paste0('Chain nr ',plot_dat$chain)
             p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value)) +
-                geom_path(col="#0072B5FF",alpha=0.7,size=0.3) +
+                geom_path(col="#0072B5FF",size=0.3) +
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
