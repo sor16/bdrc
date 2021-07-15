@@ -34,16 +34,16 @@ For further details about the different models, see Hrafnkelsson et al. (2020). 
 library(bdrc)
 library(ggplot2)
 ```
-We will use a dataset from a stream gauging station called Kallstorp in Sweden that comes with the package:
+We will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:
 ```{r, data}
-data(kallstorp)
-kallstorp
+data(krokfors)
+krokfors
 ```
 ## Fitting a discharge rating curve
-It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in kallstorp, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
+It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
 
 ```{r, cache=T}
-gplm.fit <- gplm(Q~W,data=kallstorp)
+gplm.fit <- gplm(Q~W,data=krokfors)
 ```
 <tt>gplm</tt> returns an object of class "gplm" which we can summarize and visualize using familiar functions such as
 
@@ -120,9 +120,9 @@ plot(gplm.fit,type='autocorrelation')
 
 
 ## Customization of models
-There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 22.35 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 24 m, then your function call would look like this
+There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this
 ```{r,cache=T,results}
-gplm.fit.known_c <- gplm(Q~W,kallstorp,c_param=22.35,h_max=24)
+gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10)
 summary(gplm.fit.known_c)
 ```
 one neat way to get a visualization summary of your model is to use the 'panel' option in the plot method:
@@ -134,7 +134,7 @@ plot(gplm.fit.known_c,type='panel',transformed=T)
 ## Prediction for an equally spaced grid of stages
 To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which Bayesian inference was performed
 ```{r}
-h_grid <- seq(22.35,24,by=0.01)
+h_grid <- seq(7.65,10,by=0.01)
 rating_curve_h_grid <- predict(gplm.fit.known_c,newdata=h_grid)
 print(rating_curve_h_grid)
 ```
