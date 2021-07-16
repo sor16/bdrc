@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summary method for a discharge rating curve tournament — summary.tournament • bdrc</title>
+<title>Norn stream gauging station in Sweden — norn • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Summary method for a discharge rating curve tournament — summary.tournament" />
-<meta property="og:description" content="Print the summary of a tournament of model comparisons" />
+<meta property="og:title" content="Norn stream gauging station in Sweden — norn" />
+<meta property="og:description" content="Data on discharge and stage from Norn stream gauging station in Sweden." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,52 +131,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summary method for a discharge rating curve tournament</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/tournament_methods.R'><code>R/tournament_methods.R</code></a></small>
-    <div class="hidden name"><code>summary.tournament.Rd</code></div>
+    <h1>Norn stream gauging station in Sweden</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>norn.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Print the summary of a tournament of model comparisons</p>
+    <p>Data on discharge and stage from Norn stream gauging station in Sweden.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for tournament</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='va'>norn</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>object</th>
-      <td><p>an object of class "tournament"</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>not used in this function</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> to run a dishcarge rating curve tournament and <code><a href='plot.tournament.html'>plot.tournament</a></code> for visualizing the mode comparison</p></div>
+    <p>A data frame with columns:</p><dl>
+ <dt>W</dt><dd><p>Measurements of water stage in meters</p></dd>
+ <dt>Q</dt><dd><p>Measurements of water discharge in cubic meters per second</p></dd>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running tournament:
-#&gt; 25% - gplm finished
-#&gt; 50% - gplm0 finished
-#&gt; 75% - plm finished
-#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
-#&gt; 1     1    1  gplm 8.531369e-02 -1.2777329      6.226583 2.141771e-01  FALSE
-#&gt; 2     1    1 gplm0 3.130188e-01 -0.5683349      6.444648 7.858229e-01   TRUE
-#&gt; 3     1    2   plm 1.117009e-06 23.5901753      2.980449 3.937496e-01  FALSE
-#&gt; 4     1    2  plm0 1.719842e-06 23.3499868      2.948087 6.062504e-01   TRUE
-#&gt; 5     2    3 gplm0 3.130188e-01 -0.5683349      6.444648 9.999945e-01   TRUE
-#&gt; 6     2    3  plm0 1.719842e-06 23.3499868      2.948087 5.494341e-06  FALSE</div><div class='input'><span class='co'># }</span>
-</div></pre>
+</dl>
+
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Swedish Meteorological and Hydrological Institute <a href='http://www.smhi.se'>http://www.smhi.se</a></p>
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

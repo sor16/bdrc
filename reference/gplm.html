@@ -234,33 +234,33 @@ Bayesian inference is based on the posterior density and summary statistics such
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>norn</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>formula</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>norn</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Formula: 
 #&gt;  Q ~ W
 #&gt; Latent parameters:
 #&gt;   lower-2.5% median-50% upper-97.5%
-#&gt; a 1.50       1.94       2.24       
-#&gt; b 1.83       1.84       1.84       
+#&gt; a 13.26      24.55      32.62      
+#&gt; b  1.83       1.84       1.84      
 #&gt; 
 #&gt; Hyperparameters:
 #&gt;            lower-2.5% median-50% upper-97.5%
-#&gt; c           7.7126     7.8102     7.855     
-#&gt; sigma_beta  0.4218     0.6991     1.270     
-#&gt; phi_beta    0.5540     1.1710     2.767     
-#&gt; sigma_eta   0.0044     0.0933     0.521     
-#&gt; eta_1      -4.9170    -4.2646    -3.587     
-#&gt; eta_2      -5.9918    -4.0806    -2.285     
-#&gt; eta_3      -6.9041    -4.2228    -1.655     
-#&gt; eta_4      -7.7196    -4.5050    -1.239     
-#&gt; eta_5      -8.2968    -4.6586    -0.723     
-#&gt; eta_6      -8.8076    -4.6574    -0.319     
+#&gt; c          396.4173   396.669    396.814    
+#&gt; sigma_beta   0.1633     0.336      0.807    
+#&gt; phi_beta     1.3561     2.906      6.542    
+#&gt; sigma_eta    0.0497     0.424      0.880    
+#&gt; eta_1       -6.0989    -5.359     -4.329    
+#&gt; eta_2       -7.7165    -5.984     -4.523    
+#&gt; eta_3       -9.2525    -7.130     -5.269    
+#&gt; eta_4      -10.6787    -8.186     -5.888    
+#&gt; eta_5      -11.8105    -8.901     -6.019    
+#&gt; eta_6      -12.5955    -9.355     -5.899    
 #&gt; 
-#&gt; DIC: -1.567564</div><div class='input'><span class='co'># }</span>
+#&gt; DIC: 240.2871</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
