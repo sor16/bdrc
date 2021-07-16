@@ -1,6 +1,6 @@
-#' Kallstorp stream gauging station in Sweden
+#' Norn stream gauging station in Sweden
 #'
-#' Data on discharge and stage from Kallstorp stream gauging station in Sweden.
+#' Data on discharge and stage from Norn stream gauging station in Sweden.
 #'
 #' @format A data frame with columns:
 #' \describe{
@@ -8,7 +8,7 @@
 #'  \item{Q}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
-"kallstorp"
+"norn"
 
 #' Krokfors stream gauging station in Sweden
 #'

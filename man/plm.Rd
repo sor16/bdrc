@@ -69,10 +69,10 @@ Bayesian inference is based on the posterior density and summary statistics such
 }
 \examples{
 \donttest{
-data(krokfors)
+data(spanga)
 set.seed(1)
 formula <- Q~W
-plm.fit <- plm(formula,krokfors)
+plm.fit <- plm(formula,spanga)
 summary(plm.fit)
 }
 }

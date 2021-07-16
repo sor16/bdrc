@@ -58,10 +58,10 @@
 #'
 #' @examples
 #' \donttest{
-#' data(krokfors)
+#' data(norn)
 #' set.seed(1)
 #' formula <- Q~W
-#' gplm.fit <- gplm(formula,krokfors)
+#' gplm.fit <- gplm(formula,norn)
 #' summary(gplm.fit)
 #' }
 #' @export
@@ -148,11 +148,11 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=
   c_upper <- NULL
   if(is.null(c_param)){
     RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
-    c_sd <- sqrt(diag(solve(RC_plm0$H)))[1]
-    c_mode <- RC_plm0$theta_m[1]
-    if(exp(c_mode + 1.96*c_sd)> 2){
+    lhmc_sd <- sqrt(diag(solve(RC_plm0$H)))[1]
+    lhmc_mode <- RC_plm0$theta_m[1]
+    if(exp(lhmc_mode - 1.96*lhmc_sd)> 2){
       warning('Dataset lacks measurements near point of zero flow and thus the model infers its upper bound (see c_upper in run_info).')
-      c_upper <- c_mode + 1.96*c_sd
+      c_upper <- min(h) - exp(lhmc_mode - 1.96*lhmc_sd)
     }
   }
   RC <- get_model_components('gplm',y,h,c_param,h_max,forcepoint,h_min=c_upper)

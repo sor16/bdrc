@@ -17,7 +17,7 @@ plot_tournament_fun <- function(x,type='deviance'){
             geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
             theme_bdrc() +
             xlab('') +
-            ylab('Deviance')
+            ylab('Deviance & DIC')
     }
     return(p)
 }

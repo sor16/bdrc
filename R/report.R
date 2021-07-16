@@ -40,12 +40,15 @@ get_report_components <- function(x,type=1){
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
         p_mat <- predict(m_obj[[1]],wide=TRUE)
-        output_list$p_mat_list <- tableGrob(format(round(p_mat,digits=3),nsmall=3),
-                                            theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),fg_params=list(fontface=3)),
-                                                                 colhead=list(fg_params=list(col="black",fontface=2L)),
-                                                                 rowhead=list(fg_params=list(col="black",fontface=2L)),
-                                                                 base_size = 10))
-
+        num_pages <- floor(nrow(p_mat)/41)+1
+        output_list$p_mat_list <- lapply(1:num_pages,function(i){
+            idx <- if(num_pages==1) 1:nrow(p_mat) else if(i==num_pages) ((num_pages-1)*40+1):nrow(p_mat) else ((i-1)*40+1):((i)*40)
+            tableGrob(format(round(p_mat[idx,],digits=3),nsmall=3),
+                      theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),fg_params=list(fontface=3)),
+                                           colhead=list(fg_params=list(col="black",fontface=2L)),
+                                           rowhead=list(fg_params=list(col="black",fontface=2L)),
+                                           base_size = 10))
+        })
         output_list$obj_class <- class(m_obj[[1]])
     }else{
         output_list$main_page_plots <- plot_tournament_grob(t_obj)
@@ -97,13 +100,14 @@ get_report_pages_fun <- function(x,type=1){
                                       as.table=TRUE,
                                       heights=c(5,3),
                                       top=textGrob(report_components$obj_class,gp=gpar(fontsize=22,facetype='bold')))
-        predict_mat <- arrangeGrob(report_components$p_mat_list,
-                                   nrow=1,
-                                   as.table=TRUE,
-                                   heights=c(1),
-                                   #top=textGrob(paste0('Rating curve predictions in cubic meters per second as a function of stage in meters.\n The stage increments by a decimeter per row and the columns represent centimeter increments.',report_components$obj_class),gp=gpar(fontsize=12,facetype='bold')))
-                                   top=textGrob(paste0('Tabular Rating Curve - ',report_components$obj_class),gp=gpar(fontsize=22,facetype='bold')))
-        report_pages <- list(main_page_plot,predict_mat)
+        predict_mat <- lapply(report_components$p_mat_list,function(p){
+            arrangeGrob(p,
+                        nrow=1,
+                        as.table=TRUE,
+                        heights=c(1),
+                        top=textGrob(paste0('Tabular Rating Curve - ',report_components$obj_class),gp=gpar(fontsize=22,facetype='bold')))
+        })
+        report_pages <- c(list(main_page_plot),predict_mat)
     }else{
         main_page_plots <- lapply(names(report_components$main_page_plots),function(m){
                                   arrangeGrob(report_components$main_page_plots[[m]],
@@ -139,9 +143,9 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
     message <- 'The report was saved at the following location:\n'
     if(is.null(path)){
         path <- 'report.pdf'
-        complete_message <- paste0(message,getwd(),'/',path)
+        complete_message <- paste0(message,getwd(),'/',path,'\n')
     }else{
-        complete_message <- paste0(message,path)
+        complete_message <- paste0(message,path,'\n')
     }
     pdf(file=path,paper=paper,width=width,height=height)
     for(i in 1:length(report_pages)){
