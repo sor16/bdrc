@@ -4,7 +4,7 @@
 \alias{spread_draws}
 \title{Spread MCMC chain draws to data.frame on a wide format}
 \usage{
-spread_draws(mod, ..., transformed = F)
+spread_draws(mod, ..., transformed = FALSE)
 }
 \arguments{
 \item{mod}{an object of class "plm0","plm","gplm0" or "gplm".}

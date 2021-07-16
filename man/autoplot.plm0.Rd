@@ -7,13 +7,13 @@
 \alias{autoplot.gplm}
 \title{Autoplot method for discharge rating curves}
 \usage{
-\method{autoplot}{plm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{autoplot}{plm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{autoplot}{plm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{autoplot}{plm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{autoplot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{autoplot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{autoplot}{gplm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{autoplot}{gplm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class "plm0","plm","gplm0" or "gplm".}

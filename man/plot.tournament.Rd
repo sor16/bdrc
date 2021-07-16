@@ -4,7 +4,7 @@
 \alias{plot.tournament}
 \title{Plot method for discharge rating curve tournament}
 \usage{
-\method{plot}{tournament}(x, type = "tournament_results", transformed = F, ...)
+\method{plot}{tournament}(x, type = "tournament_results", transformed = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class "tournament"}
@@ -32,7 +32,7 @@ Compare the four models from the tournament object in multiple ways
 data(krokfors)
 t_obj <- tournament(Q~W,krokfors)
 plot(t_obj)
-plot(t_obj,transformed=T)
+plot(t_obj,transformed=TRUE)
 plot(t_obj,type='deviance')
 plot(t_obj,type='f')
 plot(t_obj,type='sigma_eps')

@@ -7,13 +7,13 @@
 \alias{plot.gplm}
 \title{Plot method for discharge rating curves}
 \usage{
-\method{plot}{plm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{plot}{plm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{plot}{plm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{plot}{plm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{plot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{plot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 
-\method{plot}{gplm}(x, type = "rating_curve", param = NULL, transformed = F, ...)
+\method{plot}{gplm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 }
 \arguments{
 \item{x}{object of class "plm0", "plm", "gplm0" or "gplm".}
@@ -61,9 +61,9 @@ Visualize discharge rating curve result objects
 data(krokfors)
 plm0.fit <- plm0(Q~W,krokfors)
 plot(plm0.fit)
-plot(plm0.fit,transformed=T)
+plot(plm0.fit,transformed=TRUE)
 plot(plm0.fit,type='histogram',param='c')
-plot(plm0.fit,type='histogram',param='c',transformed=T)
+plot(plm0.fit,type='histogram',param='c',transformed=TRUE)
 plot(plm0.fit,type='histogram',param='hyperparameters')
 plot(plm0.fit,type='histogram',param='latent_parameters')
 plot(plm0.fit,type='residuals')

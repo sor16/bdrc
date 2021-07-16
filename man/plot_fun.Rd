@@ -4,7 +4,7 @@
 \alias{plot_fun}
 \title{Plot bdrc model objects}
 \usage{
-plot_fun(x, type = "rating_curve", param = NULL, transformed = F, ...)
+plot_fun(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 }
 \arguments{
 \item{x}{an object of class "plm0","plm","gplm0" or "gplm".}

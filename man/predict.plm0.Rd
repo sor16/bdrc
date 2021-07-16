@@ -25,7 +25,7 @@
 \item{...}{not used in this function}
 }
 \value{
-an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=T, a matrix as described above (see wide parameter) is returned.
+an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=TRUE, a matrix as described above (see wide parameter) is returned.
 }
 \description{
 Predict the discharge for given stage values based on a discharge rating curve result object.
@@ -47,7 +47,7 @@ data(krokfors)
 plm0.fit <- plm0(Q~W,krokfors,h_max=24)
 #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
 predict(plm0.fit,newdata=seq(23,24,by=0.01))
-predict(plm0.fit,wide=T)
+predict(plm0.fit,wide=TRUE)
 }
 }
 \seealso{

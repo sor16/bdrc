@@ -9,7 +9,7 @@ gplm0(
   data,
   c_param = NULL,
   h_max = NULL,
-  parallel = T,
+  parallel = TRUE,
   forcepoint = rep(FALSE, nrow(data))
 )
 }
