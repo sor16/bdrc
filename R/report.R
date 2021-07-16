@@ -224,9 +224,9 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' \donttest{
 #' data(skogsliden)
 #' plm0.fit <- plm0(Q~W,skogsliden)
-#' get_report(plm0.fit)
+#' #get_report(plm0.fit)
 #' t_obj <- tournament(Q~W,skogsliden)
-#' get_report(t_obj)
+#' #get_report(t_obj)
 #' }
 #' @export
 get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")

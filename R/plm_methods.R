@@ -420,17 +420,17 @@ summary.plm0 <- function(object,...){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
-# data(krokfors)
-# plm0.fit <- plm0(Q~W,krokfors)
-# autoplot(plm0.fit)
-# autoplot(plm0.fit,transformed=TRUE)
-# autoplot(plm0.fit,type='histogram',param='c')
-# autoplot(plm0.fit,type='histogram',param='c',transformed=TRUE)
-# autoplot(plm0.fit,type='histogram',param='hyperparameters')
-# autoplot(plm0.fit,type='histogram',param='latent_parameters')
-# autoplot(plm0.fit,type='residuals')
-# autoplot(plm0.fit,type='f')
-# autoplot(plm0.fit,type='sigma_eps')
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
+#' autoplot(plm0.fit)
+#' autoplot(plm0.fit,transformed=TRUE)
+#' autoplot(plm0.fit,type='histogram',param='c')
+#' autoplot(plm0.fit,type='histogram',param='c',transformed=TRUE)
+#' autoplot(plm0.fit,type='histogram',param='hyperparameters')
+#' autoplot(plm0.fit,type='histogram',param='latent_parameters')
+#' autoplot(plm0.fit,type='residuals')
+#' autoplot(plm0.fit,type='f')
+#' autoplot(plm0.fit,type='sigma_eps')
 #' }
 #' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @export
