@@ -53,7 +53,7 @@
 #' summary(gplm0.fit)
 #' }
 #' @export
-gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,nrow(data))){
+gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
     stopifnot('formula' %in% class(formula))
     stopifnot('data.frame' %in% class(data))
@@ -62,10 +62,10 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     formula_args <- all.vars(formula)
     stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
     model_dat <- as.data.frame(data[,all.vars(formula)])
-    forcepoint <- forcepoint[order(model_dat[,2,drop=T])]
-    model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-    Q <- model_dat[,1,drop=T]
-    h <- model_dat[,2,drop=T]
+    forcepoint <- forcepoint[order(model_dat[,2,drop=TRUE])]
+    model_dat <- model_dat[order(model_dat[,2,drop=TRUE]),]
+    Q <- model_dat[,1,drop=TRUE]
+    h <- model_dat[,2,drop=TRUE]
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- gplm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
@@ -94,7 +94,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx,][h_unique_order,])
     result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
     result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),][h_unique_order,]
-    result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(result_obj$beta_posterior)),nrow=nrow(result_obj$beta_posterior),byrow=T) + result_obj$beta_posterior
+    result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(result_obj$beta_posterior)),nrow=nrow(result_obj$beta_posterior),byrow=TRUE) + result_obj$beta_posterior
     result_obj$Deviance_posterior <- c(MCMC_output_list$D)
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
@@ -123,7 +123,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep
     return(result_obj)
 }
 #' @importFrom stats dist optim
-gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     c_upper <- NULL
     if(is.null(c_param)){
       RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)

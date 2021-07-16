@@ -9,9 +9,9 @@ summary_fun <- function(x){
     cat("\nFormula: \n",
         paste(deparse(x$formula), sep = "\n", collapse = "\n"))
     cat("\nLatent parameters:\n")
-    print(param_summary[1:2,],row.names = T,digits=3,right=F)
+    print(param_summary[1:2,],row.names = TRUE,digits=3,right=FALSE)
     cat("\nHyperparameters:\n")
-    print(param_summary[3:nrow(param_summary),],row.names = T,digits=3,right=F)
+    print(param_summary[3:nrow(param_summary),],row.names = TRUE,digits=3,right=FALSE)
     cat("\nDIC:",x$DIC)
 }
 
@@ -82,7 +82,7 @@ histogram_breaks <-function(x){
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
-plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     args <- list(...)
     color_palette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','r_hat','autocorrelation')
@@ -180,13 +180,13 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         }
     }else if(type=='sigma_eps'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=TRUE]
         if('sigma_eps_summary' %in% names(x)){
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'(','',italic(paste('h')),')','','')"
             plot_dat <- x$sigma_eps_summary[x$sigma_eps_summary$h>=min(h_in_data) & x$sigma_eps_summary$h<=max(h_in_data),]
         }else{
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'')"
-            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=TRUE],
                                    lower=x$param_summary['sigma_eps','lower'],
                                    median=x$param_summary['sigma_eps','median'],
                                    upper=x$param_summary['sigma_eps','upper'])
@@ -206,7 +206,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         }
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         y_lab <- "paste('','',beta,,,,'(','',italic(paste('h')),')','','')"
-        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=TRUE]
         p <- ggplot(data=x$beta_summary[x$beta_summary$h>=min(h_in_data) & x$beta_summary$h<=max(h_in_data),]) +
             geom_path(aes(.data$h,.data$median)) +
             geom_path(aes(.data$h,.data$lower),linetype='dashed') +
@@ -218,13 +218,13 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
             theme_bdrc()
     }else if(type=='f'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[,all.vars(x$formula)[2],drop=T]
+        h_in_data <- x$data[,all.vars(x$formula)[2],drop=TRUE]
         if('f_summary' %in% names(x)){
             y_lab <- "paste('','',italic(paste('b+',beta,,,,'(','h',')','')),'')"
             plot_dat <- x$f_summary[x$f_summary$h>=min(h_in_data) & x$f_summary$h<=max(h_in_data),]
         }else{
             y_lab <- "paste('','',italic(paste('b')),'')"
-            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=T],
+            plot_dat <- data.frame(h=x$data[,all.vars(x$formula)[2],drop=TRUE],
                                    lower=x$param_summary['b','lower'],
                                    median=x$param_summary['b','median'],
                                    upper=x$param_summary['b','upper'])
@@ -264,7 +264,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data=rhat_dat, aes(x=.data$iterations,y=.data$Rhat,color=.data$parameters)) +
              geom_hline(yintercept=1.1,linetype='dashed') +
-             geom_line(na.rm=T) +
+             geom_line(na.rm=TRUE) +
              scale_x_continuous(limits=c(4*x$run_info$thin+x$run_info$burnin,x$run_info$nr_iter),breaks=c(5000,10000,15000),expand=c(0,0)) +
              scale_y_continuous(limits=c(1,2),breaks=c(1,1.1,1.2,1.4,1.6,1.8,2),expand=c(0,0)) +
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
@@ -296,7 +296,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom grid textGrob gpar unit
 #' @importFrom ggplot2 theme guides guide_legend
-plot_grob <- function(x,type,transformed=F){
+plot_grob <- function(x,type,transformed=FALSE){
     if(type=='panel'){
         panel_types <- c('rating_curve','residuals','f','sigma_eps')
         plot_list <- lapply(panel_types,function(ty){
@@ -423,9 +423,9 @@ summary.plm0 <- function(object,...){
 # data(krokfors)
 # plm0.fit <- plm0(Q~W,krokfors)
 # autoplot(plm0.fit)
-# autoplot(plm0.fit,transformed=T)
+# autoplot(plm0.fit,transformed=TRUE)
 # autoplot(plm0.fit,type='histogram',param='c')
-# autoplot(plm0.fit,type='histogram',param='c',transformed=T)
+# autoplot(plm0.fit,type='histogram',param='c',transformed=TRUE)
 # autoplot(plm0.fit,type='histogram',param='hyperparameters')
 # autoplot(plm0.fit,type='histogram',param='latent_parameters')
 # autoplot(plm0.fit,type='residuals')
@@ -434,7 +434,7 @@ summary.plm0 <- function(object,...){
 #' }
 #' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @export
-autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
@@ -468,9 +468,9 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' data(krokfors)
 #' plm0.fit <- plm0(Q~W,krokfors)
 #' plot(plm0.fit)
-#' plot(plm0.fit,transformed=T)
+#' plot(plm0.fit,transformed=TRUE)
 #' plot(plm0.fit,type='histogram',param='c')
-#' plot(plm0.fit,type='histogram',param='c',transformed=T)
+#' plot(plm0.fit,type='histogram',param='c',transformed=TRUE)
 #' plot(plm0.fit,type='histogram',param='hyperparameters')
 #' plot(plm0.fit,type='histogram',param='latent_parameters')
 #' plot(plm0.fit,type='residuals')
@@ -481,7 +481,7 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,...)
@@ -499,7 +499,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param wide a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.
 #' @param ... not used in this function
-#' @return an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=T, a matrix as described above (see wide parameter) is returned.
+#' @return an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=TRUE, a matrix as described above (see wide parameter) is returned.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
 #' \donttest{
@@ -507,7 +507,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' plm0.fit <- plm0(Q~W,krokfors,h_max=24)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
 #' predict(plm0.fit,newdata=seq(23,24,by=0.01))
-#' predict(plm0.fit,wide=T)
+#' predict(plm0.fit,wide=TRUE)
 #' }
 #' @describeIn predict.plm0 Predict method for plm0
 #' @export
@@ -530,7 +530,7 @@ summary.plm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
-autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
@@ -538,7 +538,7 @@ autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+plot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,...)
@@ -569,7 +569,7 @@ summary.gplm0 <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
-autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
@@ -577,7 +577,7 @@ autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,...)
@@ -608,7 +608,7 @@ summary.gplm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
-autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
 }
 
@@ -616,7 +616,7 @@ autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=F,...){
+plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
         p <- autoplot(x,type=type,param=param,transformed=transformed,...)

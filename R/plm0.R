@@ -47,7 +47,7 @@
 #' summary(plm0.fit)
 #' }
 #' @export
-plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,nrow(data))){
+plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
     stopifnot('formula' %in% class(formula))
     stopifnot('data.frame' %in% class(data))
@@ -56,10 +56,10 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
     formula_args <- all.vars(formula)
     stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
     model_dat <- as.data.frame(data[,formula_args])
-    forcepoint <- forcepoint[order(model_dat[,2,drop=T])]
-    model_dat <- model_dat[order(model_dat[,2,drop=T]),]
-    Q <- model_dat[,1,drop=T]
-    h <- model_dat[,2,drop=T]
+    forcepoint <- forcepoint[order(model_dat[,2,drop=TRUE])]
+    model_dat <- model_dat[order(model_dat[,2,drop=TRUE]),]
+    Q <- model_dat[,1,drop=TRUE]
+    h <- model_dat[,2,drop=TRUE]
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- plm0.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
@@ -110,7 +110,7 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(
 }
 
 #' @importFrom stats optim
-plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=T,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     RC <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
     output_list <- get_MCMC_output_list(theta_m=RC$theta_m,RC=RC,density_fun=RC$density_fun,
                                         unobserved_prediction_fun=RC$unobserved_prediction_fun,

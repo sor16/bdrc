@@ -22,16 +22,16 @@
 #' head(rating_curve_samples)
 #'}
 #'@export
-spread_draws <- function(mod,...,transformed=F){
+spread_draws <- function(mod,...,transformed=FALSE){
     gathered_dat <- gather_draws(mod,...,transformed=transformed)
     if('h' %in% names(gathered_dat)){
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
                                   chain=sort(unique(gathered_dat$chain)),
-                                  h=sort(unique(gathered_dat$h)),stringsAsFactors = F)
+                                  h=sort(unique(gathered_dat$h)),stringsAsFactors = FALSE)
         spread_dat <- spread_dat[,c('chain','iter','h')]
     }else{
         spread_dat <- expand.grid(iter=sort(unique(gathered_dat$iter)),
-                                  chain=sort(unique(gathered_dat$chain)),stringsAsFactors = F)
+                                  chain=sort(unique(gathered_dat$chain)),stringsAsFactors = FALSE)
         spread_dat <- spread_dat[,c('chain','iter')]
     }
     mod_res_list <- lapply(unique(gathered_dat$name),function(n){
@@ -69,7 +69,6 @@ spread_draws <- function(mod,...,transformed=F){
 #'@export
 gather_draws <- function(mod,...,transformed=F){
     args <- c(...)
-    ###TODO: refine class check
     if(!(class(mod) %in% c('plm0','plm','gplm0','gplm'))){
         stop('mod must be of class "plm0","plm","gplm0" or "gplm"')
     }
@@ -139,7 +138,7 @@ gather_draws_stage_dependent <- function(mod,name,baseline_dat){
     MCMC_output <- mod[[post_name]]
     out_dat_list <- lapply(1:nrow(MCMC_output),
                            function(i){
-                               out_dat <- data.frame(name=name,value=MCMC_output[i,,drop=T])
+                               out_dat <- data.frame(name=name,value=MCMC_output[i,,drop=TRUE])
                                return(out_dat)
                            })
     out_dat <- cbind(baseline_dat,do.call('rbind',out_dat_list))

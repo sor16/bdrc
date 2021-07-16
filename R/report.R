@@ -61,7 +61,7 @@ get_report_components <- function(x,type=1){
         output_list$mcmc_hist_list <- lapply(m_obj,function(m){
             params <- get_param_names(class(m),m$run_info$c_param)
             hist_plot_list <- lapply(1:length(params), function(j){
-                autoplot(m,type='histogram',param=params[j],transformed = T)
+                autoplot(m,type='histogram',param=params[j],transformed = TRUE)
             })
         })
         mcmc_table <- lapply(m_obj,function(m){
@@ -145,7 +145,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
     }
     pdf(file=path,paper=paper,width=width,height=height)
     for(i in 1:length(report_pages)){
-        grid.arrange(report_pages[[i]],as.table=T)
+        grid.arrange(report_pages[[i]],as.table=TRUE)
     }
     invisible(dev.off())
     cat(complete_message)

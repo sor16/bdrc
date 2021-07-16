@@ -45,7 +45,7 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
   RC$epsilon <- rep(1,RC$n)
   RC$epsilon[forcepoint] <- 1/RC$n
   if(model %in% c('plm','gplm')){
-    RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=T)*1
+    RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=TRUE)*1
     h_tilde <- RC$h-min(RC$h)
     RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
   }
@@ -133,13 +133,13 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     density_eval_m <- density_fun(theta_m,RC)
     theta_old <- theta_m
     density_eval_old <- density_eval_m
-    acceptance_vec <- rep(F,nr_iter)
+    acceptance_vec <- rep(FALSE,nr_iter)
     for(i in 1:nr_iter){
         theta_new <- theta_old+solve(t(RC$LH),rnorm(RC$theta_length,0,1))
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
         if (logR>log(runif(1))){
-            acceptance_vec[i] <- T
+            acceptance_vec[i] <- TRUE
             theta_old <- theta_new
             density_eval_old <- density_eval_new
         }
@@ -159,8 +159,8 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     rm(param_mat,param_mat1,param_mat2)
     idx <- seq(burnin,nr_iter,thin)
     acceptance_vec <- acceptance_vec[idx]
-    theta_mat <- theta_mat[,idx,drop=F]
-    output_list <- sapply(output_list,FUN=function(x) x[,idx,drop=F],simplify=F,USE.NAMES=T)
+    theta_mat <- theta_mat[,idx,drop=FALSE]
+    output_list <- sapply(output_list,FUN=function(x) x[,idx,drop=FALSE],simplify=FALSE,USE.NAMES=TRUE)
     for(i in 1:ncol(theta_mat)){
         unobserved_list <- unobserved_prediction_fun(theta_mat[,i],output_list[['x']][1:(RC$desired_output[['x']][['observed']]),i],RC)
         for(elem in names(unobserved_list)){
@@ -225,9 +225,9 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
 #' @importFrom stats quantile
 get_MCMC_summary <- function(X,h=NULL){
     summary_dat <- apply(X,1,function(x) {
-                      c(quantile(x,probs=0.025,na.rm=T),
-                        quantile(x,probs=0.5,na.rm=T),
-                        quantile(x,probs=0.975,na.rm=T))
+                      c(quantile(x,probs=0.025,na.rm=TRUE),
+                        quantile(x,probs=0.5,na.rm=TRUE),
+                        quantile(x,probs=0.975,na.rm=TRUE))
                     })
     summary_dat <- as.data.frame(t(summary_dat))
     names(summary_dat) <- c('lower','median','upper')
@@ -378,7 +378,7 @@ h_unobserved <- function(RC,h_min=NA,h_max=NA){
   distvect=abs(h-c(h[2:length(h)],1000))
   #add datapoints to corresponding distances to see range of distance
   distwithdata=rbind(h,distvect,c(h[2:length(h)],1000))
-  distfilter=distwithdata[,distvect>max_h_diff,drop=F]
+  distfilter=distwithdata[,distvect>max_h_diff,drop=FALSE]
   #remove dummy distance
   distfilter=as.matrix(distfilter[,-ncol(distfilter)])
   if(ncol(distfilter)!=0){
@@ -516,7 +516,7 @@ get_rhat_dat <- function(m,param,smoothness=20){
   thin <- m$run_info$thin
   burnin <- m$run_info$burnin
   draws_list <- lapply(param,function(x){
-    draws <- gather_draws(m,x,transformed=T)
+    draws <- gather_draws(m,x,transformed=TRUE)
     disjoint <- split(draws$value,draws$chain,drop=TRUE)
     disjoint <- do.call('cbind',disjoint)
   })

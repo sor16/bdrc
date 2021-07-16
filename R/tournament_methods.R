@@ -25,7 +25,7 @@ plot_tournament_fun <- function(x,type='deviance'){
 
 #' @importFrom ggplot2 autoplot
 #' @importFrom gridExtra arrangeGrob
-plot_tournament_grob <- function(x,type='panel',transformed=F){
+plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
     ylim_dat <- lapply(x$contestants,function(m){
         if(grepl('0',class(m))){
             sig_ylim <- c( min=0, max=1.1*m$param_summary['sigma_eps','upper'] )
@@ -207,7 +207,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' data(krokfors)
 #' t_obj <- tournament(Q~W,krokfors)
 #' plot(t_obj)
-#' plot(t_obj,transformed=T)
+#' plot(t_obj,transformed=TRUE)
 #' plot(t_obj,type='deviance')
 #' plot(t_obj,type='f')
 #' plot(t_obj,type='sigma_eps')
@@ -217,7 +217,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @importFrom grid grid.draw
 #' @importFrom gridExtra grid.arrange
 #' @export
-plot.tournament <- function(x,type='tournament_results',transformed=F,...){
+plot.tournament <- function(x,type='tournament_results',transformed=FALSE,...){
     args <- list(...)
     legal_types <- c("deviance","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
     if(type=='deviance'){
