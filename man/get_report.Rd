@@ -54,9 +54,9 @@ Save a pdf file with a report of a discharge rating curve object or tournament
 \donttest{
 data(skogsliden)
 plm0.fit <- plm0(Q~W,skogsliden)
-get_report(plm0.fit)
+#get_report(plm0.fit)
 t_obj <- tournament(Q~W,skogsliden)
-get_report(t_obj)
+#get_report(t_obj)
 }
 }
 \seealso{
