@@ -530,6 +530,3 @@ get_rhat_dat <- function(m,param,smoothness=20){
   return(rhat_dat)
 }
 
-
-
-

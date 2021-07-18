@@ -138,15 +138,23 @@ get_report_pages_fun <- function(x,type=1){
     return(report_pages)
 }
 
+#' @importFrom utils askYesNo
 #' @importFrom grDevices pdf dev.off
 save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
     message <- 'The report was saved at the following location:\n'
     if(is.null(path)){
-        path <- 'report.pdf'
-        complete_message <- paste0(message,getwd(),'/',path,'\n')
+        path <- paste0(getwd(),'/report.pdf')
+        complete_message <- paste0(message,path,'\n')
     }else{
         complete_message <- paste0(message,path,'\n')
     }
+    if(interactive()){
+        msg <- paste0('Do you wish to create a pdf file at the following location:  ',path)
+        answer <- askYesNo(msg)
+    }else{
+        stop('Unable to ask permission for file storing path. get_report() function must be used in an interactive R session')
+    }
+    if(answer==FALSE | is.na(answer)) stop('Permission to store a pdf file was not granted')
     pdf(file=path,paper=paper,width=width,height=height)
     for(i in 1:length(report_pages)){
         grid.arrange(report_pages[[i]],as.table=TRUE)
