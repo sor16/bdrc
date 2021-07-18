@@ -28,7 +28,7 @@ get_report(x, path = NULL, type = 1, ...)
 
 \item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 \itemize{
-   \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+   \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
    \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
@@ -55,10 +55,10 @@ This function can only be used in an interactive R session as it asks permission
 
 \examples{
 \donttest{
-data(skogsliden)
-plm0.fit <- plm0(Q~W,skogsliden)
+data(krokfors)
+plm0.fit <- plm0(Q~W,krokfors)
 #get_report(plm0.fit)
-t_obj <- tournament(Q~W,skogsliden)
+t_obj <- tournament(Q~W,krokfors)
 #get_report(t_obj,type=2)
 }
 }

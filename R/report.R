@@ -149,10 +149,10 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
         complete_message <- paste0(message,path,'\n')
     }
     if(interactive()){
-        msg <- paste0('Do you wish to create a pdf file at the following location:  ',path)
+        msg <- paste0('Do you wish to save the report as a pdf file at the following location:  ',path,'?')
         answer <- askYesNo(msg)
     }else{
-        stop('Unable to ask permission for file storing path. get_report() function must be used in an interactive R session')
+        stop('Unable to ask permission for writing the report to the filesystem. get_report() must be used in an interactive R session')
     }
     if(answer==FALSE | is.na(answer)) stop('Permission to store a pdf file was not granted')
     pdf(file=path,paper=paper,width=width,height=height)
@@ -223,7 +223,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @param path file path to which the pdf file of the report is saved. If NULL, the current working directory is used.
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
 #'                    \itemize{
-#'                       \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+#'                       \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
 #'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
@@ -231,10 +231,10 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{
-#' data(skogsliden)
-#' plm0.fit <- plm0(Q~W,skogsliden)
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
 #' #get_report(plm0.fit)
-#' t_obj <- tournament(Q~W,skogsliden)
+#' t_obj <- tournament(Q~W,krokfors)
 #' #get_report(t_obj,type=2)
 #' }
 #' @export
