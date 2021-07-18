@@ -1,5 +1,4 @@
-#' @importFrom ggplot2 autoplot ggplot geom_segment geom_text scale_colour_manual theme_classic geom_label theme unit element_blank
-#' @importFrom gridExtra arrangeGrob
+#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 plot_tournament_fun <- function(x,type='deviance'){
     if(type=='deviance'){
         deviance_post_dat <- lapply(x$contestants,function(m){
@@ -167,9 +166,9 @@ summary.tournament <- function(object,...){
 #' t_obj <- tournament(Q~W,krokfors)
 #' summary(t_obj)
 #' plot(t_obj)
-#' #autoplot(t_obj)
+#' autoplot(t_obj)
 #' }
-#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
+#' @importFrom ggplot2 autoplot ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
 autoplot.tournament <- function(x,type='deviance',...){

@@ -25,7 +25,7 @@ data(krokfors)
 t_obj <- tournament(Q~W,krokfors)
 summary(t_obj)
 plot(t_obj)
-#autoplot(t_obj)
+autoplot(t_obj)
 }
 }
 \seealso{

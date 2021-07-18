@@ -355,6 +355,43 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
     return(pred_dat)
 }
 
+#' Print method for discharge rating curves
+#'
+#' Print a discharge rating curve result object
+#' @param x an object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... not used in this function
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
+#' @examples
+#' \donttest{
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit
+#' print(plm0.fit)
+#' }
+#' @describeIn print.plm0 Print method for plm0
+#' @export
+print.plm0 <- function(x,...){
+    print_fun(x)
+}
+
+#' Summary method for discharge rating curves
+#'
+#' Summarize a discharge rating curve result object
+#' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... Not used for this function
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
+#' @examples
+#' \donttest{
+#' data(krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors)
+#' summary(plm0.fit)
+#' }
+#' @describeIn summary.plm0 Summary method for plm0
+#' @export
+summary.plm0 <- function(object,...){
+    summary_fun(object)
+}
+
 #' Autoplot method for discharge rating curves
 #'
 #' Visualize discharge rating curve result objects
@@ -394,48 +431,8 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
 #' autoplot(plm0.fit,type='f')
 #' autoplot(plm0.fit,type='sigma_eps')
 #' }
-#' @export
-autoplot <- function(type='rating_curve',param=NULL,transformed=FALSE,...) UseMethod("autoplot")
-
-
-#' Print method for discharge rating curves
-#'
-#' Print a discharge rating curve result object
-#' @param x an object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param ... not used in this function
-#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
-#' @examples
-#' \donttest{
-#' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
-#' plm0.fit
-#' print(plm0.fit)
-#' }
-#' @describeIn print.plm0 Print method for plm0
-#' @export
-print.plm0 <- function(x,...){
-    print_fun(x)
-}
-
-#' Summary method for discharge rating curves
-#'
-#' Summarize a discharge rating curve result object
-#' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param ... Not used for this function
-#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
-#' @examples
-#' \donttest{
-#' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
-#' summary(plm0.fit)
-#' }
-#' @describeIn summary.plm0 Summary method for plm0
-#' @export
-summary.plm0 <- function(object,...){
-    summary_fun(object)
-}
-
-#' @describeIn autoplot Autoplot method for plm
+#' @describeIn autoplot.plm0 Autoplot method for plm0
+#' @importFrom ggplot2 autoplot
 #' @export
 autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
@@ -531,7 +528,7 @@ summary.plm <- function(object,...){
     summary_fun(object)
 }
 
-#' @describeIn autoplot Autoplot method for plm
+#' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
 autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
@@ -570,7 +567,7 @@ summary.gplm0 <- function(object,...){
     summary_fun(object)
 }
 
-#' @describeIn autoplot Autoplot method for gplm0
+#' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
 autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
@@ -609,7 +606,7 @@ summary.gplm <- function(object,...){
     summary_fun(object)
 }
 
-#' @describeIn autoplot Autoplot method for gplm
+#' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
 autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
     plot_fun(x,type=type,param=param,transformed=transformed,...)
