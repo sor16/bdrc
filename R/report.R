@@ -218,7 +218,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 
 #' Report for a discharge rating curve or tournament
 #'
-#' Save a pdf file with a report of a discharge rating curve object or tournament
+#' Save a pdf file with a report of a discharge rating curve object or tournament.
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param path file path to which the pdf file of the report is saved. If NULL, the current working directory is used.
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
@@ -227,6 +227,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
+#' @details  This function can only be used in an interactive R session as it asks permission from the user to write to their filesystem.
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{
@@ -234,7 +235,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' plm0.fit <- plm0(Q~W,skogsliden)
 #' #get_report(plm0.fit)
 #' t_obj <- tournament(Q~W,skogsliden)
-#' #get_report(t_obj)
+#' #get_report(t_obj,type=2)
 #' }
 #' @export
 get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")

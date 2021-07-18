@@ -35,7 +35,10 @@ get_report(x, path = NULL, type = 1, ...)
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Save a pdf file with a report of a discharge rating curve object or tournament
+Save a pdf file with a report of a discharge rating curve object or tournament.
+}
+\details{
+This function can only be used in an interactive R session as it asks permission from the user to write to their filesystem.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -56,7 +59,7 @@ data(skogsliden)
 plm0.fit <- plm0(Q~W,skogsliden)
 #get_report(plm0.fit)
 t_obj <- tournament(Q~W,skogsliden)
-#get_report(t_obj)
+#get_report(t_obj,type=2)
 }
 }
 \seealso{
