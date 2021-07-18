@@ -419,6 +419,7 @@ summary.plm0 <- function(object,...){
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
+#' library(ggplot2)
 #' data(krokfors)
 #' plm0.fit <- plm0(Q~W,krokfors)
 #' autoplot(plm0.fit)

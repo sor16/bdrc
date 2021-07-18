@@ -60,6 +60,7 @@ Visualize discharge rating curve result objects
 
 \examples{
 \donttest{
+library(ggplot2)
 data(krokfors)
 plm0.fit <- plm0(Q~W,krokfors)
 autoplot(plm0.fit)

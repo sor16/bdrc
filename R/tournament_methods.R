@@ -22,7 +22,7 @@ plot_tournament_fun <- function(x,type='deviance'){
 }
 
 
-#' @importFrom ggplot2 autoplot
+#' @importFrom ggplot2 autoplot geom_text geom_label geom_segment scale_colour_manual theme_classic theme
 #' @importFrom gridExtra arrangeGrob
 plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
     ylim_dat <- lapply(x$contestants,function(m){
@@ -162,13 +162,14 @@ summary.tournament <- function(object,...){
 #' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
+#' library(ggplot2)
 #' data(krokfors)
 #' t_obj <- tournament(Q~W,krokfors)
 #' summary(t_obj)
 #' plot(t_obj)
 #' autoplot(t_obj)
 #' }
-#' @importFrom ggplot2 autoplot ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
+#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
 autoplot.tournament <- function(x,type='deviance',...){
