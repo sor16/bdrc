@@ -1,6 +1,6 @@
 ---
 title: "Tournament - Model comparison"
-author: "Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson"
+author: "Solvi Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson"
 date:
 output: rmarkdown::html_vignette
 vignette: >
@@ -22,8 +22,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r,message=F}
-#load the packages needed for this vignette
 library(bdrc)
+set.seed(1) # set seed for reproducibility
 ```
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
@@ -106,6 +106,6 @@ plot(t_obj_known_c,type='panel',transformed=T)
 
 
 ## References
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
-Jeffreys, H. (1961). Theory of Probability, Third Edition. Oxford University Press.
-Kass, R., and A. Raftery, A. (1995). Bayes Factors. Journal of the American Statistical Association, 90, 773-795.
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*. arXiv preprint 2010.04769.   
+Jeffreys, H. (1961). *Theory of Probability*, Third Edition. Oxford University Press.    
+Kass, R., and A. Raftery, A. (1995). *Bayes Factors*. Journal of the American Statistical Association, 90, 773-795.
