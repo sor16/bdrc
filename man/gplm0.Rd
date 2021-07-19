@@ -2,7 +2,7 @@
 % Please edit documentation in R/gplm0.R
 \name{gplm0}
 \alias{gplm0}
-\title{Generalized power-law model with constant variance}
+\title{Generalized power-law model with a constant variance}
 \usage{
 gplm0(
   formula,

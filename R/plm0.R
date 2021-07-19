@@ -1,4 +1,4 @@
-#' Power-law model with constant variance
+#' Power-law model with a constant variance
 #'
 #' plm0 is used to fit a discharge rating curve for paired measurements of stage and discharge using a power-law model with a constant variance as described in Hrafnkelsson et al. (2020). See "Details" for a more elaborate description of the model.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).

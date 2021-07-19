@@ -2,7 +2,7 @@
 % Please edit documentation in R/plm0.R
 \name{plm0}
 \alias{plm0}
-\title{Power-law model with constant variance}
+\title{Power-law model with a constant variance}
 \usage{
 plm0(
   formula,
