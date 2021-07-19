@@ -1,3 +1,3 @@
-# bdrc 0.0.0.9001
+# bdrc 1.0.0
 
-* Added a `NEWS.md` file to track changes to the package.
+* Release of the first version of the package.
