@@ -45,7 +45,7 @@ $$\log(Q_i) = \log(a) + b \log(h_i -c) + \epsilon_i, \quad i = 1,...,n,$$ (5)
 
 
 where $\epsilon_i$ follows a normal distribution with mean zero and variance $\sigma_{\epsilon}^2$, $n$ is the number of paired observations and $a$, $b$ and $c$ are as before. The Bayesian inference scheme implemented for the power-law model is standard, however, for efficient posterior simulation, first, samples from the joint marginal posterior density of $(c, \sigma_{\epsilon}^2)$ are obtained, then samples from the conditional posterior density of $(\log(a), b)$ conditional on $(c, \sigma_{\epsilon}^2)$ are obtained.
-The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function $f(h)$ is modelled at the latent level as $b$ plus a mean zero continuous stochastic process which is assumed to be twice mean square differentiable. The model is presented on a logarithmic scale,
+The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function $f(h)$ is modeled at the latent level as $b$ plus a mean zero continuous stochastic process which is assumed to be twice mean square differentiable. The model is presented on a logarithmic scale,
 
 $$\log (Q_i) = \log (a) + (b + \beta(h_i)) \log(h_i -c) + \varepsilon_i, \quad i = 1,...,n,$$ (6)
 

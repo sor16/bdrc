@@ -36,7 +36,7 @@ This vignette explores the ways you can compare the fit of the different dischar
 
 ```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
-To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from astream gauging station called Krokfors in Sweden that comes with the package:
+To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:
 ```{r, data}
 data(krokfors)
 krokfors
@@ -76,7 +76,7 @@ Another informative way of comparing different models.The deviance of an MCMC sa
 plot(t_obj,type='deviance')
 ```
 
-The red diamonds on the plot denote the DIC values for the resective models. Next, to plot rating curves from the different model, write
+The red diamonds on the plot denote the DIC values for the respective models. Next, to plot rating curves from the different model, write
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='rating_curve')
 ```
@@ -85,7 +85,7 @@ Another useful plot is the residual plot
 plot(t_obj,type='residuals')
 ```
 
-The main difference between the four models lies in the modelling of the power law exponent ($f(h)$) and the variance on the data level ($\sigma^2_{\varepsilon}$). Thus it is insightful to look at the posterior of the power law exponent for the different models
+The main difference between the four models lies in the modeling of the power law exponent ($f(h)$) and the variance on the data level ($\sigma^2_{\varepsilon}$). Thus it is insightful to look at the posterior of the power law exponent for the different models
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='f')
 ```

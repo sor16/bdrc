@@ -78,7 +78,7 @@ There is a shorthand to visualize all hyperparameters at once
 ```{r, fig.width=10, fig.height=6}
 plot(gplm.fit,type='histogram',param='hyperparameters')
 ```
-Similairily, writing 'latent_parameters' plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write
+Similarly, writing 'latent_parameters' plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write
 
 ```{r, fig.width=10, fig.height=6}
 plot(gplm.fit,type='histogram',param='hyperparameters',transformed=T)
@@ -98,13 +98,13 @@ The package has several functions for convergence diagnostics of a bdrc model, m
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='residuals')
 ```
-The log-residuals are calculated by subtracting the posterior estimate of log-discharge,$log(\hat{Q})$, from the observed log-discharge. Additionally, the plot includes the 95% predictive intervals for log(Q) (- -) and 95% credible intervals for the expected value of log(Q) (—), reflecting the rating curve uncertainty. 
+The log-residuals are calculated by subtracting the posterior estimate of log-discharge,$log(\hat{Q})$, from the observed log-discharge. Additionally, the plot includes the 95% predictive intervals or log(Q) (- -) and 95% credible intervals for the expected value of log(Q) (—), reflecting the rating curve uncertainty. 
 
 ```{r, fig.width=10, fig.height=6}
 plot(gplm.fit,type='trace',param='c',transformed=T)
 ```
 
-To plot a trace plot for all hyperparameters, you write similiarily as above
+To plot a trace plot for all hyperparameters, you write similarly as above
 ```{r, fig.width=10, fig.height=6}
 plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
 ```
