@@ -8,7 +8,7 @@
 There were no ERRORs, WARNINGs or NOTEs. 
 
 ## CRAN Policy issues
-* One helper function, save_report() writes a pdf file to the user’s filesystem, but it requires permission from the user in an interactive R session
+* One helper function, save_report() writes a pdf file to the user’s file system, but it requires permission from the user in an interactive R session
 * The examples are slow, because in order to demonstrate the usage of most of the functions, a model has to be run. The model is fitted using an MCMC algorithm which can take up to a minute to run. I wrapped the examples in \donttest{}.
 
 
