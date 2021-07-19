@@ -4,6 +4,8 @@
 inst/doc
 Meta
 tests/cached_results
+vignettes/figs-introduction
+vignettes/figs-tournament
 vignettes/introduction_cache
 vignettes/tournament_cache
 doc

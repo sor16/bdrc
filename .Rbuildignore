@@ -12,3 +12,10 @@
 ^Meta$
 ^revdep$
 ^cran-comments
+^tests/cached_results
+^tests/figs
+^tests/testthat/_snaps
+^vignettes/figs-introduction
+^vignettes/figs-tournament
+^vignettes/introduction_cache
+^vignettes/tournament_cache
