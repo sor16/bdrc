@@ -66,7 +66,7 @@ where \eqn{\varepsilon} follows a normal distribution with mean zero and varianc
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
 set.seed(1)
 gplm0.fit <- gplm0(formula=Q~W,data=krokfors)
