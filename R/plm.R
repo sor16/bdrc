@@ -46,12 +46,31 @@
 #' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
 #' @seealso \code{\link{summary.plm}} for summaries, \code{\link{predict.plm}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm}} to help visualize the full posterior distributions.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(spanga)
 #' set.seed(1)
-#' formula <- Q~W
-#' plm.fit <- plm(formula,spanga,parallel=F)
+#' plm.fit <- plm(formula=Q~W,data=spanga)
 #' summary(plm.fit)
+#'
+#' #Formula:
+#' #  Q ~ W
+#' #Latent parameters:
+#' #  lower-2.5% median-50% upper-97.5%
+#' #a 11.10      12.53      13.80
+#' #b  1.92       2.05       2.21
+#' #
+#' #Hyperparameters:
+#' #            lower-2.5% median-50% upper-97.5%
+#' #c           9.4018    9.45       9.495
+#' #sigma_eta   0.0149    0.35       0.864
+#' #eta_1      -5.5404   -4.83      -3.777
+#' #eta_2      -7.6414   -5.92      -4.220
+#' #eta_3      -9.0013   -6.87      -4.173
+#' #eta_4      -9.7819   -7.28      -4.197
+#' #eta_5     -10.5232   -7.57      -3.984
+#' #eta_6     -10.9925   -7.52      -3.655
+#' #
+#' #DIC: 52.10376
 #' }
 #' @export
 plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){

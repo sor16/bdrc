@@ -59,10 +59,12 @@ Visualize discharge rating curve model objects
 }}
 
 \examples{
-\donttest{
+\dontrun{
 library(ggplot2)
 data(krokfors)
+set.seed(1)
 plm0.fit <- plm0(Q~W,krokfors)
+
 autoplot(plm0.fit)
 autoplot(plm0.fit,transformed=TRUE)
 autoplot(plm0.fit,type='histogram',param='c')

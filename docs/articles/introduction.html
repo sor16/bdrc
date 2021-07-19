@@ -90,7 +90,7 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction</h1>
-                        <h4 class="author">Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
+                        <h4 class="author">Solvi Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/introduction.Rmd"><code>vignettes/introduction.Rmd</code></a></small>
@@ -106,9 +106,8 @@
 <p><code><a href="../reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
 <p><code><a href="../reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
 <p>For further details about the different models, see Hrafnkelsson et al. (2020). The models differ in their complexity and <tt>gplm</tt> is the most flexible and complex model. We will focus on the use of <tt>gplm</tt> throughout this introduction vignette and explore the different ways to fit the <tt>gplm</tt> and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co">#load the packages needed for this vignette</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">library</span>(bdrc)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(bdrc)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>) <span class="co">#set seed for reproducibility</span></span></code></pre></div>
 <p>We will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(krokfors)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> krokfors</span>
@@ -144,7 +143,7 @@
 <h2 class="hasAnchor">
 <a href="#fitting-a-discharge-rating-curve" class="anchor"></a>Fitting a discharge rating curve</h2>
 <p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">parallel=</span>F)</span></code></pre></div>
 <p><tt>gplm</tt> returns an object of class “gplm” which we can summarize and visualize using familiar functions such as</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -152,23 +151,23 @@
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 1.48       1.94       2.24       </span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; b 1.83       1.83       1.84       </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 1.50       1.95       2.24       </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; b 1.83       1.84       1.84       </span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; c           7.71020    7.8104     7.856     </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.42060    0.7085     1.241     </span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.56507    1.2008     2.859     </span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00297    0.0898     0.529     </span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.91918   -4.2565    -3.535     </span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.98806   -4.0666    -2.213     </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.80321   -4.2018    -1.614     </span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.57348   -4.5280    -1.176     </span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.39451   -4.6588    -0.831     </span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -8.80184   -4.6319    -0.321     </span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; c           7.71609    7.810      7.856     </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.41028    0.696      1.235     </span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.55844    1.170      2.910     </span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00299    0.084      0.508     </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.89895   -4.244     -3.519     </span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.98867   -4.060     -2.194     </span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.85268   -4.205     -1.642     </span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.73475   -4.470     -1.133     </span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.29439   -4.584     -0.703     </span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -8.75451   -4.578     -0.193     </span></span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: -1.363927</span></span></code></pre></div>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: -1.458007</span></span></code></pre></div>
 <p>and</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;"></p>
@@ -185,7 +184,7 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="fu">c</span>(<span class="st">'a'</span>,<span class="st">'c'</span>))</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"> There is a shorthand to visualize all hyperparameters at once</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;"> Similairily, writing ‘latent_parameters’ plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write</p>
+<p><img src="introduction_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;"> Similarly, writing ‘latent_parameters’ plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>Finally, we can visualize certain components of the model that varies with stage, the power-law exponent, <span class="math inline">\(f(h)\)</span>, and the standard deviation on the data level <span class="math inline">\(\sigma_{\varepsilon}(h)\)</span>. <tt>gplm0</tt> and <tt>gplm</tt> generalize the power law exponent, model it as a stochastic process,<span class="math inline">\(f(h)=b+\beta(h)\)</span>, which assumed to be twice differentiable.<tt>plm</tt> and <tt>plm0</tt> on the other hand model the exponent as a fixed constant <span class="math inline">\(f(h)=b\)</span>. We can plot the inferred power-law exponent with</p>
@@ -199,10 +198,10 @@
 <a href="#assessing-model-fitness-and-convergence" class="anchor"></a>Assessing model fitness and convergence</h2>
 <p>The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot, tracing plots, autocorrelation plot and the Gelman-Rubin statistic plot. The log-residuals can be plotted with</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"> The log-residuals are calculated by subtracting the posterior estimate of log-discharge,<span class="math inline">\(log(\hat{Q})\)</span>, from the observed log-discharge. Additionally, the plot includes the 95% predictive intervals for log(Q) (- -) and 95% credible intervals for the expected value of log(Q) (—), reflecting the rating curve uncertainty.</p>
+<p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"> The log-residuals are calculated by subtracting the posterior estimate of log-discharge,<span class="math inline">\(log(\hat{Q})\)</span>, from the observed log-discharge. Additionally, the plot includes the 95% predictive intervals or log(Q) (- -) and 95% credible intervals for the expected value of log(Q) (—), reflecting the rating curve uncertainty.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'c'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-14-1.png" width="960" style="display: block; margin: auto;"></p>
-<p>To plot a trace plot for all hyperparameters, you write similiarily as above</p>
+<p>To plot a trace plot for all hyperparameters, you write similarly as above</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-15-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize <span class="math inline">\(\hat{R}\)</span> as presented by Gelman and Rubin with:</p>
@@ -215,29 +214,29 @@
 <h2 class="hasAnchor">
 <a href="#customization-of-models" class="anchor"></a>Customization of models</h2>
 <p>There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of <span class="math inline">\(c\)</span> and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>,<span class="at">h_max=</span><span class="dv">10</span>)</span>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>,<span class="at">h_max=</span><span class="dv">10</span>,<span class="at">parallel=</span>F)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit.known_c)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Formula: </span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 1.16       1.30       1.48       </span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; a 1.17       1.31       1.55       </span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; b 1.83       1.84       1.84       </span></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.52341    0.8572     1.472     </span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.43817    0.9296    10.013     </span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00341    0.0961     0.544     </span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.76818   -4.1233    -3.242     </span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.98644   -4.0828    -2.249     </span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.97125   -4.3607    -1.724     </span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.86072   -4.7456    -1.264     </span></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.53232   -4.8623    -0.848     </span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -9.02187   -4.8651    -0.351     </span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.46129    0.8385     1.43e+00  </span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.45483    0.9770     2.65e+05  </span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00343    0.0989     5.32e-01  </span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.73770   -4.0520    -3.06e+00  </span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.96896   -4.0081    -2.02e+00  </span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.87073   -4.2471    -1.43e+00  </span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.76986   -4.5777    -1.02e+00  </span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.54034   -4.6760    -5.59e-01  </span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -9.09386   -4.7592    -5.13e-02  </span></span>
 <span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: 0.31336</span></span></code></pre></div>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: 0.8071395</span></span></code></pre></div>
 <p>one neat way to get a visualization summary of your model is to use the ‘panel’ option in the plot method:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit.known_c,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;"></p>
@@ -251,246 +250,246 @@
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">print</span>(rating_curve_h_grid)</span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         h        lower       median        upper</span></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    7.65 0.000000e+00 0.000000e+00 0.000000e+00</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    7.66 5.111750e-06 2.391616e-05 9.909431e-05</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    7.67 1.022350e-05 4.783232e-05 1.981886e-04</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    7.68 1.533525e-05 7.174847e-05 2.972829e-04</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    7.69 2.044700e-05 9.566463e-05 3.963772e-04</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    7.70 2.555875e-05 1.195808e-04 4.954715e-04</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7    7.71 1.035956e-04 3.186244e-04 9.595757e-04</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    7.72 1.816325e-04 5.176680e-04 1.423680e-03</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    7.73 2.596694e-04 7.167116e-04 1.887784e-03</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   7.74 3.377063e-04 9.157552e-04 2.351888e-03</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   7.75 4.157432e-04 1.114799e-03 2.815993e-03</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   7.76 7.732434e-04 1.738566e-03 3.898036e-03</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   7.77 1.130744e-03 2.362333e-03 4.980080e-03</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   7.78 1.488244e-03 2.986100e-03 6.062123e-03</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   7.79 1.845744e-03 3.609867e-03 7.144167e-03</span></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   7.80 2.203244e-03 4.233634e-03 8.226210e-03</span></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17   7.81 3.166634e-03 5.606750e-03 1.021549e-02</span></span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   7.82 4.130024e-03 6.979866e-03 1.220478e-02</span></span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   7.83 5.093414e-03 8.352982e-03 1.419406e-02</span></span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   7.84 6.056803e-03 9.726098e-03 1.618334e-02</span></span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21   7.85 7.020193e-03 1.109921e-02 1.817263e-02</span></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   7.86 8.916788e-03 1.354958e-02 2.150753e-02</span></span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   7.87 1.081338e-02 1.599995e-02 2.484244e-02</span></span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   7.88 1.270998e-02 1.845032e-02 2.817734e-02</span></span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   7.89 1.460657e-02 2.090069e-02 3.151225e-02</span></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   7.90 1.687393e-02 2.381044e-02 3.529498e-02</span></span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   7.91 1.969742e-02 2.740926e-02 3.974944e-02</span></span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   7.92 2.252092e-02 3.100808e-02 4.420390e-02</span></span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   7.93 2.568590e-02 3.517249e-02 4.958004e-02</span></span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   7.94 2.910886e-02 3.976418e-02 5.565249e-02</span></span>
-<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   7.95 3.253182e-02 4.435587e-02 6.172494e-02</span></span>
-<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   7.96 3.651870e-02 4.972341e-02 6.868328e-02</span></span>
-<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   7.97 4.070444e-02 5.536453e-02 7.595401e-02</span></span>
-<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   7.98 4.489018e-02 6.100565e-02 8.322474e-02</span></span>
-<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   7.99 4.976302e-02 6.772971e-02 9.172771e-02</span></span>
-<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   8.00 5.470469e-02 7.456226e-02 1.003541e-01</span></span>
-<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   8.01 5.972071e-02 8.147932e-02 1.091377e-01</span></span>
-<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   8.02 6.560833e-02 8.938714e-02 1.197639e-01</span></span>
-<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   8.03 7.149595e-02 9.729497e-02 1.303900e-01</span></span>
-<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   8.04 7.749739e-02 1.053898e-01 1.412219e-01</span></span>
-<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   8.05 8.413182e-02 1.145245e-01 1.531981e-01</span></span>
-<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   8.06 9.076625e-02 1.236592e-01 1.651742e-01</span></span>
-<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   8.07 9.758325e-02 1.330821e-01 1.775463e-01</span></span>
-<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   8.08 1.050248e-01 1.434909e-01 1.912730e-01</span></span>
-<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   8.09 1.124663e-01 1.538997e-01 2.049998e-01</span></span>
-<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   8.10 1.201843e-01 1.646382e-01 2.192042e-01</span></span>
-<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   8.11 1.285473e-01 1.761459e-01 2.345234e-01</span></span>
-<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   8.12 1.369103e-01 1.876536e-01 2.498426e-01</span></span>
-<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49   8.13 1.452734e-01 1.991613e-01 2.651618e-01</span></span>
-<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50   8.14 1.545349e-01 2.114764e-01 2.816104e-01</span></span>
-<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51   8.15 1.643412e-01 2.242810e-01 2.987438e-01</span></span>
-<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52   8.16 1.741474e-01 2.370856e-01 3.158771e-01</span></span>
-<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 53   8.17 1.841318e-01 2.509829e-01 3.330310e-01</span></span>
-<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 54   8.18 1.941223e-01 2.649175e-01 3.501855e-01</span></span>
-<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 55   8.19 2.044598e-01 2.789790e-01 3.678631e-01</span></span>
-<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 56   8.20 2.155653e-01 2.933211e-01 3.866976e-01</span></span>
-<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 57   8.21 2.266708e-01 3.076632e-01 4.055321e-01</span></span>
-<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 58   8.22 2.382638e-01 3.231327e-01 4.264602e-01</span></span>
-<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 59   8.23 2.501130e-01 3.391943e-01 4.484879e-01</span></span>
-<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 60   8.24 2.619622e-01 3.552558e-01 4.705156e-01</span></span>
-<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 61   8.25 2.743957e-01 3.717644e-01 4.910616e-01</span></span>
-<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 62   8.26 2.868292e-01 3.882729e-01 5.116076e-01</span></span>
-<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 63   8.27 2.998253e-01 4.049118e-01 5.323486e-01</span></span>
-<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 64   8.28 3.134645e-01 4.216998e-01 5.533124e-01</span></span>
-<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 65   8.29 3.271037e-01 4.384878e-01 5.742762e-01</span></span>
-<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 66   8.30 3.414116e-01 4.571209e-01 5.997813e-01</span></span>
-<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 67   8.31 3.557673e-01 4.758858e-01 6.256108e-01</span></span>
-<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 68   8.32 3.697027e-01 4.946446e-01 6.517413e-01</span></span>
-<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 69   8.33 3.830076e-01 5.133944e-01 6.783232e-01</span></span>
-<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 70   8.34 3.975502e-01 5.321738e-01 7.027718e-01</span></span>
-<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 71   8.35 4.129178e-01 5.509730e-01 7.257983e-01</span></span>
-<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 72   8.36 4.284255e-01 5.708685e-01 7.518648e-01</span></span>
-<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 73   8.37 4.439682e-01 5.910381e-01 7.786913e-01</span></span>
-<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 74   8.38 4.597793e-01 6.116805e-01 8.048945e-01</span></span>
-<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75   8.39 4.756950e-01 6.323760e-01 8.314375e-01</span></span>
-<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 76   8.40 4.925512e-01 6.535491e-01 8.610374e-01</span></span>
-<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 77   8.41 5.094075e-01 6.747221e-01 8.906372e-01</span></span>
-<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 78   8.42 5.264824e-01 6.960451e-01 9.201983e-01</span></span>
-<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 79   8.43 5.441338e-01 7.177633e-01 9.496571e-01</span></span>
-<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 80   8.44 5.617852e-01 7.394815e-01 9.791159e-01</span></span>
-<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 81   8.45 5.787290e-01 7.617810e-01 1.009396e+00</span></span>
-<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 82   8.46 5.948079e-01 7.847911e-01 1.040678e+00</span></span>
-<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 83   8.47 6.108868e-01 8.078011e-01 1.071961e+00</span></span>
-<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 84   8.48 6.290786e-01 8.320557e-01 1.105699e+00</span></span>
-<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 85   8.49 6.485380e-01 8.570569e-01 1.140910e+00</span></span>
-<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 86   8.50 6.679975e-01 8.820580e-01 1.176121e+00</span></span>
-<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 87   8.51 6.881562e-01 9.070268e-01 1.206213e+00</span></span>
-<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 88   8.52 7.084897e-01 9.319874e-01 1.235026e+00</span></span>
-<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 89   8.53 7.283912e-01 9.568949e-01 1.268772e+00</span></span>
-<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 90   8.54 7.479353e-01 9.817585e-01 1.306600e+00</span></span>
-<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 91   8.55 7.679060e-01 1.007771e+00 1.343675e+00</span></span>
-<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 92   8.56 7.888989e-01 1.036538e+00 1.378949e+00</span></span>
-<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 93   8.57 8.098902e-01 1.065229e+00 1.414386e+00</span></span>
-<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 94   8.58 8.308476e-01 1.092194e+00 1.453586e+00</span></span>
-<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 95   8.59 8.518050e-01 1.119159e+00 1.492786e+00</span></span>
-<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 96   8.60 8.727624e-01 1.146124e+00 1.531986e+00</span></span>
-<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 97   8.61 8.961145e-01 1.176034e+00 1.574339e+00</span></span>
-<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 98   8.62 9.199528e-01 1.206541e+00 1.617333e+00</span></span>
-<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 99   8.63 9.437910e-01 1.237048e+00 1.660327e+00</span></span>
-<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100  8.64 9.674695e-01 1.268250e+00 1.706027e+00</span></span>
-<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 101  8.65 9.910504e-01 1.299877e+00 1.753378e+00</span></span>
-<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 102  8.66 1.014631e+00 1.331504e+00 1.800729e+00</span></span>
-<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 103  8.67 1.038229e+00 1.364031e+00 1.847229e+00</span></span>
-<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 104  8.68 1.061852e+00 1.397853e+00 1.892505e+00</span></span>
-<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 105  8.69 1.085475e+00 1.431674e+00 1.937782e+00</span></span>
-<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 106  8.70 1.110401e+00 1.465982e+00 1.984474e+00</span></span>
-<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 107  8.71 1.140541e+00 1.502236e+00 2.036828e+00</span></span>
-<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 108  8.72 1.170681e+00 1.538489e+00 2.089182e+00</span></span>
-<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 109  8.73 1.200821e+00 1.574742e+00 2.141537e+00</span></span>
-<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 110  8.74 1.233516e+00 1.612725e+00 2.193208e+00</span></span>
-<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 111  8.75 1.266396e+00 1.650834e+00 2.244830e+00</span></span>
-<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 112  8.76 1.299277e+00 1.688943e+00 2.296451e+00</span></span>
-<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 113  8.77 1.332026e+00 1.730078e+00 2.349856e+00</span></span>
-<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 114  8.78 1.364707e+00 1.772744e+00 2.404162e+00</span></span>
-<span id="cb20-119"><a href="#cb20-119" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 115  8.79 1.397388e+00 1.815409e+00 2.458468e+00</span></span>
-<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 116  8.80 1.431268e+00 1.859939e+00 2.519277e+00</span></span>
-<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 117  8.81 1.466974e+00 1.907307e+00 2.589990e+00</span></span>
-<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 118  8.82 1.502680e+00 1.954675e+00 2.660703e+00</span></span>
-<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 119  8.83 1.539105e+00 2.002759e+00 2.730535e+00</span></span>
-<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 120  8.84 1.580403e+00 2.055699e+00 2.794380e+00</span></span>
-<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 121  8.85 1.621702e+00 2.108639e+00 2.858226e+00</span></span>
-<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 122  8.86 1.663001e+00 2.161579e+00 2.922072e+00</span></span>
-<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 123  8.87 1.704300e+00 2.214519e+00 2.985917e+00</span></span>
-<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 124  8.88 1.747093e+00 2.270155e+00 3.061153e+00</span></span>
-<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 125  8.89 1.790526e+00 2.326947e+00 3.141271e+00</span></span>
-<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 126  8.90 1.833959e+00 2.383738e+00 3.221388e+00</span></span>
-<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 127  8.91 1.881118e+00 2.445590e+00 3.309241e+00</span></span>
-<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 128  8.92 1.929595e+00 2.509234e+00 3.399831e+00</span></span>
-<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 129  8.93 1.978073e+00 2.572878e+00 3.490421e+00</span></span>
-<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 130  8.94 2.031855e+00 2.640887e+00 3.575133e+00</span></span>
-<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 131  8.95 2.087157e+00 2.710148e+00 3.658159e+00</span></span>
-<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 132  8.96 2.142460e+00 2.779409e+00 3.741186e+00</span></span>
-<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 133  8.97 2.205742e+00 2.858603e+00 3.839015e+00</span></span>
-<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 134  8.98 2.270828e+00 2.940040e+00 3.940190e+00</span></span>
-<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 135  8.99 2.335914e+00 3.021478e+00 4.041364e+00</span></span>
-<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 136  9.00 2.399937e+00 3.102883e+00 4.139885e+00</span></span>
-<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 137  9.01 2.455732e+00 3.185067e+00 4.219390e+00</span></span>
-<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 138  9.02 2.523491e+00 3.276911e+00 4.342660e+00</span></span>
-<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 139  9.03 2.591251e+00 3.368755e+00 4.465930e+00</span></span>
-<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 140  9.04 2.660907e+00 3.461190e+00 4.588884e+00</span></span>
-<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 141  9.05 2.747635e+00 3.558942e+00 4.708987e+00</span></span>
-<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 142  9.06 2.834363e+00 3.656694e+00 4.829090e+00</span></span>
-<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 143  9.07 2.919588e+00 3.755910e+00 4.951608e+00</span></span>
-<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 144  9.08 2.991282e+00 3.868299e+00 5.095867e+00</span></span>
-<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 145  9.09 3.062977e+00 3.980688e+00 5.240126e+00</span></span>
-<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 146  9.10 3.135573e+00 4.091794e+00 5.376475e+00</span></span>
-<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 147  9.11 3.233383e+00 4.202448e+00 5.497376e+00</span></span>
-<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 148  9.12 3.332379e+00 4.323835e+00 5.656026e+00</span></span>
-<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 149  9.13 3.424567e+00 4.447442e+00 5.815070e+00</span></span>
-<span id="cb20-154"><a href="#cb20-154" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 150  9.14 3.517269e+00 4.571634e+00 5.975330e+00</span></span>
-<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 151  9.15 3.615523e+00 4.702130e+00 6.148699e+00</span></span>
-<span id="cb20-156"><a href="#cb20-156" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 152  9.16 3.713778e+00 4.832626e+00 6.322068e+00</span></span>
-<span id="cb20-157"><a href="#cb20-157" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 153  9.17 3.813815e+00 4.967948e+00 6.484844e+00</span></span>
-<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 154  9.18 3.916283e+00 5.109845e+00 6.633186e+00</span></span>
-<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 155  9.19 4.018750e+00 5.251742e+00 6.781528e+00</span></span>
-<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 156  9.20 4.120933e+00 5.394377e+00 6.980127e+00</span></span>
-<span id="cb20-161"><a href="#cb20-161" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 157  9.21 4.223027e+00 5.537244e+00 7.194454e+00</span></span>
-<span id="cb20-162"><a href="#cb20-162" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 158  9.22 4.326893e+00 5.681728e+00 7.405631e+00</span></span>
-<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 159  9.23 4.446710e+00 5.840768e+00 7.588450e+00</span></span>
-<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 160  9.24 4.566118e+00 6.000735e+00 7.779115e+00</span></span>
-<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 161  9.25 4.684820e+00 6.162304e+00 7.983333e+00</span></span>
-<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 162  9.26 4.804939e+00 6.323182e+00 8.209991e+00</span></span>
-<span id="cb20-167"><a href="#cb20-167" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 163  9.27 4.925880e+00 6.483661e+00 8.449640e+00</span></span>
-<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 164  9.28 5.049403e+00 6.660353e+00 8.665400e+00</span></span>
-<span id="cb20-169"><a href="#cb20-169" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 165  9.29 5.173213e+00 6.838845e+00 8.878505e+00</span></span>
-<span id="cb20-170"><a href="#cb20-170" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 166  9.30 5.297023e+00 7.017338e+00 9.091611e+00</span></span>
-<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 167  9.31 5.422815e+00 7.201988e+00 9.347476e+00</span></span>
-<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 168  9.32 5.549455e+00 7.389277e+00 9.621667e+00</span></span>
-<span id="cb20-173"><a href="#cb20-173" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 169  9.33 5.676096e+00 7.576565e+00 9.895857e+00</span></span>
-<span id="cb20-174"><a href="#cb20-174" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 170  9.34 5.818471e+00 7.765425e+00 1.015008e+01</span></span>
-<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 171  9.35 5.976580e+00 7.955857e+00 1.038432e+01</span></span>
-<span id="cb20-176"><a href="#cb20-176" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 172  9.36 6.134689e+00 8.146288e+00 1.061856e+01</span></span>
-<span id="cb20-177"><a href="#cb20-177" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 173  9.37 6.286328e+00 8.341323e+00 1.085780e+01</span></span>
-<span id="cb20-178"><a href="#cb20-178" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 174  9.38 6.422870e+00 8.547100e+00 1.110870e+01</span></span>
-<span id="cb20-179"><a href="#cb20-179" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 175  9.39 6.559412e+00 8.752877e+00 1.135959e+01</span></span>
-<span id="cb20-180"><a href="#cb20-180" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 176  9.40 6.696340e+00 8.958985e+00 1.161452e+01</span></span>
-<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 177  9.41 6.836745e+00 9.168075e+00 1.190580e+01</span></span>
-<span id="cb20-182"><a href="#cb20-182" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 178  9.42 6.977149e+00 9.377165e+00 1.219708e+01</span></span>
-<span id="cb20-183"><a href="#cb20-183" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 179  9.43 7.117554e+00 9.586255e+00 1.248836e+01</span></span>
-<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 180  9.44 7.247411e+00 9.808880e+00 1.275878e+01</span></span>
-<span id="cb20-185"><a href="#cb20-185" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 181  9.45 7.376095e+00 1.003301e+01 1.302688e+01</span></span>
-<span id="cb20-186"><a href="#cb20-186" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 182  9.46 7.504780e+00 1.025714e+01 1.329499e+01</span></span>
-<span id="cb20-187"><a href="#cb20-187" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 183  9.47 7.682172e+00 1.046479e+01 1.358676e+01</span></span>
-<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 184  9.48 7.888893e+00 1.066894e+01 1.390168e+01</span></span>
-<span id="cb20-189"><a href="#cb20-189" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 185  9.49 8.068922e+00 1.090775e+01 1.423924e+01</span></span>
-<span id="cb20-190"><a href="#cb20-190" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 186  9.50 8.219302e+00 1.114419e+01 1.455318e+01</span></span>
-<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 187  9.51 8.310384e+00 1.137589e+01 1.481991e+01</span></span>
-<span id="cb20-192"><a href="#cb20-192" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 188  9.52 8.468665e+00 1.160896e+01 1.514138e+01</span></span>
-<span id="cb20-193"><a href="#cb20-193" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 189  9.53 8.703742e+00 1.184360e+01 1.552541e+01</span></span>
-<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 190  9.54 8.870635e+00 1.207610e+01 1.587049e+01</span></span>
-<span id="cb20-195"><a href="#cb20-195" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 191  9.55 8.992070e+00 1.230716e+01 1.618959e+01</span></span>
-<span id="cb20-196"><a href="#cb20-196" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 192  9.56 9.113506e+00 1.253823e+01 1.650869e+01</span></span>
-<span id="cb20-197"><a href="#cb20-197" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 193  9.57 9.234941e+00 1.276930e+01 1.682780e+01</span></span>
-<span id="cb20-198"><a href="#cb20-198" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 194  9.58 9.374458e+00 1.301029e+01 1.717363e+01</span></span>
-<span id="cb20-199"><a href="#cb20-199" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 195  9.59 9.527801e+00 1.325887e+01 1.753991e+01</span></span>
-<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 196  9.60 9.681144e+00 1.350744e+01 1.790618e+01</span></span>
-<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 197  9.61 9.834487e+00 1.375602e+01 1.827246e+01</span></span>
-<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 198  9.62 9.984023e+00 1.399652e+01 1.863237e+01</span></span>
-<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 199  9.63 1.013023e+01 1.422996e+01 1.898673e+01</span></span>
-<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 200  9.64 1.027643e+01 1.446340e+01 1.934108e+01</span></span>
-<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 201  9.65 1.042264e+01 1.469684e+01 1.969543e+01</span></span>
-<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 202  9.66 1.057544e+01 1.493234e+01 2.005954e+01</span></span>
-<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 203  9.67 1.073483e+01 1.516990e+01 2.043339e+01</span></span>
-<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 204  9.68 1.089423e+01 1.540746e+01 2.080723e+01</span></span>
-<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 205  9.69 1.105362e+01 1.564502e+01 2.118108e+01</span></span>
-<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 206  9.70 1.122144e+01 1.587610e+01 2.152812e+01</span></span>
-<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 207  9.71 1.139888e+01 1.609978e+01 2.184450e+01</span></span>
-<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 208  9.72 1.157632e+01 1.632345e+01 2.216088e+01</span></span>
-<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 209  9.73 1.175375e+01 1.654713e+01 2.247726e+01</span></span>
-<span id="cb20-214"><a href="#cb20-214" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 210  9.74 1.191717e+01 1.677455e+01 2.281819e+01</span></span>
-<span id="cb20-215"><a href="#cb20-215" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 211  9.75 1.206225e+01 1.700689e+01 2.319122e+01</span></span>
-<span id="cb20-216"><a href="#cb20-216" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 212  9.76 1.220733e+01 1.723923e+01 2.356424e+01</span></span>
-<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 213  9.77 1.235241e+01 1.747156e+01 2.393727e+01</span></span>
-<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 214  9.78 1.249927e+01 1.769563e+01 2.426943e+01</span></span>
-<span id="cb20-219"><a href="#cb20-219" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 215  9.79 1.264879e+01 1.790728e+01 2.454030e+01</span></span>
-<span id="cb20-220"><a href="#cb20-220" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 216  9.80 1.279831e+01 1.811893e+01 2.481117e+01</span></span>
-<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 217  9.81 1.294783e+01 1.833058e+01 2.508204e+01</span></span>
-<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 218  9.82 1.309854e+01 1.854165e+01 2.537468e+01</span></span>
-<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 219  9.83 1.325131e+01 1.875170e+01 2.570491e+01</span></span>
-<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 220  9.84 1.340408e+01 1.896176e+01 2.603515e+01</span></span>
-<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 221  9.85 1.355685e+01 1.917181e+01 2.636538e+01</span></span>
-<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 222  9.86 1.368804e+01 1.936875e+01 2.669614e+01</span></span>
-<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 223  9.87 1.377604e+01 1.953946e+01 2.702795e+01</span></span>
-<span id="cb20-228"><a href="#cb20-228" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 224  9.88 1.386404e+01 1.971018e+01 2.735976e+01</span></span>
-<span id="cb20-229"><a href="#cb20-229" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 225  9.89 1.395205e+01 1.988089e+01 2.769157e+01</span></span>
-<span id="cb20-230"><a href="#cb20-230" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 226  9.90 1.403976e+01 2.005409e+01 2.804325e+01</span></span>
-<span id="cb20-231"><a href="#cb20-231" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 227  9.91 1.412680e+01 2.023310e+01 2.844129e+01</span></span>
-<span id="cb20-232"><a href="#cb20-232" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 228  9.92 1.421383e+01 2.041211e+01 2.883934e+01</span></span>
-<span id="cb20-233"><a href="#cb20-233" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 229  9.93 1.422721e+01 2.059861e+01 2.925856e+01</span></span>
-<span id="cb20-234"><a href="#cb20-234" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 230  9.94 1.421264e+01 2.078795e+01 2.968583e+01</span></span>
-<span id="cb20-235"><a href="#cb20-235" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 231  9.95 1.419684e+01 2.096583e+01 3.011423e+01</span></span>
-<span id="cb20-236"><a href="#cb20-236" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 232  9.96 1.417404e+01 2.107879e+01 3.054909e+01</span></span>
-<span id="cb20-237"><a href="#cb20-237" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 233  9.97 1.415125e+01 2.119175e+01 3.098394e+01</span></span>
-<span id="cb20-238"><a href="#cb20-238" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 234  9.98 1.413026e+01 2.131502e+01 3.147532e+01</span></span>
-<span id="cb20-239"><a href="#cb20-239" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 235  9.99 1.411060e+01 2.144591e+01 3.200847e+01</span></span>
-<span id="cb20-240"><a href="#cb20-240" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 236 10.00 1.409095e+01 2.157680e+01 3.254162e+01</span></span></code></pre></div>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    7.66 5.399466e-06 2.685440e-05 1.005592e-04</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    7.67 1.079893e-05 5.370880e-05 2.011184e-04</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    7.68 1.619840e-05 8.056320e-05 3.016775e-04</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    7.69 2.159786e-05 1.074176e-04 4.022367e-04</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    7.70 2.699733e-05 1.342720e-04 5.027959e-04</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7    7.71 1.097669e-04 3.467144e-04 9.921704e-04</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    7.72 1.925366e-04 5.591568e-04 1.481545e-03</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    7.73 2.753062e-04 7.715993e-04 1.970919e-03</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   7.74 3.580758e-04 9.840417e-04 2.460294e-03</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   7.75 4.408454e-04 1.196484e-03 2.949668e-03</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   7.76 8.087442e-04 1.840274e-03 4.074836e-03</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   7.77 1.176643e-03 2.484064e-03 5.200005e-03</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   7.78 1.544542e-03 3.127854e-03 6.325173e-03</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   7.79 1.912441e-03 3.771645e-03 7.450341e-03</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   7.80 2.280339e-03 4.415435e-03 8.575509e-03</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17   7.81 3.261535e-03 5.799997e-03 1.065020e-02</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   7.82 4.242731e-03 7.184560e-03 1.272488e-02</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   7.83 5.223927e-03 8.569123e-03 1.479957e-02</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   7.84 6.205123e-03 9.953686e-03 1.687426e-02</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21   7.85 7.186319e-03 1.133825e-02 1.894895e-02</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   7.86 9.054079e-03 1.379787e-02 2.230998e-02</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   7.87 1.092184e-02 1.625748e-02 2.567101e-02</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   7.88 1.278960e-02 1.871710e-02 2.903204e-02</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   7.89 1.465736e-02 2.117672e-02 3.239307e-02</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   7.90 1.688092e-02 2.406289e-02 3.626272e-02</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   7.91 1.963818e-02 2.758888e-02 4.089528e-02</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   7.92 2.239544e-02 3.111487e-02 4.552784e-02</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   7.93 2.542733e-02 3.520915e-02 5.086761e-02</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   7.94 2.866669e-02 3.973273e-02 5.674165e-02</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   7.95 3.190605e-02 4.425632e-02 6.261570e-02</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   7.96 3.576483e-02 4.961234e-02 6.937503e-02</span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   7.97 3.984202e-02 5.526190e-02 7.644654e-02</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   7.98 4.391921e-02 6.091147e-02 8.351805e-02</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   7.99 4.852775e-02 6.747956e-02 9.212447e-02</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   8.00 5.318950e-02 7.413966e-02 1.008846e-01</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   8.01 5.790657e-02 8.089125e-02 1.097788e-01</span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   8.02 6.327207e-02 8.871535e-02 1.202441e-01</span></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   8.03 6.863757e-02 9.653945e-02 1.307095e-01</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   8.04 7.413053e-02 1.045458e-01 1.414371e-01</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   8.05 8.033243e-02 1.135656e-01 1.536235e-01</span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   8.06 8.653433e-02 1.225855e-01 1.658100e-01</span></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   8.07 9.300995e-02 1.318524e-01 1.783861e-01</span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   8.08 1.004220e-01 1.419646e-01 1.922952e-01</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   8.09 1.078340e-01 1.520768e-01 2.062044e-01</span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   8.10 1.154126e-01 1.625845e-01 2.201904e-01</span></span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   8.11 1.233800e-01 1.740152e-01 2.343557e-01</span></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   8.12 1.313474e-01 1.854459e-01 2.485211e-01</span></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49   8.13 1.393148e-01 1.968766e-01 2.626864e-01</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50   8.14 1.477151e-01 2.090123e-01 2.788738e-01</span></span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51   8.15 1.563778e-01 2.215754e-01 2.962868e-01</span></span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52   8.16 1.650405e-01 2.341384e-01 3.136998e-01</span></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 53   8.17 1.745218e-01 2.479925e-01 3.327188e-01</span></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 54   8.18 1.840312e-01 2.618906e-01 3.517927e-01</span></span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 55   8.19 1.937908e-01 2.760973e-01 3.708472e-01</span></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 56   8.20 2.041042e-01 2.909868e-01 3.898586e-01</span></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 57   8.21 2.144176e-01 3.058762e-01 4.088700e-01</span></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 58   8.22 2.256945e-01 3.208044e-01 4.285201e-01</span></span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 59   8.23 2.374775e-01 3.357529e-01 4.485057e-01</span></span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 60   8.24 2.492604e-01 3.507013e-01 4.684914e-01</span></span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 61   8.25 2.617935e-01 3.678985e-01 4.918148e-01</span></span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 62   8.26 2.743265e-01 3.850957e-01 5.151383e-01</span></span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 63   8.27 2.876683e-01 4.022486e-01 5.388122e-01</span></span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 64   8.28 3.019342e-01 4.193507e-01 5.628866e-01</span></span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 65   8.29 3.162002e-01 4.364529e-01 5.869610e-01</span></span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 66   8.30 3.303900e-01 4.548972e-01 6.107734e-01</span></span>
+<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 67   8.31 3.445743e-01 4.734374e-01 6.345670e-01</span></span>
+<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 68   8.32 3.593032e-01 4.922550e-01 6.585091e-01</span></span>
+<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 69   8.33 3.748488e-01 5.114886e-01 6.826738e-01</span></span>
+<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 70   8.34 3.889619e-01 5.307033e-01 7.064568e-01</span></span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 71   8.35 4.021198e-01 5.499053e-01 7.299853e-01</span></span>
+<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 72   8.36 4.161589e-01 5.695457e-01 7.548910e-01</span></span>
+<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 73   8.37 4.304183e-01 5.892956e-01 7.801410e-01</span></span>
+<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 74   8.38 4.478002e-01 6.098488e-01 8.102295e-01</span></span>
+<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75   8.39 4.650718e-01 6.305150e-01 8.404171e-01</span></span>
+<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 76   8.40 4.813509e-01 6.521991e-01 8.714969e-01</span></span>
+<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 77   8.41 4.976301e-01 6.738831e-01 9.025768e-01</span></span>
+<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 78   8.42 5.146706e-01 6.958192e-01 9.340383e-01</span></span>
+<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 79   8.43 5.337183e-01 7.184200e-01 9.665060e-01</span></span>
+<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 80   8.44 5.527660e-01 7.410209e-01 9.989737e-01</span></span>
+<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 81   8.45 5.704069e-01 7.638688e-01 1.030953e+00</span></span>
+<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 82   8.46 5.863282e-01 7.870189e-01 1.062336e+00</span></span>
+<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 83   8.47 6.022496e-01 8.101689e-01 1.093718e+00</span></span>
+<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 84   8.48 6.212968e-01 8.347106e-01 1.127142e+00</span></span>
+<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 85   8.49 6.422194e-01 8.600872e-01 1.161791e+00</span></span>
+<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 86   8.50 6.631421e-01 8.854638e-01 1.196440e+00</span></span>
+<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 87   8.51 6.839788e-01 9.106315e-01 1.232558e+00</span></span>
+<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 88   8.52 7.047939e-01 9.357471e-01 1.269044e+00</span></span>
+<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 89   8.53 7.259927e-01 9.623103e-01 1.308815e+00</span></span>
+<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 90   8.54 7.475088e-01 9.900714e-01 1.351306e+00</span></span>
+<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 91   8.55 7.680063e-01 1.017546e+00 1.393823e+00</span></span>
+<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 92   8.56 7.860631e-01 1.044333e+00 1.436404e+00</span></span>
+<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 93   8.57 8.042617e-01 1.071167e+00 1.479022e+00</span></span>
+<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 94   8.58 8.257186e-01 1.099065e+00 1.522454e+00</span></span>
+<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 95   8.59 8.471755e-01 1.126964e+00 1.565886e+00</span></span>
+<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 96   8.60 8.686324e-01 1.154863e+00 1.609318e+00</span></span>
+<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 97   8.61 8.946207e-01 1.185493e+00 1.654230e+00</span></span>
+<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 98   8.62 9.215286e-01 1.216676e+00 1.699442e+00</span></span>
+<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 99   8.63 9.484365e-01 1.247860e+00 1.744654e+00</span></span>
+<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100  8.64 9.735461e-01 1.280141e+00 1.796943e+00</span></span>
+<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 101  8.65 9.975574e-01 1.313091e+00 1.853553e+00</span></span>
+<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 102  8.66 1.021569e+00 1.346042e+00 1.910163e+00</span></span>
+<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 103  8.67 1.046098e+00 1.379369e+00 1.962956e+00</span></span>
+<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 104  8.68 1.071372e+00 1.413237e+00 2.010264e+00</span></span>
+<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 105  8.69 1.096646e+00 1.447106e+00 2.057573e+00</span></span>
+<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 106  8.70 1.122885e+00 1.481761e+00 2.106903e+00</span></span>
+<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 107  8.71 1.152986e+00 1.519563e+00 2.164320e+00</span></span>
+<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 108  8.72 1.183088e+00 1.557365e+00 2.221737e+00</span></span>
+<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 109  8.73 1.213189e+00 1.595166e+00 2.279153e+00</span></span>
+<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 110  8.74 1.243990e+00 1.635115e+00 2.351626e+00</span></span>
+<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 111  8.75 1.274842e+00 1.675219e+00 2.425196e+00</span></span>
+<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 112  8.76 1.305694e+00 1.715323e+00 2.498765e+00</span></span>
+<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 113  8.77 1.336614e+00 1.756341e+00 2.556158e+00</span></span>
+<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 114  8.78 1.367568e+00 1.797821e+00 2.605373e+00</span></span>
+<span id="cb20-119"><a href="#cb20-119" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 115  8.79 1.398523e+00 1.839301e+00 2.654588e+00</span></span>
+<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 116  8.80 1.431603e+00 1.883698e+00 2.716960e+00</span></span>
+<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 117  8.81 1.467923e+00 1.932538e+00 2.799373e+00</span></span>
+<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 118  8.82 1.504243e+00 1.981379e+00 2.881785e+00</span></span>
+<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 119  8.83 1.541491e+00 2.030549e+00 2.964191e+00</span></span>
+<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 120  8.84 1.585045e+00 2.081954e+00 3.046546e+00</span></span>
+<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 121  8.85 1.628598e+00 2.133358e+00 3.128902e+00</span></span>
+<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 122  8.86 1.672151e+00 2.184763e+00 3.211257e+00</span></span>
+<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 123  8.87 1.715704e+00 2.236168e+00 3.293612e+00</span></span>
+<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 124  8.88 1.757779e+00 2.293354e+00 3.376878e+00</span></span>
+<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 125  8.89 1.799219e+00 2.353017e+00 3.460534e+00</span></span>
+<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 126  8.90 1.840660e+00 2.412681e+00 3.544189e+00</span></span>
+<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 127  8.91 1.887747e+00 2.475762e+00 3.620203e+00</span></span>
+<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 128  8.92 1.936832e+00 2.540053e+00 3.693511e+00</span></span>
+<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 129  8.93 1.985918e+00 2.604343e+00 3.766819e+00</span></span>
+<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 130  8.94 2.036555e+00 2.676943e+00 3.855353e+00</span></span>
+<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 131  8.95 2.087636e+00 2.751925e+00 3.948254e+00</span></span>
+<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 132  8.96 2.138718e+00 2.826907e+00 4.041155e+00</span></span>
+<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 133  8.97 2.199263e+00 2.901775e+00 4.145388e+00</span></span>
+<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 134  8.98 2.261946e+00 2.976618e+00 4.252182e+00</span></span>
+<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 135  8.99 2.324629e+00 3.051460e+00 4.358976e+00</span></span>
+<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 136  9.00 2.386727e+00 3.127656e+00 4.464023e+00</span></span>
+<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 137  9.01 2.445547e+00 3.216660e+00 4.555082e+00</span></span>
+<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 138  9.02 2.522285e+00 3.311372e+00 4.661755e+00</span></span>
+<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 139  9.03 2.599024e+00 3.406085e+00 4.768429e+00</span></span>
+<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 140  9.04 2.675312e+00 3.500542e+00 4.877106e+00</span></span>
+<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 141  9.05 2.747549e+00 3.592710e+00 5.003815e+00</span></span>
+<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 142  9.06 2.819786e+00 3.684878e+00 5.130525e+00</span></span>
+<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 143  9.07 2.893507e+00 3.779180e+00 5.257136e+00</span></span>
+<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 144  9.08 2.980587e+00 3.892687e+00 5.382860e+00</span></span>
+<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 145  9.09 3.067667e+00 4.006195e+00 5.508583e+00</span></span>
+<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 146  9.10 3.152004e+00 4.117570e+00 5.619379e+00</span></span>
+<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 147  9.11 3.220548e+00 4.227707e+00 5.711099e+00</span></span>
+<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 148  9.12 3.308956e+00 4.348327e+00 5.877416e+00</span></span>
+<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 149  9.13 3.406653e+00 4.467956e+00 6.042227e+00</span></span>
+<span id="cb20-154"><a href="#cb20-154" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 150  9.14 3.503409e+00 4.588214e+00 6.205335e+00</span></span>
+<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 151  9.15 3.590026e+00 4.715264e+00 6.350069e+00</span></span>
+<span id="cb20-156"><a href="#cb20-156" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 152  9.16 3.676644e+00 4.842314e+00 6.494804e+00</span></span>
+<span id="cb20-157"><a href="#cb20-157" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 153  9.17 3.765488e+00 4.975490e+00 6.652533e+00</span></span>
+<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 154  9.18 3.857369e+00 5.117014e+00 6.827968e+00</span></span>
+<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 155  9.19 3.949249e+00 5.258538e+00 7.003404e+00</span></span>
+<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 156  9.20 4.049019e+00 5.405160e+00 7.191272e+00</span></span>
+<span id="cb20-161"><a href="#cb20-161" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 157  9.21 4.151257e+00 5.553377e+00 7.383030e+00</span></span>
+<span id="cb20-162"><a href="#cb20-162" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 158  9.22 4.254013e+00 5.701283e+00 7.571643e+00</span></span>
+<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 159  9.23 4.361432e+00 5.846380e+00 7.731942e+00</span></span>
+<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 160  9.24 4.462911e+00 5.993307e+00 7.907423e+00</span></span>
+<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 161  9.25 4.554131e+00 6.143393e+00 8.109131e+00</span></span>
+<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 162  9.26 4.672973e+00 6.311072e+00 8.304881e+00</span></span>
+<span id="cb20-167"><a href="#cb20-167" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 163  9.27 4.807808e+00 6.488937e+00 8.497183e+00</span></span>
+<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 164  9.28 4.914389e+00 6.654321e+00 8.726088e+00</span></span>
+<span id="cb20-169"><a href="#cb20-169" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 165  9.29 5.017829e+00 6.818318e+00 8.959059e+00</span></span>
+<span id="cb20-170"><a href="#cb20-170" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 166  9.30 5.121270e+00 6.982315e+00 9.192031e+00</span></span>
+<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 167  9.31 5.233855e+00 7.156500e+00 9.424023e+00</span></span>
+<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 168  9.32 5.350359e+00 7.335051e+00 9.655596e+00</span></span>
+<span id="cb20-173"><a href="#cb20-173" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 169  9.33 5.466862e+00 7.513603e+00 9.887169e+00</span></span>
+<span id="cb20-174"><a href="#cb20-174" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 170  9.34 5.581320e+00 7.698226e+00 1.011778e+01</span></span>
+<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 171  9.35 5.693734e+00 7.888921e+00 1.034744e+01</span></span>
+<span id="cb20-176"><a href="#cb20-176" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 172  9.36 5.806147e+00 8.079616e+00 1.057710e+01</span></span>
+<span id="cb20-177"><a href="#cb20-177" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 173  9.37 5.923070e+00 8.272294e+00 1.081740e+01</span></span>
+<span id="cb20-178"><a href="#cb20-178" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 174  9.38 6.050519e+00 8.469601e+00 1.108251e+01</span></span>
+<span id="cb20-179"><a href="#cb20-179" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 175  9.39 6.177967e+00 8.666908e+00 1.134762e+01</span></span>
+<span id="cb20-180"><a href="#cb20-180" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 176  9.40 6.305461e+00 8.864521e+00 1.161274e+01</span></span>
+<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 177  9.41 6.433358e+00 9.064891e+00 1.187801e+01</span></span>
+<span id="cb20-182"><a href="#cb20-182" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 178  9.42 6.561255e+00 9.265261e+00 1.214327e+01</span></span>
+<span id="cb20-183"><a href="#cb20-183" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 179  9.43 6.689152e+00 9.465632e+00 1.240853e+01</span></span>
+<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 180  9.44 6.833407e+00 9.680156e+00 1.271255e+01</span></span>
+<span id="cb20-185"><a href="#cb20-185" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 181  9.45 6.979479e+00 9.896254e+00 1.302087e+01</span></span>
+<span id="cb20-186"><a href="#cb20-186" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 182  9.46 7.125552e+00 1.011235e+01 1.332920e+01</span></span>
+<span id="cb20-187"><a href="#cb20-187" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 183  9.47 7.189118e+00 1.032886e+01 1.356687e+01</span></span>
+<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 184  9.48 7.228403e+00 1.055004e+01 1.379092e+01</span></span>
+<span id="cb20-189"><a href="#cb20-189" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 185  9.49 7.414499e+00 1.078866e+01 1.416939e+01</span></span>
+<span id="cb20-190"><a href="#cb20-190" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 186  9.50 7.585045e+00 1.101952e+01 1.454529e+01</span></span>
+<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 187  9.51 7.724493e+00 1.123485e+01 1.491603e+01</span></span>
+<span id="cb20-192"><a href="#cb20-192" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 188  9.52 7.873247e+00 1.145243e+01 1.522457e+01</span></span>
+<span id="cb20-193"><a href="#cb20-193" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 189  9.53 8.032637e+00 1.167257e+01 1.546204e+01</span></span>
+<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 190  9.54 8.155660e+00 1.189975e+01 1.574762e+01</span></span>
+<span id="cb20-195"><a href="#cb20-195" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 191  9.55 8.254440e+00 1.213161e+01 1.606529e+01</span></span>
+<span id="cb20-196"><a href="#cb20-196" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 192  9.56 8.353219e+00 1.236346e+01 1.638295e+01</span></span>
+<span id="cb20-197"><a href="#cb20-197" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 193  9.57 8.451999e+00 1.259532e+01 1.670061e+01</span></span>
+<span id="cb20-198"><a href="#cb20-198" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 194  9.58 8.570264e+00 1.283382e+01 1.705371e+01</span></span>
+<span id="cb20-199"><a href="#cb20-199" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 195  9.59 8.703430e+00 1.307739e+01 1.743390e+01</span></span>
+<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 196  9.60 8.836595e+00 1.332097e+01 1.781409e+01</span></span>
+<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 197  9.61 8.969761e+00 1.356454e+01 1.819428e+01</span></span>
+<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 198  9.62 9.120275e+00 1.379702e+01 1.853870e+01</span></span>
+<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 199  9.63 9.285970e+00 1.401978e+01 1.885182e+01</span></span>
+<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 200  9.64 9.451665e+00 1.424255e+01 1.916494e+01</span></span>
+<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 201  9.65 9.617360e+00 1.446531e+01 1.947806e+01</span></span>
+<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 202  9.66 9.766897e+00 1.469113e+01 1.982730e+01</span></span>
+<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 203  9.67 9.900278e+00 1.492001e+01 2.021266e+01</span></span>
+<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 204  9.68 1.003366e+01 1.514889e+01 2.059802e+01</span></span>
+<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 205  9.69 1.016704e+01 1.537777e+01 2.098338e+01</span></span>
+<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 206  9.70 1.028781e+01 1.561003e+01 2.134592e+01</span></span>
+<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 207  9.71 1.039418e+01 1.584615e+01 2.168239e+01</span></span>
+<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 208  9.72 1.050054e+01 1.608228e+01 2.201885e+01</span></span>
+<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 209  9.73 1.060691e+01 1.631840e+01 2.235532e+01</span></span>
+<span id="cb20-214"><a href="#cb20-214" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 210  9.74 1.073236e+01 1.654559e+01 2.270499e+01</span></span>
+<span id="cb20-215"><a href="#cb20-215" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 211  9.75 1.088277e+01 1.676110e+01 2.307193e+01</span></span>
+<span id="cb20-216"><a href="#cb20-216" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 212  9.76 1.103318e+01 1.697661e+01 2.343887e+01</span></span>
+<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 213  9.77 1.118359e+01 1.719212e+01 2.380580e+01</span></span>
+<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 214  9.78 1.134649e+01 1.741065e+01 2.414920e+01</span></span>
+<span id="cb20-219"><a href="#cb20-219" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 215  9.79 1.152812e+01 1.763371e+01 2.445727e+01</span></span>
+<span id="cb20-220"><a href="#cb20-220" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 216  9.80 1.170974e+01 1.785677e+01 2.476535e+01</span></span>
+<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 217  9.81 1.189137e+01 1.807983e+01 2.507343e+01</span></span>
+<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 218  9.82 1.205864e+01 1.829377e+01 2.540861e+01</span></span>
+<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 219  9.83 1.220111e+01 1.849197e+01 2.579062e+01</span></span>
+<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 220  9.84 1.234357e+01 1.869018e+01 2.617263e+01</span></span>
+<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 221  9.85 1.248603e+01 1.888838e+01 2.655463e+01</span></span>
+<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 222  9.86 1.262721e+01 1.908547e+01 2.690826e+01</span></span>
+<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 223  9.87 1.276584e+01 1.928032e+01 2.720511e+01</span></span>
+<span id="cb20-228"><a href="#cb20-228" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 224  9.88 1.290446e+01 1.947518e+01 2.750197e+01</span></span>
+<span id="cb20-229"><a href="#cb20-229" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 225  9.89 1.304308e+01 1.967003e+01 2.779883e+01</span></span>
+<span id="cb20-230"><a href="#cb20-230" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 226  9.90 1.318406e+01 1.985241e+01 2.812894e+01</span></span>
+<span id="cb20-231"><a href="#cb20-231" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 227  9.91 1.333055e+01 2.000568e+01 2.853666e+01</span></span>
+<span id="cb20-232"><a href="#cb20-232" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 228  9.92 1.347704e+01 2.015895e+01 2.894437e+01</span></span>
+<span id="cb20-233"><a href="#cb20-233" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 229  9.93 1.358392e+01 2.032862e+01 2.929089e+01</span></span>
+<span id="cb20-234"><a href="#cb20-234" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 230  9.94 1.367578e+01 2.050450e+01 2.961420e+01</span></span>
+<span id="cb20-235"><a href="#cb20-235" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 231  9.95 1.376512e+01 2.067408e+01 2.996640e+01</span></span>
+<span id="cb20-236"><a href="#cb20-236" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 232  9.96 1.384016e+01 2.080788e+01 3.048231e+01</span></span>
+<span id="cb20-237"><a href="#cb20-237" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 233  9.97 1.391520e+01 2.094169e+01 3.099822e+01</span></span>
+<span id="cb20-238"><a href="#cb20-238" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 234  9.98 1.388771e+01 2.108304e+01 3.144080e+01</span></span>
+<span id="cb20-239"><a href="#cb20-239" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 235  9.99 1.378443e+01 2.122997e+01 3.182918e+01</span></span>
+<span id="cb20-240"><a href="#cb20-240" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 236 10.00 1.368114e+01 2.137690e+01 3.221756e+01</span></span></code></pre></div>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
+<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). <em>Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling</em>. arXiv preprint 2010.04769.</p>
 </div>
   </div>
 

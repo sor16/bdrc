@@ -12,7 +12,7 @@ A data frame with columns:
 }
 }
 \source{
-Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
+Swedish Meteorological and Hydrological Institute.
 }
 \usage{
 spanga

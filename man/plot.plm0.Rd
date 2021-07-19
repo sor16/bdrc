@@ -57,9 +57,11 @@ Visualize discharge rating curve model objects
 }}
 
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
+
 plot(plm0.fit)
 plot(plm0.fit,transformed=TRUE)
 plot(plm0.fit,type='histogram',param='c')

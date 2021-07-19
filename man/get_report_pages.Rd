@@ -33,7 +33,7 @@ get_report_pages(x, type = 1, ...)
 \item{...}{further arguments passed to other methods (currently unused).}
 }
 \description{
-Get a list the pages of a report of a discharge rating curve object or tournament
+Get a list of the pages of a report on a discharge rating curve model or tournament
 }
 \section{Methods (by class)}{
 \itemize{
@@ -49,11 +49,12 @@ Get a list the pages of a report of a discharge rating curve object or tournamen
 }}
 
 \examples{
-\donttest{
-data(skogsliden)
-plm0.fit <- plm0(Q~W,skogsliden)
+\dontrun{
+data(krokfors)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
 plm0_pages <- get_report_pages(plm0.fit)
-t_obj <- tournament(Q~W,skogsliden)
+t_obj <- tournament(formula=Q~W,data=krokfors)
 tournament_pages <- get_report_pages(t_obj,type=2)
 }
 }

@@ -35,11 +35,15 @@ Print a discharge rating curve model object
 }}
 
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
 plm0.fit
 print(plm0.fit)
+
+# plm0 - Call:
+# Q ~ W
 }
 }
 \seealso{

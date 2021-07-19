@@ -20,11 +20,11 @@
 Compare the four discharge rating curves from the tournament object in different ways
 }
 \examples{
-\donttest{
+\dontrun{
 library(ggplot2)
 data(krokfors)
-t_obj <- tournament(Q~W,krokfors)
-summary(t_obj)
+set.seed(1)
+t_obj <- tournament(formula=Q~W,data=krokfors)
 autoplot(t_obj)
 }
 }

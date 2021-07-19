@@ -39,12 +39,25 @@
 #' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
 #' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(skogsliden)
 #' set.seed(1)
-#' formula <- Q~W
-#' plm0.fit <- plm0(formula,skogsliden,parallel=F)
+#' plm0.fit <- plm0(formula=Q~W,data=skogsliden)
 #' summary(plm0.fit)
+#'
+#' # Formula:
+#' # Q ~ W
+#' # Latent parameters:
+#' #   lower-2.5% median-50% upper-97.5%
+#' # a 10.30      10.77      11.23
+#' # b  2.09       2.17       2.26
+#' #
+#' # Hyperparameters:
+#' #           lower-2.5% median-50% upper-97.5%
+#' # c         3.9042     3.9200     3.9342
+#' # sigma_eps 0.0455     0.0591     0.0808
+#' #
+#' # DIC: 4.439337
 #' }
 #' @export
 plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){

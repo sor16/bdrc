@@ -24,14 +24,29 @@ Data frame with columns
 Useful to convert MCMC chain draws of particular parameters or output from the model object to a wide format for further data wrangling
 }
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-f <- Q~W
-plm0.fit <- plm0(f,krokfors)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
 hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 head(hyp_samples)
+
+#   chain iter        c sigma_eps
+# 1     1    1 7.684278 0.1825335
+# 2     1    2 7.632519 0.1556740
+# 3     1    3 7.621310 0.2163913
+# 4     1    4 7.728676 0.1858621
+# 5     1    5 7.681251 0.2146834
+# 6     1    6 7.657240 0.1833728
 rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
 head(rating_curve_samples)
+#  chain iter        h rating_curve rating_curve_mean
+#1     1    1 7.673811 0.000000e+00      0.000000e+00
+#2     1    2 7.673811 7.931522e-05      8.954229e-05
+#3     1    3 7.673811 1.837430e-04      2.336355e-04
+#4     1    4 7.673811 0.000000e+00      0.000000e+00
+#5     1    5 7.673811 0.000000e+00      0.000000e+00
+#6     1    6 7.673811 1.008884e-05      8.483278e-06
 }
 }
 \references{

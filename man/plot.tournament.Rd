@@ -28,9 +28,10 @@
 Compare the four models from the tournament object in multiple ways
 }
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-t_obj <- tournament(Q~W,krokfors)
+set.seed(1)
+t_obj <- tournament(formula=Q~W,data=krokfors)
 plot(t_obj)
 plot(t_obj,transformed=TRUE)
 plot(t_obj,type='deviance')

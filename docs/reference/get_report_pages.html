@@ -47,7 +47,7 @@
 
 
 <meta property="og:title" content="Report pages for a discharge rating curve or tournament — get_report_pages" />
-<meta property="og:description" content="Get a list the pages of a report of a discharge rating curve object or tournament" />
+<meta property="og:description" content="Get a list of the pages of a report on a discharge rating curve model or tournament" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -137,7 +137,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Get a list the pages of a report of a discharge rating curve object or tournament</p>
+    <p>Get a list of the pages of a report on a discharge rating curve model or tournament</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_report_pages</span><span class='op'>(</span><span class='va'>x</span>, type <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>...</span><span class='op'>)</span>
@@ -192,17 +192,14 @@
     <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> for running a tournament,<code><a href='summary.tournament.html'>summary.tournament</a></code> for summaries and <code><a href='get_report.html'>get_report</a></code> for generating and saving a report of a tournament object.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>skogsliden</span><span class='op'>)</span>
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>skogsliden</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='va'>plm0_pages</span> <span class='op'>&lt;-</span> <span class='fu'>get_report_pages</span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>skogsliden</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running tournament:
-#&gt; 25% - gplm finished
-#&gt; 50% - gplm0 finished
-#&gt; 75% - plm finished
-#&gt; 100% - plm0 finished</div><div class='input'><span class='va'>tournament_pages</span> <span class='op'>&lt;-</span> <span class='fu'>get_report_pages</span><span class='op'>(</span><span class='va'>t_obj</span>,type<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-<span class='co'># }</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>tournament_pages</span> <span class='op'>&lt;-</span> <span class='fu'>get_report_pages</span><span class='op'>(</span><span class='va'>t_obj</span>,type<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

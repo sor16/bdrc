@@ -15,12 +15,13 @@
 Print the results of a tournament of discharge rating curve model comparisons
 }
 \examples{
-\donttest{
 data(krokfors)
+set.seed(1)
+\dontrun{
 t_obj <- tournament(Q~W,krokfors)
-t_obj
-print(t_obj)
+summary(t_obj)
 }
+# Tournament with winner gplm0
 }
 \seealso{
 \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison

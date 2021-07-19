@@ -35,10 +35,25 @@ Summarize a discharge rating curve model object
 }}
 
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
 summary(plm0.fit)
+
+# Formula:
+# Q ~ W
+# Latent parameters:
+#   lower-2.5\% median-50\% upper-97.5\%
+# a 1.16       1.64       2.12
+# b 2.47       2.82       3.21
+#
+# Hyperparameters:
+#           lower-2.5\% median-50\% upper-97.5\%
+# c         7.58       7.676      7.750
+# sigma_eps 0.15       0.191      0.251
+#
+# DIC: 23.37559
 }
 }
 \seealso{

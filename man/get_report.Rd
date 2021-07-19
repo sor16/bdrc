@@ -54,12 +54,19 @@ This function can only be used in an interactive R session as it asks permission
 }}
 
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors)
-#get_report(plm0.fit)
-t_obj <- tournament(Q~W,krokfors)
-#get_report(t_obj,type=2)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors)
+get_report(plm0.fit)
+# Do you wish to save the report as a pdf file at the following location:  /path/? (Yes/no/cancel) Yes
+# The report was saved at the following location:
+# /path/
+t_obj <- tournament(formula=Q~W,data=krokfors)
+get_report(t_obj,type=2)
+# Do you wish to save the report as a pdf file at the following location:  /path/? (Yes/no/cancel) Yes
+# The report was saved at the following location:
+# /path/
 }
 }
 \seealso{

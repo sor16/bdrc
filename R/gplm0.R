@@ -45,12 +45,27 @@
 #' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
 #' @seealso \code{\link{summary.gplm0}} for summaries, \code{\link{predict.gplm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.gplm0}} to help visualize the full posterior distributions.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(krokfors)
 #' set.seed(1)
-#' formula <- Q~W
-#' gplm0.fit <- gplm0(formula,krokfors,parallel=F)
+#' gplm0.fit <- gplm0(formula=Q~W,data=krokfors)
 #' summary(gplm0.fit)
+#'
+#' #Formula:
+#' #  Q ~ W
+#' #Latent parameters:
+#' #             lower-2.5% median-50% upper-97.5%
+#' #a 1.50       1.94       2.24
+#' #b 1.83       1.84       1.84
+#' #
+#' #Hyperparameters:
+#' #           lower-2.5% median-50% upper-97.5%
+#' #c          7.7132     7.810      7.855
+#' #sigma_eps  0.0908     0.119      0.163
+#' #sigma_beta 0.6479     0.836      1.124
+#' #phi_beta   0.5543     1.192      2.978
+#' #
+#' #DIC: -0.7404264
 #' }
 #' @export
 gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){

@@ -15,11 +15,19 @@
 Print the summary of a tournament of model comparisons
 }
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
+set.seed(1)
 t_obj <- tournament(Q~W,krokfors)
 summary(t_obj)
 }
+#   round game model            B       DIC num_eff_param            P winner
+#1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE
+#2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE
+#3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE
+#4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE
+#5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE
+#6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE
 }
 \seealso{
 \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison

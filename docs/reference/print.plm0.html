@@ -179,14 +179,16 @@
     <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code>, <code><a href='plm.html'>plm</a></code>, <code><a href='gplm0.html'>gplm0</a></code>, <code><a href='gplm.html'>gplm</a></code> for fitting a discharge rating curve and <code><a href='summary.plm0.html'>summary.plm0</a></code>, <code><a href='summary.plm0.html'>summary.plm</a></code>, <code><a href='summary.plm0.html'>summary.gplm0</a></code> and <code><a href='summary.plm0.html'>summary.gplm</a></code> for summaries. It is also useful to look at <code><a href='plot.plm0.html'>plot.plm0</a></code>, <code><a href='plot.plm0.html'>plot.plm</a></code>, <code><a href='plot.plm0.html'>plot.gplm0</a></code> and <code><a href='plot.plm0.html'>plot.gplm</a></code> to help visualize all aspects of the fitted discharge rating curve. Additionally, <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='spread_draws.html'>spread_draws</a></code> help working directly with the MCMC samples.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='va'>plm0.fit</span>
-</div><div class='output co'>#&gt; plm0 - Call:
-#&gt;  Q ~ W </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; plm0 - Call:
-#&gt;  Q ~ W </div><div class='input'><span class='co'># }</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
+
+<span class='co'># plm0 - Call:</span>
+<span class='co'># Q ~ W</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

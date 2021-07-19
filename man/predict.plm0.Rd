@@ -42,12 +42,24 @@ Predict the discharge for given stage values based on a discharge rating curve m
 }}
 
 \examples{
-\donttest{
+\dontrun{
 data(krokfors)
-plm0.fit <- plm0(Q~W,krokfors,h_max=24)
-#predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
-predict(plm0.fit,newdata=seq(23,24,by=0.01))
-predict(plm0.fit,wide=TRUE)
+set.seed(1)
+plm0.fit <- plm0(formula=Q~W,data=krokfors,h_max=10)
+#predict rating curve on a equally 10 cm spaced grid from 9 to 10 meters
+predict(plm0.fit,newdata=seq(9,10,by=0.1))
+#h     lower    median     upper
+#1   9.0  2.440093  3.625679  5.341507
+#2   9.1  2.969410  4.434736  6.596974
+#3   9.2  3.626720  5.380490  8.025924
+#4   9.3  4.284265  6.431505  9.560236
+#5   9.4  5.069827  7.638437 11.406727
+#6   9.5  5.936947  8.951891 13.309962
+#7   9.6  6.848027 10.403692 15.458685
+#8   9.7  7.949128 11.970401 17.813098
+#9   9.8  9.057391 13.714896 20.606599
+#10  9.9 10.232563 15.690309 23.470253
+#11 10.0 11.546006 17.727467 26.802094
 }
 }
 \seealso{

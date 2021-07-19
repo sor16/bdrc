@@ -166,7 +166,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #### S3 methods
 #' Report pages for a discharge rating curve or tournament
 #'
-#' Get a list the pages of a report of a discharge rating curve object or tournament
+#' Get a list of the pages of a report on a discharge rating curve model or tournament
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
@@ -176,11 +176,12 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @param ... further arguments passed to other methods (currently unused).
 #' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
-#' \donttest{
-#' data(skogsliden)
-#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
+#' \dontrun{
+#' data(krokfors)
+#' set.seed(1)
+#' plm0.fit <- plm0(formula=Q~W,data=krokfors)
 #' plm0_pages <- get_report_pages(plm0.fit)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
+#' t_obj <- tournament(formula=Q~W,data=krokfors)
 #' tournament_pages <- get_report_pages(t_obj,type=2)
 #' }
 #' @export
@@ -230,12 +231,19 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @details  This function can only be used in an interactive R session as it asks permission from the user to write to their file system.
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
-#' #get_report(plm0.fit)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
-#' #get_report(t_obj,type=2)
+#' set.seed(1)
+#' plm0.fit <- plm0(formula=Q~W,data=krokfors)
+#' get_report(plm0.fit)
+#' # Do you wish to save the report as a pdf file at the following location:  /path/? (Yes/no/cancel) Yes
+#' # The report was saved at the following location:
+#' # /path/
+#' t_obj <- tournament(formula=Q~W,data=krokfors)
+#' get_report(t_obj,type=2)
+#' # Do you wish to save the report as a pdf file at the following location:  /path/? (Yes/no/cancel) Yes
+#' # The report was saved at the following location:
+#' # /path/
 #' }
 #' @export
 get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")

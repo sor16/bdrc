@@ -227,8 +227,7 @@ Bayesian inference is based on the posterior density and summary statistics such
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>formula</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>gplm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm0</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>gplm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm0</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm0.fit</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Formula: 
@@ -245,7 +244,23 @@ Bayesian inference is based on the posterior density and summary statistics such
 #&gt; sigma_beta 0.6479     0.836      1.124      
 #&gt; phi_beta   0.5543     1.192      2.978      
 #&gt; 
-#&gt; DIC: -0.7404264</div><div class='input'><span class='co'># }</span>
+#&gt; DIC: -0.7404264</div><div class='input'>
+<span class='co'>#Formula:</span>
+<span class='co'>#  Q ~ W</span>
+<span class='co'>#Latent parameters:</span>
+<span class='co'>#             lower-2.5% median-50% upper-97.5%</span>
+<span class='co'>#a 1.50       1.94       2.24</span>
+<span class='co'>#b 1.83       1.84       1.84</span>
+<span class='co'>#</span>
+<span class='co'>#Hyperparameters:</span>
+<span class='co'>#           lower-2.5% median-50% upper-97.5%</span>
+<span class='co'>#c          7.7132     7.810      7.855</span>
+<span class='co'>#sigma_eps  0.0908     0.119      0.163</span>
+<span class='co'>#sigma_beta 0.6479     0.836      1.124</span>
+<span class='co'>#phi_beta   0.5543     1.192      2.978</span>
+<span class='co'>#</span>
+<span class='co'>#DIC: -0.7404264</span>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

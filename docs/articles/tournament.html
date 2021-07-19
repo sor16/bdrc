@@ -90,7 +90,7 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Tournament - Model comparison</h1>
-                        <h4 class="author">Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
+                        <h4 class="author">Solvi Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/tournament.Rmd"><code>vignettes/tournament.Rmd</code></a></small>
@@ -100,15 +100,14 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co">#load the packages needed for this vignette</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> <span class="fu">library</span>(bdrc)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(bdrc)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span></code></pre></div>
 <p>This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:</p>
 <p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
 <p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
 <p><code><a href="../reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
 <p><code><a href="../reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
-<p>To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the <a href="introduction.html">introduction vignette</a>. The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types “gplm” vs. “gplm0” and “plm” vs. “plm0”. If the posterior probability of the more complex model (“gplm” and “plm”, respectively) exceeds the “winning_criteria” (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same “winning_criteria” then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from astream gauging station called Krokfors in Sweden that comes with the package:</p>
+<p>To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the <a href="introduction.html">introduction vignette</a>. The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types “gplm” vs. “gplm0” and “plm” vs. “plm0”. If the posterior probability of the more complex model (“gplm” and “plm”, respectively) exceeds the “winning_criteria” (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same “winning_criteria” then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(krokfors)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> krokfors</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           W          Q</span></span>
@@ -144,7 +143,7 @@
 <a href="#running-a-tournament" class="anchor"></a>Running a tournament</h2>
 <p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(Q<span class="sc">~</span>W,krokfors)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">parallel=</span>F)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
@@ -157,13 +156,13 @@
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Tournament with winner gplm0</span></span></code></pre></div>
 <p>For a more detailed summary of the results of the tournament write</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(t_obj)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B       DIC num_eff_param            P winner</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param            P winner</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 3.720584e-01 -1.4580066      6.166518 6.789784e-01  FALSE</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 1.759095e-01 -0.7837597      6.375767 3.210216e-01   TRUE</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 8.217027e-07 23.5577648      3.000456 3.654075e-01  FALSE</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 1.427027e-06 23.2495998      2.887929 6.345925e-01   TRUE</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 1.759095e-01 -0.7837597      6.375767 9.999919e-01   TRUE</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 1.427027e-06 23.2495998      2.887929 8.112211e-06  FALSE</span></span></code></pre></div>
 <p>Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best fit of the data at hand.</p>
 </div>
 <div id="comparing-different-components-of-the-models" class="section level2">
@@ -172,15 +171,15 @@
 <p>There are several tools to visualize the different aspects of the model comparison. To get a visual summary of the results of the different games in the tournament, write</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj) <span class="co">#this is equivalent to type='tournament_results'</span></span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>Another informative way of comparing different models.The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write</p>
+<p>Another informative way of comparing different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'deviance'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>The red diamonds on the plot denote the DIC values for the resective models. Next, to plot rating curves from the different model, write</p>
+<p>The red diamonds on the plot denote the DIC values for the respective models. Next, to plot rating curves from the different model, write</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'rating_curve'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;"> Another useful plot is the residual plot</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>The main difference between the four models lies in the modelling of the power law exponent (<span class="math inline">\(f(h)\)</span>) and the variance on the data level (<span class="math inline">\(\sigma^2_{\varepsilon}\)</span>). Thus it is insightful to look at the posterior of the power law exponent for the different models</p>
+<p>The main difference between the four models lies in the modeling of the power law exponent (<span class="math inline">\(f(h)\)</span>) and the variance on the data level (<span class="math inline">\(\sigma^2_{\varepsilon}\)</span>). Thus it is insightful to look at the posterior of the power law exponent for the different models</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'f'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"> and the variance on the data level</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj,<span class="at">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
@@ -190,20 +189,20 @@
 <h2 class="hasAnchor">
 <a href="#customizing-tournaments" class="anchor"></a>Customizing tournaments</h2>
 <p>There are ways to customize the tournament further. For example, if the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known you might want to fix that parameter to the known value in the model. Assume 7.65 m is the known value of <span class="math inline">\(c\)</span>. Then you can directly run a tournament with the <span class="math inline">\(c\)</span> parameter fixed in all models</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj_known_c <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="at">formula=</span>Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>)</span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj_known_c <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="at">formula=</span>Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>,<span class="at">parallel=</span>F)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75% - plm finished</span></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100% - plm0 finished</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(t_obj_known_c)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B         DIC num_eff_param           P winner</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 8.762951e-04 -0.03878322      5.650730 0.580591150  FALSE</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 6.330202e-04  1.59569479      6.341464 0.419408850   TRUE</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 5.695433e-06 21.46928077      2.337616 0.558936248  FALSE</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 4.494339e-06 21.18584096      2.203317 0.441063752   TRUE</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 6.330202e-04  1.59569479      6.341464 0.992950217   TRUE</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 4.494339e-06 21.18584096      2.203317 0.007049783  FALSE</span></span></code></pre></div>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param          P winner</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 2.823131e-04  0.8515635      6.004683 0.39431413  FALSE</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 4.336467e-04  1.7021191      6.418082 0.60568587   TRUE</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 8.044550e-06 21.5178031      2.359842 0.52136525  FALSE</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 7.385228e-06 21.2342407      2.224901 0.47863475   TRUE</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 4.336467e-04  1.7021191      6.418082 0.98325467   TRUE</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 7.385228e-06 21.2342407      2.224901 0.01674533  FALSE</span></span></code></pre></div>
 <p>One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm0:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj_known_c,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span>T)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;"></p>
@@ -211,7 +210,9 @@
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769. Jeffreys, H. (1961). Theory of Probability, Third Edition. Oxford University Press. Kass, R., and A. Raftery, A. (1995). Bayes Factors. Journal of the American Statistical Association, 90, 773-795.</p>
+<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). <em>Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling</em>. arXiv preprint 2010.04769.<br>
+Jeffreys, H. (1961). <em>Theory of Probability</em>, Third Edition. Oxford University Press.<br>
+Kass, R., and A. Raftery, A. (1995). <em>Bayes Factors</em>. Journal of the American Statistical Association, 90, 773-795.</p>
 </div>
   </div>
 

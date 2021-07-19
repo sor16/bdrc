@@ -121,12 +121,13 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' @param ... not used in this function
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
-#' \donttest{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
-#' t_obj
-#' print(t_obj)
+#' set.seed(1)
+#' \dontrun{
+#' t_obj <- tournament(Q~W,krokfors)
+#' summary(t_obj)
 #' }
+#' # Tournament with winner gplm0
 #' @export
 print.tournament <- function(x,...){
     cat(paste0('Tournament with winner ',class(x$winner)))
@@ -139,11 +140,19 @@ print.tournament <- function(x,...){
 #' @param ... not used in this function
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
+#' set.seed(1)
+#' t_obj <- tournament(Q~W,krokfors)
 #' summary(t_obj)
 #' }
+#' #   round game model            B       DIC num_eff_param            P winner
+#' #1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE
+#' #2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE
+#' #3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE
+#' #4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE
+#' #5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE
+#' #6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE
 #' @export
 summary.tournament <- function(object,...){
     object$summary
@@ -161,11 +170,11 @@ summary.tournament <- function(object,...){
 #' @param ... further arguments passed to other methods.
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' library(ggplot2)
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
-#' summary(t_obj)
+#' set.seed(1)
+#' t_obj <- tournament(formula=Q~W,data=krokfors)
 #' autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
@@ -202,9 +211,10 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @param ... further arguments passed to other methods.
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors,parallel=F)
+#' set.seed(1)
+#' t_obj <- tournament(formula=Q~W,data=krokfors)
 #' plot(t_obj)
 #' plot(t_obj,transformed=TRUE)
 #' plot(t_obj,type='deviance')
