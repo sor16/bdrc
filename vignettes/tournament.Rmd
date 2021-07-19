@@ -70,7 +70,7 @@ plot(t_obj) #this is equivalent to type='tournament_results'
 ```
 
 
-Another informative way of comparing different models.The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write
+Another informative way of comparing different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write
 
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='deviance')

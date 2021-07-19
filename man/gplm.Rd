@@ -2,7 +2,7 @@
 % Please edit documentation in R/gplm.R
 \name{gplm}
 \alias{gplm}
-\title{Generalized power-law model}
+\title{Generalized power-law model with variance that varies with stage.}
 \usage{
 gplm(
   formula,

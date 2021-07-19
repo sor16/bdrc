@@ -1,4 +1,4 @@
-#' Generalized power-law model
+#' Generalized power-law model with variance that varies with stage.
 #'
 #' gplm is used to fit a discharge rating curve for paired measurements of stage and discharge using a generalized power-law model with variance that varies with stage as described in Hrafnkelsson et al. (2020).  See "Details" for a more elaborate description of the model.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).

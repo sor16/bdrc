@@ -2,7 +2,7 @@
 % Please edit documentation in R/plm.R
 \name{plm}
 \alias{plm}
-\title{Power-law model}
+\title{Power-law model with variance that varies with stage.}
 \usage{
 plm(
   formula,

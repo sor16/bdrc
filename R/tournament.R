@@ -26,9 +26,9 @@ evaluate_game <- function(m,winning_criteria=0.75){
 }
 
 
-#' Determine the most adequate rating curve model
+#' Tournament - Model comparison
 #'
-#' tournament compares four rating curve models of different complexities and determines which model is the most adequate
+#' tournament compares four rating curve models of different complexities and determines the model that provides the best fit of the data at hand.
 #'
 #' @param ... if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
