@@ -21,7 +21,7 @@
 \item{...}{not used in this function}
 }
 \description{
-Print a discharge rating curve result object
+Print a discharge rating curve model object
 }
 \section{Functions}{
 \itemize{

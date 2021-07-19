@@ -21,7 +21,7 @@
 \item{...}{Not used for this function}
 }
 \description{
-Summarize a discharge rating curve result object
+Summarize a discharge rating curve model object
 }
 \section{Functions}{
 \itemize{

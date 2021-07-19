@@ -43,7 +43,7 @@
 }}
 }
 \description{
-Visualize discharge rating curve result objects
+Visualize discharge rating curve model objects
 }
 \section{Functions}{
 \itemize{

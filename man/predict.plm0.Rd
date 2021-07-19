@@ -28,7 +28,7 @@
 an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=TRUE, a matrix as described above (see wide parameter) is returned.
 }
 \description{
-Predict the discharge for given stage values based on a discharge rating curve result object.
+Predict the discharge for given stage values based on a discharge rating curve model object.
 }
 \section{Functions}{
 \itemize{

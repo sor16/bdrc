@@ -170,7 +170,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
 #' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
 #'                    \itemize{
-#'                       \item{1 - }{produces a two page report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. The second one contains a tabular prediction of discharge on an equally spaced grid of stages.}
+#'                       \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
 #'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
@@ -186,31 +186,31 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @export
 get_report_pages <- function(x,type=1,...) UseMethod("get_report_pages")
 
-#' @describeIn get_report_pages Get report pages for plm0 result object
+#' @describeIn get_report_pages Get report pages for plm0 model object
 #' @export
 get_report_pages.plm0 <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-#' @describeIn get_report_pages Get report pages for plm result object
+#' @describeIn get_report_pages Get report pages for plm model object
 #' @export
 get_report_pages.plm <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-#' @describeIn get_report_pages Get report pages for gplm0 result object
+#' @describeIn get_report_pages Get report pages for gplm0 model object
 #' @export
 get_report_pages.gplm0 <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-#' @describeIn get_report_pages Get report pages for gplm result object
+#' @describeIn get_report_pages Get report pages for gplm model object
 #' @export
 get_report_pages.gplm <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
 }
 
-#' @describeIn get_report_pages Get report pages for discharge rating curve tournament result object
+#' @describeIn get_report_pages Get report pages for discharge rating curve tournament model object
 #' @export
 get_report_pages.tournament <- function(x,type=1,...){
     get_report_pages_fun(x,type=type)
@@ -240,21 +240,21 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @export
 get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
 
-#' @describeIn get_report Get report for plm0 result object
+#' @describeIn get_report Get report for plm0 model object
 #' @export
 get_report.plm0 <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-#' @describeIn get_report Get report for plm result object
+#' @describeIn get_report Get report for plm model object
 #' @export
 get_report.plm <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)
     save_report(report_pages,path=path,...)
 }
 
-#' @describeIn get_report Get report for gplm0 result object
+#' @describeIn get_report Get report for gplm0 model object
 #' @export
 get_report.gplm0 <- function(x,path=NULL,type=1,...){
     report_pages <- get_report_pages_fun(x,type=type)

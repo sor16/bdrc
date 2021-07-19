@@ -42,11 +42,11 @@ This function can only be used in an interactive R session as it asks permission
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{plm0}: Get report for plm0 result object
+\item \code{plm0}: Get report for plm0 model object
 
-\item \code{plm}: Get report for plm result object
+\item \code{plm}: Get report for plm model object
 
-\item \code{gplm0}: Get report for gplm0 result object
+\item \code{gplm0}: Get report for gplm0 model object
 
 \item \code{gplm}: Get report for gplm
 

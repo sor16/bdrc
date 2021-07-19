@@ -357,7 +357,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
 
 #' Print method for discharge rating curves
 #'
-#' Print a discharge rating curve result object
+#' Print a discharge rating curve model object
 #' @param x an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param ... not used in this function
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
@@ -376,7 +376,7 @@ print.plm0 <- function(x,...){
 
 #' Summary method for discharge rating curves
 #'
-#' Summarize a discharge rating curve result object
+#' Summarize a discharge rating curve model object
 #' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param ... Not used for this function
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
@@ -394,7 +394,7 @@ summary.plm0 <- function(object,...){
 
 #' Autoplot method for discharge rating curves
 #'
-#' Visualize discharge rating curve result objects
+#' Visualize discharge rating curve model objects
 #' @param x an object of class "plm0","plm","gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
@@ -441,7 +441,7 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...
 
 #' Plot method for discharge rating curves
 #'
-#' Visualize discharge rating curve result objects
+#' Visualize discharge rating curve model objects
 #' @param x object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
@@ -495,7 +495,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 
 #' Predict method for discharge rating curves
 #'
-#' Predict the discharge for given stage values based on a discharge rating curve result object.
+#' Predict the discharge for given stage values based on a discharge rating curve model object.
 #' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
 #' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
 #' @param wide a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.
