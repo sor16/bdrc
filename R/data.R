@@ -7,7 +7,7 @@
 #'  \item{W}{Measurements of water stage in meters}
 #'  \item{Q}{Measurements of water discharge in cubic meters per second}
 #' }
-#' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
+#' @source Swedish Meteorological and Hydrological Institute.
 "norn"
 
 #' Krokfors stream gauging station in Sweden
@@ -19,7 +19,7 @@
 #'  \item{W}{Measurements of water stage in meters}
 #'  \item{Q}{Measurements of water discharge in cubic meters per second}
 #' }
-#' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
+#' @source Swedish Meteorological and Hydrological Institute.
 "krokfors"
 
 #' Spanga stream gauging station in Sweden
@@ -31,7 +31,7 @@
 #'  \item{W}{Measurements of water stage in meters}
 #'  \item{Q}{Measurements of water discharge in cubic meters per second}
 #' }
-#' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
+#' @source Swedish Meteorological and Hydrological Institute.
 "spanga"
 
 #' Skogsliden stream gauging station in Sweden
@@ -43,5 +43,5 @@
 #'  \item{W}{Measurements of water stage in meters}
 #'  \item{Q}{Measurements of water discharge in cubic meters per second}
 #' }
-#' @source Swedish Meteorological and Hydrological Institute \url{http://www.smhi.se}
+#' @source Swedish Meteorological and Hydrological Institute.
 "skogsliden"
