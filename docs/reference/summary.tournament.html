@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bdrc</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -158,7 +158,7 @@
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> to run a dishcarge rating curve tournament and <code><a href='plot.tournament.html'>plot.tournament</a></code> for visualizing the mode comparison</p></div>
+    <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> to run a discharge rating curve tournament and <code><a href='plot.tournament.html'>plot.tournament</a></code> for visualizing the mode comparison</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
@@ -169,13 +169,13 @@
 #&gt; 50% - gplm0 finished
 #&gt; 75% - plm finished
 #&gt; 100% - plm0 finished</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   round game model            B       DIC num_eff_param            P winner
-#&gt; 1     1    1  gplm 2.239611e-01 -1.590889      6.152212 7.933802e-01   TRUE
-#&gt; 2     1    1 gplm0 5.832612e-02 -0.946878      6.285658 2.066198e-01  FALSE
-#&gt; 3     1    2   plm 2.629525e-07 23.598949      3.011847 2.737713e-01  FALSE
-#&gt; 4     1    2  plm0 6.975298e-07 23.313881      2.902870 7.262287e-01   TRUE
-#&gt; 5     2    3  gplm 2.239611e-01 -1.590889      6.152212 9.999969e-01   TRUE
-#&gt; 6     2    3  plm0 6.975298e-07 23.313881      2.902870 3.114503e-06  FALSE</div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
+#&gt; 1     1    1  gplm 1.195758e-02 -1.5460392      6.140475 2.455009e-01  FALSE
+#&gt; 2     1    1 gplm0 3.674931e-02 -0.7320041      6.412704 7.544991e-01   TRUE
+#&gt; 3     1    2   plm 1.628512e-06 23.5292308      2.938193 4.654665e-01  FALSE
+#&gt; 4     1    2  plm0 1.870154e-06 23.2678857      2.913874 5.345335e-01   TRUE
+#&gt; 5     2    3 gplm0 3.674931e-02 -0.7320041      6.412704 9.999491e-01   TRUE
+#&gt; 6     2    3  plm0 1.870154e-06 23.2678857      2.913874 5.088693e-05  FALSE</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

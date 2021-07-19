@@ -80,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bdrc</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="Unreleased version">0.0.0.9002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -145,7 +145,7 @@
   <span class='va'>data</span>,
   c_param <span class='op'>=</span> <span class='cn'>NULL</span>,
   h_max <span class='op'>=</span> <span class='cn'>NULL</span>,
-  parallel <span class='op'>=</span> <span class='cn'>T</span>,
+  parallel <span class='op'>=</span> <span class='cn'>TRUE</span>,
   forcepoint <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='cn'>FALSE</span>, <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
@@ -198,7 +198,7 @@
 <dt><code>eta_4_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_4\).</p></dd>
 <dt><code>eta_5_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_5\).</p></dd>
 <dt><code>eta_6_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_6\).</p></dd>
-<dt><code>Deviance_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.</p></dd>
+<dt><code>Deviance_posterior</code></dt><dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.</p></dd>
 <dt><code>D_hat</code></dt><dd><p>deviance at the median value of the parameters.</p></dd>
 <dt><code>num_effective_param</code></dt><dd><p>number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.</p></dd>
 <dt><code>DIC</code></dt><dd><p>Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.</p></dd>
@@ -227,31 +227,31 @@ Bayesian inference is based on the posterior density and summary statistics such
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>spanga</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>formula</span> <span class='op'>&lt;-</span> <span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>
-<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>plm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>plm</span><span class='op'>(</span><span class='va'>formula</span>,<span class='va'>spanga</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>plm.fit</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; 
 #&gt; Formula: 
 #&gt;  Q ~ W
 #&gt; Latent parameters:
 #&gt;   lower-2.5% median-50% upper-97.5%
-#&gt; a 1.17       1.66       2.13       
-#&gt; b 2.45       2.81       3.21       
+#&gt; a 11.10      12.53      13.80      
+#&gt; b  1.92       2.05       2.21      
 #&gt; 
 #&gt; Hyperparameters:
 #&gt;           lower-2.5% median-50% upper-97.5%
-#&gt; c          7.58174    7.6788     7.7517    
-#&gt; sigma_eta  0.00327    0.0795     0.4390    
-#&gt; eta_1     -3.99509   -3.3400    -2.7526    
-#&gt; eta_2     -5.06522   -3.2159    -1.3386    
-#&gt; eta_3     -5.72148   -3.1039    -0.6323    
-#&gt; eta_4     -6.26442   -3.0298     0.0544    
-#&gt; eta_5     -6.78031   -2.9221     0.6961    
-#&gt; eta_6     -7.25810   -2.8813     1.2458    
+#&gt; c           9.4018    9.45       9.495     
+#&gt; sigma_eta   0.0149    0.35       0.864     
+#&gt; eta_1      -5.5404   -4.83      -3.777     
+#&gt; eta_2      -7.6414   -5.92      -4.220     
+#&gt; eta_3      -9.0013   -6.87      -4.173     
+#&gt; eta_4      -9.7819   -7.28      -4.197     
+#&gt; eta_5     -10.5232   -7.57      -3.984     
+#&gt; eta_6     -10.9925   -7.52      -3.655     
 #&gt; 
-#&gt; DIC: 23.64642</div><div class='input'><span class='co'># }</span>
+#&gt; DIC: 52.10376</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
