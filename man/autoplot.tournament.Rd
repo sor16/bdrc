@@ -25,10 +25,9 @@ library(ggplot2)
 data(krokfors)
 t_obj <- tournament(Q~W,krokfors)
 summary(t_obj)
-plot(t_obj)
 autoplot(t_obj)
 }
 }
 \seealso{
-\code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
+\code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 }
