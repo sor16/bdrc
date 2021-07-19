@@ -101,8 +101,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="co">#load the packages needed for this vignette</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(ggplot2)</span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span></code></pre></div>
 <p>This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:</p>
 <p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
 <p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
@@ -144,7 +143,7 @@
 <a href="#running-a-tournament" class="anchor"></a>Running a tournament</h2>
 <p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>F)</span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
@@ -158,12 +157,12 @@
 <p>For a more detailed summary of the results of the tournament write</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj)</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param            P winner</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; 1     1    1  gplm 4.235318e-01 -1.5675637      6.192257 6.289009e-01  FALSE</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 2     1    1 gplm0 2.499158e-01 -0.8490926      6.325837 3.710991e-01   TRUE</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; 3     1    2   plm 9.666899e-07 23.6508881      3.009948 3.674699e-01  FALSE</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 4     1    2  plm0 1.663974e-06 23.4019985      2.954873 6.325301e-01   TRUE</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 5     2    3 gplm0 2.499158e-01 -0.8490926      6.325837 9.999933e-01   TRUE</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 6     2    3  plm0 1.663974e-06 23.4019985      2.954873 6.658095e-06  FALSE</span></span></code></pre></div>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; 1     1    1  gplm 3.720584e-01 -1.4580066      6.166518 6.789784e-01  FALSE</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 2     1    1 gplm0 1.759095e-01 -0.7837597      6.375767 3.210216e-01   TRUE</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; 3     1    2   plm 8.217027e-07 23.5577648      3.000456 3.654075e-01  FALSE</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 4     1    2  plm0 1.427027e-06 23.2495998      2.887929 6.345925e-01   TRUE</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 5     2    3 gplm0 1.759095e-01 -0.7837597      6.375767 9.999919e-01   TRUE</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 6     2    3  plm0 1.427027e-06 23.2495998      2.887929 8.112211e-06  FALSE</span></span></code></pre></div>
 <p>Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best fit of the data at hand.</p>
 </div>
 <div id="comparing-different-components-of-the-models" class="section level2">
@@ -190,20 +189,20 @@
 <h2 class="hasAnchor">
 <a href="#customizing-tournaments" class="anchor"></a>Customizing tournaments</h2>
 <p>There are ways to customize the tournament further. For example, if the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known you might want to fix that parameter to the known value in the model. Assume 7.65 m is the known value of <span class="math inline">\(c\)</span>. Then you can directly run a tournament with the <span class="math inline">\(c\)</span> parameter fixed in all models</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj_known_c &lt;-<span class="st"> </span><span class="kw">tournament</span>(<span class="dt">formula=</span>Q<span class="op">~</span>W,<span class="dt">data=</span>krokfors,<span class="dt">c_param=</span><span class="fl">7.65</span>)</span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj_known_c &lt;-<span class="st"> </span><span class="kw">tournament</span>(<span class="dt">formula=</span>Q<span class="op">~</span>W,<span class="dt">data=</span>krokfors,<span class="dt">c_param=</span><span class="fl">7.65</span>,<span class="dt">parallel=</span>F)</span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
 <span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; 75% - plm finished</span></span>
 <span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; 100% - plm0 finished</span></span>
 <span id="cb13-7"><a href="#cb13-7"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj_known_c)</span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   round game model            B         DIC num_eff_param           P winner</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; 1     1    1  gplm 1.020631e-03 -0.04700816      5.718738 0.424106081  FALSE</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; 2     1    1 gplm0 1.385915e-03  1.48095038      6.324843 0.575893919   TRUE</span></span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; 3     1    2   plm 5.311255e-06 21.47880827      2.336585 0.511622181  FALSE</span></span>
-<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; 4     1    2  plm0 5.069951e-06 21.19374866      2.206672 0.488377819   TRUE</span></span>
-<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt; 5     2    3 gplm0 1.385915e-03  1.48095038      6.324843 0.996355136   TRUE</span></span>
-<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt; 6     2    3  plm0 5.069951e-06 21.19374866      2.206672 0.003644864  FALSE</span></span></code></pre></div>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param          P winner</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; 1     1    1  gplm 2.823131e-04  0.8515635      6.004683 0.39431413  FALSE</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; 2     1    1 gplm0 4.336467e-04  1.7021191      6.418082 0.60568587   TRUE</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; 3     1    2   plm 8.044550e-06 21.5178031      2.359842 0.52136525  FALSE</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; 4     1    2  plm0 7.385228e-06 21.2342407      2.224901 0.47863475   TRUE</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt; 5     2    3 gplm0 4.336467e-04  1.7021191      6.418082 0.98325467   TRUE</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt; 6     2    3  plm0 7.385228e-06 21.2342407      2.224901 0.01674533  FALSE</span></span></code></pre></div>
 <p>One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm0:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj_known_c,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;"></p>
