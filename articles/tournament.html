@@ -90,7 +90,7 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Tournament - Model comparison</h1>
-                        <h4 class="author">Sölvi Rögnvaldsson, Axel Örn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
+                        <h4 class="author">Solvi Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/tournament.Rmd"><code>vignettes/tournament.Rmd</code></a></small>
@@ -100,8 +100,8 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="co">#load the packages needed for this vignette</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="er">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span></code></pre></div>
 <p>This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:</p>
 <p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
 <p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
@@ -210,7 +210,9 @@
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
-<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769. Jeffreys, H. (1961). Theory of Probability, Third Edition. Oxford University Press. Kass, R., and A. Raftery, A. (1995). Bayes Factors. Journal of the American Statistical Association, 90, 773-795.</p>
+<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). <em>Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling</em>. arXiv preprint 2010.04769.<br>
+Jeffreys, H. (1961). <em>Theory of Probability</em>, Third Edition. Oxford University Press.<br>
+Kass, R., and A. Raftery, A. (1995). <em>Bayes Factors</em>. Journal of the American Statistical Association, 90, 773-795.</p>
 </div>
   </div>
 

@@ -167,23 +167,13 @@
     <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code> to run a discharge rating curve tournament and <code><a href='summary.tournament.html'>summary.tournament</a></code> for summaries.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,<span class='va'>krokfors</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Running tournament:
-#&gt; 25% - gplm finished
-#&gt; 50% - gplm0 finished
-#&gt; 75% - plm finished
-#&gt; 100% - plm0 finished</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
-#&gt; 1     1    1  gplm 4.946249e-02 -1.5222648      6.166183 2.731107e-01  FALSE
-#&gt; 2     1    1 gplm0 1.316453e-01 -0.5360443      6.501155 7.268893e-01   TRUE
-#&gt; 3     1    2   plm 8.257282e-07 23.5963706      2.993081 4.566934e-01  FALSE
-#&gt; 4     1    2  plm0 9.823299e-07 23.3192665      2.917275 5.433066e-01   TRUE
-#&gt; 5     2    3 gplm0 1.316453e-01 -0.5360443      6.501155 9.999925e-01   TRUE
-#&gt; 6     2    3  plm0 9.823299e-07 23.3192665      2.917275 7.461887e-06  FALSE</div><div class='input'><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-</div><div class='img'><img src='autoplot.tournament-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tournament.html'>tournament</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/autoplot.html'>autoplot</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
