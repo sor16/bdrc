@@ -43,7 +43,7 @@
 #' data(skogsliden)
 #' set.seed(1)
 #' formula <- Q~W
-#' plm0.fit <- plm0(formula,skogsliden)
+#' plm0.fit <- plm0(formula,skogsliden,parallel=F)
 #' summary(plm0.fit)
 #' }
 #' @export

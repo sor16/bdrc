@@ -61,7 +61,7 @@
 #' data(norn)
 #' set.seed(1)
 #' formula <- Q~W
-#' gplm.fit <- gplm(formula,norn)
+#' gplm.fit <- gplm(formula,norn,parallel=F)
 #' summary(gplm.fit)
 #' }
 #' @export

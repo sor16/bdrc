@@ -364,7 +364,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' plm0.fit
 #' print(plm0.fit)
 #' }
@@ -383,7 +383,7 @@ print.plm0 <- function(x,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' summary(plm0.fit)
 #' }
 #' @describeIn summary.plm0 Summary method for plm0
@@ -421,7 +421,7 @@ summary.plm0 <- function(object,...){
 #' \donttest{
 #' library(ggplot2)
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' autoplot(plm0.fit)
 #' autoplot(plm0.fit,transformed=TRUE)
 #' autoplot(plm0.fit,type='histogram',param='c')
@@ -467,7 +467,7 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' plot(plm0.fit)
 #' plot(plm0.fit,transformed=TRUE)
 #' plot(plm0.fit,type='histogram',param='c')
@@ -505,7 +505,7 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors,h_max=24)
+#' plm0.fit <- plm0(Q~W,krokfors,h_max=24,parallel=F)
 #' #predict rating curve on a equally 1 cm spaced grid from 1 to 2 meters
 #' predict(plm0.fit,newdata=seq(23,24,by=0.01))
 #' predict(plm0.fit,wide=TRUE)

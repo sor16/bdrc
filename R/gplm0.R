@@ -49,7 +49,7 @@
 #' data(krokfors)
 #' set.seed(1)
 #' formula <- Q~W
-#' gplm0.fit <- gplm0(formula,krokfors)
+#' gplm0.fit <- gplm0(formula,krokfors,parallel=F)
 #' summary(gplm0.fit)
 #' }
 #' @export

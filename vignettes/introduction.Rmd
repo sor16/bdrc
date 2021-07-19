@@ -43,7 +43,7 @@ krokfors
 It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
 
 ```{r, cache=T}
-gplm.fit <- gplm(Q~W,data=krokfors)
+gplm.fit <- gplm(Q~W,data=krokfors,parallel=F)
 ```
 <tt>gplm</tt> returns an object of class "gplm" which we can summarize and visualize using familiar functions such as
 
@@ -122,7 +122,7 @@ plot(gplm.fit,type='autocorrelation')
 ## Customization of models
 There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this
 ```{r,cache=T,results}
-gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10)
+gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10,parallel=F)
 summary(gplm.fit.known_c)
 ```
 one neat way to get a visualization summary of your model is to use the 'panel' option in the plot method:

@@ -51,12 +51,8 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
-#' plm.fit <- plm(Q~W,krokfors)
-#' gplm0.fit <- gplm0(Q~W,krokfors)
-#' gplm.fit <- gplm(Q~W,krokfors)
-#' t_obj <- tournament(gplm.fit,gplm0.fit,plm.fit,plm0.fit,winning_criteria=0.95)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
+#' summary(t_obj)
 #' }
 #' @export
 tournament <- function(formula=NULL,data=NULL,...,winning_criteria=0.75) {

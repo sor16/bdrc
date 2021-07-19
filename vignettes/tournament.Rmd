@@ -24,7 +24,6 @@ knitr::opts_chunk$set(
 ```{r,message=F}
 #load the packages needed for this vignette
 library(bdrc)
-library(ggplot2)
 ```
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
@@ -45,7 +44,7 @@ krokfors
 The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:
 ```{r, cache=T}
 set.seed(1)
-t_obj <- tournament(Q~W,krokfors)
+t_obj <- tournament(Q~W,krokfors,parallel=F)
 ```
 The function both runs the four models for you and runs the tournament. It's worth mentioning that if you have already run your models of the four different kinds, <tt>plm0</tt>, <tt>plm</tt>, <tt>gplm0</tt> and <tt>gplm</tt> and they are stored in objects, say <tt>plm0.fit</tt>, <tt>plm.fit</tt>, <tt>gplm0.fit</tt> and <tt>gplm.fit</tt>, you can alternatively run the tournament very efficiently in the following way:
 ```{r,eval=F}
@@ -97,7 +96,7 @@ plot(t_obj,type='sigma_eps')
 ## Customizing tournaments
 There are ways to customize the tournament further. For example, if the parameter of zero discharge, $c$, is known you  might want to fix that parameter to the known value in the model. Assume 7.65 m is the known value of $c$. Then you can directly run a tournament with the $c$ parameter fixed in all models
 ```{r,cache=T}
-t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65)
+t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65,parallel=F)
 summary(t_obj_known_c)
 ```
 One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm0:

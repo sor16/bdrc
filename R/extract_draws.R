@@ -15,7 +15,7 @@
 #'\donttest{
 #' data(krokfors)
 #' f <- Q~W
-#' plm0.fit <- plm0(f,krokfors)
+#' plm0.fit <- plm0(f,krokfors,parallel=F)
 #' hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 #' head(hyp_samples)
 #' rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
@@ -60,7 +60,7 @@ spread_draws <- function(mod,...,transformed=FALSE){
 #'\donttest{
 #' data(krokfors)
 #' f <- Q~W
-#' plm0.fit <- plm0(f,krokfors)
+#' plm0.fit <- plm0(f,krokfors,parallel=F)
 #' hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 #' head(hyp_samples)
 #' rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')

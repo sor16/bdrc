@@ -123,7 +123,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' t_obj
 #' print(t_obj)
 #' }
@@ -141,7 +141,7 @@ print.tournament <- function(x,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' summary(t_obj)
 #' }
 #' @export
@@ -164,7 +164,7 @@ summary.tournament <- function(object,...){
 #' \donttest{
 #' library(ggplot2)
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' summary(t_obj)
 #' autoplot(t_obj)
 #' }
@@ -204,7 +204,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' plot(t_obj)
 #' plot(t_obj,transformed=TRUE)
 #' plot(t_obj,type='deviance')

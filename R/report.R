@@ -178,9 +178,9 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' @examples
 #' \donttest{
 #' data(skogsliden)
-#' plm0.fit <- plm0(Q~W,skogsliden)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' plm0_pages <- get_report_pages(plm0.fit)
-#' t_obj <- tournament(Q~W,skogsliden)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' tournament_pages <- get_report_pages(t_obj,type=2)
 #' }
 #' @export
@@ -232,9 +232,9 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' @examples
 #' \donttest{
 #' data(krokfors)
-#' plm0.fit <- plm0(Q~W,krokfors)
+#' plm0.fit <- plm0(Q~W,krokfors,parallel=F)
 #' #get_report(plm0.fit)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,parallel=F)
 #' #get_report(t_obj,type=2)
 #' }
 #' @export

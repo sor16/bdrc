@@ -50,7 +50,7 @@
 #' data(spanga)
 #' set.seed(1)
 #' formula <- Q~W
-#' plm.fit <- plm(formula,spanga)
+#' plm.fit <- plm(formula,spanga,parallel=F)
 #' summary(plm.fit)
 #' }
 #' @export

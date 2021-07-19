@@ -186,9 +186,9 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
              nr_iter=nr_iter,burnin=burnin,thin=thin,T_max=T_max)
   }
   if(parallel){
-    chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-    if (nzchar(chk) && chk == "TRUE") {
-      # use 2 cores in CRAN/Travis/AppVeyor
+    chk <- tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", ""))
+    if (nchar(chk)>0 & chk != "false") {
+      # use 2 cores in CRAN and CI environments
       num_cores <- 2L
     } else {
       num_cores <- min(detectCores(),num_chains)
