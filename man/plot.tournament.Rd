@@ -41,5 +41,5 @@ plot(t_obj,type='tournament_results')
 }
 }
 \seealso{
-\code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
+\code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 }

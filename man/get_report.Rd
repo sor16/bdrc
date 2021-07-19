@@ -38,7 +38,7 @@ get_report(x, path = NULL, type = 1, ...)
 Save a pdf file with a report of a discharge rating curve object or tournament.
 }
 \details{
-This function can only be used in an interactive R session as it asks permission from the user to write to their filesystem.
+This function can only be used in an interactive R session as it asks permission from the user to write to their file system.
 }
 \section{Methods (by class)}{
 \itemize{

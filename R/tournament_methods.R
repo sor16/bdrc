@@ -119,7 +119,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' Print the results of a tournament of discharge rating curve model comparisons
 #' @param x an object of class "tournament"
 #' @param ... not used in this function
-#' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
+#' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
 #' \donttest{
 #' data(krokfors)
@@ -137,7 +137,7 @@ print.tournament <- function(x,...){
 #' Print the summary of a tournament of model comparisons
 #' @param object an object of class "tournament"
 #' @param ... not used in this function
-#' @seealso  \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
+#' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
 #' \donttest{
 #' data(krokfors)
@@ -159,14 +159,13 @@ summary.tournament <- function(object,...){
 #'  \item{"deviance"}{ to plot the deviance of the four models.}
 #' }
 #' @param ... further arguments passed to other methods.
-#' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
+#' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
 #' library(ggplot2)
 #' data(krokfors)
 #' t_obj <- tournament(Q~W,krokfors)
 #' summary(t_obj)
-#' plot(t_obj)
 #' autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
@@ -201,7 +200,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param ... further arguments passed to other methods.
-#' @seealso \code{\link{tournament}} to run a dishcarge rating curve tournament and \code{\link{summary.tournament}} for summaries.
+#' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
 #' data(krokfors)

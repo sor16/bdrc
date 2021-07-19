@@ -18,7 +18,7 @@ tournament(formula = NULL, data = NULL, ..., winning_criteria = 0.75)
 \value{
 An object of type "tournament" with the following elements
 \describe{
- \item{\code{summary}}{a data frame with information on reults of the different games in the tournament.}
+ \item{\code{summary}}{a data frame with information on results of the different games in the tournament.}
  \item{\code{contestants}}{model objects of types "plm0","plm","gplm0" and "gplm" being compared.}
  \item{\code{winner}}{model object of the tournament winner.}
 }
@@ -27,7 +27,7 @@ An object of type "tournament" with the following elements
 tournament compares four rating curve models of different complexities and determines which model is the most adequate
 }
 \details{
-Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (defult value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor and assuming a priori that the two models were equally likely [see Jeffreys (1961) and Kass and Raftery (1995)].
+Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor and assuming a priori that the two models were equally likely [see Jeffreys (1961) and Kass and Raftery (1995)].
 }
 \examples{
 \donttest{

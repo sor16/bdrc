@@ -60,7 +60,7 @@ histogram_breaks <-function(x){
 }
 #' Plot bdrc model objects
 #'
-#' Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
+#' Visualize results from model objects in bdrc, plm0, plm, gplm0,gplm
 #' @param x an object of class "plm0","plm","gplm0" or "gplm".
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{

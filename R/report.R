@@ -152,7 +152,7 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
         msg <- paste0('Do you wish to save the report as a pdf file at the following location:  ',path,'?')
         answer <- askYesNo(msg)
     }else{
-        stop('Unable to ask permission for writing the report to the filesystem. get_report() must be used in an interactive R session')
+        stop('Unable to ask permission for writing the report to the file system. get_report() must be used in an interactive R session')
     }
     if(answer==FALSE | is.na(answer)) stop('Permission to store a pdf file was not granted')
     pdf(file=path,paper=paper,width=width,height=height)
@@ -227,7 +227,7 @@ get_report_pages.tournament <- function(x,type=1,...){
 #'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 #'                    }
 #' @param ... further arguments passed to other methods (currently unused).
-#' @details  This function can only be used in an interactive R session as it asks permission from the user to write to their filesystem.
+#' @details  This function can only be used in an interactive R session as it asks permission from the user to write to their file system.
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{

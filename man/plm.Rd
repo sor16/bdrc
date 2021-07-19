@@ -45,7 +45,7 @@ plm returns an object of class "plm". An object of class "plm" is a list contain
 \item{\code{eta_4_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_4}.}
 \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5}.}
 \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
-\item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
+\item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.}
 \item{\code{D_hat}}{deviance at the median value of the parameters.}
 \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
 \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.}

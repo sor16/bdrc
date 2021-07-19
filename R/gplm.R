@@ -11,7 +11,7 @@
 #' @details The generalized power-law model is of the form
 #' \deqn{Q=a(h-c)^{f(h)}}
 #' where \eqn{Q} is discharge, \eqn{h} is stage, \eqn{a} and \eqn{c} are unknown constants and \eqn{f} is a function of \eqn{h}, referred to as the generalized power-law exponent.\cr\cr
-#' The generalized power-law model is here inferred by using a Bayesian hierarchical model. The function \eqn{f} is modelled at the latent level as a fixed constant \eqn{b} plus a continuous stochastic process, \eqn{\beta(h)}, which is assumed to be twice differentiable. The model is on a logarithmic scale
+#' The generalized power-law model is here inferred by using a Bayesian hierarchical model. The function \eqn{f} is modeled at the latent level as a fixed constant \eqn{b} plus a continuous stochastic process, \eqn{\beta(h)}, which is assumed to be twice differentiable. The model is on a logarithmic scale
 #' \deqn{\log(Q_i) = \log(a) + (b + \beta(h_i)) \log(h_i - c) + \varepsilon_i,     i = 1,...,n}
 #' where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 #' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
@@ -39,9 +39,9 @@
 #'  \item{\code{eta_5_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_5} excluding burn-in samples.}
 #'  \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6} excluding burn-in samples.}
 #'  \item{\code{f_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{f(h)} excluding burn-in samples.}
-#'  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burnin samples.}
-#'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\varepsilon(h)} excluding burnin samples.}
-#'  \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burnin samples.}
+#'  \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta(h)} excluding burn-in samples.}
+#'  \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_\varepsilon(h)} excluding burn-in samples.}
+#'  \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.}
 #'  \item{\code{D_hat}}{deviance at the median value of the parameters.}
 #'  \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
 #'  \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.}

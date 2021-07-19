@@ -32,6 +32,6 @@ plot_fun(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 returns an object of class ggplot2.
 }
 \description{
-Visualize results from model ojbects in bdrc, plm0, plm, gplm0,gplm
+Visualize results from model objects in bdrc, plm0, plm, gplm0,gplm
 }
 \keyword{internal}

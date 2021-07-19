@@ -23,5 +23,5 @@ print(t_obj)
 }
 }
 \seealso{
-\code{\link{tournament}} to run a dishcarge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
+\code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
 }
