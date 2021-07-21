@@ -48,6 +48,10 @@ test_that("the gplm object with unknown c is in tact", {
 })
 
 test_that("the gplm object with known c with a maximum stage value is in tact", {
+    skip_on_cran()
+    skip_on_ci()
+    set.seed(1)
+    gplm.fit_known_c <- gplm(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
     expect_is(gplm.fit_known_c,"gplm")
     #latent parameters
     test_stage_indep_param(gplm.fit_known_c,'a')
