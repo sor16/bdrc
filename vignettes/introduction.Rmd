@@ -92,6 +92,12 @@ plot(gplm.fit,type='f')
 plot(gplm.fit,type='sigma_eps')
 ```
 
+To get a visualization summary of your model, the 'panel' option in the plot method is useful:
+
+```{r, fig.width=8, fig.height=6,results='hide'}
+plot(gplm.fit,type='panel',transformed=T)
+```
+
 ## Assessing model fitness and convergence
 The package has several functions for convergence diagnostics of a bdrc model, most notably the residual plot, tracing plots, autocorrelation plot and the Gelman-Rubin statistic plot. The log-residuals can be plotted with 
 ```{r, fig.width=8, fig.height=6}
@@ -117,24 +123,17 @@ And finally autocorrelation of parameters can be assessed with
 plot(gplm.fit,type='autocorrelation')
 ```
 
-
 ## Customization of models
 There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this
-```{r,cache=T,results}
+```{r,cache=T,eval=FALSE}
 gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10,parallel=F)
-summary(gplm.fit.known_c)
-```
-one neat way to get a visualization summary of your model is to use the 'panel' option in the plot method:
-
-```{r, fig.width=8, fig.height=6,results='hide'}
-plot(gplm.fit.known_c,type='panel',transformed=T)
 ```
 
 ## Prediction for an equally spaced grid of stages
 To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which Bayesian inference was performed
 ```{r}
-h_grid <- seq(7.65,10,by=0.01)
-rating_curve_h_grid <- predict(gplm.fit.known_c,newdata=h_grid)
+h_grid <- seq(8,9,by=0.01)
+rating_curve_h_grid <- predict(gplm.fit,newdata=h_grid)
 print(rating_curve_h_grid)
 ```
 

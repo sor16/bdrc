@@ -21,10 +21,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r,message=F}
-library(bdrc)
-set.seed(1) # set seed for reproducibility
-```
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
 ```plm0() ``` - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
@@ -36,7 +32,9 @@ This vignette explores the ways you can compare the fit of the different dischar
 ```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
 To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:
-```{r, data}
+```{r,message=F}
+library(bdrc)
+set.seed(1) # set seed for reproducibility
 data(krokfors)
 krokfors
 ```
@@ -93,16 +91,17 @@ and the variance on the data level
 plot(t_obj,type='sigma_eps')
 ```
 
+Finally, the panel option is useful to gain insight into all different model components of the winning model, which in this case is gplm0:
+```{r, fig.width=8, fig.height=6}
+plot(t_obj,type='panel',transformed=T)
+```
+
 ## Customizing tournaments
 There are ways to customize the tournament further. For example, if the parameter of zero discharge, $c$, is known you  might want to fix that parameter to the known value in the model. Assume 7.65 m is the known value of $c$. Then you can directly run a tournament with the $c$ parameter fixed in all models
-```{r,cache=T}
-t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65,parallel=F)
-summary(t_obj_known_c)
+```{r,eval=F}
+t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65)
 ```
-One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm0:
-```{r, fig.width=8, fig.height=6}
-plot(t_obj_known_c,type='panel',transformed=T)
-```
+
 
 
 ## References
