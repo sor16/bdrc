@@ -100,112 +100,99 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span></code></pre></div>
 <p>This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the bdrc package. The package includes four different models to fit a discharge rating curve of different complexities. These are:</p>
 <p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
 <p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
 <p><code><a href="../reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
 <p><code><a href="../reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).</p>
 <p>To learn more about the four models, see Hrafnkelsson et al. (2020). To learn about how to run the models on your data see the <a href="introduction.html">introduction vignette</a>. The tournament is a model comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types “gplm” vs. “gplm0” and “plm” vs. “plm0”. If the posterior probability of the more complex model (“gplm” and “plm”, respectively) exceeds the “winning_criteria” (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same “winning_criteria” then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor, assuming a priori that the two models were equally likely (see Jeffreys (1961) and Kass and Raftery (1995)). As in the introduction vignette, we will use a dataset from a stream gauging station called Krokfors in Sweden that comes with the package:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(krokfors)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>krokfors</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt;           W          Q</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 1  9.478000 10.8211700</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 2  8.698000  1.5010000</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 3  9.009000  3.3190000</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; 4  8.097000  0.1595700</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 5  9.104000  4.5462500</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; 6  8.133774  0.2121178</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt; 7  8.569583  1.1580000</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt; 8  9.139151  4.8110000</span></span>
-<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 9  9.464250 10.9960000</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 10 8.009214  0.0984130</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 11 8.961843  2.7847910</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; 12 8.316000  0.6631890</span></span>
-<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 13 8.828716  1.8911800</span></span>
-<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; 14 9.897000 20.2600000</span></span>
-<span id="cb2-18"><a href="#cb2-18"></a><span class="co">#&gt; 15 7.896000  0.0190000</span></span>
-<span id="cb2-19"><a href="#cb2-19"></a><span class="co">#&gt; 16 9.534000 12.1000000</span></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="co">#&gt; 17 9.114000  4.3560000</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; 18 8.389000  0.6200000</span></span>
-<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt; 19 8.999000  2.6800000</span></span>
-<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt; 20 9.099000  3.7310000</span></span>
-<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt; 21 8.502000  0.8930000</span></span>
-<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt; 22 8.873000  1.9000000</span></span>
-<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt; 23 8.240000  0.3200000</span></span>
-<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt; 24 9.219000  5.9000000</span></span>
-<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt; 25 9.271000  6.9000000</span></span>
-<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt; 26 8.370000  0.4420000</span></span>
-<span id="cb2-30"><a href="#cb2-30"></a><span class="co">#&gt; 27 9.431000  9.0000000</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">library</span>(bdrc)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">data</span>(krokfors)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="op">&gt;</span><span class="st"> </span>krokfors</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt;           W          Q</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#&gt; 1  9.478000 10.8211700</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="co">#&gt; 2  8.698000  1.5010000</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co">#&gt; 3  9.009000  3.3190000</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co">#&gt; 4  8.097000  0.1595700</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">#&gt; 5  9.104000  4.5462500</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co">#&gt; 6  8.133774  0.2121178</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt; 7  8.569583  1.1580000</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt; 8  9.139151  4.8110000</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt; 9  9.464250 10.9960000</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; 10 8.009214  0.0984130</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt; 11 8.961843  2.7847910</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt; 12 8.316000  0.6631890</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="co">#&gt; 13 8.828716  1.8911800</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co">#&gt; 14 9.897000 20.2600000</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="co">#&gt; 15 7.896000  0.0190000</span></span>
+<span id="cb1-21"><a href="#cb1-21"></a><span class="co">#&gt; 16 9.534000 12.1000000</span></span>
+<span id="cb1-22"><a href="#cb1-22"></a><span class="co">#&gt; 17 9.114000  4.3560000</span></span>
+<span id="cb1-23"><a href="#cb1-23"></a><span class="co">#&gt; 18 8.389000  0.6200000</span></span>
+<span id="cb1-24"><a href="#cb1-24"></a><span class="co">#&gt; 19 8.999000  2.6800000</span></span>
+<span id="cb1-25"><a href="#cb1-25"></a><span class="co">#&gt; 20 9.099000  3.7310000</span></span>
+<span id="cb1-26"><a href="#cb1-26"></a><span class="co">#&gt; 21 8.502000  0.8930000</span></span>
+<span id="cb1-27"><a href="#cb1-27"></a><span class="co">#&gt; 22 8.873000  1.9000000</span></span>
+<span id="cb1-28"><a href="#cb1-28"></a><span class="co">#&gt; 23 8.240000  0.3200000</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a><span class="co">#&gt; 24 9.219000  5.9000000</span></span>
+<span id="cb1-30"><a href="#cb1-30"></a><span class="co">#&gt; 25 9.271000  6.9000000</span></span>
+<span id="cb1-31"><a href="#cb1-31"></a><span class="co">#&gt; 26 8.370000  0.4420000</span></span>
+<span id="cb1-32"><a href="#cb1-32"></a><span class="co">#&gt; 27 9.431000  9.0000000</span></span></code></pre></div>
 <div id="running-a-tournament" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-a-tournament" class="anchor"></a>Running a tournament</h2>
 <p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>F)</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; Running tournament:</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt; 25% - gplm finished</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; 75% - plm finished</span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; 100% - plm0 finished</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>F)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; Running tournament:</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 25% - gplm finished</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="co">#&gt; 75% - plm finished</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt; 100% - plm0 finished</span></span></code></pre></div>
 <p>The function both runs the four models for you and runs the tournament. It’s worth mentioning that if you have already run your models of the four different kinds, <tt>plm0</tt>, <tt>plm</tt>, <tt>gplm0</tt> and <tt>gplm</tt> and they are stored in objects, say <tt>plm0.fit</tt>, <tt>plm.fit</tt>, <tt>gplm0.fit</tt> and <tt>gplm.fit</tt>, you can alternatively run the tournament very efficiently in the following way:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(plm0.fit,plm.fit,gplm0.fit,gplm.fit)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(plm0.fit,plm.fit,gplm0.fit,gplm.fit)</span></code></pre></div>
 <p>The printing method is very simple and gives you the name of the winner</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj <span class="co"># or alternatively print(t_obj)</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; Tournament with winner gplm0</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj <span class="co"># or alternatively print(t_obj)</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; Tournament with winner gplm0</span></span></code></pre></div>
 <p>For a more detailed summary of the results of the tournament write</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj)</span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param            P winner</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt; 1     1    1  gplm 3.720584e-01 -1.4580066      6.166518 6.789784e-01  FALSE</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 2     1    1 gplm0 1.759095e-01 -0.7837597      6.375767 3.210216e-01   TRUE</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; 3     1    2   plm 8.217027e-07 23.5577648      3.000456 3.654075e-01  FALSE</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 4     1    2  plm0 1.427027e-06 23.2495998      2.887929 6.345925e-01   TRUE</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 5     2    3 gplm0 1.759095e-01 -0.7837597      6.375767 9.999919e-01   TRUE</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 6     2    3  plm0 1.427027e-06 23.2495998      2.887929 8.112211e-06  FALSE</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj)</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param            P winner</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; 1     1    1  gplm 3.720584e-01 -1.4580066      6.166518 6.789784e-01  FALSE</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; 2     1    1 gplm0 1.759095e-01 -0.7837597      6.375767 3.210216e-01   TRUE</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; 3     1    2   plm 8.217027e-07 23.5577648      3.000456 3.654075e-01  FALSE</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; 4     1    2  plm0 1.427027e-06 23.2495998      2.887929 6.345925e-01   TRUE</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; 5     2    3 gplm0 1.759095e-01 -0.7837597      6.375767 9.999919e-01   TRUE</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 6     2    3  plm0 1.427027e-06 23.2495998      2.887929 8.112211e-06  FALSE</span></span></code></pre></div>
 <p>Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best fit of the data at hand.</p>
 </div>
 <div id="comparing-different-components-of-the-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#comparing-different-components-of-the-models" class="anchor"></a>Comparing different components of the models</h2>
 <p>There are several tools to visualize the different aspects of the model comparison. To get a visual summary of the results of the different games in the tournament, write</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj) <span class="co">#this is equivalent to type='tournament_results'</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj) <span class="co">#this is equivalent to type='tournament_results'</span></span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>Another informative way of comparing different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, DIC and B are calculated. DIC is a metric on the fit of the models taking their complexity into account (number of effective parameters). B is used to calculate the Bayes factor between different models. To plot the posterior distribution of the deviance of the different models, we write</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'deviance'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'deviance'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The red diamonds on the plot denote the DIC values for the respective models. Next, to plot rating curves from the different model, write</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'rating_curve'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'rating_curve'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;"> Another useful plot is the residual plot</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The main difference between the four models lies in the modeling of the power law exponent (<span class="math inline">\(f(h)\)</span>) and the variance on the data level (<span class="math inline">\(\sigma^2_{\varepsilon}\)</span>). Thus it is insightful to look at the posterior of the power law exponent for the different models</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'f'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'f'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"> and the variance on the data level</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
+<p>Finally, the panel option is useful to gain insight into all different model components of the winning model, which in this case is gplm0:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</span></code></pre></div>
+<p><img src="tournament_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="customizing-tournaments" class="section level2">
 <h2 class="hasAnchor">
 <a href="#customizing-tournaments" class="anchor"></a>Customizing tournaments</h2>
 <p>There are ways to customize the tournament further. For example, if the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known you might want to fix that parameter to the known value in the model. Assume 7.65 m is the known value of <span class="math inline">\(c\)</span>. Then you can directly run a tournament with the <span class="math inline">\(c\)</span> parameter fixed in all models</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj_known_c &lt;-<span class="st"> </span><span class="kw">tournament</span>(<span class="dt">formula=</span>Q<span class="op">~</span>W,<span class="dt">data=</span>krokfors,<span class="dt">c_param=</span><span class="fl">7.65</span>,<span class="dt">parallel=</span>F)</span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="co">#&gt; Running tournament:</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; 25% - gplm finished</span></span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt; 75% - plm finished</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; 100% - plm0 finished</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj_known_c)</span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param          P winner</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; 1     1    1  gplm 2.823131e-04  0.8515635      6.004683 0.39431413  FALSE</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; 2     1    1 gplm0 4.336467e-04  1.7021191      6.418082 0.60568587   TRUE</span></span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; 3     1    2   plm 8.044550e-06 21.5178031      2.359842 0.52136525  FALSE</span></span>
-<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; 4     1    2  plm0 7.385228e-06 21.2342407      2.224901 0.47863475   TRUE</span></span>
-<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt; 5     2    3 gplm0 4.336467e-04  1.7021191      6.418082 0.98325467   TRUE</span></span>
-<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt; 6     2    3  plm0 7.385228e-06 21.2342407      2.224901 0.01674533  FALSE</span></span></code></pre></div>
-<p>One useful feature of the plot function is the panel option. This plots four different plots of the tournament winning model, which in this case is gplm0:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj_known_c,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">&gt;</span><span class="st"> </span>t_obj_known_c &lt;-<span class="st"> </span><span class="kw">tournament</span>(<span class="dt">formula=</span>Q<span class="op">~</span>W,<span class="dt">data=</span>krokfors,<span class="dt">c_param=</span><span class="fl">7.65</span>)</span></code></pre></div>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
