@@ -155,11 +155,11 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.</p></td>
+      <td><p>optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.</p></td>
     </tr>
     <tr>
       <th>winning_criteria</th>
-      <td><p>a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous.</p></td>
+      <td><p>a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.</p></td>
     </tr>
     </table>
 

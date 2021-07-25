@@ -146,6 +146,7 @@
   c_param <span class='op'>=</span> <span class='cn'>NULL</span>,
   h_max <span class='op'>=</span> <span class='cn'>NULL</span>,
   parallel <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  num_cores <span class='op'>=</span> <span class='cn'>NULL</span>,
   forcepoint <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='cn'>FALSE</span>, <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
@@ -171,6 +172,10 @@
     <tr>
       <th>parallel</th>
       <td><p>logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.</p></td>
+    </tr>
+    <tr>
+      <th>num_cores</th>
+      <td><p>integer beween 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.</p></td>
     </tr>
     <tr>
       <th>forcepoint</th>
