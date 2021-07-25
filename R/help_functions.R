@@ -174,7 +174,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     return(output_list)
 }
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
-get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
   if(num_chains>4){
     stop('Max number of chains is 4. Please pick a lower number of chains')
@@ -186,12 +186,15 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
              nr_iter=nr_iter,burnin=burnin,thin=thin,T_max=T_max)
   }
   if(parallel){
-    chk <- tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", ""))
-    if (nchar(chk)>0 & chk != "false") {
-      # use 2 cores in CRAN and CI environments
-      num_cores <- 2L
-    } else {
-      num_cores <- min(detectCores(),num_chains)
+    num_cores_on_device <- detectCores()
+    num_cores_default <- min(num_cores_on_device,num_chains)
+    if (!is.null(num_cores)) {
+      if(!(num_cores %in% 1:num_chains)){
+        num_cores <- num_cores_default
+        warning(paste0('num_cores argument used must be an integer between 1 and ',num_chains,' (the number of chains). Using ',num_cores_default,' cores instead.'))
+      }
+    }else{
+      num_cores <- num_cores_default
     }
     cl <- makeCluster(num_cores,setup_strategy='sequential')
     clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer

@@ -6,6 +6,7 @@
 #' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
 #' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
+#' @param num_cores integer beween 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.
 #' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
 #'
 #' @details The power-law model, which is commonly used in hydraulic practice, is of the form
@@ -73,12 +74,14 @@
 #' #DIC: 52.10376
 #' }
 #' @export
-plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,nrow(data))){
+plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
     stopifnot('formula' %in% class(formula))
     stopifnot('data.frame' %in% class(data))
     stopifnot(is.null(c_param) | is.double(c_param))
     stopifnot(is.null(h_max) | is.double(h_max))
+    stopifnot(is.null(num_cores) | is.numeric(num_cores))
+    stopifnot(length(forcepoint)==nrow(data) & is.logical(forcepoint))
     formula_args <- all.vars(formula)
     stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
     model_dat <- as.data.frame(data[,all.vars(formula)])
@@ -88,7 +91,7 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=re
     h <- model_dat[,2,drop=TRUE]
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
-    MCMC_output_list <- plm.inference(y=log(Q),h=h,c_param,h_max,parallel,forcepoint)
+    MCMC_output_list <- plm.inference(y=log(Q),h=h,c_param=c_param,h_max=h_max,parallel=parallel,forcepoint=forcepoint,num_cores=num_cores)
     param_names <- get_param_names('plm',c_param)
     result_obj=list()
     attr(result_obj, "class") <- "plm"
@@ -143,11 +146,11 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=re
 }
 
 #' @importFrom stats optim
-plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
   RC <- get_model_components('plm',y,h,c_param,h_max,forcepoint,h_min=NULL)
   output_list <- get_MCMC_output_list(theta_m=RC$theta_m,RC=RC,density_fun=RC$density_fun,
                                       unobserved_prediction_fun=RC$unobserved_prediction_fun,
-                                      parallel=parallel,num_chains=num_chains,nr_iter=nr_iter,
+                                      parallel=parallel,num_cores=num_cores,num_chains=num_chains,nr_iter=nr_iter,
                                       burnin=burnin,thin=thin)
   output_list$D_hat <- plm.calc_Dhat(output_list$theta,RC)
   if(is.null(RC$c)){

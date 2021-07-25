@@ -11,9 +11,9 @@ tournament(formula = NULL, data = NULL, ..., winning_criteria = 0.75)
 
 \item{data}{data.frame containing the variables specified in formula.}
 
-\item{...}{if data and formula are set to NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This prevents the function from running all four models explicitly.}
+\item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
 
-\item{winning_criteria}{a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model in each model comparison, given the data and calculated using Bayes factor, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous.}
+\item{winning_criteria}{a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.}
 }
 \value{
 An object of type "tournament" with the following elements
