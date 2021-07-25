@@ -143,7 +143,7 @@
 <a href="#running-a-tournament" class="anchor"></a>Running a tournament</h2>
 <p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>F)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>T,<span class="dt">num_cores=</span><span class="dv">2</span>) <span class="co"># parallel=T by default and by default, the number of cores is detected on the machine</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
@@ -157,12 +157,12 @@
 <p>For a more detailed summary of the results of the tournament write</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">summary</span>(t_obj)</span>
 <span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt;   round game model            B        DIC num_eff_param            P winner</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; 1     1    1  gplm 3.720584e-01 -1.4580066      6.166518 6.789784e-01  FALSE</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; 2     1    1 gplm0 1.759095e-01 -0.7837597      6.375767 3.210216e-01   TRUE</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; 3     1    2   plm 8.217027e-07 23.5577648      3.000456 3.654075e-01  FALSE</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; 4     1    2  plm0 1.427027e-06 23.2495998      2.887929 6.345925e-01   TRUE</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; 5     2    3 gplm0 1.759095e-01 -0.7837597      6.375767 9.999919e-01   TRUE</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 6     2    3  plm0 1.427027e-06 23.2495998      2.887929 8.112211e-06  FALSE</span></span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; 1     1    1  gplm 3.201743e-02 -1.4709638      6.190845 1.302100e-01  FALSE</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; 2     1    1 gplm0 2.138732e-01 -0.8188839      6.359006 8.697900e-01   TRUE</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; 3     1    2   plm 1.427185e-06 23.6779944      3.041535 4.339125e-01  FALSE</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; 4     1    2  plm0 1.861923e-06 23.4058849      2.958588 5.660875e-01   TRUE</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; 5     2    3 gplm0 2.138732e-01 -0.8188839      6.359006 9.999913e-01   TRUE</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 6     2    3  plm0 1.861923e-06 23.4058849      2.958588 8.705656e-06  FALSE</span></span></code></pre></div>
 <p>Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best fit of the data at hand.</p>
 </div>
 <div id="comparing-different-components-of-the-models" class="section level2">
