@@ -35,6 +35,7 @@ check_gather_draws_MCMC_mat_concordance <- function(mod,dat){
 
 test_that("check different inputs to spread draws and gather draws", {
     skip_on_cran()
+    skip_on_ci()
     expect_equal(spread_draws(plm0.fit,'c','sigma_eps'),spread_draws(plm0.fit,c('c','sigma_eps')))
     expect_equal(spread_draws(plm.fit,'c',paste0('eta_',1:3)),spread_draws(plm.fit,c('c','c',paste0('eta_',1:3))))
     expect_equal(spread_draws(gplm0.fit,'c','c'),spread_draws(gplm0.fit,'c'))
@@ -50,6 +51,7 @@ test_that("check different inputs to spread draws and gather draws", {
 
 test_that("spread draws and gather draws are concordant with MCMC matrices", {
     skip_on_cran()
+    skip_on_ci()
     #spread_draws
     check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'c','sigma_eps'))
     check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit,'rating_curve','rating_curve_mean','c'))

@@ -42,6 +42,7 @@ test_that("the gplm0 object with unknown c is in tact", {
 
 test_that("the gplm0 object with known c with a maximum stage value is in tact", {
     skip_on_cran()
+    skip_on_ci()
     set.seed(1)
     gplm0.fit_known_c <- gplm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
     expect_is(gplm0.fit_known_c,"gplm0")
