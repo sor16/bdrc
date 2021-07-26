@@ -9,6 +9,7 @@ test_that("plm0 can handle different inputs", {
     expect_error(plm0(Q~W,krokfors,c_param=1L)) # c_param not double
     expect_error(plm0(Q~W,krokfors,h_max=max(krokfors$W)-0.5)) #h_max lower than highest stage measurement
     skip_on_cran()
+    skip_on_ci()
     krokfors_new_names <- krokfors
     names(krokfors_new_names) <- c('t1','t2')
     set.seed(1)
