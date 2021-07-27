@@ -2,7 +2,7 @@
 * local OS X install, R 4.1.0
 * macOS-latest (4.1) on Github Actions
 * windows-latest (4.1) on Github Actions
-* ubuntu 18.04 (devel,4.1,4.0,3.6,3.5,3.4,3.3) on Github Actions
+* ubuntu 18.04 (devel,4.1,4.0,3.6,3.5) on Github Actions
 
 ## R CMD check results
 There were no ERRORs, WARNINGs or NOTEs. 
