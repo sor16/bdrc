@@ -34,18 +34,6 @@ Print a discharge rating curve model object
 \item \code{print.gplm}: Print method for gplm
 }}
 
-\examples{
-\dontrun{
-data(krokfors)
-set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors)
-plm0.fit
-print(plm0.fit)
-
-# plm0 - Call:
-# Q ~ W
-}
-}
 \seealso{
 \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 }

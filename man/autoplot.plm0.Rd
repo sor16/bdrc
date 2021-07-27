@@ -42,7 +42,7 @@
 }}
 }
 \value{
-returns an object of class ggplot2.
+returns an object of class "ggplot2".
 }
 \description{
 Visualize discharge rating curve model objects
@@ -59,12 +59,11 @@ Visualize discharge rating curve model objects
 }}
 
 \examples{
-\dontrun{
+\donttest{
 library(ggplot2)
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(Q~W,krokfors)
-
+plm0.fit <- plm0(Q~W,krokfors,num_cores=2)
 autoplot(plm0.fit)
 autoplot(plm0.fit,transformed=TRUE)
 autoplot(plm0.fit,type='histogram',param='c')

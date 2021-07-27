@@ -16,15 +16,18 @@
 
 \item{...}{further arguments passed to other methods.}
 }
+\value{
+returns an object of class "ggplot2".
+}
 \description{
 Compare the four discharge rating curves from the tournament object in different ways
 }
 \examples{
-\dontrun{
+\donttest{
 library(ggplot2)
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors)
+t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 autoplot(t_obj)
 }
 }

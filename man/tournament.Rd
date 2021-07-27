@@ -30,25 +30,13 @@ tournament compares four rating curve models of different complexities and deter
 Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the posterior probability of the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 0.75) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each of the three matches, the posterior probabilities of the models are computed using the Bayes factor and assuming a priori that the two models were equally likely [see Jeffreys (1961) and Kass and Raftery (1995)].
 }
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors)
+t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj
 summary(t_obj)
 
-#  round game model            B       DIC num_eff_param            P winner
-#1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE
-#2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE
-#3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE
-#4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE
-#5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE
-#6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE
-
-plm0.fit <- plm0(formula=Q~W,data=krokfors)
-plm.fit <- plm(formula=Q~W,data=krokfors)
-gplm0.fit <- gplm0(formula=Q~W,data=krokfors)
-gplm.fit <- gplm(formula=Q~W,data=krokfors)
-t_obj_from_mod <- tournament(gplm.fit,gplm0.fit,plm.fit,plm0.fit,winning_criteria=0.95)
 }
 }
 \references{

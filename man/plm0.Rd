@@ -64,25 +64,11 @@ where \eqn{\varepsilon} follows a normal distribution with mean zero and varianc
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
-\dontrun{
+\donttest{
 data(skogsliden)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=skogsliden)
+plm0.fit <- plm0(formula=Q~W,data=skogsliden,num_cores=2)
 summary(plm0.fit)
-
-# Formula:
-# Q ~ W
-# Latent parameters:
-#   lower-2.5\% median-50\% upper-97.5\%
-# a 10.30      10.77      11.23
-# b  2.09       2.17       2.26
-#
-# Hyperparameters:
-#           lower-2.5\% median-50\% upper-97.5\%
-# c         3.9042     3.9200     3.9342
-# sigma_eps 0.0455     0.0591     0.0808
-#
-# DIC: 4.439337
 }
 }
 \references{

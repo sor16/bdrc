@@ -24,14 +24,17 @@
 
 \item{...}{further arguments passed to other methods.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Compare the four models from the tournament object in multiple ways
 }
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors)
+t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 plot(t_obj)
 plot(t_obj,transformed=TRUE)
 plot(t_obj,type='deviance')

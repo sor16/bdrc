@@ -78,32 +78,11 @@ where \eqn{\varepsilon_i} follows a normal distribution with mean zero and varia
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
-\dontrun{
+\donttest{
 data(norn)
 set.seed(1)
-gplm.fit <- gplm(formula=Q~W,data=norn)
+gplm.fit <- gplm(formula=Q~W,data=norn,num_cores=2)
 summary(gplm.fit)
-Formula:
-Q ~ W
-#Latent parameters:
-#  lower-2.5\% median-50\% upper-97.5\%
-#a 13.34      24.52      32.64
-#b  1.83       1.84       1.84
-#
-#Hyperparameters:
-#          lower-2.5\% median-50\% upper-97.5\%
-#c          396.418    396.669    396.815
-#sigma_beta   0.162      0.333      0.812
-#phi_beta     1.351      2.916      6.600
-#sigma_eta    0.101      0.435      0.880
-#eta_1       -6.077     -5.351     -4.314
-#eta_2       -7.701     -6.002     -4.573
-#eta_3       -9.247     -7.183     -5.464
-#eta_4      -10.623     -8.237     -6.251
-#eta_5      -11.883     -8.947     -6.522
-#eta_6      -12.697     -9.460     -6.498
-#
-#DIC: 240.1283
 }
 }
 \references{

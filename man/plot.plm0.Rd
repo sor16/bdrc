@@ -42,6 +42,9 @@
   \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
 }}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Visualize discharge rating curve model objects
 }
@@ -57,10 +60,10 @@ Visualize discharge rating curve model objects
 }}
 
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors)
+plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
 
 plot(plm0.fit)
 plot(plm0.fit,transformed=TRUE)

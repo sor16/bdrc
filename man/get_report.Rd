@@ -34,6 +34,9 @@ get_report(x, path = NULL, type = 1, ...)
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Save a pdf file with a report of a discharge rating curve object or tournament.
 }
@@ -54,17 +57,13 @@ This function can only be used in an interactive R session as it asks permission
 }}
 
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors)
+plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
+}
+\dontrun{
 get_report(plm0.fit)
-# The report was saved at the following location:
-# /path/
-t_obj <- tournament(formula=Q~W,data=krokfors)
-get_report(t_obj,type=2)
-# The report was saved at the following location:
-# /path/
 }
 }
 \seealso{

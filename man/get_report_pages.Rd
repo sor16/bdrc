@@ -32,6 +32,9 @@ get_report_pages(x, type = 1, ...)
 
 \item{...}{further arguments passed to other methods (currently unused).}
 }
+\value{
+A list of objects of type "grob" that correspond to the pages in a rating curve report.
+}
 \description{
 Get a list of the pages of a report on a discharge rating curve model or tournament
 }
@@ -49,13 +52,11 @@ Get a list of the pages of a report on a discharge rating curve model or tournam
 }}
 
 \examples{
-\dontrun{
+\donttest{
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors)
+plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
 plm0_pages <- get_report_pages(plm0.fit)
-t_obj <- tournament(formula=Q~W,data=krokfors)
-tournament_pages <- get_report_pages(t_obj,type=2)
 }
 }
 \seealso{
