@@ -39,7 +39,7 @@ test_that("the plm0 object with unknown c is in tact", {
 test_that("the plm0 object with known c with a maximum stage value is in tact", {
     skip_on_cran()
     set.seed(1)
-    plm0.fit_known_c <- plm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
+    plm0.fit_known_c <- plm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,num_cores=2)
     expect_is(plm0.fit_known_c,"plm0")
     #latent parameters
     test_stage_indep_param(plm0.fit_known_c,'a')
@@ -65,5 +65,5 @@ test_that("plm0 output remains unchanged", {
     skip_on_cran()
     skip_on_ci()
     skip_on_covr()
-    expect_equal_to_reference(plm0.fit,file='../cached_results/plm0.fit.rds',update=T)
+    expect_equal_to_reference(plm0.fit,file='../cached_results/plm0.fit.rds',update=TRUE)
 })

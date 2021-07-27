@@ -43,7 +43,7 @@ test_that("the gplm0 object with unknown c is in tact", {
 test_that("the gplm0 object with known c with a maximum stage value is in tact", {
     skip_on_cran()
     set.seed(1)
-    gplm0.fit_known_c <- gplm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
+    gplm0.fit_known_c <- gplm0(Q~W,krokfors,c_param=known_c,h_max=h_extrap,num_cores=2)
     expect_is(gplm0.fit_known_c,"gplm0")
     #latent parameters
     test_stage_indep_param(gplm0.fit_known_c,'a')
@@ -73,5 +73,5 @@ test_that("gplm0 output remains unchanged", {
     skip_on_cran()
     skip_on_ci()
     skip_on_covr()
-    expect_equal_to_reference(gplm0.fit,file='../cached_results/gplm0.fit.rds',update=T)
+    expect_equal_to_reference(gplm0.fit,file='../cached_results/gplm0.fit.rds',update=TRUE)
 })

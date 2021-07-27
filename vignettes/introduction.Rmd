@@ -13,9 +13,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  #fig.path='figs-introduction/',
-  fig.align='center',
-  prompt=T
+  fig.align = 'center',
+  prompt = TRUE
 )
 ```
 A discharge rating curve is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it is used to predict discharge for a given stage. This is the main practical usage of rating curves as stage is substantially easier to directly observe than discharge. Four different discharge rating curve models are implemented in this R package using a Bayesian hierarchical model:
@@ -29,7 +28,7 @@ A discharge rating curve is a model that describes the relationship between wate
 ```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
 
 For further details about the different models, see Hrafnkelsson et al. (2020). The models differ in their complexity and <tt>gplm</tt> is the most flexible and complex model. We will focus on the use of <tt>gplm</tt> throughout this introduction vignette and explore the different ways to fit the <tt>gplm</tt> and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
-```{r,message=F}
+```{r,message=FALSE}
 library(bdrc)
 set.seed(1) #set seed for reproducibility
 ```
@@ -41,8 +40,8 @@ krokfors
 ## Fitting a discharge rating curve
 It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
 
-```{r, cache=T}
-gplm.fit <- gplm(Q~W,data=krokfors,parallel=T,num_cores=2) # parallel=T by default and by default, the number of cores is detected on the machine
+```{r, cache=TRUE}
+gplm.fit <- gplm(Q~W,data=krokfors,parallel=TRUE,num_cores=2) # parallel=TRUE by default and by default, the number of cores is detected on the machine
 ```
 <tt>gplm</tt> returns an object of class "gplm" which we can summarize and visualize using familiar functions such as
 
@@ -66,7 +65,7 @@ plot(gplm.fit,type='histogram',param='c')
 Technically, instead of inferring $c$ directly, $h_{min}-c$ is inferred where $h_{min}$ is the lowest stage value in the data. Since $h_{min}-c$ is strictly positive, it is transformed during Bayesian inference s.t. it has support on the real line with $\zeta=log(h_{min}-c)$. To plot the transformed posterior we write
 
 ```{r, fig.width=8, fig.height=6}
-plot(gplm.fit,type='histogram',param='c',transformed=T)
+plot(gplm.fit,type='histogram',param='c',transformed=TRUE)
 ```
 the <tt>param</tt> argument can also be a vector of different parameter names. To visualize the posterior distribution of many parameters at once we can for instance write
 
@@ -80,7 +79,7 @@ plot(gplm.fit,type='histogram',param='hyperparameters')
 Similarly, writing 'latent_parameters' plots the latent parameters in one plot. To plot the hyperparameters transformed, on the same scale as in the Bayesian inference, we write
 
 ```{r, fig.width=10, fig.height=6}
-plot(gplm.fit,type='histogram',param='hyperparameters',transformed=T)
+plot(gplm.fit,type='histogram',param='hyperparameters',transformed=TRUE)
 ```
 
 Finally, we can visualize certain components of the model that varies with stage, the power-law exponent, $f(h)$, and the standard deviation on the data level $\sigma_{\varepsilon}(h)$. <tt>gplm0</tt> and <tt>gplm</tt> generalize the power law exponent, model it as a stochastic process,$f(h)=b+\beta(h)$, which assumed to be twice differentiable.<tt>plm</tt> and <tt>plm0</tt> on the other hand model the exponent as a fixed constant $f(h)=b$. We can plot the inferred power-law exponent with
@@ -95,7 +94,7 @@ plot(gplm.fit,type='sigma_eps')
 To get a visualization summary of your model, the 'panel' option in the plot method is useful:
 
 ```{r, fig.width=8, fig.height=6,results='hide'}
-plot(gplm.fit,type='panel',transformed=T)
+plot(gplm.fit,type='panel',transformed=TRUE)
 ```
 
 ## Assessing model fitness and convergence
@@ -106,12 +105,12 @@ plot(gplm.fit,type='residuals')
 The log-residuals are calculated by subtracting the posterior estimate of log-discharge,$log(\hat{Q})$, from the observed log-discharge. Additionally, the plot includes the 95% predictive intervals or log(Q) (- -) and 95% credible intervals for the expected value of log(Q) (—), reflecting the rating curve uncertainty. 
 
 ```{r, fig.width=10, fig.height=6}
-plot(gplm.fit,type='trace',param='c',transformed=T)
+plot(gplm.fit,type='trace',param='c',transformed=TRUE)
 ```
 
 To plot a trace plot for all hyperparameters, you write similarly as above
 ```{r, fig.width=10, fig.height=6}
-plot(gplm.fit,type='trace',param='hyperparameters',transformed=T)
+plot(gplm.fit,type='trace',param='hyperparameters',transformed=TRUE)
 ```
 
 To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize $\hat{R}$ as presented by Gelman and Rubin with:
@@ -125,8 +124,8 @@ plot(gplm.fit,type='autocorrelation')
 
 ## Customization of models
 There are ways to customize the <tt>gplm</tt> further. In some instances, the parameter of zero discharge, $c$, is known and then you want to fix that parameter to the known value in the model. In addition you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this
-```{r,cache=T,eval=FALSE}
-gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10,parallel=F)
+```{r,cache=TRUE,eval=FALSE}
+gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10,parallel=FALSE)
 ```
 
 ## Prediction for an equally spaced grid of stages

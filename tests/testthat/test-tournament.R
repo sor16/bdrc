@@ -18,6 +18,6 @@ test_that("Tournament object remains the same", {
     skip_on_cran()
     skip_on_ci()
     skip_on_covr()
-    expect_equal_to_reference(t_obj,file='../cached_results/tournament.rds',update=T)
+    expect_equal_to_reference(t_obj,file='../cached_results/tournament.rds',update=TRUE)
 })
 
