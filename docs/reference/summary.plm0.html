@@ -179,26 +179,25 @@
     <div class='dont-index'><p><code><a href='plm0.html'>plm0</a></code>, <code><a href='plm.html'>plm</a></code>, <code><a href='gplm0.html'>gplm0</a></code> and <code><a href='gplm.html'>gplm</a></code> for fitting a discharge rating curve. It is also useful to look at <code><a href='plot.plm0.html'>plot.plm0</a></code>, <code><a href='plot.plm0.html'>plot.plm</a></code>, <code><a href='plot.plm0.html'>plot.gplm0</a></code> and <code><a href='plot.plm0.html'>plot.gplm</a></code> to help visualize all aspects of the fitted discharge rating curve. Additionally, <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='spread_draws.html'>spread_draws</a></code> help working directly with the MCMC samples.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
+<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span>,num_cores<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>plm0.fit</span><span class='op'>)</span>
-
-<span class='co'># Formula:</span>
-<span class='co'># Q ~ W</span>
-<span class='co'># Latent parameters:</span>
-<span class='co'>#   lower-2.5% median-50% upper-97.5%</span>
-<span class='co'># a 1.16       1.64       2.12</span>
-<span class='co'># b 2.47       2.82       3.21</span>
-<span class='co'>#</span>
-<span class='co'># Hyperparameters:</span>
-<span class='co'>#           lower-2.5% median-50% upper-97.5%</span>
-<span class='co'># c         7.58       7.676      7.750</span>
-<span class='co'># sigma_eps 0.15       0.191      0.251</span>
-<span class='co'>#</span>
-<span class='co'># DIC: 23.37559</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; 
+#&gt; Formula: 
+#&gt;  Q ~ W
+#&gt; Latent parameters:
+#&gt;   lower-2.5% median-50% upper-97.5%
+#&gt; a 1.15       1.64       2.12       
+#&gt; b 2.47       2.82       3.21       
+#&gt; 
+#&gt; Hyperparameters:
+#&gt;           lower-2.5% median-50% upper-97.5%
+#&gt; c         7.578      7.676      7.750      
+#&gt; sigma_eps 0.151      0.191      0.252      
+#&gt; 
+#&gt; DIC: 23.29108</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

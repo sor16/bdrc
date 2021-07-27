@@ -238,33 +238,33 @@ Bayesian inference is based on the posterior density and summary statistics such
     <div class='dont-index'><p><code><a href='summary.plm0.html'>summary.gplm</a></code> for summaries, <code><a href='predict.plm0.html'>predict.gplm</a></code> for prediction and <code><a href='plot.plm0.html'>plot.gplm</a></code> for plots. <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='gather_draws.html'>gather_draws</a></code> are also useful to aid further visualization of the full posterior distributions.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>norn</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>norn</span><span class='op'>)</span>
+<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>gplm</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>norn</span>,num_cores<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>gplm.fit</span><span class='op'>)</span>
-<span class='va'>Formula</span><span class='op'>:</span>
-<span class='va'>Q</span> <span class='op'>~</span> <span class='va'>W</span>
-<span class='co'>#Latent parameters:</span>
-<span class='co'>#  lower-2.5% median-50% upper-97.5%</span>
-<span class='co'>#a 13.34      24.52      32.64</span>
-<span class='co'>#b  1.83       1.84       1.84</span>
-<span class='co'>#</span>
-<span class='co'>#Hyperparameters:</span>
-<span class='co'>#          lower-2.5% median-50% upper-97.5%</span>
-<span class='co'>#c          396.418    396.669    396.815</span>
-<span class='co'>#sigma_beta   0.162      0.333      0.812</span>
-<span class='co'>#phi_beta     1.351      2.916      6.600</span>
-<span class='co'>#sigma_eta    0.101      0.435      0.880</span>
-<span class='co'>#eta_1       -6.077     -5.351     -4.314</span>
-<span class='co'>#eta_2       -7.701     -6.002     -4.573</span>
-<span class='co'>#eta_3       -9.247     -7.183     -5.464</span>
-<span class='co'>#eta_4      -10.623     -8.237     -6.251</span>
-<span class='co'>#eta_5      -11.883     -8.947     -6.522</span>
-<span class='co'>#eta_6      -12.697     -9.460     -6.498</span>
-<span class='co'>#</span>
-<span class='co'>#DIC: 240.1283</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; 
+#&gt; Formula: 
+#&gt;  Q ~ W
+#&gt; Latent parameters:
+#&gt;   lower-2.5% median-50% upper-97.5%
+#&gt; a 13.71      24.56      32.40      
+#&gt; b  1.83       1.84       1.84      
+#&gt; 
+#&gt; Hyperparameters:
+#&gt;            lower-2.5% median-50% upper-97.5%
+#&gt; c          396.42993  396.669    396.810    
+#&gt; sigma_beta   0.16314    0.334      0.778    
+#&gt; phi_beta     1.34820    2.914      6.520    
+#&gt; sigma_eta    0.00351    0.404      0.865    
+#&gt; eta_1       -6.14022   -5.412     -4.399    
+#&gt; eta_2       -7.64553   -5.955     -4.495    
+#&gt; eta_3       -9.14698   -7.028     -4.696    
+#&gt; eta_4      -10.61819   -8.032     -4.626    
+#&gt; eta_5      -11.75072   -8.759     -4.367    
+#&gt; eta_6      -12.52465   -9.176     -4.234    
+#&gt; 
+#&gt; DIC: 240.3863</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
