@@ -9,11 +9,10 @@ test_that("gplm can handle different inputs", {
     expect_error(gplm(Q~W,krokfors,c_param=1L)) # c_param not double
     expect_error(gplm(Q~W,krokfors,h_max=max(krokfors$W)-0.5)) #h_max lower than highest stage measurement
     skip_on_cran()
-    skip_on_ci()
     krokfors_new_names <- krokfors
     names(krokfors_new_names) <- c('t1','t2')
     set.seed(1)
-    gplm.fit_new_names <- gplm(t2~t1,krokfors_new_names,parallel=F)
+    gplm.fit_new_names <- gplm(t2~t1,krokfors_new_names,num_cores=2)
     expect_equal(gplm.fit_new_names$rating_curve,gplm.fit$rating_curve)
 })
 
@@ -50,7 +49,6 @@ test_that("the gplm object with unknown c is in tact", {
 
 test_that("the gplm object with known c with a maximum stage value is in tact", {
     skip_on_cran()
-    skip_on_ci()
     set.seed(1)
     gplm.fit_known_c <- gplm(Q~W,krokfors,c_param=known_c,h_max=h_extrap,parallel=F)
     expect_is(gplm.fit_known_c,"gplm")
@@ -90,5 +88,4 @@ test_that("gplm output remains unchanged", {
     skip_on_ci()
     skip_on_covr()
     expect_equal_to_reference(gplm.fit,file='../cached_results/gplm.fit.rds',update=T)
-    expect_equal_to_reference(gplm.fit_known_c,file='../cached_results/gplm.fit_known_c.rds',update=T)
 })

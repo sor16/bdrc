@@ -1,7 +1,6 @@
 context('Report')
 test_that("report components are correct", {
     skip_on_cran()
-    skip_on_ci()
     report_cmp_1 <- get_report_components(gplm.fit,type=1)
     t_report_cmp_1 <- get_report_components(t_obj,type=1)
     t_report_cmp_2 <- get_report_components(t_obj,type=2)
