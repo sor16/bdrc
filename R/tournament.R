@@ -49,25 +49,13 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #'
 #' @seealso \code{\link{summary.tournament}} and \code{\link{plot.tournament}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(krokfors)
 #' set.seed(1)
-#' t_obj <- tournament(formula=Q~W,data=krokfors)
+#' t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+#' t_obj
 #' summary(t_obj)
 #'
-#' #  round game model            B       DIC num_eff_param            P winner
-#' #1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE
-#' #2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE
-#' #3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE
-#' #4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE
-#' #5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE
-#' #6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE
-#'
-#' plm0.fit <- plm0(formula=Q~W,data=krokfors)
-#' plm.fit <- plm(formula=Q~W,data=krokfors)
-#' gplm0.fit <- gplm0(formula=Q~W,data=krokfors)
-#' gplm.fit <- gplm(formula=Q~W,data=krokfors)
-#' t_obj_from_mod <- tournament(gplm.fit,gplm0.fit,plm.fit,plm0.fit,winning_criteria=0.95)
 #' }
 #' @export
 tournament <- function(formula=NULL,data=NULL,...,winning_criteria=0.75) {
@@ -94,15 +82,15 @@ tournament <- function(formula=NULL,data=NULL,...,winning_criteria=0.75) {
         }
     }else{
         args <- list()
-        cat('Running tournament:\n')
+        message('Running tournament:')
         args$gplm <- gplm(formula, data, ...)
-        cat('25% - gplm finished\n')
+        message('25% - gplm finished')
         args$gplm0 <- gplm0(formula, data, ...)
-        cat('50% - gplm0 finished\n')
+        message('50% - gplm0 finished')
         args$plm <- plm(formula, data, ...)
-        cat('75% - plm finished\n')
+        message('75% - plm finished')
         args$plm0 <- plm0(formula, data, ...)
-        cat('100% - plm0 finished\n')
+        message('100% - plm0 finished')
     }
     round1 <- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
     round1_res <- lapply(1:length(round1),function(i){

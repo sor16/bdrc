@@ -58,32 +58,11 @@
 #' @seealso \code{\link{summary.gplm}} for summaries, \code{\link{predict.gplm}} for prediction and \code{\link{plot.gplm}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(norn)
 #' set.seed(1)
-#' gplm.fit <- gplm(formula=Q~W,data=norn)
+#' gplm.fit <- gplm(formula=Q~W,data=norn,num_cores=2)
 #' summary(gplm.fit)
-#' Formula:
-#' Q ~ W
-#' #Latent parameters:
-#' #  lower-2.5% median-50% upper-97.5%
-#' #a 13.34      24.52      32.64
-#' #b  1.83       1.84       1.84
-#' #
-#' #Hyperparameters:
-#' #          lower-2.5% median-50% upper-97.5%
-#' #c          396.418    396.669    396.815
-#' #sigma_beta   0.162      0.333      0.812
-#' #phi_beta     1.351      2.916      6.600
-#' #sigma_eta    0.101      0.435      0.880
-#' #eta_1       -6.077     -5.351     -4.314
-#' #eta_2       -7.701     -6.002     -4.573
-#' #eta_3       -9.247     -7.183     -5.464
-#' #eta_4      -10.623     -8.237     -6.251
-#' #eta_5      -11.883     -8.947     -6.522
-#' #eta_6      -12.697     -9.460     -6.498
-#' #
-#' #DIC: 240.1283
 #' }
 #' @export
 gplm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data))){

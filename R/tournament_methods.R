@@ -119,15 +119,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' Print the results of a tournament of discharge rating curve model comparisons
 #' @param x an object of class "tournament"
 #' @param ... not used in this function
-#' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison
-#' @examples
-#' data(krokfors)
-#' set.seed(1)
-#' \dontrun{
-#' t_obj <- tournament(Q~W,krokfors)
-#' summary(t_obj)
-#' }
-#' # Tournament with winner gplm0
+#' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison.
 #' @export
 print.tournament <- function(x,...){
     cat(paste0('Tournament with winner ',class(x$winner)))
@@ -140,19 +132,12 @@ print.tournament <- function(x,...){
 #' @param ... not used in this function
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(krokfors)
 #' set.seed(1)
-#' t_obj <- tournament(Q~W,krokfors)
+#' t_obj <- tournament(Q~W,krokfors,num_cores=2)
 #' summary(t_obj)
 #' }
-#' #   round game model            B       DIC num_eff_param            P winner
-#' #1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE
-#' #2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE
-#' #3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE
-#' #4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE
-#' #5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE
-#' #6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE
 #' @export
 summary.tournament <- function(object,...){
     object$summary
@@ -168,13 +153,14 @@ summary.tournament <- function(object,...){
 #'  \item{"deviance"}{ to plot the deviance of the four models.}
 #' }
 #' @param ... further arguments passed to other methods.
+#' @return returns an object of class "ggplot2".
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(ggplot2)
 #' data(krokfors)
 #' set.seed(1)
-#' t_obj <- tournament(formula=Q~W,data=krokfors)
+#' t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 #' autoplot(t_obj)
 #' }
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
@@ -184,7 +170,7 @@ autoplot.tournament <- function(x,type='deviance',...){
     args <- list(...)
     legal_types <- c('deviance')
     if(!(type %in% legal_types)){
-        stop(cat(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - '))))
+        stop(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - ')))
     }else if(type=="deviance"){
         p <- plot_tournament_fun(x,type=type)
     }
@@ -209,12 +195,13 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param ... further arguments passed to other methods.
+#' @return No return value, called for side effects
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data(krokfors)
 #' set.seed(1)
-#' t_obj <- tournament(formula=Q~W,data=krokfors)
+#' t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 #' plot(t_obj)
 #' plot(t_obj,transformed=TRUE)
 #' plot(t_obj,type='deviance')
@@ -234,7 +221,7 @@ plot.tournament <- function(x,type='tournament_results',transformed=FALSE,...){
     }else if(type%in%legal_types){
         p <- plot_tournament_grob(x,type=type,transformed=transformed,...)
     }else{
-        stop(cat(paste0('type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))))
+        stop(paste0('Type not recognized. Possible types are:',paste(legal_types,collapse='\n - ')))
     }
     if('ggplot' %in% class(p)){
         print(p)
