@@ -185,26 +185,20 @@
     <div class='dont-index'><p><code><a href='summary.tournament.html'>summary.tournament</a></code> and <code><a href='plot.tournament.html'>plot.tournament</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>krokfors</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
-
-<span class='co'>#  round game model            B       DIC num_eff_param            P winner</span>
-<span class='co'>#1     1    1  gplm 2.403442e-01 -1.490023      6.187344 5.076073e-01  FALSE</span>
-<span class='co'>#2     1    1 gplm0 2.331403e-01 -0.888024      6.340312 4.923927e-01   TRUE</span>
-<span class='co'>#3     1    2   plm 9.175547e-07 23.682956      3.032648 4.522140e-01  FALSE</span>
-<span class='co'>#4     1    2  plm0 1.111473e-06 23.388382      2.950380 5.477860e-01   TRUE</span>
-<span class='co'>#5     2    3 gplm0 2.331403e-01 -0.888024      6.340312 9.999952e-01   TRUE</span>
-<span class='co'>#6     2    3  plm0 1.111473e-06 23.388382      2.950380 4.767376e-06  FALSE</span>
-
-<span class='va'>plm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm0.html'>plm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='plm.html'>plm</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>gplm0.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gplm0.html'>gplm0</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>gplm.fit</span> <span class='op'>&lt;-</span> <span class='fu'><a href='gplm.html'>gplm</a></span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span><span class='op'>)</span>
-<span class='va'>t_obj_from_mod</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span><span class='va'>gplm.fit</span>,<span class='va'>gplm0.fit</span>,<span class='va'>plm.fit</span>,<span class='va'>plm0.fit</span>,winning_criteria<span class='op'>=</span><span class='fl'>0.95</span><span class='op'>)</span>
-<span class='op'>}</span>
+<span class='va'>t_obj</span> <span class='op'>&lt;-</span> <span class='fu'>tournament</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>krokfors</span>,num_cores<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Running tournament:</span></div><div class='output co'>#&gt; <span class='message'>25% - gplm finished</span></div><div class='output co'>#&gt; <span class='message'>50% - gplm0 finished</span></div><div class='output co'>#&gt; <span class='message'>75% - plm finished</span></div><div class='output co'>#&gt; <span class='message'>100% - plm0 finished</span></div><div class='input'><span class='va'>t_obj</span>
+</div><div class='output co'>#&gt; Tournament with winner gplm0</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>t_obj</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   round game model            B        DIC num_eff_param            P winner
+#&gt; 1     1    1  gplm 3.201743e-02 -1.4709638      6.190845 1.302100e-01  FALSE
+#&gt; 2     1    1 gplm0 2.138732e-01 -0.8188839      6.359006 8.697900e-01   TRUE
+#&gt; 3     1    2   plm 1.427185e-06 23.6779944      3.041535 4.339125e-01  FALSE
+#&gt; 4     1    2  plm0 1.861923e-06 23.4058849      2.958588 5.660875e-01   TRUE
+#&gt; 5     2    3 gplm0 2.138732e-01 -0.8188839      6.359006 9.999913e-01   TRUE
+#&gt; 6     2    3  plm0 1.861923e-06 23.4058849      2.958588 8.705656e-06  FALSE</div><div class='input'>
+<span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

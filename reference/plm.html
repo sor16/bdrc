@@ -231,32 +231,31 @@ Bayesian inference is based on the posterior density and summary statistics such
     <div class='dont-index'><p><code><a href='summary.plm0.html'>summary.plm</a></code> for summaries, <code><a href='predict.plm0.html'>predict.plm</a></code> for prediction. It is also useful to look at <code><a href='spread_draws.html'>spread_draws</a></code> and <code><a href='plot.plm0.html'>plot.plm</a></code> to help visualize the full posterior distributions.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>spanga</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>plm</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>spanga</span><span class='op'>)</span>
+<span class='va'>plm.fit</span> <span class='op'>&lt;-</span> <span class='fu'>plm</span><span class='op'>(</span>formula<span class='op'>=</span><span class='va'>Q</span><span class='op'>~</span><span class='va'>W</span>,data<span class='op'>=</span><span class='va'>spanga</span>,num_cores<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>plm.fit</span><span class='op'>)</span>
-
-<span class='co'>#Formula:</span>
-<span class='co'>#  Q ~ W</span>
-<span class='co'>#Latent parameters:</span>
-<span class='co'>#  lower-2.5% median-50% upper-97.5%</span>
-<span class='co'>#a 11.10      12.53      13.80</span>
-<span class='co'>#b  1.92       2.05       2.21</span>
-<span class='co'>#</span>
-<span class='co'>#Hyperparameters:</span>
-<span class='co'>#            lower-2.5% median-50% upper-97.5%</span>
-<span class='co'>#c           9.4018    9.45       9.495</span>
-<span class='co'>#sigma_eta   0.0149    0.35       0.864</span>
-<span class='co'>#eta_1      -5.5404   -4.83      -3.777</span>
-<span class='co'>#eta_2      -7.6414   -5.92      -4.220</span>
-<span class='co'>#eta_3      -9.0013   -6.87      -4.173</span>
-<span class='co'>#eta_4      -9.7819   -7.28      -4.197</span>
-<span class='co'>#eta_5     -10.5232   -7.57      -3.984</span>
-<span class='co'>#eta_6     -10.9925   -7.52      -3.655</span>
-<span class='co'>#</span>
-<span class='co'>#DIC: 52.10376</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; 
+#&gt; Formula: 
+#&gt;  Q ~ W
+#&gt; Latent parameters:
+#&gt;   lower-2.5% median-50% upper-97.5%
+#&gt; a 11.20      12.56      13.9       
+#&gt; b  1.91       2.04       2.2       
+#&gt; 
+#&gt; Hyperparameters:
+#&gt;           lower-2.5% median-50% upper-97.5%
+#&gt; c           9.4045    9.452      9.496     
+#&gt; sigma_eta   0.0255    0.373      0.865     
+#&gt; eta_1      -5.5265   -4.783     -3.742     
+#&gt; eta_2      -7.6882   -6.002     -4.305     
+#&gt; eta_3      -9.0869   -6.993     -4.494     
+#&gt; eta_4      -9.8542   -7.442     -4.572     
+#&gt; eta_5     -10.6135   -7.712     -4.540     
+#&gt; eta_6     -11.0220   -7.678     -4.178     
+#&gt; 
+#&gt; DIC: 51.67442</div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

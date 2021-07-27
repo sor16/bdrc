@@ -143,7 +143,7 @@
 <a href="#running-a-tournament" class="anchor"></a>Running a tournament</h2>
 <p>The tournament function is easy to use. All you need are two mandatory input arguments, formula and data. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m<span class="math inline">\(^3/\)</span>s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to run our first tournament:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span>T,<span class="dt">num_cores=</span><span class="dv">2</span>) <span class="co"># parallel=T by default and by default, the number of cores is detected on the machine</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="op">&gt;</span><span class="st"> </span>t_obj &lt;-<span class="st"> </span><span class="kw">tournament</span>(Q<span class="op">~</span>W,krokfors,<span class="dt">parallel=</span><span class="ot">TRUE</span>,<span class="dt">num_cores=</span><span class="dv">2</span>) <span class="co"># parallel=TRUE by default and by default, the number of cores is detected on the machine</span></span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb2-4"><a href="#cb2-4"></a><span class="co">#&gt; 25% - gplm finished</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co">#&gt; 50% - gplm0 finished</span></span>
@@ -185,7 +185,7 @@
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>Finally, the panel option is useful to gain insight into all different model components of the winning model, which in this case is gplm0:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span>T)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">plot</span>(t_obj,<span class="dt">type=</span><span class="st">'panel'</span>,<span class="dt">transformed=</span><span class="ot">TRUE</span>)</span></code></pre></div>
 <p><img src="tournament_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div id="customizing-tournaments" class="section level2">
