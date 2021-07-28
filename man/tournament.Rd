@@ -36,7 +36,6 @@ set.seed(1)
 t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 t_obj
 summary(t_obj)
-
 }
 }
 \references{

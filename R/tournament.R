@@ -55,7 +55,6 @@ evaluate_game <- function(m,winning_criteria=0.75){
 #' t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 #' t_obj
 #' summary(t_obj)
-#'
 #' }
 #' @export
 tournament <- function(formula=NULL,data=NULL,...,winning_criteria=0.75) {

@@ -25,7 +25,7 @@ plm(
 
 \item{parallel}{logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
-\item{num_cores}{integer beween 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.}
+\item{num_cores}{integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.}
 
 \item{forcepoint}{logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.}
 }
