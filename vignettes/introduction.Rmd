@@ -38,7 +38,7 @@ data(krokfors)
 krokfors
 ```
 ## Fitting a discharge rating curve
-It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>argument</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
+It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>data</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt> where <tt>y</tt> is discharge in m$^3/$s and <tt>x</tt> is stage in m (it is very important that the data is in the correct units). The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, in Krokfors, a column named Q includes discharge measurements and W the stage measurements. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
 
 ```{r, cache=TRUE}
 gplm.fit <- gplm(Q~W,data=krokfors,parallel=TRUE,num_cores=2) # parallel=TRUE by default and by default, the number of cores is detected on the machine
