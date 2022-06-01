@@ -336,7 +336,7 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$h_u-RC$c)
-  X=cbind(rep(1,m),l,diag(l))
+  X=if(length(l)>1) cbind(rep(1,m),l,diag(l)) else matrix(c(1,l,1),nrow=1)
   x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
   yp_u <- c(X%*%x_u)
@@ -381,7 +381,7 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   m_above_c <- sum(above_c)
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
-  X=cbind(rep(1,m_above_c),l,diag(l))
+  X=if(length(l)>1) cbind(rep(1,m_above_c),l,diag(l)) else matrix(c(1,l,1),nrow=1)
   #vector of parameters
   x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
