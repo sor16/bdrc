@@ -90,7 +90,7 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
     result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
     result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
-    result_obj$param_summary$n_eff_samples <- MCMC_output_list$num_effective_samples
+    result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
     result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
     row.names(result_obj$param_summary) <- param_names
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
@@ -181,7 +181,6 @@ plm0.density_evaluation_unknown_c <- function(theta,RC){
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
     D=-2*sum(log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))))
-
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
