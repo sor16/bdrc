@@ -307,15 +307,23 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 
 
 #' @importFrom gridExtra arrangeGrob
-#' @importFrom grid textGrob gpar unit
-#' @importFrom ggplot2 theme guides guide_legend
+#' @importFrom grid textGrob gpar unit unit.pmax
+#' @importFrom ggplot2 theme guides guide_legend ggplotGrob
 plot_grob <- function(x,type,transformed=FALSE){
     if(type=='panel'){
         panel_types <- c('rating_curve','residuals','f','sigma_eps')
-        plot_list <- lapply(panel_types,function(ty){
-            plot_fun(x,type=ty,transformed=transformed)
+        grob_list <- lapply(panel_types,function(ty){
+            ggplotGrob(plot_fun(x,type=ty,transformed=transformed))
         })
-        p <- do.call(arrangeGrob,c(plot_list,ncol=round(sqrt(length(panel_types)))))
+        maxHeight <-  unit.pmax( grob_list[[1]]$heights[2:9], grob_list[[2]]$heights[2:9],
+                                 grob_list[[3]]$heights[2:9], grob_list[[4]]$heights[2:9])
+        maxWidth <-  unit.pmax( grob_list[[1]]$widths[2:5], grob_list[[2]]$widths[2:5],
+                                grob_list[[3]]$widths[2:5], grob_list[[4]]$widths[2:5])
+        for(j in 1:4){
+            grob_list[[j]]$heights[2:9] <- as.list(maxHeight)
+            grob_list[[j]]$widths[2:5] <- as.list(maxWidth)
+        }
+        p <- do.call(arrangeGrob,c(grob_list,ncol=round(sqrt(length(panel_types)))))
     }else if(type=='convergence_diagnostics'){
         autocorrelation_plot <- plot_fun(x,type='autocorrelation') +
                                 theme_bdrc(legend.key.size = unit(0.8, "lines"),
