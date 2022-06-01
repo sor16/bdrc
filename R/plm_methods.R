@@ -24,8 +24,8 @@ summary_fun <- function(x){
 #' @keywords internal
 theme_bdrc <- function(...,scaling=1){
     title_size <- scaling*12
-    text_size <- scaling*10
-    plot_title_size=scaling*15
+    text_size <- scaling*12
+    plot_title_size=scaling*12
     theme_classic() %+replace%
         theme( #text = element_text(family="Times", face="plain"),
                strip.background = element_blank(),
@@ -112,6 +112,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                                    name='Chain number') +
                 xlab('Iteration') +
                 ylab('') +
+                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
                 theme_bdrc()
         }else{
             param_expr <- get_param_expression(params)
@@ -121,6 +122,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
+                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
                 theme_bdrc()
         }
     }else if(type=='histogram'){
@@ -139,6 +141,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_y_continuous(expand=c(0,0,0.05,0)) +
             xlab('') +
             ylab('') +
+            ggtitle(if(!is.null(args$title)) args$title else "Posterior draws") +
             theme_bdrc()
     }else if(type=='rating_curve' | type=='rating_curve_mean'){
         if(transformed){
@@ -162,6 +165,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
+                ggtitle(if(!is.null(args$title)) args$title else "Log-transformed rating curve") +
                 theme_bdrc()
         }else{
             x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
@@ -176,6 +180,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
+                ggtitle(if(!is.null(args$title)) args$title else "Rating curve") +
                 theme_bdrc()
         }
     }else if(type=='sigma_eps'){
@@ -199,6 +204,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
+            ggtitle(if(!is.null(args$title)) args$title else "Standard deviation of the error terms") +
             theme_bdrc()
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
@@ -214,7 +220,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
+            ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent deviations") +
             theme_bdrc()
     }else if(type=='f'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
@@ -237,6 +244,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
+            ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent") +
             theme_bdrc()
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
@@ -260,6 +268,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
+            ggtitle(if(!is.null(args$title)) args$title else "Residuals") +
             theme_bdrc()
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
@@ -275,6 +284,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
+             ggtitle(if(!is.null(args$title)) args$title else "Gelman-Rubin statistic") +
              theme_bdrc()
     }else if(type=='autocorrelation'){
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
@@ -289,10 +299,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Lag') +
              ylab('Autocorrelation') +
+             ggtitle(if(!is.null(args$title)) args$title else "Posterior sample autocorrelation") +
              theme_bdrc()
-    }
-    if(!is.null(args$title)){
-        p <- p + ggtitle(args$title)
     }
     return(p)
 }
