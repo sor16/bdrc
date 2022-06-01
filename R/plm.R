@@ -36,8 +36,8 @@
 #' \item{\code{eta_6_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\eta_6}.}
 #' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.}
 #' \item{\code{D_hat}}{deviance at the median value of the parameters.}
-#' \item{\code{num_effective_param}}{number of effective parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
-#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*num_effective_parameters.}
+#' \item{\code{effective_num_param}}{effective number of parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
+#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters.}
 #' \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 #' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
@@ -110,8 +110,8 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NUL
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
-    result_obj$num_effective_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
-    result_obj$DIC <- result_obj$D_hat + 2*result_obj$num_effective_param
+    result_obj$effective_num_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    result_obj$DIC <- result_obj$D_hat + 2*result_obj$effective_num_param
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
