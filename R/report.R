@@ -72,7 +72,7 @@ get_report_components <- function(x,type=1){
                        nr_chains=m$run_info$num_chains,
                        burnin=m$run_info$burnin,
                        thin=m$run_info$thin,
-                       nr_eff_param=format(m$num_effective_param,digits=2),
+                       eff_num_param=format(m$effective_num_param,digits=2),
                        acceptance_rate=format(m$acceptance_rate,digits=2))
         })
         mcmc_table <- t(do.call('rbind',mcmc_table))

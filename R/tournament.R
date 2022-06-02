@@ -15,7 +15,7 @@ evaluate_game <- function(m,winning_criteria=0.75){
     BF <- B_vec[1]/B_vec[2]
     PR_m1 <- 1/(1+(1/BF))
     DIC_vec <- sapply(m,function(x) x$DIC)
-    num_eff_param <- sapply(m,function(x) x$num_effective_param)
+    num_eff_param <- sapply(m,function(x) x$effective_num_param)
     winner <- if(PR_m1>=winning_criteria) 1 else 2
     data.frame(model=sapply(m,class),
                B=B_vec,
