@@ -3,7 +3,7 @@
 \docType{data}
 \name{krokfors}
 \alias{krokfors}
-\title{Krokfors stream gauging station in Sweden}
+\title{Krokfors gauging station in Sweden}
 \format{
 A data frame with columns:
 \describe{
@@ -18,6 +18,6 @@ Swedish Meteorological and Hydrological Institute.
 krokfors
 }
 \description{
-Data on discharge and stage from Krokfors stream gauging station in Sweden.
+Data on discharge and stage from Krokfors gauging station in Sweden.
 }
 \keyword{datasets}

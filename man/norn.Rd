@@ -3,7 +3,7 @@
 \docType{data}
 \name{norn}
 \alias{norn}
-\title{Norn stream gauging station in Sweden}
+\title{Norn gauging station in Sweden}
 \format{
 A data frame with columns:
 \describe{
@@ -18,6 +18,6 @@ Swedish Meteorological and Hydrological Institute.
 norn
 }
 \description{
-Data on discharge and stage from Norn stream gauging station in Sweden.
+Data on discharge and stage from Norn gauging station in Sweden.
 }
 \keyword{datasets}
