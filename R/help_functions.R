@@ -533,3 +533,16 @@ get_rhat_dat <- function(m,param,smoothness=20){
   return(rhat_dat)
 }
 
+#' @importFrom stats dnorm var
+calc_waic <- function(m,data){
+  d <- data
+  sigma_eps <- m$sigma_eps_posterior
+  yp <- m$rating_curve_mean_posterior
+  rc <- m$rating_curve
+  idx <- as.numeric(merge(cbind("rowname"=rownames(rc),rc),d,by.x="h",by.y=colnames(d)[2],all.y = T)$rowname)
+  lppd <- sum( sapply(1:nrow(d), function(n) { log( mean( dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],] ))) } ))
+  p_waic <- sum( sapply( 1:nrow(d), function(n) { var( log( dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],]))) } ))
+  waic <- -2*(lppd-p_waic)
+  return(list("waic"=waic,"lppd"=lppd,"p_waic"=p_waic))
+}
+

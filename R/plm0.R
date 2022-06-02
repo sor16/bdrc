@@ -29,8 +29,11 @@
 #' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\varepsilon}}.}
 #' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.}
 #' \item{\code{D_hat}}{deviance at the median value of the parameters}
-#' \item{\code{effective_num_param}}{effective number of parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
-#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters.}
+#' \item{\code{effective_num_param_DIC}}{effective number of parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
+#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.}
+#' \item{\code{lppd}}{log pointwise predictive probability of the observed data under the model}
+#' \item{\code{effective_num_param_WAIC}}{effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.}
+#' \item{\code{WAIC}}{Watanabe-Akaike information criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).}
 #' \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
 #' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
 #' \item{\code{formula}}{object of type "formula" provided by the user.}
@@ -96,8 +99,13 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
     result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
-    result_obj$effective_num_param <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
-    result_obj$DIC <- result_obj$D_hat + 2*result_obj$effective_num_param
+    result_obj$effective_num_param_DIC <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    result_obj$DIC <- result_obj$D_hat + 2*result_obj$effective_num_param_DIC
+    #WAIC calculations
+    waic_list <- calc_waic(result_obj,model_dat)
+    result_obj$lppd <- waic_list$lppd
+    result_obj$effective_num_param_WAIC <- waic_list$p_waic
+    result_obj$WAIC <- waic_list$waic
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
