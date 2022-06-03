@@ -78,7 +78,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
@@ -112,7 +112,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                                    name='Chain number') +
                 xlab('Iteration') +
                 ylab('') +
-                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
+                ggtitle(if(!is.null(args$title)) args$title else "Trace") +
                 theme_bdrc()
         }else{
             param_expr <- get_param_expression(params)
@@ -122,7 +122,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
-                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
+                ggtitle(if(!is.null(args$title)) args$title else "Trace") +
                 theme_bdrc()
         }
     }else if(type=='histogram'){

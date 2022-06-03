@@ -168,7 +168,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint
     return(output_list)
 }
 
-#' @importFrom stats rnorm dnorm
+#' @importFrom stats rnorm dlnorm
 gplm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     log_sig_b <- theta[2]
@@ -199,11 +199,11 @@ gplm0.density_evaluation_known_c <- function(theta,RC){
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(dnorm(RC$y[1:RC$n,],yp,sqrt(varr))))
+    D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
-#' @importFrom stats rnorm dnorm
+#' @importFrom stats rnorm dlnorm
 gplm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
@@ -234,11 +234,11 @@ gplm0.density_evaluation_unknown_c <- function(theta,RC){
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum(log(dnorm(RC$y[1:RC$n,],yp,sqrt(varr))))
+    D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
-#' @importFrom stats dnorm
+#' @importFrom stats dlnorm
 gplm0.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
   if(!is.null(RC$c)){
@@ -263,7 +263,7 @@ gplm0.calc_Dhat <- function(theta,RC){
   w=solve(L,RC$y-X%*%RC$mu_x)
   x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
-  D=-2*sum(log(dnorm(RC$y[1:RC$n,],yp,sqrt(varr))))
+  D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
   return(D)
 }
 #' @importFrom stats rnorm dist
