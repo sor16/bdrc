@@ -4,7 +4,13 @@
 \alias{tournament}
 \title{Tournament - Model comparison}
 \usage{
-tournament(formula = NULL, data = NULL, ..., winning_criteria = 0.75)
+tournament(
+  formula = NULL,
+  data = NULL,
+  ...,
+  method = "Delta_WAIC",
+  winning_criteria = NULL
+)
 }
 \arguments{
 \item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
@@ -12,6 +18,8 @@ tournament(formula = NULL, data = NULL, ..., winning_criteria = 0.75)
 \item{data}{data.frame containing the variables specified in formula.}
 
 \item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
+
+\item{method}{a string specifying the method used to declare a winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".}
 
 \item{winning_criteria}{a numerical value between 0 and 1 which sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the better model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.}
 }

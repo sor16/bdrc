@@ -5,18 +5,18 @@ plot_tournament_fun <- function(x,type='deviance'){
             data.frame(model=class(m),D=c(m$Deviance_posterior))
         })
         deviance_post_dat <- do.call(rbind,deviance_post_dat)
-        DIC_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),DIC=c(m$DIC))
+        WAIC_dat <- lapply(x$contestants,function(m){
+            data.frame(model=class(m),WAIC=c(m$WAIC))
         })
-        DIC_dat <- do.call(rbind,DIC_dat)
+        WAIC_dat <- do.call(rbind,WAIC_dat)
         p <- ggplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D)) +
             geom_boxplot(size=0.4,width=0.4,color="black",outlier.size=0.2,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
             stat_boxplot(geom='errorbar',width=0.2) +
-            geom_line(data=DIC_dat,aes(x=.data$model,y=.data$DIC,group=1),color='gray30') +
-            geom_point(data=DIC_dat,aes(x=.data$model,y=.data$DIC),size=3,shape=23,fill='red2',color='black') +
+            geom_line(data=WAIC_dat,aes(x=.data$model,y=.data$WAIC,group=1),color='gray30') +
+            geom_point(data=WAIC_dat,aes(x=.data$model,y=.data$WAIC),size=3,shape=23,fill='red2',color='black') +
             theme_bdrc() +
             xlab('') +
-            ylab('Deviance & DIC')
+            ylab('Deviance & WAIC')
     }
     return(p)
 }
@@ -92,13 +92,14 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
                                       x$summary$model[5:6],
                                       paste0('Tournament winner  =>  ',class(x$winner),
                                              paste0(rep(' ',20),collapse=' '))))
-        prob_dat <- data.frame(P=round(x$summary$P,digits=3),
+        method <- if(grepl("WAIC",x$info$method)) "WAIC" else if(grepl("DIC",x$info$method)) "DIC" else "P"
+        prob_dat <- data.frame(WAIC=paste0(paste0(method,"=",if(method!="P") "\n"),round(x$summary[[method]],digits=if(method=="P") 2 else 1 )),
                                winner=x$summary$winner,
                                x=c(loc_pts$x[1:4],0.8*(loc_pts$x[5:6]-1.5)+1.5),
                                y=loc_pts$y[1:6]+0.5)
         game_results <- ggplot() +
             geom_segment(data=loc_pts[1:6,],aes(x=.data$x,y=.data$y,xend=.data$xend,yend=.data$yend)) +
-            geom_text(data=prob_dat, aes(x=.data$x,y=.data$y,label=.data$P,color=.data$winner,size=7)) +
+            geom_text(data=prob_dat, aes(x=.data$x,y=.data$y,label=.data$WAIC,color=.data$winner,size=7)) +
             geom_label(data=loc_pts[5:7,],aes(x=.data$x,y=.data$y,label=.data$model),label.padding=unit(0.5,"lines"),label.size=0,color="Black",fill="white",size=6) +
             scale_colour_manual(values = c("red", "green3")) +
             theme_classic() +
@@ -191,7 +192,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'   \item{"f"}{ to plot the power-law exponent.}
 #'   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
 #'   \item{"residuals"}{ to plot the log residuals.}
-#'   \item{"residuals"}{ to plot tournament results visually, game for game.}
+#'   \item{"tournament_results"}{ to plot tournament results visually, game for game.}
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param ... further arguments passed to other methods.
