@@ -533,8 +533,7 @@ get_rhat_dat <- function(m,param,smoothness=20){
   return(rhat_dat)
 }
 
-# m is model object    Laga ...
-# d is data
+#' calc_waic is a function that takes in a model object (m) and data (d) and returns a list containing the elements used to calculate WAIC.
 #' @importFrom stats dlnorm var
 calc_waic <- function(m,d){
   sigma_eps <- m$sigma_eps_posterior
