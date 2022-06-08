@@ -12,7 +12,7 @@ summary_fun <- function(x){
     print(param_summary[1:2,],row.names = TRUE,digits=3,right=FALSE)
     cat("\nHyperparameters:\n")
     print(param_summary[3:nrow(param_summary),],row.names = TRUE,digits=3,right=FALSE)
-    cat("\nDIC:",x$DIC)
+    cat("\nWAIC:",x$WAIC)
 }
 
 #' Custom bdrc theme
