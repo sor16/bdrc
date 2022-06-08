@@ -54,11 +54,11 @@ get_report_components <- function(x,type=1){
         output_list$main_page_plots <- plot_tournament_grob(t_obj)
         output_list$main_page_table <- lapply(m_obj,function(m){
                                             param <- get_param_names(class(m),m$run_info$c_param)
-                                            table <- rbind(m$param_summary,data.frame(m$Deviance_summary,r_hat=NA,n_eff_samples=NA))
+                                            table <- rbind(m$param_summary,data.frame(m$Deviance_summary,r_hat=NA,eff_n_samples=NA))
                                             table[,c('lower','median','upper','r_hat')] <- format(round(table[,c('lower','median','upper','r_hat')],digits=3),nsmall=3)
                                             row.names(table) <- c(sapply(1:length(param),get_param_expression),"Deviance")
-                                            table['Deviance',c('n_eff_samples','r_hat')] <- ''
-                                            names(table) <- c(paste0(names(table[,c('lower','median','upper')]),c('-2.5%','-50%','-97.5%')),'num_eff_samples','r_hat')
+                                            table['Deviance',c('eff_n_samples','r_hat')] <- ''
+                                            names(table) <- c(paste0(names(table[,c('lower','median','upper')]),c('-2.5%','-50%','-97.5%')),'eff_n_samples','r_hat')
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
         output_list$mcmc_hist_list <- lapply(m_obj,function(m){
