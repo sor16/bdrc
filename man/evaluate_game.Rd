@@ -11,16 +11,16 @@ evaluate_game(m, method, winning_criteria)
 
 \item{method}{a string specifying the method used to declare a winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".}
 
-\item{winning_criteria}{a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model of the two. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.}
+\item{winning_criteria}{a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.}
 }
 \value{
 A data.frame with the summary of the results of the game
 }
 \description{
-evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model favors the other
+evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model is more appropriate than the other
 }
 \references{
-B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.
 }
 \seealso{
 \code{\link{tournament}}

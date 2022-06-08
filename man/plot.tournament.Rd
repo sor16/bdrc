@@ -17,7 +17,7 @@
   \item{"f"}{ to plot the power-law exponent.}
   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
   \item{"residuals"}{ to plot the log residuals.}
-  \item{"residuals"}{ to plot tournament results visually, game for game.}
+  \item{"tournament_results"}{ to plot tournament results visually, game for game.}
  }}
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
