@@ -3,6 +3,10 @@ context('Tournament')
 test_that("tournament can handle different inputs", {
     expect_error(tournament(plm0.fit,plm0.fit,gplm0.fit,gplm.fit))
     expect_error(tournament(plm0.fit,plm.fit,gplm0.fit))
+    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = NA ))
+    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = NULL ))
+    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, winning_criteria = "1.5" ))
+    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = "Bayes_factor", winning_criteria = 1.5 ))
 })
 
 test_that("the tournament object is in tact", {

@@ -3,7 +3,7 @@
 #' evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model is more appropriate than the other
 #'
 #' @param m a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"
-#' @param method a string specifying the method used to declare a winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".
+#' @param method a string specifying the method used to declare a winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".
 #' @param winning_criteria a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.
 #' @return
 #' A data.frame with the summary of the results of the game
@@ -12,27 +12,26 @@
 #' @seealso \code{\link{tournament}}
 #' @keywords internal
 evaluate_game <- function(m,method,winning_criteria){
-    B_vec <- sapply(m,function(x) 1/mean(exp(0.5*x$Deviance_posterior)))
-    BF <- B_vec[1]/B_vec[2]
-    PR_m1 <- 1/(1+(1/BF))
-    DIC_vec <- sapply(m,function(x) x$DIC)
-    WAIC_vec <- sapply(m,function(x) x$WAIC)
-    eff_num_param_DIC <- sapply(m,function(x) x$effective_num_param_DIC)
-    eff_num_param_WAIC <- sapply(m,function(x) x$effective_num_param_WAIC)
-    DDIC <- DIC_vec[2]-DIC_vec[1]
-    DWAIC <- WAIC_vec[2]-WAIC_vec[1]
-    delta_vec <- c('Bayes_factor'=PR_m1,'Delta_DIC'=DDIC,'Delta_WAIC'=DWAIC)
-    winner <- if(delta_vec[[method]]>=winning_criteria) 1 else 2
-    data.frame(model=sapply(m,class),
-               BF=B_vec,
-               P=c(PR_m1,1-PR_m1),
-               eff_num_param_DIC=eff_num_param_DIC,
-               DIC=DIC_vec,
-               Delta_DIC=c(DDIC,NA),
-               eff_num_param_WAIC=eff_num_param_WAIC,
-               WAIC=WAIC_vec,
-               Delta_WAIC=c(DWAIC,NA),
-               winner=1:2==winner)
+    if(method=="Bayes_factor"){
+        ml <- sapply(m,function(x) 1/mean(exp(0.5*x$Deviance_posterior)))
+        BF <- ml[1]/ml[2]
+        PR_m1 <- 1/(1+(1/BF))
+        df <- data.frame("marg_lik"=ml,"P"=c(PR_m1,1-PR_m1))
+    }else if(method=="DIC"){
+        D_hat <- sapply(m,function(x) x$D_hat)
+        eff_num_param_DIC <- sapply(m,function(x) x$effective_num_param_DIC)
+        DIC_vec <- sapply(m,function(x) x$DIC)
+        DDIC <- DIC_vec[2]-DIC_vec[1]
+        df <- data.frame("D_hat"=D_hat,"eff_num_param"=eff_num_param_DIC,"DIC"=DIC_vec,"Delta_DIC"=c(DDIC,NA))
+    }else if(method=="WAIC"){
+        lppd <- sapply(m,function(x) x$lppd)
+        eff_num_param_WAIC <- sapply(m,function(x) x$effective_num_param_WAIC)
+        WAIC_vec <- sapply(m,function(x) x$WAIC)
+        DWAIC <- WAIC_vec[2]-WAIC_vec[1]
+        df <- data.frame("lppd"=lppd,"eff_num_param"=eff_num_param_WAIC,"WAIC"=WAIC_vec,"Delta_WAIC"=c(DWAIC,NA))
+    }
+    winner <- if(df[1,ncol(df)]>=winning_criteria) 1 else 2
+    data.frame(model=sapply(m,class),df,winner=1:2==winner)
 }
 
 
@@ -43,9 +42,9 @@ evaluate_game <- function(m,method,winning_criteria){
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
 #' @param data data.frame containing the variables specified in formula.
 #' @param ... optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.
-#' @param method a string specifying the method used to declare the winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".
-#' @param winning_criteria a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. When "Bayes_factor" is used as the model selection criterion this value should be between 0 and 1 as this sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the more appropriate model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. When "Delta_WAIC" or "Delta_DIC" is used as the model selection criterion this value should be a real number. In this case this value defaults to 1.5 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.
-#' @details Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models, or the differences in either DIC or WAIC, and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 1.5, when using "Delta_WAIC") then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
+#' @param method a string specifying the method used to declare the winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".
+#' @param winning_criteria a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. When "Bayes_factor" is used as the model selection criterion this value should be between 0 and 1 as this sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the more appropriate model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. When "WAIC" or "DIC" is used as the model selection criterion this value should be a real number. In this case this value defaults to 1.5 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.
+#' @details Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models, or the differences in either DIC or WAIC, and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 1.5, when using "WAIC") then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 #' @return
 #' An object of type "tournament" with the following elements
 #' \describe{
@@ -71,21 +70,21 @@ evaluate_game <- function(m,method,winning_criteria){
 #' summary(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,...,method='Delta_WAIC',winning_criteria=NULL) {
+tournament <- function(formula=NULL,data=NULL,...,method='WAIC',winning_criteria=NULL) {
     args <- list(...)
-    default_win_crit <- c('Delta_WAIC'=1.5,'Delta_DIC'=1.5,'Bayes_factor'=0.75)
-    error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'Delta_WAIC' (default), 'Delta_DIC' and 'Bayes_factor'."
+    default_win_crit <- c('WAIC'=1.5,'DIC'=1.5,'Bayes_factor'=0.75)
+    error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'WAIC' (default), 'DIC' and 'Bayes_factor'."
     if( is.null(method) ){
         stop(error_msg)
     }else{
-        if( !(method%in%c('Delta_WAIC','Delta_DIC','Bayes_factor')) ){
+        if( !(method%in%c('WAIC','DIC','Bayes_factor')) ){
             stop(error_msg)
         }
     }
-    if(grepl("Delta",method)){
-        error_msg <- "The winning_criteria when the method is set to 'Delta_DIC' or 'Delta_WAIC' must be a numerical real value. It is a threshold which a more complex model needs to surpass to be declared the more appropriate model when compared with a less complex model. This value defaults to 1.5 when the method is set to 'Delta_DIC' or 'Delta_WAIC'."
+    if(grepl("IC",method)){
+        error_msg <- "The winning_criteria when the method is set to 'DIC' or 'WAIC' must be a numerical real value. This is the threshold value which a model comparison statistic of the more complex model must surpass to be declared the more appropriate model when compared with a less complex model. This value defaults to 1.5 when the models are compared by their 'DIC' or 'WAIC' values."
     }else{
-        error_msg <- "The winning_criteria when the method is set to 'Bayes_factor' must be a numerical value between 0 and 1. It is a threshold which a more complex model needs to surpass to be declared the more appropriate model when compared with a less complex model. This value defaults to 0.75 when the method is set to 'Bayes_factor'."
+        error_msg <- "The winning_criteria when the method is set to 'Bayes_factor' must be a numerical value between 0 and 1. This is the threshold for which the posterior probability of a more complex model, which is calculated using the Bayes factor, needs to surpass to be declared the appropriate model when compared with a less complex model. This value defaults to 0.75 when the model compariso method is set to 'Bayes_factor'."
     }
     if(!is.null(winning_criteria)){
         if(class(winning_criteria)!="numeric"){
