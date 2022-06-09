@@ -23,11 +23,11 @@ A discharge rating curve is a model that describes the relationship between wate
 
 ```plm() ``` - Power-law model with variance that varies with stage.
 
-```gplm0() ``` - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2020).
+```gplm0() ``` - Generalized power-law model with a constant variance (hence the 0). The generalized power-law is introduced in Hrafnkelsson et al. (2022).
 
-```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2020).
+```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2022).
 
-For further details about the different models, see Hrafnkelsson et al. (2020). The models differ in their complexity and <tt>gplm</tt> is the most flexible and complex model. We will focus on the use of <tt>gplm</tt> throughout this introduction vignette and explore the different ways to fit the <tt>gplm</tt> and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
+For further details about the different models, see Hrafnkelsson et al. (2022). The models differ in their complexity and <tt>gplm</tt> is the most flexible and complex model. We will focus on the use of <tt>gplm</tt> throughout this introduction vignette and explore the different ways to fit the <tt>gplm</tt> and visualize its output. However the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
 ```{r,message=FALSE}
 library(bdrc)
 set.seed(1) #set seed for reproducibility
