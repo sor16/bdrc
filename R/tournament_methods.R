@@ -217,12 +217,15 @@ autoplot.tournament <- function(x,type='deviance',...){
 plot.tournament <- function(x,type='tournament_results',transformed=FALSE,...){
     args <- list(...)
     legal_types <- c("deviance","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
-    if(type=='deviance'){
+    error_msg <- paste0('Type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))
+    if( is.null(type) ){
+        stop(error_msg)
+    }else if(type=='deviance'){
         p <- autoplot(x,type=type)
     }else if(type%in%legal_types){
         p <- plot_tournament_grob(x,type=type,transformed=transformed,...)
     }else{
-        stop(paste0('Type not recognized. Possible types are:',paste(legal_types,collapse='\n - ')))
+        stop(error_msg)
     }
     if('ggplot' %in% class(p)){
         print(p)
