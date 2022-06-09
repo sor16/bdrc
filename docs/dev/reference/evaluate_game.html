@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compare two models using Bayes factor — evaluate_game • bdrc</title>
+<title>Compare two models using a specified model selection criteria — evaluate_game • bdrc</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Compare two models using Bayes factor — evaluate_game" />
-<meta property="og:description" content="evaluate_game uses the Bayes factor of two models to determine whether one model favors the other" />
+<meta property="og:title" content="Compare two models using a specified model selection criteria — evaluate_game" />
+<meta property="og:description" content="evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model is more appropriate than the other" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -131,27 +131,31 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compare two models using Bayes factor</h1>
+    <h1>Compare two models using a specified model selection criteria</h1>
     <small class="dont-index">Source: <a href='https://github.com/sor16/bdrc/blob/master/R/tournament.R'><code>R/tournament.R</code></a></small>
     <div class="hidden name"><code>evaluate_game.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>evaluate_game uses the Bayes factor of two models to determine whether one model favors the other</p>
+    <p>evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model is more appropriate than the other</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evaluate_game</span><span class='op'>(</span><span class='va'>m</span>, winning_criteria <span class='op'>=</span> <span class='fl'>0.75</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>evaluate_game</span><span class='op'>(</span><span class='va'>m</span>, <span class='va'>method</span>, <span class='va'>winning_criteria</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>m</th>
-      <td><p>a list of two model objects fit on the same dataset. Model objects allowed are "gplm", "gplm0", "plm" and "plm0"</p></td>
+      <td><p>a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>a string specifying the method used to declare a winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".</p></td>
     </tr>
     <tr>
       <th>winning_criteria</th>
-      <td><p>a numerical value between 0 and 1 which sets the threshold for which the probability of the first model in the list, given the data and calculated using Bayes factor, must exceed for it to be declared the better model of the two. This value defaults to 0.75.</p></td>
+      <td><p>a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.</p></td>
     </tr>
     </table>
 
@@ -160,7 +164,7 @@
     <p>A data.frame with the summary of the results of the game</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>B. Hrafnkelsson, H. Sigurdarson, S.M. Gardarsson, 2020, Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling. arXiv preprint 2010.04769.</p>
+    <p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='tournament.html'>tournament</a></code></p></div>
