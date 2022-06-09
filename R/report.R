@@ -77,14 +77,15 @@ get_report_components <- function(x,type=1){
         })
         mcmc_table <- t(do.call('rbind',mcmc_table))
         output_list$mcmc_table <- tableGrob(mcmc_table,theme=ttheme_minimal())
-        tour_table <- t_obj$summary[c("round","game","model","DIC","P","winner")]
-        tour_table[c('DIC','P')] <- round(tour_table[c('DIC','P')],digits=2)
+        tour_table <- t_obj$summary
+        col_idx <- !(names(tour_table) %in% c('round','game','model','winner'))
+        tour_table[,col_idx] <- round(tour_table[,col_idx],digits=2)
         output_list$tour_table <- tableGrob(tour_table,theme=ttheme_minimal(),rows=NULL)
         output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
         output_list$tournament_results <- plot_tournament_grob(t_obj,type='tournament_results')
         output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
-                                           plot_grob(x,type='convergence_diagnostics')
-                                       })
+            plot_grob(x,type='convergence_diagnostics')
+        })
     }
     return(output_list)
 }
