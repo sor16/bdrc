@@ -9,7 +9,7 @@ evaluate_game(m, method, winning_criteria)
 \arguments{
 \item{m}{a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"}
 
-\item{method}{a string specifying the method used to declare a winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".}
+\item{method}{a string specifying the method used to declare a winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".}
 
 \item{winning_criteria}{a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.}
 }

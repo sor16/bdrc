@@ -8,7 +8,7 @@ tournament(
   formula = NULL,
   data = NULL,
   ...,
-  method = "Delta_WAIC",
+  method = "WAIC",
   winning_criteria = NULL
 )
 }
@@ -19,9 +19,9 @@ tournament(
 
 \item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
 
-\item{method}{a string specifying the method used to declare the winner. The allowed methods are "Delta_WAIC", "Delta_DIC" and "Bayes_factor".}
+\item{method}{a string specifying the method used to declare the winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".}
 
-\item{winning_criteria}{a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. When "Bayes_factor" is used as the model selection criterion this value should be between 0 and 1 as this sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the more appropriate model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. When "Delta_WAIC" or "Delta_DIC" is used as the model selection criterion this value should be a real number. In this case this value defaults to 1.5 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.}
+\item{winning_criteria}{a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. When "Bayes_factor" is used as the model selection criterion this value should be between 0 and 1 as this sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the more appropriate model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. When "WAIC" or "DIC" is used as the model selection criterion this value should be a real number. In this case this value defaults to 1.5 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.}
 }
 \value{
 An object of type "tournament" with the following elements
@@ -36,7 +36,7 @@ An object of type "tournament" with the following elements
 tournament compares four rating curve models of different complexities and determines the model that provides the best fit of the data at hand.
 }
 \details{
-Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models, or the differences in either DIC or WAIC, and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 1.5, when using "Delta_WAIC") then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
+Tournament is a comparison method that uses Bayes factor to compute the posterior probabilities of the models, or the differences in either DIC or WAIC, and select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". If the more complex model ("gplm" and "plm", respectively) exceeds the "winning_criteria" (default value = 1.5, when using "WAIC") then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same "winning_criteria" then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 }
 \examples{
 \donttest{
