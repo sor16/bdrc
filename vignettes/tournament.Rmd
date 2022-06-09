@@ -105,6 +105,6 @@ t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65)
 
 
 ## References
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*. arXiv preprint 2010.04769.   
-Jeffreys, H. (1961). *Theory of Probability*, Third Edition. Oxford University Press.    
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
+Jeffreys, H. (1961). *Theory of Probability*, Third Edition. Oxford University Press.
 Kass, R., and A. Raftery, A. (1995). *Bayes Factors*. Journal of the American Statistical Association, 90, 773-795.
