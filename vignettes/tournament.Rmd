@@ -86,7 +86,7 @@ Another useful plot is the residual plot
 plot(t_obj,type='residuals')
 ```
 
-The main difference between the four models lies in the modeling of the power law exponent $f(h)$ and the variance on the data level $\sigma^2_{\varepsilon}$. Thus it is insightful to look at the posterior of the power law exponent for the different models
+The main difference between the four models lies in the modeling of the power law exponent $f(h)$ and the variance on the data level $\sigma^2_{\varepsilon}(h)$. Thus it is insightful to look at the posterior of the power law exponent for the different models
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj,type='f')
 ```
