@@ -62,6 +62,6 @@ recommend taking a look at our two vignettes.
 
 ## References
 
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2020).
-*Generalization of the power-law rating curve using hydrodynamic theory
-and Bayesian hierarchical modeling*. arXiv preprint 2010.04769.
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). 
+*Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, 
+Environmetrics, 33(2):e2711.
