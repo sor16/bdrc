@@ -82,18 +82,29 @@
     <h2>Arguments</h2>
     <dl><dt>formula</dt>
 <dd><p>an object of class "formula", with discharge column name as response and stage column name as a covariate.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>data.frame containing the variables specified in formula.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>optional arguments passed to the model functions. Also, if data and formula are NULL, one can add four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>a string specifying the method used to declare the winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".</p></dd>
+
+
 <dt>winning_criteria</dt>
 <dd><p>a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. When "Bayes_factor" is used as the model selection criterion this value should be between 0 and 1 as this sets the threshold for which the probability of the more complex model given the data in each model comparison, must exceed for it to be declared the more appropriate model. This value defaults to 0.75 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. When "WAIC" or "DIC" is used as the model selection criterion this value should be a real number. In this case this value defaults to 1.5 to favor the less complex models when the superiority of the more complex model is somewhat ambiguous. See the Details section.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of type "tournament" with the following elements</p><dl><dt><code>contestants</code></dt>
+    
+
+<p>An object of type "tournament" with the following elements</p><dl><dt><code>contestants</code></dt>
 <dd><p>model objects of types "plm0","plm","gplm0" and "gplm" being compared.</p></dd>
 
  <dt><code>winner</code></dt>
@@ -160,7 +171,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

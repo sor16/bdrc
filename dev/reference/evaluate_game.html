@@ -76,14 +76,21 @@
     <h2>Arguments</h2>
     <dl><dt>m</dt>
 <dd><p>a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"</p></dd>
+
+
 <dt>method</dt>
 <dd><p>a string specifying the method used to declare a winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".</p></dd>
+
+
 <dt>winning_criteria</dt>
 <dd><p>a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data.frame with the summary of the results of the game</p>
+    
+
+<p>A data.frame with the summary of the results of the game</p>
     </div>
     <div id="references">
     <h2>References</h2>
@@ -106,7 +113,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

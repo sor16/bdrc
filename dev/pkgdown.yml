@@ -1,9 +1,9 @@
 pandoc: 2.7.3
-pkgdown: 2.0.3
+pkgdown: 2.0.4
 pkgdown_sha: ~
 articles:
   background: background.html
   introduction: introduction.html
   tournament: tournament.html
-last_built: 2022-06-09T23:18Z
+last_built: 2022-06-14T14:55Z
 
