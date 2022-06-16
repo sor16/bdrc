@@ -78,7 +78,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
@@ -112,7 +112,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                                    name='Chain number') +
                 xlab('Iteration') +
                 ylab('') +
-                ggtitle(if(!is.null(args$title)) args$title else "Trace") +
+                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
                 theme_bdrc()
         }else{
             param_expr <- get_param_expression(params)
@@ -122,7 +122,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
-                ggtitle(if(!is.null(args$title)) args$title else "Trace") +
+                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
                 theme_bdrc()
         }
     }else if(type=='histogram'){
@@ -136,13 +136,16 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
         plot_dat$chain <- factor(as.character(plot_dat$chain),levels=1:max(plot_dat$chain))
         p <- ggplot(plot_dat,aes(x=.data$value)) +
             geom_histogram(bins=50,fill="#0072B5FF") +
-            facet_wrap(~name_expr,scales='free',labeller=label_parsed) +
+            facet_wrap(~name_expr,scales='free',labeller=label_parsed,strip.position = "bottom") +
             scale_x_continuous(breaks=histogram_breaks) +
             scale_y_continuous(expand=c(0,0,0.05,0)) +
             xlab('') +
             ylab('') +
-            ggtitle(if(!is.null(args$title)) args$title else "Posterior draws") +
-            theme_bdrc()
+            ggtitle(if(!is.null(args$title)) args$title else "Histograms of posterior draws") +
+            theme_bdrc() +
+            theme(plot.title = element_text( vjust = 2 ),
+                  strip.placement = "outside",
+                  plot.margin =  margin(t = 10, r = 10, b = -10, l = 0, unit = "pt"))
     }else if(type=='rating_curve' | type=='rating_curve_mean'){
         if(transformed){
             x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
@@ -166,7 +169,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 ggtitle(if(!is.null(args$title)) args$title else "Log-transformed rating curve") +
-                theme_bdrc()
+                theme_bdrc() +
+                theme(plot.title = element_text( vjust = 2 ))
         }else{
             x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
             y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
@@ -181,7 +185,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
                 ggtitle(if(!is.null(args$title)) args$title else "Rating curve") +
-                theme_bdrc()
+                theme_bdrc() +
+                theme(plot.title = element_text( vjust = 2 ))
         }
     }else if(type=='sigma_eps'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
@@ -204,8 +209,9 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
-            ggtitle(if(!is.null(args$title)) args$title else "Standard deviation of the error terms") +
-            theme_bdrc()
+            ggtitle(if(!is.null(args$title)) args$title else "Std. dev. of the error terms") +
+            theme_bdrc() +
+            theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='beta'){
         if(!('beta_summary' %in% names(x))){
             stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "gplm0" and "gplm"')
@@ -222,7 +228,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_x_continuous(if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
             ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent deviations") +
-            theme_bdrc()
+            theme_bdrc() +
+            theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='f'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         h_in_data <- x$data[,all.vars(x$formula)[2],drop=TRUE]
@@ -245,7 +252,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
             ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent") +
-            theme_bdrc()
+            theme_bdrc() +
+            theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='residuals'){
         resid_dat <- get_residuals_dat(x)
         y_lab <- "paste('','log','(','',italic(paste('Q')),')','','-log','(','',italic(paste('',hat(paste('Q')))),')','','')"
@@ -269,7 +277,8 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
             scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
             ggtitle(if(!is.null(args$title)) args$title else "Residuals") +
-            theme_bdrc()
+            theme_bdrc() +
+            theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='r_hat'){
         rhat_dat <- get_rhat_dat(x,param)
         rhat_dat$Rhat[rhat_dat$Rhat<1] <- 1
@@ -285,7 +294,10 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
              ggtitle(if(!is.null(args$title)) args$title else "Gelman-Rubin statistic") +
-             theme_bdrc()
+             theme_bdrc() +
+             theme(plot.title = element_text( vjust = 2 ),
+                   axis.title.y = element_text( vjust = 3 ),
+                   plot.margin = margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
     }else if(type=='autocorrelation'){
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
         param_expr <- parse(text=get_param_expression(param))
@@ -298,9 +310,12 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              scale_y_continuous(limits=c(min(auto_dat$corr,-1/11),1),expand=c(0,0)) +
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Lag') +
-             ylab('Autocorrelation') +
-             ggtitle(if(!is.null(args$title)) args$title else "Posterior sample autocorrelation") +
-             theme_bdrc()
+             ylab('Sample autocorrelation') +
+             ggtitle(if(!is.null(args$title)) args$title else "Autocorrelation in posterior draws") +
+             theme_bdrc() +
+             theme(plot.title = element_text( vjust = 2 ),
+                   axis.title.y = element_text( vjust = 3 ),
+                   plot.margin = margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
     }
     return(p)
 }
