@@ -116,6 +116,6 @@ Jeffreys, H. (1961). *Theory of Probability*, Third Edition. Oxford University P
 
 Kass, R., and A. Raftery, A. (1995). *Bayes Factors*. Journal of the American Statistical Association, 90, 773-795.
 
-Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639.
+Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). *Bayesian measures of model complexity and fit*. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639.
 
-Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
+Watanabe, S. (2010). *Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory*. Journal of Machine Learning Research, 11, 3571–3594.
