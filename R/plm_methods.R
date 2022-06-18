@@ -78,7 +78,7 @@ histogram_breaks <-function(x){
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
 #' @return returns an object of class ggplot2.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin element_text theme
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
@@ -141,11 +141,11 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_y_continuous(expand=c(0,0,0.05,0)) +
             xlab('') +
             ylab('') +
-            ggtitle(if(!is.null(args$title)) args$title else "Histograms of posterior draws") +
+            ggtitle(if(!is.null(args$title)) args$title else if( length(param)==1 ) "Histogram of posterior draws" else "Histograms of posterior draws" ) +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ),
                   strip.placement = "outside",
-                  plot.margin =  margin(t = 10, r = 10, b = -10, l = 0, unit = "pt"))
+                  plot.margin =  ggplot2::margin(t = 10, r = 10, b = -10, l = 0, unit = "pt"))
     }else if(type=='rating_curve' | type=='rating_curve_mean'){
         if(transformed){
             x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
@@ -297,7 +297,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              theme_bdrc() +
              theme(plot.title = element_text( vjust = 2 ),
                    axis.title.y = element_text( vjust = 3 ),
-                   plot.margin = margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
+                   plot.margin = ggplot2::margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
     }else if(type=='autocorrelation'){
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
         param_expr <- parse(text=get_param_expression(param))
@@ -315,7 +315,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              theme_bdrc() +
              theme(plot.title = element_text( vjust = 2 ),
                    axis.title.y = element_text( vjust = 3 ),
-                   plot.margin = margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
+                   plot.margin = ggplot2::margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
     }
     return(p)
 }
