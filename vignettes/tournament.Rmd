@@ -37,6 +37,7 @@ To learn more about the four models, see Hrafnkelsson et al. (2022). To learn ab
 To introduce the tournament function we will use a dataset from the stream gauging station Krokfors in Sweden that comes with the package:
 ```{r,message=FALSE}
 # library(bdrc)
+library(devtools)
 devtools::load_all()
 data(krokfors)
 krokfors
