@@ -27,8 +27,6 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -74,7 +72,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/sor16/bdrc/" class="external-link">
+  <a href="https://github.com/sor16/bdrc/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -89,47 +87,128 @@
 
       
 
-      </header><script src="background_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="background_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Background</h1>
-                        <h4 data-toc-skip class="author">Birgir Hrafnkelsson</h4>
+                        <h4 class="author">Birgir Hrafnkelsson</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/vignettes/background.Rmd" class="external-link"><code>vignettes/background.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/background.Rmd"><code>vignettes/background.Rmd</code></a></small>
       <div class="hidden name"><code>background.Rmd</code></div>
 
     </div>
 
     
     
-<p>Most methods for directly measuring the discharge of a water stream are time-consuming and expensive. Therefore, indirect methods for measuring the discharge are usually applied. A popular method for inferring discharge is to fit a model that describes the relationship between discharge and water level, also referred to as stage. Such a model is called a discharge rating curve, and one, widely used in hydrology, is the power-law rating curve, <span class="math inline">\(Q(h)=a(h-c)^b\)</span>, where <span class="math inline">\(Q(h)\)</span> is the discharge, <span class="math inline">\(h\)</span> is the water stage, and <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are constants. However, the power-law rating curve is not always able to adequately describe the relationship between discharge and stage. Hrafnkelsson et al. (2022) proposed a novel extension to the power-law rating curve referred to as the generalized power-law rating curve. Its form is <span class="math inline">\(Q(h)=a(h-c)^{f(h)}\)</span>, where the power-law exponent, <span class="math inline">\(f(h)\)</span>, is a function of stage. This generalization allows the water stream cross-section’s geometry to affect the power-law exponent and thus lends more flexibility to the rating curve to adequately describe the relationship between discharge and stage.</p>
-<div class="section level2">
-<h2 id="bayesian-generalized-power-law-rating-curves">Bayesian Generalized Power-Law Rating Curves<a class="anchor" aria-label="anchor" href="#bayesian-generalized-power-law-rating-curves"></a>
-</h2>
-<p>The power-law model is commonly assumed in hydraulic practice to fit rating curves, and as mention above, its form is</p>
-<p><span class="math display">\[Q(h) = a(h-c)^{b}\]</span> (1) where <span class="math inline">\(Q\)</span>, <span class="math inline">\(h\)</span>, <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are as before, see e.g., Venetis (1970), Clarke (1999) and Clarke et al. (2000). The second type of rating curves is the generalized power-law model. Its construction is based on the hydraulics of open channel flow given the formulas of Chézy and Manning which are of the form</p>
+<p>Most methods for directly measuring the discharge of a water stream
+are time-consuming and expensive. Therefore, indirect methods for
+measuring the discharge are usually applied. A popular method for
+inferring discharge is to fit a model that describes the relationship
+between discharge and water level, also referred to as stage. Such a
+model is called a discharge rating curve, and one, widely used in
+hydrology, is the power-law rating curve, <span class="math inline">\(Q(h)=a(h-c)^b\)</span>, where <span class="math inline">\(Q(h)\)</span> is the discharge, <span class="math inline">\(h\)</span> is the water stage, and <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>
+and <span class="math inline">\(c\)</span> are constants. However, the
+power-law rating curve is not always able to adequately describe the
+relationship between discharge and stage. Hrafnkelsson et al. (2022)
+proposed a novel extension to the power-law rating curve referred to as
+the generalized power-law rating curve. Its form is <span class="math inline">\(Q(h)=a(h-c)^{f(h)}\)</span>, where the power-law
+exponent, <span class="math inline">\(f(h)\)</span>, is a function of
+stage. This generalization allows the water stream cross-section’s
+geometry to affect the power-law exponent and thus lends more
+flexibility to the rating curve to adequately describe the relationship
+between discharge and stage.</p>
+<div id="bayesian-generalized-power-law-rating-curves" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bayesian-generalized-power-law-rating-curves" class="anchor"></a>Bayesian Generalized Power-Law Rating Curves</h2>
+<p>The power-law model is commonly assumed in hydraulic practice to fit
+rating curves, and as mention above, its form is</p>
+<p><span class="math display">\[Q(h) = a(h-c)^{b}\]</span> (1) where
+<span class="math inline">\(Q\)</span>, <span class="math inline">\(h\)</span>, <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>
+and <span class="math inline">\(c\)</span> are as before, see e.g.,
+Venetis (1970), Clarke (1999) and Clarke et al. (2000). The second type
+of rating curves is the generalized power-law model. Its construction is
+based on the hydraulics of open channel flow given the formulas of Chézy
+and Manning which are of the form</p>
 <p><span class="math display">\[Q = KR^{x}AS^{1/2}\]</span> (2)</p>
-<p>where <span class="math inline">\(K\)</span> is a constant, <span class="math inline">\(R\)</span> is the hydraulic radius, <span class="math inline">\(x\)</span> is constant, <span class="math inline">\(A\)</span> is the cross-section area, <span class="math inline">\(S\)</span> is the slope of the channel, further, <span class="math inline">\(R = A/P\)</span> where <span class="math inline">\(P\)</span> is the wetted perimeter. According to Chézy <span class="math inline">\(x = 1/2\)</span> while Manning claimed that <span class="math inline">\(x = 2/3\)</span> (Chow, 1959). The form of the generalized rating curve is</p>
+<p>where <span class="math inline">\(K\)</span> is a constant, <span class="math inline">\(R\)</span> is the hydraulic radius, <span class="math inline">\(x\)</span> is constant, <span class="math inline">\(A\)</span> is the cross-section area, <span class="math inline">\(S\)</span> is the slope of the channel, further,
+<span class="math inline">\(R = A/P\)</span> where <span class="math inline">\(P\)</span> is the wetted perimeter. According to
+Chézy <span class="math inline">\(x = 1/2\)</span> while Manning claimed
+that <span class="math inline">\(x = 2/3\)</span> (Chow, 1959). The form
+of the generalized rating curve is</p>
 <p><span class="math display">\[Q = a(h − c)^{f(h)}\]</span> (3)</p>
-<p>where <span class="math inline">\(a\)</span> and <span class="math inline">\(c\)</span> are constants and <span class="math inline">\(f(h)\)</span> is a function of <span class="math inline">\(h\)</span> and referred to as the generalized power-law exponent. The relationship between (2) and (3) can be found by equating these two equations. In particular, the form of <span class="math inline">\(f(h)\)</span> can be derived, namely,</p>
-<p><span class="math display">\[f(h) = \frac{(x+1)\{ \log A(h) - \log A(1) \}  - x \{ \log P(h) - \log P(1)  \}}{\log h}\]</span> (4)</p>
-<p>Thus, <span class="math inline">\(f(h)\)</span> is a function of the constant <span class="math inline">\(x\)</span>, the cross section <span class="math inline">\(A\)</span> and the wetted perimeter <span class="math inline">\(P\)</span>. The estimation approach is proposed for the estimation of the power-law model and the generalized power-law model. Bayesian inference requires specification of prior densities for unknown parameters and unknown quantities along with a full probabilistic specification of the observed data. Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using Markov chain Monte Carlo simulation. The Bayesian power-law model is presented on a logarithmic scale as,</p>
-<p><span class="math display">\[\log(Q_i) = \log(a) + b \log(h_i -c) + \epsilon_i, \quad i = 1,...,n,\]</span> (5)</p>
-<p>where <span class="math inline">\(\epsilon_i\)</span> follows a normal distribution with mean zero and variance <span class="math inline">\(\sigma_{\epsilon}^2\)</span>, <span class="math inline">\(n\)</span> is the number of paired observations and <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are as before. The Bayesian inference scheme implemented for the power-law model is standard, however, for efficient posterior simulation, first, samples from the joint marginal posterior density of <span class="math inline">\((c, \sigma_{\epsilon}^2)\)</span> are obtained, then samples from the conditional posterior density of <span class="math inline">\((\log(a), b)\)</span> conditional on <span class="math inline">\((c, \sigma_{\epsilon}^2)\)</span> are obtained. The Bayesian generalized power-law model is presented as a Bayesian hierarchical model. The function <span class="math inline">\(f(h)\)</span> is modeled at the latent level as <span class="math inline">\(b\)</span> plus a mean zero continuous stochastic process which is assumed to be twice mean square differentiable. The model is presented on a logarithmic scale,</p>
-<p><span class="math display">\[\log (Q_i) = \log (a) + (b + \beta(h_i)) \log(h_i -c) + \varepsilon_i, \quad i = 1,...,n,\]</span> (6)</p>
-<p>where <span class="math inline">\(\epsilon_i\)</span> follows a normal distribution with mean zero and variance <span class="math inline">\(\sigma(h_i)_{\epsilon}^2\)</span> that can vary with stage. Here the parameters <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> play a similar role as in the Bayesian power law model. The stochastic process <span class="math inline">\(\beta(h)\)</span> is assumed a priori to be a Gaussian process governed by a Matérn covariance function with smoothness parameter <span class="math inline">\(\nu = 2.5\)</span>, see Matérn (1960). This model is constrained by setting <span class="math inline">\(b=1.835\)</span>. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the conditional density of the latent parameters conditional on the hyperparameters.</p>
-
+<p>where <span class="math inline">\(a\)</span> and <span class="math inline">\(c\)</span> are constants and <span class="math inline">\(f(h)\)</span> is a function of <span class="math inline">\(h\)</span> and referred to as the generalized
+power-law exponent. The relationship between (2) and (3) can be found by
+equating these two equations. In particular, the form of <span class="math inline">\(f(h)\)</span> can be derived, namely,</p>
+<p><span class="math display">\[f(h) = \frac{(x+1)\{ \log A(h) - \log
+A(1) \}  - x \{ \log P(h) - \log P(1)  \}}{\log h}\]</span> (4)</p>
+<p>Thus, <span class="math inline">\(f(h)\)</span> is a function of the
+constant <span class="math inline">\(x\)</span>, the cross section <span class="math inline">\(A\)</span> and the wetted perimeter <span class="math inline">\(P\)</span>. The estimation approach is proposed
+for the estimation of the power-law model and the generalized power-law
+model. Bayesian inference requires specification of prior densities for
+unknown parameters and unknown quantities along with a full
+probabilistic specification of the observed data. Bayesian inference is
+based on the posterior density and summary statistics such as the
+posterior mean and 95% posterior intervals are based on the posterior
+density. Analytical formulas for these summary statistics are
+intractable in most cases and thus they are computed by generating
+samples from the posterior density using Markov chain Monte Carlo
+simulation. The Bayesian power-law model is presented on a logarithmic
+scale as,</p>
+<p><span class="math display">\[\log(Q_i) = \log(a) + b \log(h_i -c) +
+\epsilon_i, \quad i = 1,...,n,\]</span> (5)</p>
+<p>where <span class="math inline">\(\epsilon_i\)</span> follows a
+normal distribution with mean zero and variance <span class="math inline">\(\sigma_{\epsilon}^2\)</span>, <span class="math inline">\(n\)</span> is the number of paired observations
+and <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are as before. The Bayesian inference
+scheme implemented for the power-law model is standard, however, for
+efficient posterior simulation, first, samples from the joint marginal
+posterior density of <span class="math inline">\((c,
+\sigma_{\epsilon}^2)\)</span> are obtained, then samples from the
+conditional posterior density of <span class="math inline">\((\log(a),
+b)\)</span> conditional on <span class="math inline">\((c,
+\sigma_{\epsilon}^2)\)</span> are obtained. The Bayesian generalized
+power-law model is presented as a Bayesian hierarchical model. The
+function <span class="math inline">\(f(h)\)</span> is modeled at the
+latent level as <span class="math inline">\(b\)</span> plus a mean zero
+continuous stochastic process which is assumed to be twice mean square
+differentiable. The model is presented on a logarithmic scale,</p>
+<p><span class="math display">\[\log (Q_i) = \log (a) + (b + \beta(h_i))
+\log(h_i -c) + \varepsilon_i, \quad i = 1,...,n,\]</span> (6)</p>
+<p>where <span class="math inline">\(\epsilon_i\)</span> follows a
+normal distribution with mean zero and variance <span class="math inline">\(\sigma_{\epsilon}^2(h_i)\)</span> that can vary
+with stage. Here the parameters <span class="math inline">\(a\)</span>,
+<span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> play a similar role as in the Bayesian
+power law model. The stochastic process <span class="math inline">\(\beta(h)\)</span> is assumed a priori to be a
+Gaussian process governed by a Matérn covariance function with
+smoothness parameter <span class="math inline">\(\nu = 2.5\)</span>, see
+Matérn (1960). This model is constrained by setting <span class="math inline">\(b=1.835\)</span>. An efficient posterior
+simulation is achieved by sampling from the joint posterior density of
+the hyperparameters of the model, and then sampling from the conditional
+density of the latent parameters conditional on the hyperparameters.</p>
 </div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
-<p>Chow, V. (1959). <em>Open-Channel Hydraulics</em>. McGraw-Hill. New York.</p>
-<p>Clarke, R. (1999). <em>Uncertainty in the estimation of mean annual flood due to rating-curve indefinition.</em> Journal of Hydrology 222(1-4). 185–190.</p>
-<p>Clarke, R., Mendiondo, E., Brusa L. (2000). <em>Uncertainties in mean discharges from two large South American rivers due to rating curve variability.</em> Hydrological Sciences 45(2). 221–236.</p>
-<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). <em>Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling</em>, Environmetrics, 33(2):e2711.</p>
-<p>Matérn, B. (1960). <em>Spatial variation. Stochastic models and their application to some problems in forest surveys and other sampling investigations.</em> Meddelanden från statens Skogsforskningsinstitut. 49(5).</p>
-<p>Venetis, C. (1970). <em>A note on the estimation of the parameters in logarithmic stage-discharge relationships with estimates of their error.</em> International Association of Scientific Hydrology. Bulletin XV 2(6). 105–111.</p>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
+<p>Chow, V. (1959). <em>Open-Channel Hydraulics</em>. McGraw-Hill. New
+York.</p>
+<p>Clarke, R. (1999). <em>Uncertainty in the estimation of mean annual
+flood due to rating-curve indefinition.</em> Journal of Hydrology
+222(1-4). 185–190.</p>
+<p>Clarke, R., Mendiondo, E., Brusa L. (2000). <em>Uncertainties in mean
+discharges from two large South American rivers due to rating curve
+variability.</em> Hydrological Sciences 45(2). 221–236.</p>
+<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022).
+<em>Generalization of the power-law rating curve using hydrodynamic
+theory and Bayesian hierarchical modeling</em>, Environmetrics,
+33(2):e2711.</p>
+<p>Matérn, B. (1960). <em>Spatial variation. Stochastic models and their
+application to some problems in forest surveys and other sampling
+investigations.</em> Meddelanden från statens Skogsforskningsinstitut.
+49(5).</p>
+<p>Venetis, C. (1970). <em>A note on the estimation of the parameters in
+logarithmic stage-discharge relationships with estimates of their
+error.</em> International Association of Scientific Hydrology. Bulletin
+XV 2(6). 105–111.</p>
 </div>
   </div>
 
@@ -144,13 +223,11 @@
 
 
       <footer><div class="copyright">
-  <p></p>
-<p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a>.</p>
+  <p>Developed by <a href="https://english.hi.is/staff/birgirhr">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias">Rafael Vias</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -158,8 +235,6 @@
 
   
 
-
-  
 
   </body>
 </html>
