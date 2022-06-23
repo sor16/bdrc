@@ -49,7 +49,7 @@ The Bayesian generalized power-law model is presented as a Bayesian hierarchical
 
 $$\log (Q_i) = \log (a) + (b + \beta(h_i)) \log(h_i -c) + \varepsilon_i, \quad i = 1,...,n,$$ (6)
 
-where $\epsilon_i$ follows a normal distribution with mean zero and variance $\sigma(h_i)_{\epsilon}^2$ that can vary with stage. Here the parameters $a$, $b$ and $c$ play a similar role as in the Bayesian power law model. The stochastic process $\beta(h)$ is assumed a priori to be a Gaussian process governed by a Matérn covariance function with smoothness parameter $\nu = 2.5$, see Matérn (1960). This model is constrained by setting $b=1.835$. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the conditional density of the latent parameters conditional on the hyperparameters.
+where $\epsilon_i$ follows a normal distribution with mean zero and variance $\sigma_{\epsilon}^2(h_i)$ that can vary with stage. Here the parameters $a$, $b$ and $c$ play a similar role as in the Bayesian power law model. The stochastic process $\beta(h)$ is assumed a priori to be a Gaussian process governed by a Matérn covariance function with smoothness parameter $\nu = 2.5$, see Matérn (1960). This model is constrained by setting $b=1.835$. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the conditional density of the latent parameters conditional on the hyperparameters.
 
 
 \vspace{12pt}

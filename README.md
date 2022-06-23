@@ -9,7 +9,7 @@
 coverage](https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg)](https://codecov.io/gh/sor16/bdrc?branch=master)
 [![R build
 status](https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg)](https://github.com/sor16/bdrc/actions)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/bdrc)](https://cran.r-project.org/package=bdrc)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/bdrc)](https://cran.r-project.org/package=bdrc)
 <!-- badges: end -->
 
 This software package fits a discharge rating curve based on the
@@ -45,12 +45,13 @@ devtools::install_github("sor16/bdrc")
 It is very simple to fit a discharge rating curve with the *bdrc*
 package. All you need are two mandatory input arguments, formula and
 data. The formula is of the form y\~x where y is discharge in
-m<sup>3</sup>/s and x is stage in m (it is very important that the data
-is in the correct units). data is a data.frame which must include x and
-y as column names. As an example, we will use data from the Swedish
-gauging station *Krokfors*, which is one of the datasets that come with
-the package. In this table, the Q column denotes discharge while W
-denotes stage:
+m![^3/](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5E3%2F "^3/")s
+and x is stage in m (it is very important that the data is in the
+correct units). data is a data.frame which must include x and y as
+column names. As an example, we will use data from the Swedish gauging
+station *Krokfors*, which is one of the datasets that come with the
+package. In this table, the Q column denotes discharge while W denotes
+stage:
 
 ``` r
 gplm.fit <- gplm(Q~W,krokfors)
@@ -62,6 +63,6 @@ recommend taking a look at our two vignettes.
 
 ## References
 
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). 
-*Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, 
-Environmetrics, 33(2):e2711.
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022).
+*Generalization of the power-law rating curve using hydrodynamic theory
+and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.

@@ -9,15 +9,15 @@ evaluate_game(m, method, winning_criteria)
 \arguments{
 \item{m}{a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"}
 
-\item{method}{a string specifying the method used to declare a winner. The allowed methods are "WAIC", "DIC" and "Bayes_factor".}
+\item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
 
-\item{winning_criteria}{a numerical value which sets the threshold for which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 0.75 when Bayes factor is chosen as the model selection criteria but defaults to 1.5 when either DIC or WAIC are chosen.}
+\item{winning_criteria}{a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 1.5 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".}
 }
 \value{
 A data.frame with the summary of the results of the game
 }
 \description{
-evaluate_game uses the Bayes factor, DIC or WAIC of two models to determine whether one model is more appropriate than the other
+evaluate_game uses WAIC, DIC or the posterior probabilities of the models, calculated with Bayes factor, to determine whether one model is more appropriate than the other model given the data at hand.
 }
 \references{
 Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.

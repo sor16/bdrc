@@ -133,19 +133,16 @@ winners from the first round will be compared in the same way. In the
 second round, if the more complex model (now the generalized power-law
 model) exceeds the same “winning_criteria” then it is chosen as the
 overall tournament winner and deemed the most appropriate model given
-the data. In each of the three matches the difference in WAIC values is
-always measured in relation to the more complex model or <span class="math inline">\(\Delta\text{WAIC}=\text{WAIC}_{\text{simple}}-\text{WAIC}_{\text{complex}}\)</span>,
-a positive value of <span class="math inline">\(\Delta\text{WAIC}\)</span> indicating that the
-complex model might be a more appropriate model. The model selcection
-criterion can also be changed from WAIC to the Deviance Information
-Criterion (DIC) (see Spiegelhalter et al. (2002)) or the posterior
-probabilities of the models, which is computed using the Bayes factor,
-and assumes a priori in each comparison that the two models are equally
-likely (see Jeffreys (1961) and Kass and Raftery (1995)). To introduce
-the tournament function we will use a dataset from a stream gauging
-station Krokfors in Sweden that comes with the package:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(bdrc)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span>
+the data. In each match the difference in WAIC is defined as <span class="math inline">\(\Delta\text{WAIC}=\text{WAIC}_{\text{simple}}-\text{WAIC}_{\text{complex}}\)</span>.
+A positive value of <span class="math inline">\(\Delta\text{WAIC}\)</span> indicates that the more
+complex model is likely a more appropriate model which goes through to
+the final round if <span class="math inline">\(\Delta\text{WAIC}&gt;"winning_criteria"\)</span>.
+<!-- The model selection criterion can also be changed from WAIC to the Deviance Information Criterion (DIC) (see Spiegelhalter et al. (2002)) or the posterior probabilities of the models, which is computed using the Bayes factor, and assumes a priori in each comparison that the two models are equally likely (see Jeffreys (1961) and Kass and Raftery (1995)).  -->
+To introduce the tournament function we will use a dataset from the
+stream gauging station Krokfors in Sweden that comes with the
+package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="co"># library(bdrc)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="er">&gt;</span> devtools<span class="sc">::</span><span class="fu">load_all</span>()</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(krokfors)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> krokfors</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           W          Q</span></span>
@@ -187,7 +184,7 @@ argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as
 column names. In our case the dataset from Krokfors has a column named Q
 which includes the discharge measurements and a column W which includes
 the stage measurements. We are ready to run our first tournament:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>) <span class="co"># set seed for reproducibility</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">parallel=</span><span class="cn">TRUE</span>,<span class="at">num_cores=</span><span class="dv">2</span>) <span class="co"># parallel=TRUE by default and by default, the number of cores is detected on the machine</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running tournament:</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25% - gplm finished</span></span>
