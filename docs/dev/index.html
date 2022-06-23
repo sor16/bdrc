@@ -129,12 +129,12 @@ Hrafnkelsson et al. (2022).</p>
 <p>It is very simple to fit a discharge rating curve with the
 <em>bdrc</em> package. All you need are two mandatory input arguments,
 formula and data. The formula is of the form y~x where y is discharge in
-m<sup>3</sup>/s and x is stage in m (it is very important that the data
-is in the correct units). data is a data.frame which must include x and
-y as column names. As an example, we will use data from the Swedish
-gauging station <em>Krokfors</em>, which is one of the datasets that
-come with the package. In this table, the Q column denotes discharge
-while W denotes stage:</p>
+m<img src="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F" title="^3/" alt="^3/">s and x is stage in m (it is very important that
+the data is in the correct units). data is a data.frame which must
+include x and y as column names. As an example, we will use data from
+the Swedish gauging station <em>Krokfors</em>, which is one of the
+datasets that come with the package. In this table, the Q column denotes
+discharge while W denotes stage:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span><span class="op">)</span></code></pre></div>
 <p>To dig deeper into the functionality of the package and the different

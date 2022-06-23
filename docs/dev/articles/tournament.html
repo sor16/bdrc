@@ -127,16 +127,16 @@ sets up model types “gplm” vs. “gplm0” and “plm” vs. “plm0”. I
 comparison, if the difference in WAIC of the more complex model (“gplm”
 and “plm”, respectively) is smaller than the WAIC of the simpler models
 (“gplm0” and “plm0”, respectively) by a pre-specified value called the
-“winning_criteria” (default value = 1.5) then it is chosen as the more
+winning criteria (default value = 1.5) then it is chosen as the more
 appropriate model and moves on to the second and final round, where the
 winners from the first round will be compared in the same way. In the
 second round, if the more complex model (now the generalized power-law
-model) exceeds the same “winning_criteria” then it is chosen as the
+model) exceeds the same winning criteria then it is chosen as the
 overall tournament winner and deemed the most appropriate model given
-the data. In each match the difference in WAIC is defined as <span class="math inline">\(\Delta\text{WAIC}=\text{WAIC}_{\text{simple}}-\text{WAIC}_{\text{complex}}\)</span>.
-A positive value of <span class="math inline">\(\Delta\text{WAIC}\)</span> indicates that the more
-complex model is likely a more appropriate model which goes through to
-the final round if <span class="math inline">\(\Delta\text{WAIC}&gt;"winning_criteria"\)</span>.
+the data. In each match the difference in WAIC is defined as <span class="math inline">\(\Delta\)</span>WAIC<span class="math inline">\(=\)</span>WAIC<span class="math inline">\(_{\text{simple}}-\)</span>WAIC<span class="math inline">\(_{\text{complex}}\)</span>. A positive value of
+<span class="math inline">\(\Delta\)</span>WAIC indicates that the more
+complex model is a more appropriate model but the more complex model
+only goes through to the final round if <span class="math inline">\(\Delta\)</span>WAIC&gt;<tt>winning_criteria</tt>.
 <!-- The model selection criterion can also be changed from WAIC to the Deviance Information Criterion (DIC) (see Spiegelhalter et al. (2002)) or the posterior probabilities of the models, which is computed using the Bayes factor, and assumes a priori in each comparison that the two models are equally likely (see Jeffreys (1961) and Kass and Raftery (1995)).  -->
 To introduce the tournament function we will use a dataset from the
 stream gauging station Krokfors in Sweden that comes with the
@@ -274,6 +274,57 @@ model. Assume 7.65 m is the known value of <span class="math inline">\(c\)</span
 with the <span class="math inline">\(c\)</span> parameter fixed in all
 models</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj_known_c <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="at">formula=</span>Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>)</span></code></pre></div>
+<p>One can also change the winning criteria (default value = 1.5) which
+set the threshold for which the more complex model in each model
+comparison must exceed in terms of the pre-selected model comparison
+statistic (default method is “WAIC”). Increasing the value for example
+to <tt>winning_criteria=5</tt> raises the bar for the more complex model
+favoring model simplicity</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> t_obj_conservative <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="at">formula=</span>Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">winning_criteria=</span><span class="dv">5</span>)</span></code></pre></div>
+<p>There is also an option to change the method used to estimate the
+predictive performance of the models. The default method is “WAIC” (see
+Watanabe (2010)) which is a fully Bayesian method that uses the full set
+of posterior draws to calculate the best possible estimate of the
+expected log pointwise predictive density. Other allowed methods are
+“DIC” and “Posterior_probability”. The “DIC” (see Spiegelhalter (2002))
+is similar to “WAIC” but instead of using the full set of posterior
+draws to compute the estimate of the expected log pointwise predictive
+density it uses a point estimate of the posterior distribution. Both
+“WAIC” and “DIC” have a default value for the winning criteria of 1.5.
+If you have previously run the tournament you can change the method by
+simply inputting the tournament objects into the tournament function and
+set <tt>method=“DIC”</tt> and then print the summary</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(<span class="fu">tournament</span>(t_obj,<span class="at">method=</span><span class="st">"DIC"</span>))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model     D_hat eff_num_param        DIC  Delta_DIC winner</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm -13.85265      6.190845 -1.4709638  0.6520799  FALSE</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 -13.53690      6.359006 -0.8188839         NA   TRUE</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm  17.59492      3.041535 23.6779944 -0.2721095  FALSE</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0  17.48871      2.958588 23.4058849         NA   TRUE</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 -13.53690      6.359006 -0.8188839 24.2247688   TRUE</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0  17.48871      2.958588 23.4058849         NA  FALSE</span></span></code></pre></div>
+<p>The third and final method that can be chosen is
+“Posterior_probability” which uses the posterior probabilities of the
+models, calculated with Bayes factor (see Jeffreys (1961) and Kass and
+Raftery (1995)), to compare the models, where all the models are assumed
+a priori to be equally likely. When using the method
+“Posterior_probability” the value of the winning criteria should be a
+real number between 0 and 1 since this represents the threshold value
+that the posterior probability of the more complex model has to surpass
+to be selected as the appropriate model. The default value in this case
+for the winning criteria is 0.75 which again slightly favors model
+simplicity. The value 0.75 should give similar results to the other two
+methods with their respective default values of 1.5. Let’s now use this
+method but raise the winning criteria from 0.75 to 0.9. We see that the
+results of the tournament do not change in this example and the winner
+of the third and final game is still <tt>gplm0<tt></tt></tt></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(<span class="fu">tournament</span>(t_obj,<span class="at">method=</span><span class="st">"Posterior_probability"</span>,<span class="at">winning_criteria=</span><span class="fl">0.9</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model     marg_lik    Post_prob winner</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 3.201743e-02 1.302100e-01  FALSE</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     1    1 gplm0 2.138732e-01 8.697900e-01   TRUE</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     1    2   plm 1.427185e-06 4.339125e-01  FALSE</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     1    2  plm0 1.861923e-06 5.660875e-01   TRUE</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     2    3 gplm0 2.138732e-01 9.999913e-01   TRUE</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     2    3  plm0 1.861923e-06 8.705656e-06  FALSE</span></span></code></pre></div>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
