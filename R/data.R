@@ -69,3 +69,53 @@
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "melby"
+
+#' Jokulsa a Dal gauging station in Iceland
+#'
+#' Data on discharge and stage from Jokulsa a Dal gauging station in Iceland
+#'
+#' @format A data frame with columns:
+#' \describe{
+#'  \item{W}{Measurements of water stage in meters}
+#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#' }
+#' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
+"jokdal"
+
+#' Jokulsa a Fjollum gauging station in Iceland
+#'
+#' Data on discharge and stage from Jokulsa a Fjollum gauging station in Iceland
+#'
+#' @format A data frame with columns:
+#' \describe{
+#'  \item{W}{Measurements of water stage in meters}
+#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#' }
+#' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
+"jokfjoll"
+
+#' Nordura gauging station in Iceland
+#'
+#' Data on discharge and stage from Nordura gauging station in Iceland
+#'
+#' @format A data frame with columns:
+#' \describe{
+#'  \item{W}{Measurements of water stage in meters}
+#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#' }
+#' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
+"nordura"
+
+#' Skjalfandafljot gauging station in Iceland
+#'
+#' Data on discharge and stage from Skjalfandafljot gauging station in Iceland
+#'
+#' @format A data frame with columns:
+#' \describe{
+#'  \item{W}{Measurements of water stage in meters}
+#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#' }
+#' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
+"skjalf"
+
+
