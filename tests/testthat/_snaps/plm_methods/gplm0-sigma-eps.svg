@@ -53,6 +53,6 @@
 <text x='384.29' y='566.78' style='font-size: 12.00px; font-family: sans;' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>]</text>
 <text transform='translate(12.13,284.79) rotate(-90)' style='font-size: 12.00px; font-family: sans;' textLength='6.37px' lengthAdjust='spacingAndGlyphs'>σ</text>
 <text transform='translate(14.35,278.41) rotate(-90)' style='font-size: 8.40px; font-family: sans;' textLength='3.62px' lengthAdjust='spacingAndGlyphs'>ε</text>
-<text x='374.82' y='14.98' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='195.45px' lengthAdjust='spacingAndGlyphs'>Standard deviation of the error terms</text>
+<text x='374.82' y='11.25' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='142.74px' lengthAdjust='spacingAndGlyphs'>Std. dev. of the error terms</text>
 </g>
 </svg>

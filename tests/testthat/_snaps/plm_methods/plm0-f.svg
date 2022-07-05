@@ -58,6 +58,6 @@
 <text x='373.87' y='566.78' style='font-size: 12.00px; font-style: italic; font-family: sans;' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>m</text>
 <text x='384.84' y='566.78' style='font-size: 12.00px; font-family: sans;' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>]</text>
 <text transform='translate(15.42,283.78) rotate(-90)' style='font-size: 12.00px; font-style: italic; font-family: sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>b</text>
-<text x='375.36' y='14.98' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='108.74px' lengthAdjust='spacingAndGlyphs'>Power-law exponent</text>
+<text x='375.36' y='11.25' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='108.74px' lengthAdjust='spacingAndGlyphs'>Power-law exponent</text>
 </g>
 </svg>

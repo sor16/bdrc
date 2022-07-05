@@ -186,6 +186,6 @@
 <text x='378.98' y='569.27' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='43.36px' lengthAdjust='spacingAndGlyphs'>Iteration</text>
 <text transform='translate(12.13,296.45) rotate(-90)' style='font-size: 12.00px; font-family: sans;' textLength='6.37px' lengthAdjust='spacingAndGlyphs'>σ</text>
 <text transform='translate(14.35,290.08) rotate(-90)' style='font-size: 8.40px; font-family: sans;' textLength='4.50px' lengthAdjust='spacingAndGlyphs'>η</text>
-<text x='378.98' y='14.98' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='30.68px' lengthAdjust='spacingAndGlyphs'>Trace</text>
+<text x='378.98' y='14.98' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='56.03px' lengthAdjust='spacingAndGlyphs'>Traceplots</text>
 </g>
 </svg>
