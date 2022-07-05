@@ -6,7 +6,7 @@ test_that("tournament can handle different inputs", {
     expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = NA ))
     expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = NULL ))
     expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, winning_criteria = "1.5" ))
-    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = "Bayes_factor", winning_criteria = 1.5 ))
+    expect_error(tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit, method = "Posterior_probability", winning_criteria = 1.5 ))
     expect_error(tournament(t_obj,"1"))
     expect_error(tournament(t_obj,t_obj))
     expect_error(tournament(t_obj,t_obj$winner))

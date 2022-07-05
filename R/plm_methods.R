@@ -263,11 +263,11 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
         p <- ggplot(data=resid_dat) +
             geom_hline(yintercept=0,size=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-            geom_blank(aes(y=-r_median)) +
-            geom_blank(aes(y=-r_upper)) +
-            geom_blank(aes(y=-r_lower)) +
-            geom_blank(aes(y=-m_upper)) +
-            geom_blank(aes(y=-m_lower)) +
+            geom_blank(aes(y=-.data$r_median)) +
+            geom_blank(aes(y=-.data$r_upper)) +
+            geom_blank(aes(y=-.data$r_lower)) +
+            geom_blank(aes(y=-.data$m_upper)) +
+            geom_blank(aes(y=-.data$m_lower)) +
             geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
             geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
             geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',size=0.3,alpha=0.95,method=method,formula='y~x') +
