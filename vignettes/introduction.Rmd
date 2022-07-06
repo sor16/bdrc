@@ -115,7 +115,7 @@ To plot a trace plot for all hyperparameters, you write similarly as above
 plot(gplm.fit,type='trace',param='hyperparameters',transformed=TRUE)
 ```
 
-To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize $\hat{R}$ as presented by Gelman and Rubin with:
+To assess the mixing and convergence of the MCMC chains for each parameter, you can visualize $\hat{R}$ as presented by Gelman and Rubin (1992) with:
 ```{r,fig.width=8, fig.height=6}
 plot(gplm.fit,type='r_hat')
 ```
@@ -139,4 +139,8 @@ print(rating_curve_h_grid)
 ```
 
 ## References
+
+Gelman, A., & Rubin, D. B. (1992). *Inference from iterative simulation using multiple sequences*, Statistical Science, 7(4), 457–472.
+
 Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
+
