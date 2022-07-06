@@ -92,14 +92,14 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
                                       x$summary$model[5:6],
                                       paste0('Tournament winner  =>  ',class(x$winner),
                                              paste0(rep(' ',20),collapse=' '))))
-        method <- if(grepl("WAIC",x$info$method)) "WAIC" else if(grepl("DIC",x$info$method)) "DIC" else "P"
-        prob_dat <- data.frame(WAIC=paste0(paste0(method,"=",if(method!="P") "\n"),round(x$summary[[method]],digits=if(method=="P") 2 else 1 )),
-                               winner=x$summary$winner,
-                               x=c(loc_pts$x[1:4],0.8*(loc_pts$x[5:6]-1.5)+1.5),
-                               y=loc_pts$y[1:6]+0.5)
+        method <- if(grepl("WAIC",x$info$method)) "WAIC" else if(grepl("DIC",x$info$method)) "DIC" else "Post_prob"
+        result_dat <- data.frame(mc_stat=paste0(ifelse(method=='Post_prob',paste0("P="),paste0(method,"=\n")),round(x$summary[[method]],digits=if(method=="Post_prob") 2 else 1 )),
+                                 winner=x$summary$winner,
+                                 x=c(loc_pts$x[1:4],0.8*(loc_pts$x[5:6]-1.5)+1.5),
+                                 y=loc_pts$y[1:6]+0.5)
         game_results <- ggplot() +
             geom_segment(data=loc_pts[1:6,],aes(x=.data$x,y=.data$y,xend=.data$xend,yend=.data$yend)) +
-            geom_text(data=prob_dat, aes(x=.data$x,y=.data$y,label=.data$WAIC,color=.data$winner,size=7)) +
+            geom_text(data=result_dat, aes(x=.data$x,y=.data$y,label=.data$mc_stat,color=.data$winner,size=7)) +
             geom_label(data=loc_pts[5:7,],aes(x=.data$x,y=.data$y,label=.data$model),label.padding=unit(0.5,"lines"),label.size=0,color="Black",fill="white",size=6) +
             scale_colour_manual(values = c("red", "green3")) +
             theme_classic() +
