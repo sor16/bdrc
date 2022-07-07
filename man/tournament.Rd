@@ -7,6 +7,7 @@
 tournament(
   formula = NULL,
   data = NULL,
+  model_list = NULL,
   method = "WAIC",
   winning_criteria = NULL,
   ...
@@ -17,11 +18,13 @@ tournament(
 
 \item{data}{data.frame containing the variables specified in formula.}
 
+\item{model_list}{list of exactly four model objects of types "plm0","plm","gplm0" and "gplm" to be used in the tournament. Note that all of the model objects are required to be run with the same data and same c_param.}
+
 \item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
 
 \item{winning_criteria}{a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.}
 
-\item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
+\item{...}{optional arguments passed to the model functions.}
 }
 \value{
 An object of type "tournament" with the following elements
@@ -67,5 +70,5 @@ Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian meas
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
 }
 \seealso{
-\code{\link{summary.tournament}} and \code{\link{plot.tournament}}
+\code{\link{plm0}} \code{\link{plm}}, \code{\link{gplm0}},\code{\link{gplm}} \code{\link{summary.tournament}} and \code{\link{plot.tournament}}
 }

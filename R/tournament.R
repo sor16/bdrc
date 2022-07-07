@@ -41,9 +41,10 @@ evaluate_game <- function(m,method,winning_criteria){
 #'
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
 #' @param data data.frame containing the variables specified in formula.
+#' @param model_list list of exactly four model objects of types "plm0","plm","gplm0" and "gplm" to be used in the tournament. Note that all of the model objects are required to be run with the same data and same c_param.
 #' @param method a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".
 #' @param winning_criteria a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.
-#' @param ... optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.
+#' @param ... optional arguments passed to the model functions.
 #' @details Tournament is a model comparison method that uses WAIC to estimate the predictive performance of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". In both comparisons, if the more complex model ("gplm" and "plm", respectively) exceeds the \code{winning_criteria} (default value = 1.5) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same winning criteria then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 #'
 #' The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density.
@@ -68,7 +69,7 @@ evaluate_game <- function(m,method,winning_criteria){
 #' @references Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639.
 #' @references Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
 #'
-#' @seealso \code{\link{summary.tournament}} and \code{\link{plot.tournament}}
+#' @seealso \code{\link{plm0}} \code{\link{plm}}, \code{\link{gplm0}},\code{\link{gplm}} \code{\link{summary.tournament}} and \code{\link{plot.tournament}}
 #' @examples
 #' \donttest{
 #' data(krokfors)
@@ -78,14 +79,16 @@ evaluate_game <- function(m,method,winning_criteria){
 #' summary(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,method='WAIC',winning_criteria=NULL,...) {
-    args <- list(...)
+tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winning_criteria=NULL,...) {
     default_win_crit <- c('WAIC'=1.5,'DIC'=1.5,'Posterior_probability'=0.75)
     error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'WAIC' (default), 'DIC' and 'Posterior_probability'."
-    if( is.null(method) ){
+    if(is.null(method)){
         stop(error_msg)
     }else{
-        if( !(method%in%c('WAIC','DIC','Posterior_probability')) ){
+        if(length(method)>1){
+            stop(error_msg)
+        }
+        if(!(method%in%c('WAIC','DIC','Posterior_probability'))){
             stop(error_msg)
         }
     }
@@ -95,6 +98,9 @@ tournament <- function(formula=NULL,data=NULL,method='WAIC',winning_criteria=NUL
         error_msg <- "The winning_criteria when the method is set to 'Posterior_probability' must be a numerical value between 0 and 1. This is the threshold for which the posterior probability of a more complex model, which is calculated using the Bayes factor, needs to surpass to be declared the appropriate model when compared with a less complex model. This value defaults to 0.75 when the method is set to 'Posterior_probability'."
     }
     if(!is.null(winning_criteria)){
+        if(length(method)>1){
+            stop(error_msg)
+        }
         if(class(winning_criteria)!="numeric"){
             stop(error_msg)
         }else if( method=='Posterior_probability' & abs(winning_criteria-0.5)>0.5 ){
@@ -102,50 +108,43 @@ tournament <- function(formula=NULL,data=NULL,method='WAIC',winning_criteria=NUL
         }
     }
     if(is.null(winning_criteria)){
-        winning_criteria <- default_win_crit[[method]]
+        winning_criteria <- default_win_crit[method]
     }
-    error_msg <- 'Please provide; formula and data (name arguments explicitly); a single tournament object; or four model objects of types gplm, gplm0, plm and plm0.'
-    if(!inherits(formula,'formula') | !is.data.frame(data)){
-        args <- c(list(formula,data),args)
-        # print(unlist(lapply(args,names)))
-        if(length(args)!=4){
-            args_class <- unlist(lapply(args,class))
-            args_names <- unlist(lapply(args,names))
-            # print(length(args))
-            t_obj_content <- c("contestants","winner","summary","info")
-            if("tournament"%in%args_class & all(args_names==t_obj_content) & sum(args_names==t_obj_content)==4 & is.null(data) ){
-                args <- args[[which('tournament'%in%unlist(lapply(args,class)))]]$contestants
-            }else{
-                stop(error_msg)
-            }
-        }else{
-            args_class <- unlist(lapply(args,class))
-            if(!all(sort(args_class)==c('gplm','gplm0','plm','plm0'))){
-                stop(error_msg)
-            }else{
-                names(args) <- args_class
-                args <- args[order(names(args))]
-                if(length(unique(lapply(args,function(x) x$data)))!=1){
-                    stop('The four models added have to be fit on the same data set')
-                }
-                if(length(unique(lapply(args,function(x) x$c_param)))!=1){
-                    stop('The four models added have to be fit either all with the same stage of zero discharge (c), or all with unknown c')
-                }
-            }
+    error_msg <- 'Please provide; formula and data (name arguments explicitly) or model_list with four model objects of types gplm, gplm0, plm and plm0.'
+    models <- list()
+    if(!is.null(model_list) | (is.null(model_list) & 'list' %in% class(formula))){
+        if(is.null(model_list) & 'list' %in% class(formula)){
+            model_list=formula
+        }
+        if(length(model_list)!=4){
+            stop(error_msg)
+        }
+        models_class <- unlist(lapply(model_list,class))
+        if(!all(sort(models_class)==c('gplm','gplm0','plm','plm0'))){
+            stop(error_msg)
+        }
+        models <- model_list
+        names(models) <- models_class
+        models <- models[order(names(models))]
+        #TODO: make sure data argument matches models in model_list
+        if(length(unique(lapply(models,function(x) x$data)))!=1){
+            stop('The four models added have to be fit on the same data set')
+        }
+        if(length(unique(lapply(models,function(x) x$c_param)))!=1){
+            stop('The four models added have to be fit either all with the same stage of zero discharge (c), or all with unknown c')
         }
     }else{
-        args <- list()
         message('Running tournament:')
-        args$gplm <- gplm(formula, data, ...)
+        models$gplm <- gplm(formula, data, ...)
         message('25% - gplm finished')
-        args$gplm0 <- gplm0(formula, data, ...)
+        models$gplm0 <- gplm0(formula, data, ...)
         message('50% - gplm0 finished')
-        args$plm <- plm(formula, data, ...)
+        models$plm <- plm(formula, data, ...)
         message('75% - plm finished')
-        args$plm0 <- plm0(formula, data, ...)
+        models$plm0 <- plm0(formula, data, ...)
         message('100% - plm0 finished')
     }
-    round1 <- list(list(args$gplm,args$gplm0),list(args$plm,args$plm0))
+    round1 <- list(list(models$gplm,models$gplm0),list(models$plm,models$plm0))
     round1_res <- lapply(1:length(round1),function(i){
         game_df <- evaluate_game(round1[[i]],method,winning_criteria)
         round_df <- data.frame(round=1,game=i)
@@ -161,7 +160,7 @@ tournament <- function(formula=NULL,data=NULL,method='WAIC',winning_criteria=NUL
     round2_winner <- round2_res$model[round2_res$winner]
     out_obj <- list()
     attr(out_obj, "class") <- "tournament"
-    out_obj$contestants <- args[!(names(args) %in% c('formula','data'))]
+    out_obj$contestants <- models
     out_obj$winner <- round2[[which(round2_res$winner)]]
     out_obj$summary <- rbind(round1_res,round2_res)
     out_obj$info <- list("winner"=class(round2[[which(round2_res$winner)]]),"method"=method,"winning_criteria"=winning_criteria)

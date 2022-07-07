@@ -27,6 +27,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -72,7 +74,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/sor16/bdrc/">
+  <a href="https://github.com/sor16/bdrc/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -90,119 +92,103 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="bdrc---bayesian-discharge-rating-curves-" class="section level2">
-<h2 class="hasAnchor">
-<a href="#bdrc---bayesian-discharge-rating-curves-" class="anchor"></a>bdrc - Bayesian Discharge Rating Curves
-<img src="reference/figures/logo.png" align="right" alt="" width="140">
+<div class="section level2">
+<h2 id="bdrc---bayesian-discharge-rating-curves-">bdrc - Bayesian Discharge Rating Curves <img src="reference/figures/logo.png" align="right" alt="" width="140"><a class="anchor" aria-label="anchor" href="#bdrc---bayesian-discharge-rating-curves-"></a>
 </h2>
 <!-- badges: start -->
 
-<p>This software package fits a discharge rating curve based on the
-power-law and the generalized power-law from data on paired stage and
-discharge measurements in a given river using a Bayesian hierarchical
-model as described in Hrafnkelsson et al. (2022). Four models are
-implemented:</p>
-<p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance. This
-is a Bayesian hierarchical implementation of the most commonly used
-discharge rating curve model in hydrological practice.</p>
-<p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with variance that varies with
-stage.</p>
-<p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant
-variance. The generalized power-law is introduced in Hrafnkelsson et
-al. (2022).</p>
-<p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that
-varies with stage. The generalized power-law is introduced in
-Hrafnkelsson et al. (2022).</p>
+<p>This software package fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2022). Four models are implemented:</p>
+<p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance. This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
+<p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
+<p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant variance. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
+<p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Install release version from CRAN</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"bdrc"</span><span class="op">)</span>
-<span class="co"># Install development version from GitHub</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"sor16/bdrc"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Install release version from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bdrc"</span><span class="op">)</span></span>
+<span><span class="co"># Install development version from GitHub</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sor16/bdrc"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="getting-started" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>It is very simple to fit a discharge rating curve with the
-<em>bdrc</em> package. All you need are two mandatory input arguments,
-formula and data. The formula is of the form y~x where y is discharge in
-m<img src="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F" title="^3/" alt="^3/">s and x is stage in m (it is very important that
-the data is in the correct units). data is a data.frame which must
-include x and y as column names. As an example, we will use data from
-the Swedish gauging station <em>Krokfors</em>, which is one of the
-datasets that come with the package. In this table, the Q column denotes
-discharge while W denotes stage:</p>
+<div class="section level2">
+<h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+</h2>
+<p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in m![^3/](<a href="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F" class="external-link uri">https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F</a> “^3/”)s and x is stage in m (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. As an example, we will use data from the Swedish gauging station <em>Krokfors</em>, which is one of the datasets that come with the package. In this table, the Q column denotes discharge while W denotes stage:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span><span class="op">)</span></code></pre></div>
-<p>To dig deeper into the functionality of the package and the different
-ways to visualize a discharge rating curve model for your data, we
-recommend taking a look at our two vignettes.</p>
+<code class="sourceCode R"><span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span><span class="op">)</span></span></code></pre></div>
+<p>To dig deeper into the functionality of the package and the different ways to visualize a discharge rating curve model for your data, we recommend taking a look at our two vignettes.</p>
 </div>
-<div id="references" class="section level2">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
-<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022).
-<em>Generalization of the power-law rating curve using hydrodynamic
-theory and Bayesian hierarchical modeling</em>, Environmetrics,
-33(2):e2711.</p>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). <em>Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling</em>, Environmetrics, 33(2):e2711.</p>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=bdrc">https://​cloud.r-project.org/​package=bdrc</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/sor16/bdrc/">https://​github.com/​sor16/​bdrc/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/sor16/bdrc/issues">https://​github.com/​sor16/​bdrc/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>
-<a href="https://english.hi.is/staff/birgirhr">Birgir Hrafnkelsson</a> <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0003-1864-9652" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>
-<a href="https://github.com/sor16">Solvi Rognvaldsson</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4376-3361" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>
-<a href="https://github.com/axelornj">Axel Orn Jansson</a> <br><small class="roles"> Author </small>  </li>
-<li>
-<a href="https://github.com/RafaelVias">Rafael Vias</a> <br><small class="roles"> Author </small>  </li>
+<li><a href="https://cloud.r-project.org/package=bdrc" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/sor16/bdrc/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/sor16/bdrc/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://codecov.io/gh/sor16/bdrc?branch=master"><img src="https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://github.com/sor16/bdrc/actions"><img src="https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
-<li><a href="https://cran.r-project.org/package=bdrc"><img src="https://www.r-pkg.org/badges/version/bdrc" alt="CRAN_Status_Badge"></a></li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing bdrc</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>
+<a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a> <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0003-1864-9652" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>
+<a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4376-3361" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>
+<a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a> <br><small class="roles"> Author </small>  </li>
+<li>
+<a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a> <br><small class="roles"> Author </small>  </li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://codecov.io/gh/sor16/bdrc?branch=master" class="external-link"><img src="https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://github.com/sor16/bdrc/actions" class="external-link"><img src="https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://cran.r-project.org/package=bdrc" class="external-link"><img src="https://www.r-pkg.org/badges/version/bdrc" alt="CRAN_Status_Badge"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://english.hi.is/staff/birgirhr">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias">Rafael Vias</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -210,6 +196,8 @@ theory and Bayesian hierarchical modeling</em>, Environmetrics,
 
   
 
+
+  
 
   </body>
 </html>

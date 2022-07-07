@@ -11,4 +11,4 @@ gplm0.fit <- gplm0(Q~W,krokfors,num_cores=2)
 set.seed(1)
 gplm.fit <- gplm(Q~W,krokfors,num_cores=2)
 
-t_obj <- tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit)
+t_obj <- tournament(list(plm0.fit,plm.fit,gplm0.fit,gplm.fit))
