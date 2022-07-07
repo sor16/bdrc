@@ -7,9 +7,9 @@
 tournament(
   formula = NULL,
   data = NULL,
-  ...,
   method = "WAIC",
-  winning_criteria = NULL
+  winning_criteria = NULL,
+  ...
 )
 }
 \arguments{
@@ -17,11 +17,11 @@ tournament(
 
 \item{data}{data.frame containing the variables specified in formula.}
 
-\item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
-
 \item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
 
 \item{winning_criteria}{a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.}
+
+\item{...}{optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.}
 }
 \value{
 An object of type "tournament" with the following elements

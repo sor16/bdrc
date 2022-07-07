@@ -41,9 +41,9 @@ evaluate_game <- function(m,method,winning_criteria){
 #'
 #' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate.
 #' @param data data.frame containing the variables specified in formula.
-#' @param ... optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.
 #' @param method a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".
 #' @param winning_criteria a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.
+#' @param ... optional arguments passed to the model functions. Also, if data and formula are NULL, one can either add a previously created tournament object or four model objects of types "gplm", "gplm0", "plm" and "plm0". This runs the tournament for the input models and prevents running all four models explicitly.
 #' @details Tournament is a model comparison method that uses WAIC to estimate the predictive performance of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". In both comparisons, if the more complex model ("gplm" and "plm", respectively) exceeds the \code{winning_criteria} (default value = 1.5) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same winning criteria then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 #'
 #' The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density.
@@ -78,7 +78,7 @@ evaluate_game <- function(m,method,winning_criteria){
 #' summary(t_obj)
 #' }
 #' @export
-tournament <- function(formula=NULL,data=NULL,...,method='WAIC',winning_criteria=NULL) {
+tournament <- function(formula=NULL,data=NULL,method='WAIC',winning_criteria=NULL,...) {
     args <- list(...)
     default_win_crit <- c('WAIC'=1.5,'DIC'=1.5,'Posterior_probability'=0.75)
     error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'WAIC' (default), 'DIC' and 'Posterior_probability'."

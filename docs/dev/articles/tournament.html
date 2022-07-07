@@ -314,10 +314,12 @@ that the posterior probability of the more complex model has to surpass
 to be selected as the appropriate model. The default value in this case
 for the winning criteria is 0.75 which again slightly favors model
 simplicity. The value 0.75 should give similar results to the other two
-methods with their respective default values of 1.5. Let’s now use this
-method but raise the winning criteria from 0.75 to 0.9. We see that the
-results of the tournament do not change in this example and the winner
-of the third and final game is still <tt>gplm0<tt></tt></tt></p>
+methods with their respective default values of 1.5. This method is not
+chosen as the default method because the Bayes factor calculations can
+be quite unstable. Let’s now use this method but raise the winning
+criteria from 0.75 to 0.9. We see that the results of the tournament do
+not change in this example and the winner of the third and final game is
+still <tt>gplm0<tt></tt></tt></p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(<span class="fu">tournament</span>(t_obj,<span class="at">method=</span><span class="st">"Posterior_probability"</span>,<span class="at">winning_criteria=</span><span class="fl">0.9</span>))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round game model     marg_lik    Post_prob winner</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1    1  gplm 3.201743e-02 1.302100e-01  FALSE</span></span>
