@@ -55,6 +55,12 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
+    <loc>/reference/jokdal.html</loc>
+  </url>
+  <url>
+    <loc>/reference/jokfjoll.html</loc>
+  </url>
+  <url>
     <loc>/reference/kallstorp.html</loc>
   </url>
   <url>
@@ -62,6 +68,9 @@
   </url>
   <url>
     <loc>/reference/melby.html</loc>
+  </url>
+  <url>
+    <loc>/reference/nordura.html</loc>
   </url>
   <url>
     <loc>/reference/norn.html</loc>
@@ -89,6 +98,9 @@
   </url>
   <url>
     <loc>/reference/print.tournament.html</loc>
+  </url>
+  <url>
+    <loc>/reference/skjalf.html</loc>
   </url>
   <url>
     <loc>/reference/skogsliden.html</loc>
