@@ -4,7 +4,7 @@
 #'
 #' @param m a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"
 #' @param method a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".
-#' @param winning_criteria a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 1.5 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".
+#' @param winning_criteria a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 2.2 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".
 #' @return
 #' A data.frame with the summary of the results of the game
 #' @references Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.
@@ -45,7 +45,7 @@ evaluate_game <- function(m,method,winning_criteria){
 #' @param method a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".
 #' @param winning_criteria a numerical value which sets a threshold which the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.
 #' @param ... optional arguments passed to the model functions.
-#' @details Tournament is a model comparison method that uses WAIC to estimate the predictive performance of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". In both comparisons, if the more complex model ("gplm" and "plm", respectively) exceeds the \code{winning_criteria} (default value = 1.5) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same winning criteria then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
+#' @details Tournament is a model comparison method that uses WAIC to estimate the predictive performance of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". In both comparisons, if the more complex model ("gplm" and "plm", respectively) exceeds the \code{winning_criteria} (default value = 2.2) then it is chosen as the more appropriate model and moves on to the second and final round, where the winners from the first round will be compared in the same way. In the second round, if the more complex model (now the generalized power-law model) exceeds the same winning criteria then it is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 #'
 #' The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density.
 #'
@@ -53,7 +53,7 @@ evaluate_game <- function(m,method,winning_criteria){
 #'
 #' Method "Posterior_probability" uses the posterior probabilities of the models, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. This method is not chosen as the default method because the Bayes factor calculations can be quite unstable.
 #'
-#' When method "WAIC" or "DIC" is used the \code{winning_criteria} should be a real number. The winning criteria is a threshold value which the more complex model in each model comparison must exceed for it to be declared the more appropriate model. Setting the winning criteria slightly above 0 (default value = 1.5 for both "WAIC" and "DIC") gives the less complex model in each comparison a slight advantage. When method "Posterior_probability" is used the winning criteria should be a real value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison, must exceed for it to be declared the more appropriate model. In all three cases the default value is selected so as to give the less complex models a slight advantage and should give more or less consistent results when applying the tournament to real world data.
+#' When method "WAIC" or "DIC" is used the \code{winning_criteria} should be a real number. The winning criteria is a threshold value which the more complex model in each model comparison must exceed for it to be declared the more appropriate model. Setting the winning criteria slightly above 0 (default value = 2.2 for both "WAIC" and "DIC") gives the less complex model in each comparison a slight advantage. When method "Posterior_probability" is used the winning criteria should be a real value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison, must exceed for it to be declared the more appropriate model. In all three cases the default value is selected so as to give the less complex models a slight advantage and should give more or less consistent results when applying the tournament to real world data.
 #' @return
 #' An object of type "tournament" with the following elements
 #' \describe{
@@ -80,7 +80,7 @@ evaluate_game <- function(m,method,winning_criteria){
 #' }
 #' @export
 tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winning_criteria=NULL,...) {
-    default_win_crit <- c('WAIC'=1.5,'DIC'=1.5,'Posterior_probability'=0.75)
+    default_win_crit <- c('WAIC'=2.2,'DIC'=2.2,'Posterior_probability'=0.75)
     error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'WAIC' (default), 'DIC' and 'Posterior_probability'."
     if(is.null(method)){
         stop(error_msg)
@@ -93,7 +93,7 @@ tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winn
         }
     }
     if(grepl("IC",method)){
-        error_msg <- "The winning_criteria when the method is set to 'WAIC' or 'DIC' must be a numerical real value. This is the threshold value which a model comparison statistic of the more complex model must surpass to be declared the more appropriate model when compared with a less complex model. This value defaults to 1.5 when the models are compared by their 'WAIC' or 'DIC' values."
+        error_msg <- "The winning_criteria when the method is set to 'WAIC' or 'DIC' must be a numerical real value. This is the threshold value which a model comparison statistic of the more complex model must surpass to be declared the more appropriate model when compared with a less complex model. This value defaults to 2.2 when the models are compared by their 'WAIC' or 'DIC' values."
     }else{
         error_msg <- "The winning_criteria when the method is set to 'Posterior_probability' must be a numerical value between 0 and 1. This is the threshold for which the posterior probability of a more complex model, which is calculated using the Bayes factor, needs to surpass to be declared the appropriate model when compared with a less complex model. This value defaults to 0.75 when the method is set to 'Posterior_probability'."
     }
