@@ -27,8 +27,6 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -74,7 +72,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/sor16/bdrc/" class="external-link">
+  <a href="https://github.com/sor16/bdrc/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -89,15 +87,15 @@
 
       
 
-      </header><div class="row">
+      </header><script src="introduction_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction</h1>
-                        <h4 data-toc-skip class="author">Solvi
-Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
+                        <h4 class="author">Solvi Rognvaldsson, Axel Orn
+Jansson, Rafael Vias and Birgir Hrafnkelsson</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/introduction.Rmd"><code>vignettes/introduction.Rmd</code></a></small>
       <div class="hidden name"><code>introduction.Rmd</code></div>
 
     </div>
@@ -164,9 +162,9 @@ in Sweden that comes with the package:</p>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25 9.271000  6.9000000</span></span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 8.370000  0.4420000</span></span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 9.431000  9.0000000</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="fitting-a-discharge-rating-curve">Fitting a discharge rating curve<a class="anchor" aria-label="anchor" href="#fitting-a-discharge-rating-curve"></a>
-</h2>
+<div id="fitting-a-discharge-rating-curve" class="section level2">
+<h2 class="hasAnchor">
+<a href="#fitting-a-discharge-rating-curve" class="anchor"></a>Fitting a discharge rating curve</h2>
 <p>It is very simple to fit a discharge rating curve with the
 <em>bdrc</em> package. All you need are two mandatory input arguments,
 <tt>formula</tt> and <tt>data</tt>. The <tt>formula</tt> is of the form
@@ -201,16 +199,16 @@ summarize and visualize using familiar functions such as</p>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.24321   -4.6293    -0.680     </span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; eta_6      -8.78471   -4.6121    -0.250     </span></span>
 <span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WAIC: 1.112881</span></span></code></pre></div>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DIC: -1.470964</span></span></code></pre></div>
 <p>and</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>In the next section we will dive deeper into visualizing the “gplm”
 object.</p>
 </div>
-<div class="section level2">
-<h2 id="visualizing-posterior-distributions-of-different-parameters">Visualizing posterior distributions of different parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-different-parameters"></a>
-</h2>
+<div id="visualizing-posterior-distributions-of-different-parameters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#visualizing-posterior-distributions-of-different-parameters" class="anchor"></a>Visualizing posterior distributions of different parameters</h2>
 <p>The <em>bdrc</em> package provides several tools to visualize the
 results from model objects which can give insight into the physical
 properties of the river at hand. For instance, the hyperparameter <span class="math inline">\(c\)</span> corresponds to the stage of zero
@@ -259,9 +257,9 @@ the plot method is useful:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level2">
-<h2 id="assessing-model-fitness-and-convergence">Assessing model fitness and convergence<a class="anchor" aria-label="anchor" href="#assessing-model-fitness-and-convergence"></a>
-</h2>
+<div id="assessing-model-fitness-and-convergence" class="section level2">
+<h2 class="hasAnchor">
+<a href="#assessing-model-fitness-and-convergence" class="anchor"></a>Assessing model fitness and convergence</h2>
 <p>The package has several functions for convergence diagnostics of a
 bdrc model, most notably the residual plot, tracing plots,
 autocorrelation plot and the Gelman-Rubin statistic plot. The
@@ -289,9 +287,9 @@ And finally autocorrelation of parameters can be assessed with</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'autocorrelation'</span>)</span></code></pre></div>
 <p><img src="introduction_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level2">
-<h2 id="customization-of-models">Customization of models<a class="anchor" aria-label="anchor" href="#customization-of-models"></a>
-</h2>
+<div id="customization-of-models" class="section level2">
+<h2 class="hasAnchor">
+<a href="#customization-of-models" class="anchor"></a>Customization of models</h2>
 <p>There are ways to customize the <tt>gplm</tt> further. In some
 instances, the parameter of zero discharge, <span class="math inline">\(c\)</span>, is known and then you want to fix that
 parameter to the known value in the model. In addition you might want to
@@ -301,9 +299,9 @@ curve for stage values up to 10 m, then your function call would look
 like this</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>,<span class="at">h_max=</span><span class="dv">10</span>,<span class="at">parallel=</span><span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="prediction-for-an-equally-spaced-grid-of-stages">Prediction for an equally spaced grid of stages<a class="anchor" aria-label="anchor" href="#prediction-for-an-equally-spaced-grid-of-stages"></a>
-</h2>
+<div id="prediction-for-an-equally-spaced-grid-of-stages" class="section level2">
+<h2 class="hasAnchor">
+<a href="#prediction-for-an-equally-spaced-grid-of-stages" class="anchor"></a>Prediction for an equally spaced grid of stages</h2>
 <p>To get rating curve predictions for an equally spaced grid of stage
 values, you can use the predict function. Note that only values in the
 range from <span class="math inline">\(c\)</span> and h_max are
@@ -415,9 +413,9 @@ performed</p>
 <span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 100 8.99 2.41365344 3.08638341 3.9956300</span></span>
 <span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 101 9.00 2.47883686 3.16815388 4.0978049</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
+<div id="references" class="section level2">
+<h2 class="hasAnchor">
+<a href="#references" class="anchor"></a>References</h2>
 <p>Gelman, A., &amp; Rubin, D. B. (1992). <em>Inference from iterative
 simulation using multiple sequences</em>, Statistical Science, 7(4),
 457–472.</p>
@@ -439,13 +437,11 @@ theory and Bayesian hierarchical modeling</em>, Environmetrics,
 
 
       <footer><div class="copyright">
-  <p></p>
-<p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a>.</p>
+  <p>Developed by <a href="https://english.hi.is/staff/birgirhr">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias">Rafael Vias</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -453,8 +449,6 @@ theory and Bayesian hierarchical modeling</em>, Environmetrics,
 
   
 
-
-  
 
   </body>
 </html>

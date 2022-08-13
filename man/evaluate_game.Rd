@@ -11,7 +11,7 @@ evaluate_game(m, method, winning_criteria)
 
 \item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
 
-\item{winning_criteria}{a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 1.5 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".}
+\item{winning_criteria}{a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 2.2 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".}
 }
 \value{
 A data.frame with the summary of the results of the game
