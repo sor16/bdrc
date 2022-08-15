@@ -32,7 +32,7 @@ This vignette explores the ways you can compare the fit of the different dischar
 ```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2022).
 
 
-To learn more about the models, see Hrafnkelsson et al. (2022). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses the Widely Applicable Information Criterion (WAIC) (see Watanabe (2010)) to select the most appropriate of the four models given the data. The first round of model comparisons sets up model types "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by a pre-specified value called the winning criteria (default value = 2.2), then it is chosen as the more appropriate model, if not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each match the difference in WAIC is defined as $\Delta$WAIC$=$WAIC$_{\text{simple}}-$WAIC$_{\text{complex}}$. A positive value of $\Delta$WAIC indicates that the more complex model is a more appropriate model but the more complex model only goes through to the final round if $\Delta$WAIC><tt>winning_criteria</tt>. 
+To learn more about the models, see Hrafnkelsson et al. (2022). To learn about how to run the models on your data see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses the Widely Applicable Information Criterion (WAIC) (see Watanabe (2010)) to select the most appropriate of the four models given the data. WAIC is a measure of model fitness that also penalizes complexity (effective number of parameters). The first round of model comparisons sets up two games between model types, "gplm" vs "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by a pre-specified value called the winning criteria (default value = 2.2), then it wins the game and is chosen as the more appropriate model, if not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each match the difference in WAIC is defined as $\Delta$WAIC$=$WAIC$_{\text{simple}}-$WAIC$_{\text{complex}}$. A positive value of $\Delta$WAIC indicates that the more complex model is a more appropriate model but the more complex model only goes through to the final round if $\Delta$WAIC><tt>winning_criteria</tt>. 
 
 To introduce the tournament function we will use a dataset from the stream gauging station Krokfors in Sweden that comes with the package:
 ```{r,message=FALSE}
@@ -59,7 +59,7 @@ For a more detailed summary of the results of the tournament write
 ```{r}
 summary(t_obj)
 ```
-Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best simplicity and fit trade-off with the data at hand. 
+Notice here that in round 1, <tt>gplm0</tt> is favored over <tt>gplm</tt> in the first game and <tt>plm0</tt> over <tt>plm</tt> in the second. In the second round, <tt>gplm0</tt> is deemed the tournament winner, i.e. the model that provides the best simplicity and fitness trade-off with the data at hand. 
 
 ## Comparing different components of the models
 There are several tools to visualize the different aspects of the model comparison. To get a visual summary of the results of the different games in the tournament, write
@@ -68,7 +68,7 @@ There are several tools to visualize the different aspects of the model comparis
 plot(t_obj) #default plot type is type='tournament_results'
 ```
 
-Another informative way of comparing different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. From this distribution, WAIC, DIC and the Bayes factor are calculated. The WAIC and DIC are metrics on the fit of the models that also take their complexity into account (effective number of parameters). 
+Another informative way of comparing different models. The deviance of an MCMC sample is defined as 2 times the negative log-likelihood of the data given the values of the sampled parameters, thus lower values imply a better fit to the data. 
 To plot the posterior distribution of the deviance of the different models, we write
 
 ```{r, fig.width=8, fig.height=6}
@@ -104,20 +104,23 @@ There are ways to customize the tournament further. For example, if the paramete
 t_obj_known_c <- tournament(formula=Q~W,data=krokfors,c_param=7.65)
 ```
 
-One can also change the winning criteria (default value = 2.2) which set the threshold which the more complex model in each model comparison must exceed in terms of the pre-selected model comparison statistic (default method is "WAIC"). Increasing the value for example to <tt>winning_criteria=5</tt> raises the threshold for the more complex model favoring model simplicity
-```{r,eval=FALSE}
-t_obj_conservative <- tournament(formula=Q~W,data=krokfors,winning_criteria=5)
+One can also change the winning criteria (default value = 2.2) which sets the threshold the more complex model in each model comparison must exceed in terms of the model comparison criteria (default method is "WAIC"). Increasing the value for example to <tt>winning_criteria=5</tt> raises the threshold the more complex model must exceed to win a game, thus favoring model simplicity more than by default. To re-evaluate a previously run tournament using a different winning criteria, the most efficient way is to input the list of stored model objects in the existing tournament object. In our case we have the tournament stored in t_obj, so we can write 
+```{r}
+t_obj_conservative <- tournament(t_obj$contestants,winning_criteria=5)
+summary(t_obj_conservative)
 ```
 
-There is also an option to change the method used to estimate the predictive performance of the models. The default method is "WAIC" (see Watanabe (2010)) which is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density. Other allowed methods are "DIC" and "Posterior_probability". The "DIC" (see Spiegelhalter (2002)) is similar to "WAIC" but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density it uses a point estimate of the posterior distribution. Both "WAIC" and "DIC" have a default value for the winning criteria of 2.2. To re-evaluate the tournament using method "DIC" instead of the default "WAIC", the most efficient way is to input the list of stored model objects in a tournament object, provided that it exists. As we already have run the tournament and stored it in t_obj, we can write 
+There is also an option to change the method used to estimate the predictive performance of the models. The default method is "WAIC" (see Watanabe (2010)) which is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density. Other allowed methods are "DIC" and "Posterior_probability". The "DIC" (see Spiegelhalter (2002)) is similar to "WAIC" but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density it uses a point estimate of the posterior distribution. Both "WAIC" and "DIC" have a default value for the winning criteria of 2.2. We again run the efficient re-evaluation of the tournament
 
 ```{r}
-summary(tournament(t_obj$contestant,method="DIC"))
+t_obj_DIC <- tournament(t_obj$contestants,method="DIC")
+summary(t_obj_DIC)
 ```
 
 The third and final method that can be chosen is "Posterior_probability" which uses the posterior probabilities of the models, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. When using the method "Posterior_probability" the value of the winning criteria should be a real number between 0 and 1 since this represents the threshold value that the posterior probability of the more complex model has to surpass to be selected as the appropriate model. The default value in this case for the winning criteria is 0.75 which again slightly favors model simplicity. The value 0.75 should give similar results to the other two methods with their respective default values of 2.2. The method "Posterior_probability" is not chosen as the default method because the Bayes factor calculations can be quite unstable. Let's now use this method but raise the winning criteria from 0.75 to 0.9 
 ```{r}
-summary(tournament(t_obj$contestants,method="Posterior_probability",winning_criteria=0.9))
+t_obj_prob <- tournament(t_obj$contestants,method="Posterior_probability",winning_criteria=0.9)
+summary(t_obj_prob) 
 ```
 
 We see that the results of the tournament do not change in this example and the winner of the third and final game is still <tt>gplm0<tt>
