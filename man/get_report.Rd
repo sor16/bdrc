@@ -45,17 +45,17 @@ This function can only be used in an interactive R session as it asks permission
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{plm0}: Get report for plm0 model object
+\item \code{get_report(plm0)}: Get report for plm0 model object
 
-\item \code{plm}: Get report for plm model object
+\item \code{get_report(plm)}: Get report for plm model object
 
-\item \code{gplm0}: Get report for gplm0 model object
+\item \code{get_report(gplm0)}: Get report for gplm0 model object
 
-\item \code{gplm}: Get report for gplm
+\item \code{get_report(gplm)}: Get report for gplm
 
-\item \code{tournament}: Get report for discharge rating curve tournament
+\item \code{get_report(tournament)}: Get report for discharge rating curve tournament
+
 }}
-
 \examples{
 \donttest{
 data(krokfors)

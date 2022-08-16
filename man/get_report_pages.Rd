@@ -40,17 +40,17 @@ Get a list of the pages of a report on a discharge rating curve model or tournam
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{plm0}: Get report pages for plm0 model object
+\item \code{get_report_pages(plm0)}: Get report pages for plm0 model object
 
-\item \code{plm}: Get report pages for plm model object
+\item \code{get_report_pages(plm)}: Get report pages for plm model object
 
-\item \code{gplm0}: Get report pages for gplm0 model object
+\item \code{get_report_pages(gplm0)}: Get report pages for gplm0 model object
 
-\item \code{gplm}: Get report pages for gplm model object
+\item \code{get_report_pages(gplm)}: Get report pages for gplm model object
 
-\item \code{tournament}: Get report pages for discharge rating curve tournament model object
+\item \code{get_report_pages(tournament)}: Get report pages for discharge rating curve tournament model object
+
 }}
-
 \examples{
 \donttest{
 data(krokfors)
