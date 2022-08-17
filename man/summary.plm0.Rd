@@ -25,15 +25,15 @@ Summarize a discharge rating curve model object
 }
 \section{Functions}{
 \itemize{
-\item \code{summary.plm0}: Summary method for plm0
+\item \code{summary(plm0)}: Summary method for plm0
 
-\item \code{summary.plm}: Summary method for plm
+\item \code{summary(plm)}: Summary method for plm
 
-\item \code{summary.gplm0}: Summary method for gplm0
+\item \code{summary(gplm0)}: Summary method for gplm0
 
-\item \code{summary.gplm}: Summary method for gplm
+\item \code{summary(gplm)}: Summary method for gplm
+
 }}
-
 \examples{
 \donttest{
 data(krokfors)

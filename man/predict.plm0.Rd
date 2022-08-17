@@ -32,15 +32,15 @@ Predict the discharge for given stage values based on a discharge rating curve m
 }
 \section{Functions}{
 \itemize{
-\item \code{predict.plm0}: Predict method for plm0
+\item \code{predict(plm0)}: Predict method for plm0
 
-\item \code{predict.plm}: Predict method for plm
+\item \code{predict(plm)}: Predict method for plm
 
-\item \code{predict.gplm0}: Predict method for gplm0
+\item \code{predict(gplm0)}: Predict method for gplm0
 
-\item \code{predict.gplm}: Predict method for gplm
+\item \code{predict(gplm)}: Predict method for gplm
+
 }}
-
 \examples{
 \donttest{
 data(krokfors)

@@ -25,15 +25,15 @@ Print a discharge rating curve model object
 }
 \section{Functions}{
 \itemize{
-\item \code{print.plm0}: Print method for plm0
+\item \code{print(plm0)}: Print method for plm0
 
-\item \code{print.plm}: Print method for plm
+\item \code{print(plm)}: Print method for plm
 
-\item \code{print.gplm0}: Print method for gplm0
+\item \code{print(gplm0)}: Print method for gplm0
 
-\item \code{print.gplm}: Print method for gplm
+\item \code{print(gplm)}: Print method for gplm
+
 }}
-
 \seealso{
 \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 }

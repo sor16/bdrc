@@ -1,6 +1,6 @@
 ---
 title: "Introduction"
-author: "Solvi Rognvaldsson, Axel Orn Jansson, Rafael Vias and Birgir Hrafnkelsson"
+author: "Solvi Rognvaldsson, Rafael Vias, Birgir Hrafnkelsson and Axel Orn Jansson"
 date:
 output: rmarkdown::html_vignette
 vignette: >

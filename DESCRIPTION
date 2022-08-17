@@ -11,7 +11,7 @@ Description: Fits a discharge rating curve based on the power-law and the genera
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Imports:
     ggplot2,
     grid,

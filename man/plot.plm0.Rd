@@ -50,15 +50,15 @@ Visualize discharge rating curve model objects
 }
 \section{Functions}{
 \itemize{
-\item \code{plot.plm0}: Plot method for plm0
+\item \code{plot(plm0)}: Plot method for plm0
 
-\item \code{plot.plm}: Plot method for plm
+\item \code{plot(plm)}: Plot method for plm
 
-\item \code{plot.gplm0}: Plot method for gplm0
+\item \code{plot(gplm0)}: Plot method for gplm0
 
-\item \code{plot.gplm}: Plot method for gplm
+\item \code{plot(gplm)}: Plot method for gplm
+
 }}
-
 \examples{
 \donttest{
 data(krokfors)

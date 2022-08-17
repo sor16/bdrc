@@ -49,15 +49,15 @@ Visualize discharge rating curve model objects
 }
 \section{Functions}{
 \itemize{
-\item \code{autoplot.plm0}: Autoplot method for plm0
+\item \code{autoplot(plm0)}: Autoplot method for plm0
 
-\item \code{autoplot.plm}: Autoplot method for plm
+\item \code{autoplot(plm)}: Autoplot method for plm
 
-\item \code{autoplot.gplm0}: Autoplot method for gplm0
+\item \code{autoplot(gplm0)}: Autoplot method for gplm0
 
-\item \code{autoplot.gplm}: Autoplot method for gplm
+\item \code{autoplot(gplm)}: Autoplot method for gplm
+
 }}
-
 \examples{
 \donttest{
 library(ggplot2)
