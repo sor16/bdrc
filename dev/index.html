@@ -96,11 +96,11 @@
 <h2 id="bdrc---bayesian-discharge-rating-curves-">bdrc - Bayesian Discharge Rating Curves <img src="reference/figures/logo.png" align="right" alt="" width="140"><a class="anchor" aria-label="anchor" href="#bdrc---bayesian-discharge-rating-curves-"></a>
 </h2>
 <!-- badges: start -->
-<p>This software package fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2022). Four models are implemented:</p>
-<p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with a constant variance. This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
-<p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with variance that varies with stage.</p>
-<p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant variance. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
-<p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with variance that varies with stage. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
+<p>This software package fits a discharge rating curve based on the power-law and the generalized power-law from data on paired water elevation and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2022). Four models are implemented:</p>
+<p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with a constant error variance. This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
+<p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with error variance that varies with water elevation.</p>
+<p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant error variance. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
+<p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with error variance that varies with water elevation. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -114,7 +114,7 @@
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in m![^3/](<a href="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F" class="external-link uri">https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F</a> “^3/”)s and x is stage in m (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. As an example, we will use data from the Swedish gauging station <em>Krokfors</em>, which is one of the datasets that come with the package. In this table, the Q column denotes discharge while W denotes stage:</p>
+<p>It is very simple to fit a discharge rating curve with the <em>bdrc</em> package. All you need are two mandatory input arguments, formula and data. The formula is of the form y~x where y is discharge in m![^3/](<a href="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F" class="external-link uri">https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;%5E3%2F</a> “^3/”)s and x is water elevation in m (it is very important that the data is in the correct units). data is a data.frame which must include x and y as column names. As an example, we will use data from the Swedish gauging station <em>Krokfors</em>, which is one of the datasets that come with the package. In this table, the Q column denotes discharge while W denotes water elevation:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span><span class="op">)</span></span></code></pre></div>
 <p>To dig deeper into the functionality of the package and the different ways to visualize a discharge rating curve model for your data, we recommend taking a look at our two vignettes.</p>
