@@ -371,7 +371,7 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
             newdata <- object$rating_curve$h
         }
     }
-    if(class(newdata) !='numeric'){
+    if(!inherits(newdata,'numeric')){
         stop('newdata must be a vector of type "numeric" or NULL')
     }
     if(any(is.na(newdata))){
