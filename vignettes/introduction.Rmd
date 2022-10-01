@@ -18,15 +18,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-A discharge rating curve is a model that describes the relationship between water stage and discharge in a river. The rating curve is estimated from paired observations of stage and discharge and it is used to predict discharge for a given stage. This is the main practical usage of rating curves, as stage is substantially easier to directly observe than discharge. Four different discharge rating curve models are implemented in this R package using a Bayesian hierarchical model:
+A discharge rating curve is a model that describes the relationship between water elevation and discharge in a river. The rating curve is estimated from paired observations of water elevation and discharge and it is used to predict discharge for a given water elevation. This is the main practical usage of rating curves, as water elevation is substantially easier to directly observe than discharge. Four different discharge rating curve models are implemented in this R package using a Bayesian hierarchical model:
 
-```plm0() ``` - Power-law model with a constant variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
+```plm0() ``` - Power-law model with a constant error variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
 
-```plm() ``` - Power-law model with variance that varies with stage.
+```plm() ``` - Power-law model with error variance that varies with water elevation.
 
-```gplm0() ``` - Generalized power-law model with a constant variance (hence the 0). The generalized power law is introduced in Hrafnkelsson et al. (2022).
+```gplm0() ``` - Generalized power-law model with a constant error variance (hence the 0). The generalized power law is introduced in Hrafnkelsson et al. (2022).
 
-```gplm() ``` - Generalized power-law model with variance that varies with stage. The generalized power law is introduced in Hrafnkelsson et al. (2022).
+```gplm() ``` - Generalized power-law model with error variance that varies with water elevation. The generalized power law is introduced in Hrafnkelsson et al. (2022).
 
 For further details about the different models, see Hrafnkelsson et al. (2022). The models differ in their complexity, <tt>gplm</tt> being the most flexible and complex model. We will focus on the use of <tt>gplm</tt> throughout this introduction vignette and explore the different ways to fit the <tt>gplm</tt> and visualize its output. However, the API of the functions for the other three models are completely identical so this vignette also helps users to run those models. 
 ```{r,message=FALSE}
@@ -41,7 +41,7 @@ krokfors
 ```
 
 ## Fitting a discharge rating curve
-It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>data</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt>, where <tt>y</tt> is the discharge in square meters per second (m$^3/$s), and <tt>x</tt> is the stage in meters (m). It is very important that the data is in the correct units! The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, the Krokfors data has the discharge and stage measurements stored in columns named <tt>Q</tt> and <tt>W</tt>, respectively. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
+It is very simple to fit a discharge rating curve with the _bdrc_ package. All you need are two mandatory input arguments, <tt>formula</tt> and <tt>data</tt>. The <tt>formula</tt> is of the form <tt>y</tt>~<tt>x</tt>, where <tt>y</tt> is the discharge in square meters per second (m$^3/$s), and <tt>x</tt> is the water elevation in meters (m). It is very important that the data is in the correct units! The <tt>data</tt> argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as column names. In our case, the Krokfors data has the discharge and water elevation measurements stored in columns named <tt>Q</tt> and <tt>W</tt>, respectively. We are ready to fit a discharge rating curve using the <tt>gplm</tt> function:
 ```{r, cache=TRUE}
 gplm.fit <- gplm(Q~W,data=krokfors,parallel=TRUE,num_cores=2) # parallel=TRUE by default and by default, the number of cores is detected on the machine
 ```
@@ -59,12 +59,12 @@ plot(gplm.fit)
 In the next section, we will dive deeper into visualizing the "gplm" object.
 
 ## Visualizing posterior distributions of different parameters
-The _bdrc_ package provides several tools to visualize the results from model objects which can give insight into the physical properties of the river at hand. For instance, the hyperparameter $c$ corresponds to the stage of zero discharge. To visualize the posterior of $c$, we can write
+The _bdrc_ package provides several tools to visualize the results from model objects which can give insight into the physical properties of the river at hand. For instance, the hyperparameter $c$ corresponds to the water elevation of zero discharge. To visualize the posterior of $c$, we can write
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='histogram',param='c')
 ```
 
-Technically, instead of inferring $c$ directly, $h_{min}-c$ is inferred, where $h_{min}$ is the lowest stage value in the data. Since the parameter $h_{min}-c$ is strictly positive, a transformation $\zeta=log(h_{min}-c)$ is used for the Bayesian inference so that it has support on the real line. To plot the transformed posterior we write
+Technically, instead of inferring $c$ directly, $h_{min}-c$ is inferred, where $h_{min}$ is the lowest water elevation value in the data. Since the parameter $h_{min}-c$ is strictly positive, a transformation $\zeta=log(h_{min}-c)$ is used for the Bayesian inference so that it has support on the real line. To plot the transformed posterior we write
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='histogram',param='c',transformed=TRUE)
 ```
@@ -84,12 +84,12 @@ Similarly, writing 'latent_parameters' plots the latent parameters in one plot. 
 plot(gplm.fit,type='histogram',param='hyperparameters',transformed=TRUE)
 ```
 
-Finally, we can visualize the components of the model that are allowed (depending on the model) to vary with stage, that is, the power-law exponent, $f(h)$, and the standard deviation of the error terms at the response level, $\sigma_{\varepsilon}(h)$. Both <tt>gplm0</tt> and <tt>gplm</tt> generalize the power-law exponent by modeling it as a sum of a constant term, $b$, and Gaussian process, $\beta(h)$, namely $f(h)=b+\beta(h)$, where $\beta(h)$ is assumed to be twice differentiable with mean zero. On the other hand, <tt>plm</tt> and <tt>plm0</tt> both model the power-law exponent as a constant by setting $\beta(h)=0$, which gives $f(h)=b$. We can plot the inferred power-law exponent with
+Finally, we can visualize the components of the model that are allowed (depending on the model) to vary with water elevation, that is, the power-law exponent, $f(h)$, and the standard deviation of the error terms at the response level, $\sigma_{\varepsilon}(h)$. Both <tt>gplm0</tt> and <tt>gplm</tt> generalize the power-law exponent by modeling it as a sum of a constant term, $b$, and Gaussian process, $\beta(h)$, namely $f(h)=b+\beta(h)$, where $\beta(h)$ is assumed to be twice differentiable with mean zero. On the other hand, <tt>plm</tt> and <tt>plm0</tt> both model the power-law exponent as a constant by setting $\beta(h)=0$, which gives $f(h)=b$. We can plot the inferred power-law exponent with
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='f')
 ```
 
-Both <tt>plm</tt> and <tt>gplm</tt> model the standard deviation of the error terms at the response level, $\sigma_{\varepsilon}(h)$, as a function of stage, using B-splines basis functions, while <tt>plm0</tt> and <tt>gplm0</tt> model the standard deviation as a constant. We can plot the inferred standard deviation by writing
+Both <tt>plm</tt> and <tt>gplm</tt> model the standard deviation of the error terms at the response level, $\sigma_{\varepsilon}(h)$, as a function of water elevation, using B-splines basis functions, while <tt>plm0</tt> and <tt>gplm0</tt> model the standard deviation as a constant. We can plot the inferred standard deviation by writing
 ```{r, fig.width=8, fig.height=6}
 plot(gplm.fit,type='sigma_eps')
 ```
@@ -126,13 +126,13 @@ plot(gplm.fit,type='autocorrelation')
 ```
 
 ## Customization of models
-There are ways to further customize the <tt>gplm</tt> function. In some instances, the parameter of zero discharge, $c$, is known, and you might want to fix the model parameter to the known value. In addition, you might want to extrapolate the rating curve to higher stage values by adjusting the maximum stage. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for stage values up to 10 m, then your function call would look like this
+There are ways to further customize the <tt>gplm</tt> function. In some instances, the parameter of zero discharge, $c$, is known, and you might want to fix the model parameter to the known value. In addition, you might want to extrapolate the rating curve to higher water elevation values by adjusting the maximum water elevation. Assume 7.65 m is the known value of $c$ and you want to calculate the rating curve for water elevation values up to 10 m, then your function call would look like this
 ```{r,cache=TRUE,eval=FALSE}
 gplm.fit.known_c <- gplm(Q~W,krokfors,c_param=7.65,h_max=10,parallel=FALSE)
 ```
 
-## Prediction for an equally spaced grid of stages
-To get rating curve predictions for an equally spaced grid of stage values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which the Bayesian inference was performed
+## Prediction for an equally spaced grid of water elevations
+To get rating curve predictions for an equally spaced grid of water elevation values, you can use the predict function. Note that only values in the range from $c$ and h_max are accepted, as that is the range in which the Bayesian inference was performed
 ```{r}
 h_grid <- seq(8,9,by=0.01)
 rating_curve_h_grid <- predict(gplm.fit,newdata=h_grid)

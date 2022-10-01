@@ -54,8 +54,8 @@
 #' @export
 plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data))){
     #argument checking
-    stopifnot('formula' %in% class(formula))
-    stopifnot('data.frame' %in% class(data))
+    stopifnot(inherits(formula,'formula'))
+    stopifnot(inherits(data,'data.frame'))
     stopifnot(is.null(c_param) | is.double(c_param))
     stopifnot(is.null(h_max) | is.double(h_max))
     stopifnot(is.null(num_cores) | is.numeric(num_cores))

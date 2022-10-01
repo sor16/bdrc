@@ -12,7 +12,7 @@ get_report_components <- function(x,type=1){
     if(!(class(x) %in% legal_types)){
         stop(error_msg1)
     }
-    if(class(x)=='tournament'){
+    if(inherits(x,'tournament')){
         if(type==1){
             m_obj <- list(x$winner)
             names(m_obj) <- class(x$winner)
