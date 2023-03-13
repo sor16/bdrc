@@ -30,12 +30,12 @@ theme_bdrc <- function(...,scaling=1){
         theme( #text = element_text(family="Times", face="plain"),
                strip.background = element_blank(),
                strip.text.x = element_text(size = title_size),
-               axis.title.x = element_text(size=title_size),
-               axis.title.y = element_text(size=title_size,angle=90),
-               axis.text.x = element_text(size=text_size),
-               axis.text.y = element_text(size=text_size),
-               legend.text = element_text(size=text_size),
-               legend.title = element_text(size=text_size),
+               axis.title.x = element_text(size = title_size),
+               axis.title.y = element_text(size = title_size,angle=90),
+               axis.text.x = element_text(size = text_size),
+               axis.text.y = element_text(size = text_size),
+               legend.text = element_text(size = text_size),
+               legend.title = element_text(size = text_size),
                plot.title = element_text(size=plot_title_size),
                panel.border = element_rect(colour="black",fill=NA),
                ...)
@@ -106,7 +106,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             plot_dat$name_expr <- factor(plot_dat$name,levels=param_levels,labels=sapply(param_levels,get_param_expression))
             plot_dat$chain <- factor(as.character(plot_dat$chain),levels=1:max(plot_dat$chain))
             p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value,col=.data$chain)) +
-                geom_path(alpha=0.7,size=0.3) +
+                geom_path(alpha=0.7,linewidth=0.3) +
                 facet_wrap(~name_expr,scales='free',labeller = label_parsed) +
                 scale_color_manual(values=c("#BC3C29FF","#0072B5FF","#E18727FF","#20854EFF"),
                                    name='Chain number') +
@@ -118,7 +118,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             param_expr <- get_param_expression(params)
             plot_dat$chain_name <- paste0('Chain nr ',plot_dat$chain)
             p <- ggplot(plot_dat,aes(x=.data$iter,y=.data$value)) +
-                geom_path(col="#0072B5FF",size=0.3) +
+                geom_path(col="#0072B5FF",linewidth=0.3) +
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
@@ -261,17 +261,17 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
         method <- 'loess'
         span <- 0.3
         p <- ggplot(data=resid_dat) +
-            geom_hline(yintercept=0,size=0.8,alpha=.95) +
+            geom_hline(yintercept=0,linewidth=0.8,alpha=.95) +
             geom_point(data=resid_dat[!is.na(resid_dat$Q),],aes(.data$`log(h-c_hat)`,.data$r_median), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
             geom_blank(aes(y=-.data$r_median)) +
             geom_blank(aes(y=-.data$r_upper)) +
             geom_blank(aes(y=-.data$r_lower)) +
             geom_blank(aes(y=-.data$m_upper)) +
             geom_blank(aes(y=-.data$m_lower)) +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',size=0.5,alpha=0.95,method=method,formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',size=0.3,alpha=0.95,method=method,formula='y~x') +
-            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',size=0.3,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',linewidth=0.5,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$r_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='dashed',linewidth=0.5,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_upper),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',linewidth=0.3,alpha=0.95,method=method,formula='y~x') +
+            geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',linewidth=0.3,alpha=0.95,method=method,formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
             scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
