@@ -69,7 +69,16 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_fun</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="st">"rating_curve"</span>, param <span class="op">=</span> <span class="cn">NULL</span>, transformed <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_fun</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"rating_curve"</span>,</span>
+<span>  param <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  transformed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -101,6 +110,14 @@
 
 <dt>title</dt>
 <dd><p>a character denoting the title of the plot. Defaults to NULL, i.e. no title.</p></dd>
+
+
+<dt>xlim</dt>
+<dd><p>numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".</p></dd>
+
+
+<dt>ylim</dt>
+<dd><p>numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".</p></dd>
 
 </dl></div>
     <div id="value">
