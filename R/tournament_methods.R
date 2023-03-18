@@ -172,7 +172,7 @@ autoplot.tournament <- function(object,...,type='deviance'){
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - ')))
     }else if(type=="deviance"){
-        p <- plot_tournament_fun(x,type=type)
+        p <- plot_tournament_fun(object,type=type)
     }
     return(p)
 }

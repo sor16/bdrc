@@ -467,7 +467,7 @@ summary.plm0 <- function(object,...){
 #' @importFrom ggplot2 autoplot
 #' @export
 autoplot.plm0 <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
+    plot_fun(object,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' Plot method for discharge rating curves
@@ -565,7 +565,7 @@ summary.plm <- function(object,...){
 #' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
 autoplot.plm <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
+    plot_fun(object,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for plm
@@ -604,7 +604,7 @@ summary.gplm0 <- function(object,...){
 #' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
 autoplot.gplm0 <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
+    plot_fun(object,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for gplm0
@@ -643,7 +643,7 @@ summary.gplm <- function(object,...){
 #' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
 autoplot.gplm <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
-    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
+    plot_fun(object,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for gplm
