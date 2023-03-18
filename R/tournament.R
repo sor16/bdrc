@@ -101,7 +101,7 @@ tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winn
         if(length(method)>1){
             stop(error_msg)
         }
-        if(inherits(winning_criteria,"numeric")){
+        if(!inherits(winning_criteria,"numeric")){
             stop(error_msg)
         }else if( method=='Posterior_probability' & abs(winning_criteria-0.5)>0.5 ){
             stop(error_msg)
