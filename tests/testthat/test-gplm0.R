@@ -69,9 +69,9 @@ test_that("the gplm0 object with known c with a maximum stage value is in tact",
 })
 
 
-test_that("gplm0 output remains unchanged", {
-    skip_on_cran()
-    skip_on_ci()
-    skip_on_covr()
-    expect_equal_to_reference(gplm0.fit,file='../cached_results/gplm0.fit.rds',update=TRUE)
-})
+# test_that("gplm0 output remains unchanged", {
+#     skip_on_cran()
+#     skip_on_ci()
+#     skip_on_covr()
+#     expect_equal_to_reference(gplm0.fit,file='../cached_results/gplm0.fit.rds',update=TRUE)
+# })

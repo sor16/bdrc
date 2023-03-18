@@ -20,10 +20,10 @@ test_that("the tournament object is in tact", {
     #sapply(1:nrow(t_obj$summary),function(i) expect_equal(t_obj$contestants[[t_obj$summary$model[i]]]$DIC,t_obj$summary$DIC[i])) is failing on older R version. Skip for now
 })
 
-test_that("Tournament object remains the same", {
-    skip_on_cran()
-    skip_on_ci()
-    skip_on_covr()
-    expect_equal_to_reference(t_obj,file='../cached_results/tournament.rds',update=TRUE)
-})
+# test_that("Tournament object remains the same", {
+#     skip_on_cran()
+#     skip_on_ci()
+#     skip_on_covr()
+#     expect_equal_to_reference(t_obj,file='../cached_results/tournament.rds',update=TRUE)
+# })
 

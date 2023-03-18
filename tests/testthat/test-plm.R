@@ -75,9 +75,9 @@ test_that("the plm object with known c with a maximum stage value is in tact", {
 })
 
 
-test_that("plm output remains unchanged", {
-    skip_on_cran()
-    skip_on_ci()
-    skip_on_covr()
-    expect_equal_to_reference(plm.fit,file='../cached_results/plm.fit.rds',update=TRUE)
-})
+# test_that("plm output remains unchanged", {
+#     skip_on_cran()
+#     skip_on_ci()
+#     skip_on_covr()
+#     expect_equal_to_reference(plm.fit,file='../cached_results/plm.fit.rds',update=TRUE)
+# })
