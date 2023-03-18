@@ -4,17 +4,17 @@
 \alias{autoplot.tournament}
 \title{Autoplot method for discharge rating curve tournament}
 \usage{
-\method{autoplot}{tournament}(x, type = "deviance", ...)
+\method{autoplot}{tournament}(x, ..., type = "deviance")
 }
 \arguments{
 \item{x}{an object of class "tournament"}
+
+\item{...}{other plotting parameters (not used in this function)}
 
 \item{type}{a character denoting what type of plot should be drawn. Possible types are
 \itemize{
  \item{"deviance"}{ to plot the deviance of the four models.}
 }}
-
-\item{...}{further arguments passed to other methods.}
 }
 \value{
 returns an object of class "ggplot2".

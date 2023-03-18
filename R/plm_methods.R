@@ -77,13 +77,14 @@ histogram_breaks <-function(x){
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
 #' @return returns an object of class ggplot2.
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin element_text theme
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
-plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
-    args <- list(...)
+plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL,...){
     color_palette <- c("green","red","slateblue1","hotpink","#56B4E9","#E69F00","#000000","#999999","#CC79A7","#D55E00","#0072B2","#009E73")
     legal_types <- c('rating_curve','rating_curve_mean','f','beta','sigma_eps','residuals','trace','histogram','r_hat','autocorrelation')
     if(!(type %in% legal_types)){
@@ -112,7 +113,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                                    name='Chain number') +
                 xlab('Iteration') +
                 ylab('') +
-                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
+                ggtitle(if(!is.null(title)) title else "Traceplots") +
                 theme_bdrc()
         }else{
             param_expr <- get_param_expression(params)
@@ -122,7 +123,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 facet_wrap(~chain_name,scales='free') +
                 xlab('Iteration') +
                 ylab(parse(text=param_expr)) +
-                ggtitle(if(!is.null(args$title)) args$title else "Traceplots") +
+                ggtitle(if(!is.null(title)) title else "Traceplots") +
                 theme_bdrc()
         }
     }else if(type=='histogram'){
@@ -141,7 +142,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             scale_y_continuous(expand=c(0,0,0.05,0)) +
             xlab('') +
             ylab('') +
-            ggtitle(if(!is.null(args$title)) args$title else if( length(param)==1 ) "Histogram of posterior draws" else "Histograms of posterior draws" ) +
+            ggtitle(if(!is.null(title)) title else if( length(param)==1 ) "Histogram of posterior draws" else "Histograms of posterior draws" ) +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ),
                   strip.placement = "outside",
@@ -164,11 +165,11 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_lower),linetype='dashed',alpha=0.95) +
                 geom_path(aes(x=.data$`log(h-c_hat)`,y=.data$log_upper),linetype='dashed',alpha=0.95) +
                 geom_point(data=plot_dat[!is.na(plot_dat$log_Q),],aes(x=.data$`log(h-c_hat)`,y=.data$log_Q), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0.01,0)) +
-                scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
+                scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(NA,NA),expand=c(0.01,0)) +
+                scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
-                ggtitle(if(!is.null(args$title)) args$title else "Log-transformed rating curve") +
+                ggtitle(if(!is.null(title)) title else "Log-transformed rating curve") +
                 theme_bdrc() +
                 theme(plot.title = element_text( vjust = 2 ))
         }else{
@@ -179,12 +180,12 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
                 geom_path(aes(x=.data$lower,y=.data$h),linetype='dashed',alpha=0.95) +
                 geom_path(aes(x=.data$upper,y=.data$h),linetype='dashed',alpha=0.95) +
                 geom_point(data=x$data,aes(.data[[all.vars(x$formula)[1]]],.data[[all.vars(x$formula)[2]]]), size=.9, shape=21, fill="gray60", color="black",alpha=0.95) +
-                scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=0.01)) +
-                #scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(0,max(x$rating_curve$upper,x$data$Q)),expand=c(0.01,0)) +
-                scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=c(0.01,0)) +
+                scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(NA,NA),expand=expansion(mult=0.01)) +
+                #scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(0,max(x$rating_curve$upper,x$data$Q)),expand=c(0.01,0)) +
+                scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(NA,NA),expand=c(0.01,0)) +
                 xlab(parse(text=x_lab)) +
                 ylab(parse(text=y_lab)) +
-                ggtitle(if(!is.null(args$title)) args$title else "Rating curve") +
+                ggtitle(if(!is.null(title)) title else "Rating curve") +
                 theme_bdrc() +
                 theme(plot.title = element_text( vjust = 2 ))
         }
@@ -207,9 +208,9 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             geom_path(aes(x=.data$h,y=.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
-            ggtitle(if(!is.null(args$title)) args$title else "Std. dev. of the error terms") +
+            scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(0,max(plot_dat$upper)*1.1),expand=c(0,0)) +
+            ggtitle(if(!is.null(title)) title else "Std. dev. of the error terms") +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='beta'){
@@ -225,9 +226,9 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
-            ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent deviations") +
+            scale_x_continuous(if(!is.null(xlim)) xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
+            ggtitle(if(!is.null(title)) title else "Power-law exponent deviations") +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='f'){
@@ -249,9 +250,9 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             geom_path(aes(.data$h,.data$upper),linetype='dashed') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=c(0,0)) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
-            ggtitle(if(!is.null(args$title)) args$title else "Power-law exponent") +
+            scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(NA,NA),expand=c(0,0)) +
+            scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(min(1,0.9*min(plot_dat$lower)),max(3.5,1.1*max(plot_dat$upper))),expand=c(0,0)) +
+            ggtitle(if(!is.null(title)) title else "Power-law exponent") +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='residuals'){
@@ -274,9 +275,9 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
             geom_smooth(aes(x=.data$`log(h-c_hat)`,y=.data$m_lower),span=span,se=FALSE,stat = "smooth",color='black',linetype='solid',linewidth=0.3,alpha=0.95,method=method,formula='y~x') +
             xlab(parse(text=x_lab)) +
             ylab(parse(text=y_lab)) +
-            scale_x_continuous(limits=if(!is.null(args$xlim)) args$xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
-            scale_y_continuous(limits=if(!is.null(args$ylim)) args$ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
-            ggtitle(if(!is.null(args$title)) args$title else "Residuals") +
+            scale_x_continuous(limits=if(!is.null(xlim)) xlim else c(NA,NA),expand=expansion(mult=rep(.01,2))) +
+            scale_y_continuous(limits=if(!is.null(ylim)) ylim else c(NA,NA),expand=expansion(mult=rep(.05,2))) +
+            ggtitle(if(!is.null(title)) title else "Residuals") +
             theme_bdrc() +
             theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='r_hat'){
@@ -293,7 +294,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Iteration') +
              ylab(parse(text=y_lab)) +
-             ggtitle(if(!is.null(args$title)) args$title else "Gelman-Rubin statistic") +
+             ggtitle(if(!is.null(title)) title else "Gelman-Rubin statistic") +
              theme_bdrc() +
              theme(plot.title = element_text( vjust = 2 ),
                    axis.title.y = element_text( vjust = 3 ),
@@ -311,7 +312,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
              scale_color_manual(values=color_palette,name=class(x),labels=param_expr) +
              xlab('Lag') +
              ylab('Sample autocorrelation') +
-             ggtitle(if(!is.null(args$title)) args$title else "Autocorrelation in posterior draws") +
+             ggtitle(if(!is.null(title)) title else "Autocorrelation in posterior draws") +
              theme_bdrc() +
              theme(plot.title = element_text( vjust = 2 ),
                    axis.title.y = element_text( vjust = 3 ),
@@ -426,6 +427,7 @@ summary.plm0 <- function(object,...){
 #'
 #' Visualize discharge rating curve model objects
 #' @param x an object of class "plm0","plm","gplm0" or "gplm".
+#' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -439,12 +441,10 @@ summary.plm0 <- function(object,...){
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
-#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
-#'                     }
+#' @param title a character denoting the title of the plot
+#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#'
 #' @return returns an object of class "ggplot2".
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
@@ -466,14 +466,15 @@ summary.plm0 <- function(object,...){
 #' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @importFrom ggplot2 autoplot
 #' @export
-autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,...)
+autoplot.plm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' Plot method for discharge rating curves
 #'
 #' Visualize discharge rating curve model objects
 #' @param x object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
 #'                       \item{"rating_curve"}{ to plot the rating curve.}
@@ -488,12 +489,10 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...
 #'                    }
 #' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods. Currently supports:
-#'                     \itemize{
-#'                       \item{"title"}{ a character denoting the title of the plot}
-#'                       \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
-#'                       \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
-#'                     }
+#' @param title a character denoting the title of the plot
+#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#'
 #' @return No return value, called for side effects.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
@@ -516,10 +515,10 @@ autoplot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
+plot.plm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -546,8 +545,8 @@ plot.plm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 #' }
 #' @describeIn predict.plm0 Predict method for plm0
 #' @export
-predict.plm0 <- function(object,newdata=NULL,wide=FALSE,...){
-    predict_fun(object,newdata,wide)
+predict.plm0 <- function(object,...,newdata=NULL,wide=FALSE){
+    predict_fun(object,newdata=newdata,wide=wide)
 }
 
 #' @describeIn print.plm0 Print method for plm
@@ -565,18 +564,18 @@ summary.plm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
-autoplot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,...)
+autoplot.plm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for plm
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
+plot.plm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -586,8 +585,8 @@ plot.plm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 
 #' @describeIn predict.plm0 Predict method for plm
 #' @export
-predict.plm <- function(object,newdata=NULL,wide=FALSE,...){
-    predict_fun(object,newdata,wide)
+predict.plm <- function(object,...,newdata=NULL,wide=FALSE){
+    predict_fun(object,newdata=newdata,wide=wide)
 }
 
 #' @describeIn print.plm0 Print method for gplm0
@@ -604,18 +603,18 @@ summary.gplm0 <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
-autoplot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,...)
+autoplot.gplm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for gplm0
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
+plot.gplm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -625,8 +624,8 @@ plot.gplm0 <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 
 #' @describeIn predict.plm0 Predict method for gplm0
 #' @export
-predict.gplm0 <- function(object,newdata=NULL,wide=FALSE,...){
-    predict_fun(object,newdata,wide)
+predict.gplm0 <- function(object,...,newdata=NULL,wide=FALSE){
+    predict_fun(object,newdata=newdata,wide=wide)
 }
 
 #' @describeIn print.plm0 Print method for gplm
@@ -643,18 +642,18 @@ summary.gplm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
-autoplot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
-    plot_fun(x,type=type,param=param,transformed=transformed,...)
+autoplot.gplm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+    plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
 #' @describeIn plot.plm0 Plot method for gplm
 #' @export
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
-plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
+plot.gplm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     grob_types <- c('panel','convergence_diagnostics')
     if(is.null(type) || !(type%in%grob_types)){
-        p <- autoplot(x,type=type,param=param,transformed=transformed,...)
+        p <- autoplot(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
         print(p)
     }else{
         p <- plot_grob(x,type=type,transformed=transformed)
@@ -664,6 +663,6 @@ plot.gplm <- function(x,type='rating_curve',param=NULL,transformed=FALSE,...){
 
 #' @describeIn predict.plm0 Predict method for gplm
 #' @export
-predict.gplm <- function(object,newdata=NULL,wide=FALSE,...){
-    predict_fun(object,newdata,wide)
+predict.gplm <- function(object,...,newdata=NULL,wide=FALSE){
+    predict_fun(object,newdata=newdata,wide=wide)
 }

@@ -149,11 +149,11 @@ summary.tournament <- function(object,...){
 #' Compare the four discharge rating curves from the tournament object in different ways
 #'
 #' @param x an object of class "tournament"
+#' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
 #'  \item{"deviance"}{ to plot the deviance of the four models.}
 #' }
-#' @param ... further arguments passed to other methods.
 #' @return returns an object of class "ggplot2".
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
@@ -167,8 +167,7 @@ summary.tournament <- function(object,...){
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
-autoplot.tournament <- function(x,type='deviance',...){
-    args <- list(...)
+autoplot.tournament <- function(x,...,type='deviance'){
     legal_types <- c('deviance')
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - ')))
@@ -184,6 +183,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' Compare the four models from the tournament object in multiple ways
 #'
 #' @param x an object of class "tournament"
+#' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
 #'   \item{"deviance"}{ to plot the deviance of the four models.}
@@ -195,7 +195,6 @@ autoplot.tournament <- function(x,type='deviance',...){
 #'   \item{"tournament_results"}{ to plot tournament results visually, game for game.}
 #'  }
 #' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param ... further arguments passed to other methods.
 #' @return No return value, called for side effects
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
@@ -214,8 +213,7 @@ autoplot.tournament <- function(x,type='deviance',...){
 #' @importFrom grid grid.draw
 #' @importFrom gridExtra grid.arrange
 #' @export
-plot.tournament <- function(x,type='tournament_results',transformed=FALSE,...){
-    args <- list(...)
+plot.tournament <- function(x,...,type='tournament_results',transformed=FALSE){
     legal_types <- c("deviance","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
     error_msg <- paste0('Type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))
     if( is.null(type) ){

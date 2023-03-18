@@ -7,16 +7,54 @@
 \alias{plot.gplm}
 \title{Plot method for discharge rating curves}
 \usage{
-\method{plot}{plm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{plot}{plm0}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{plot}{plm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{plot}{plm}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{plot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{plot}{gplm0}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{plot}{gplm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{plot}{gplm}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 }
 \arguments{
 \item{x}{object of class "plm0", "plm", "gplm0" or "gplm".}
+
+\item{...}{other plotting parameters (not used in this function)}
 
 \item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
@@ -35,12 +73,11 @@
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{...}{further arguments passed to other methods. Currently supports:
-\itemize{
-  \item{"title"}{ a character denoting the title of the plot}
-  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
-  \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta"\cr,"sigma_eps","residuals".}
-}}
+\item{title}{a character denoting the title of the plot}
+
+\item{xlim}{numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+
+\item{ylim}{numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }
 \value{
 No return value, called for side effects.

@@ -7,16 +7,54 @@
 \alias{autoplot.gplm}
 \title{Autoplot method for discharge rating curves}
 \usage{
-\method{autoplot}{plm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{autoplot}{plm0}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{autoplot}{plm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{autoplot}{plm}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{autoplot}{gplm0}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{autoplot}{gplm0}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 
-\method{autoplot}{gplm}(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+\method{autoplot}{gplm}(
+  x,
+  ...,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL
+)
 }
 \arguments{
 \item{x}{an object of class "plm0","plm","gplm0" or "gplm".}
+
+\item{...}{other plotting parameters (not used in this function)}
 
 \item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 \itemize{
@@ -34,12 +72,11 @@
 
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{...}{further arguments passed to other methods. Currently supports:
-\itemize{
-  \item{"title"}{ a character denoting the title of the plot}
-  \item{"xlim"}{ numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
-  \item{"ylim"}{ numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta",\cr"sigma_eps","residuals".}
-}}
+\item{title}{a character denoting the title of the plot}
+
+\item{xlim}{numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+
+\item{ylim}{numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }
 \value{
 returns an object of class "ggplot2".

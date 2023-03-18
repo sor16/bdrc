@@ -4,7 +4,16 @@
 \alias{plot_fun}
 \title{Plot bdrc model objects}
 \usage{
-plot_fun(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
+plot_fun(
+  x,
+  type = "rating_curve",
+  param = NULL,
+  transformed = FALSE,
+  title = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class "plm0","plm","gplm0" or "gplm".}
@@ -27,6 +36,10 @@ plot_fun(x, type = "rating_curve", param = NULL, transformed = FALSE, ...)
 \item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
 \item{title}{a character denoting the title of the plot. Defaults to NULL, i.e. no title.}
+
+\item{xlim}{numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+
+\item{ylim}{numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
 }
 \value{
 returns an object of class ggplot2.
