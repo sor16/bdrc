@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Codecov test
-coverage](https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg)](https://codecov.io/gh/sor16/bdrc?branch=master)
+coverage](https://codecov.io/gh/sor16/bdrc/branch/master/graph/badge.svg)](https://app.codecov.io/gh/sor16/bdrc?branch=master)
 [![R build
 status](https://github.com/sor16/bdrc/workflows/R-CMD-check/badge.svg)](https://github.com/sor16/bdrc/actions)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/bdrc)](https://cran.r-project.org/package=bdrc)
