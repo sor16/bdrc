@@ -426,7 +426,7 @@ summary.plm0 <- function(object,...){
 #' Autoplot method for discharge rating curves
 #'
 #' Visualize discharge rating curve model objects
-#' @param x an object of class "plm0","plm","gplm0" or "gplm".
+#' @param object an object of class "plm0","plm","gplm0" or "gplm".
 #' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
 #'                    \itemize{
@@ -466,7 +466,7 @@ summary.plm0 <- function(object,...){
 #' @describeIn autoplot.plm0 Autoplot method for plm0
 #' @importFrom ggplot2 autoplot
 #' @export
-autoplot.plm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+autoplot.plm0 <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
@@ -564,7 +564,7 @@ summary.plm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for plm
 #' @export
-autoplot.plm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+autoplot.plm <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
@@ -603,7 +603,7 @@ summary.gplm0 <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm0
 #' @export
-autoplot.gplm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+autoplot.gplm0 <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 
@@ -642,7 +642,7 @@ summary.gplm <- function(object,...){
 
 #' @describeIn autoplot.plm0 Autoplot method for gplm
 #' @export
-autoplot.gplm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
+autoplot.gplm <- function(object,...,type='rating_curve',param=NULL,transformed=FALSE,title=NULL,xlim=NULL,ylim=NULL){
     plot_fun(x,type=type,param=param,transformed=transformed,title=title,xlim=xlim,ylim=ylim)
 }
 

@@ -148,7 +148,7 @@ summary.tournament <- function(object,...){
 #'
 #' Compare the four discharge rating curves from the tournament object in different ways
 #'
-#' @param x an object of class "tournament"
+#' @param object an object of class "tournament"
 #' @param ... other plotting parameters (not used in this function)
 #' @param type a character denoting what type of plot should be drawn. Possible types are
 #' \itemize{
@@ -167,7 +167,7 @@ summary.tournament <- function(object,...){
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
-autoplot.tournament <- function(x,...,type='deviance'){
+autoplot.tournament <- function(object,...,type='deviance'){
     legal_types <- c('deviance')
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - ')))

@@ -4,10 +4,10 @@
 \alias{autoplot.tournament}
 \title{Autoplot method for discharge rating curve tournament}
 \usage{
-\method{autoplot}{tournament}(x, ..., type = "deviance")
+\method{autoplot}{tournament}(object, ..., type = "deviance")
 }
 \arguments{
-\item{x}{an object of class "tournament"}
+\item{object}{an object of class "tournament"}
 
 \item{...}{other plotting parameters (not used in this function)}
 

@@ -8,7 +8,7 @@
 \title{Autoplot method for discharge rating curves}
 \usage{
 \method{autoplot}{plm0}(
-  x,
+  object,
   ...,
   type = "rating_curve",
   param = NULL,
@@ -19,7 +19,7 @@
 )
 
 \method{autoplot}{plm}(
-  x,
+  object,
   ...,
   type = "rating_curve",
   param = NULL,
@@ -30,7 +30,7 @@
 )
 
 \method{autoplot}{gplm0}(
-  x,
+  object,
   ...,
   type = "rating_curve",
   param = NULL,
@@ -41,7 +41,7 @@
 )
 
 \method{autoplot}{gplm}(
-  x,
+  object,
   ...,
   type = "rating_curve",
   param = NULL,
@@ -52,7 +52,7 @@
 )
 }
 \arguments{
-\item{x}{an object of class "plm0","plm","gplm0" or "gplm".}
+\item{object}{an object of class "plm0","plm","gplm0" or "gplm".}
 
 \item{...}{other plotting parameters (not used in this function)}
 
