@@ -101,7 +101,7 @@ tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winn
         if(length(method)>1){
             stop(error_msg)
         }
-        if(class(winning_criteria)!="numeric"){
+        if(inherits(winning_criteria,"numeric")){
             stop(error_msg)
         }else if( method=='Posterior_probability' & abs(winning_criteria-0.5)>0.5 ){
             stop(error_msg)
@@ -112,8 +112,8 @@ tournament <- function(formula=NULL,data=NULL,model_list=NULL,method='WAIC',winn
     }
     error_msg <- 'Please provide; formula and data (name arguments explicitly) or model_list with four model objects of types gplm, gplm0, plm and plm0.'
     models <- list()
-    if(!is.null(model_list) | (is.null(model_list) & 'list' %in% class(formula))){
-        if(is.null(model_list) & 'list' %in% class(formula)){
+    if(!is.null(model_list) | (is.null(model_list) & inherits(formula,'list'))){
+        if(is.null(model_list) & inherits(formula,'list')){
             model_list=formula
         }
         if(length(model_list)!=4){
