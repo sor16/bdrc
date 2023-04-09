@@ -1,3 +1,5 @@
+# bdrc (development version)
+
 # bdrc 1.1.0
 
 * The tournament function now supports information criteria (WAIC & DIC) as the model selection criteria, WAIC being the new default.
