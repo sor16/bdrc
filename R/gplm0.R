@@ -8,6 +8,7 @@
 #' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
 #' @param num_cores integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.
 #' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#' @param minimal logical value indicating whether to output a reduced model object, which does not include the posterior draws. Useful for storing or use in light-weight web applications
 #'
 #' @details The generalized power-law model is of the form
 #' \deqn{Q=a(h-c)^{f(h)}}
@@ -58,7 +59,7 @@
 #' summary(gplm0.fit)
 #' }
 #' @export
-gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data))){
+gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data)),minimal=FALSE){
     #argument checking
     stopifnot(inherits(formula,'formula'))
     stopifnot(inherits(data,'data.frame'))
@@ -132,6 +133,10 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
+    #if minimal output is required
+    if(minimal){
+        result_obj <- get_minimal(result_obj)
+    }
     return(result_obj)
 }
 #' @importFrom stats dist optim
