@@ -77,6 +77,7 @@ gplm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
   stopifnot(is.null(h_max) | is.double(h_max))
   stopifnot(is.null(num_cores) | is.numeric(num_cores))
   stopifnot(length(forcepoint)==nrow(data) & is.logical(forcepoint))
+  stopifnot(inherits(minimal,'logical'))
   formula_args <- all.vars(formula)
   stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
   model_dat <- as.data.frame(data[,all.vars(formula)])
@@ -155,6 +156,7 @@ gplm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
   if(minimal){
       result_obj <- get_minimal(result_obj)
   }
+  result_obj$minimal <- minimal
   return(result_obj)
 }
 
