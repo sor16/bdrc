@@ -69,6 +69,9 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
         })
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=='convergence_diagnostics'){
+        if(any(sapply(x$contestants,function(obj) obj$minimal))){
+            stop('Plots of type "conergence_diagnostics" need the full posterior distribution and therefore cannot be performed for tournaments with reduced plm objects (with minimal=TRUE)')
+        }
         plot_list <- lapply(x$contestants,function(m){
             plot_grob(m,type=type)
         })
@@ -234,4 +237,18 @@ plot.tournament <- function(x,...,type='tournament_results',transformed=FALSE){
             grid.draw(p)
         }
     }
+}
+
+#' Reduce tournament size by stripping plm objects of posterior samples
+#'
+#' Obtain a tournament whose model objects include with posterior summaries only to reduce object size
+#' @param x an object of class "tournament"
+#' @param ... not used in this function
+#' @seealso \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for tournament visualization.
+#' @export
+minimal.tournament <- function(x,...){
+    minimal_plm_obj <- lapply(x$contestants,minimal)
+    names(minimal_plm_obj) <- names(x$contestants)
+    x$contestants <- minimal_plm_obj
+    return(x)
 }
