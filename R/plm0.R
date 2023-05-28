@@ -120,11 +120,11 @@ plm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
-    #if minimal output is required
+    result_obj$minimal <- FALSE
+    #if minimal output is required remove posterior tables and set minimal flag to TRUE
     if(minimal){
-        result_obj <- get_minimal(result_obj)
+        result_obj <- minimal(result_obj)
     }
-    result_obj$minimal <- minimal
     return(result_obj)
 }
 

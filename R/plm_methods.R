@@ -392,6 +392,15 @@ predict_fun <- function(object,newdata=NULL,wide=FALSE){
     return(pred_dat)
 }
 
+get_minimal <- function(mod_obj){
+    remove <- names(mod_obj)[grepl('posterior|autocorrelation',names(mod_obj))]
+    for(n in remove){
+        mod_obj[[n]] <- NULL
+    }
+    mod_obj$minimal <- TRUE
+    return(mod_obj)
+}
+
 #' Print method for discharge rating curves
 #'
 #' Print a discharge rating curve model object
@@ -549,6 +558,20 @@ predict.plm0 <- function(object,...,newdata=NULL,wide=FALSE){
     predict_fun(object,newdata=newdata,wide=wide)
 }
 
+minimal <- function(x,...) UseMethod("minimal")
+
+#' Extract a reduced object without posterior samples
+#'
+#' Obtain an object with posterior summaries only to reduce object size
+#' @param x an object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... not used in this function
+#' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}}, \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve.
+#' @describeIn minimal.plm0 Reduced plm0 object
+#' @export
+minimal.plm0 <- function(x,...){
+    get_minimal(x)
+}
+
 #' @describeIn print.plm0 Print method for plm
 #' @export
 #'
@@ -587,6 +610,13 @@ plot.plm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,titl
 #' @export
 predict.plm <- function(object,...,newdata=NULL,wide=FALSE){
     predict_fun(object,newdata=newdata,wide=wide)
+}
+
+#' @describeIn minimal.plm0 Reduced plm object
+#' @export
+#'
+minimal.plm <- function(x,...){
+    get_minimal(x)
 }
 
 #' @describeIn print.plm0 Print method for gplm0
@@ -628,6 +658,13 @@ predict.gplm0 <- function(object,...,newdata=NULL,wide=FALSE){
     predict_fun(object,newdata=newdata,wide=wide)
 }
 
+#' @describeIn minimal.plm0 Reduced gplm0 object
+#' @export
+#'
+minimal.gplm0 <- function(x,...){
+    get_minimal(x)
+}
+
 #' @describeIn print.plm0 Print method for gplm
 #' @export
 print.gplm <- function(x,...){
@@ -665,4 +702,11 @@ plot.gplm <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,tit
 #' @export
 predict.gplm <- function(object,...,newdata=NULL,wide=FALSE){
     predict_fun(object,newdata=newdata,wide=wide)
+}
+
+#' @describeIn minimal.plm0 Reduced gplm object
+#' @export
+#'
+minimal.gplm <- function(x,...){
+    get_minimal(x)
 }

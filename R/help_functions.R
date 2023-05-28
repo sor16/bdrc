@@ -545,11 +545,3 @@ calc_waic <- function(m,d){
   return(list("waic"=waic,"lppd"=lppd,"p_waic"=p_waic))
 }
 
-get_minimal <- function(mod_obj){
-    remove <- names(mod_obj)[grepl('posterior|autocorrelation',names(mod_obj))]
-    for(n in remove){
-        mod_obj[[n]] <- NULL
-    }
-    return(mod_obj)
-}
-
