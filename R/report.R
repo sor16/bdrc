@@ -19,6 +19,10 @@ get_report_components <- function(x,type=1){
         }else{
             m_obj <- x$contestants
             t_obj <- x
+            #check if model objects are of type minimal - then report of type 2 is impossible
+            if(any(sapply(x$contestants,function(obj) obj$minimal))){
+                stop('Report of type 2 needs the full posterior distribution and therefore cannot be performed for tournaments with reduced model objects (with minimal=TRUE)')
+            }
         }
     }else{
         if(type==2){

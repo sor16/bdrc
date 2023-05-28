@@ -98,7 +98,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NU
     }
     if(type=='trace'){
         if(x$minimal){
-            stop('Plots of type "trace" need the full posterior distribution and therefore cannot be performed for reduced plm objects (with minimal=TRUE)')
+            stop('Plots of type "trace" need the full posterior distribution and therefore cannot be performed for reduced model objects (with minimal=TRUE)')
         }
         plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
@@ -131,7 +131,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NU
         }
     }else if(type=='histogram'){
         if(x$minimal){
-            stop('Plots of type "histogram" need the full posterior distribution and therefore cannot be performed for reduced plm objects (with minimal=TRUE)')
+            stop('Plots of type "histogram" need the full posterior distribution and therefore cannot be performed for reduced model objects (with minimal=TRUE)')
         }
         plot_dat <- gather_draws(x,param,transformed=transformed)
         if('h' %in% names(plot_dat)){
@@ -288,7 +288,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NU
             theme(plot.title = element_text( vjust = 2 ))
     }else if(type=='r_hat'){
         if(x$minimal){
-            stop('Plots of type "r_hat" need the full posterior distribution and therefore cannot be performed for reduced plm objects (with minimal=TRUE)')
+            stop('Plots of type "r_hat" need the full posterior distribution and therefore cannot be performed for reduced model objects (with minimal=TRUE)')
         }
         rhat_dat <- get_rhat_dat(x,param)
         rhat_dat$Rhat[rhat_dat$Rhat<1] <- 1
@@ -310,7 +310,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NU
                    plot.margin = ggplot2::margin( t=7, r=7, b=7, l=12, unit = "pt" ) )
     }else if(type=='autocorrelation'){
         if(x$minimal){
-            stop('Plots of type "autocorrelation" need the full posterior distribution and therefore cannot be performed for reduced plm objects (with minimal=TRUE)')
+            stop('Plots of type "autocorrelation" need the full posterior distribution and therefore cannot be performed for reduced model objects (with minimal=TRUE)')
         }
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
         param_expr <- parse(text=get_param_expression(param))

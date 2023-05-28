@@ -70,7 +70,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
         p <- do.call(arrangeGrob,c(plot_list,ncol=2))
     }else if(type=='convergence_diagnostics'){
         if(any(sapply(x$contestants,function(obj) obj$minimal))){
-            stop('Plots of type "conergence_diagnostics" need the full posterior distribution and therefore cannot be performed for tournaments with reduced plm objects (with minimal=TRUE)')
+            stop('Plots of type "conergence_diagnostics" need the full posterior distribution and therefore cannot be performed for tournaments with reduced model objects (with minimal=TRUE)')
         }
         plot_list <- lapply(x$contestants,function(m){
             plot_grob(m,type=type)
