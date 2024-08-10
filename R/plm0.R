@@ -40,7 +40,7 @@
 #' \item{\code{data}}{data provided by the user, ordered by stage.}
 #' \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
 #' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
-#' @references Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.
+#' @references Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.
 #' @references Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639.
 #' @references Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
 #' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
@@ -142,7 +142,7 @@ plm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=
     return(output_list)
 }
 
-#' @importFrom stats rnorm dlnorm
+#' @importFrom stats rnorm dnorm
 plm0.density_evaluation_known_c <- function(theta,RC){
     log_sig_eps2 <- theta[1]
     l=c(log(RC$h-RC$c))
@@ -163,11 +163,11 @@ plm0.density_evaluation_known_c <- function(theta,RC){
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
+    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
-#' @importFrom stats rnorm dlnorm
+#' @importFrom stats rnorm dnorm
 plm0.density_evaluation_unknown_c <- function(theta,RC){
     zeta <- theta[1]
     log_sig_eps2 <- theta[2]
@@ -190,11 +190,11 @@ plm0.density_evaluation_unknown_c <- function(theta,RC){
     yp=(X %*% x)[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
+    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
-#' @importFrom stats dlnorm
+#' @importFrom stats dnorm
 plm0.calc_Dhat <- function(theta,RC){
   theta_median <- apply(theta,1,median)
   if(!is.null(RC$c)){
@@ -212,7 +212,7 @@ plm0.calc_Dhat <- function(theta,RC){
   w=solve(L,RC$y-X%*%RC$mu_x)
   x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
   yp=(X %*% x)[1:RC$n,]
-  D=-2*sum( log(dlnorm(exp(RC$y[1:RC$n,]),yp,sqrt(varr))) )
+  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
   return(D)
 }
 

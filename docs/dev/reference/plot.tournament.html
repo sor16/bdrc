@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bdrc</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -70,13 +70,17 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for tournament</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="st">"tournament_results"</span>, transformed <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, type <span class="op">=</span> <span class="st">"tournament_results"</span>, transformed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>an object of class "tournament"</p></dd>
+
+
+<dt>...</dt>
+<dd><p>other plotting parameters (not used in this function)</p></dd>
 
 
 <dt>type</dt>
@@ -92,10 +96,6 @@
 
 <dt>transformed</dt>
 <dd><p>a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>further arguments passed to other methods.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -140,11 +140,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a>.</p>
+  <p></p><p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, Rafael Daníel Vias.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

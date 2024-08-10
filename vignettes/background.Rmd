@@ -65,7 +65,7 @@ Clarke, R. (1999). *Uncertainty in the estimation of mean annual flood due to ra
 
 Clarke, R., Mendiondo, E., Brusa L. (2000). *Uncertainties in mean discharges from two large South American rivers due to rating curve variability.* Hydrological Sciences 45(2). 221–236.
 
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
 
 Matérn, B. (1960). *Spatial variation. Stochastic models and their application to some problems in forest surveys and other sampling investigations.* Meddelanden från statens Skogsforskningsinstitut. 49(5).
 

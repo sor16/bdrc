@@ -143,5 +143,5 @@ print(rating_curve_h_grid)
 
 Gelman, A., & Rubin, D. B. (1992). *Inference from iterative simulation using multiple sequences*, Statistical Science, 7(4), 457–472.
 
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
 

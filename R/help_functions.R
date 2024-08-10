@@ -533,15 +533,48 @@ get_rhat_dat <- function(m,param,smoothness=20){
   return(rhat_dat)
 }
 
-#' @importFrom stats dlnorm var
+LSE <- function(lx){
+    lx_max <- which.max(lx)
+    return(log1p(sum(exp(lx[-lx_max]-lx[lx_max])))+lx[lx_max])
+}
+
+log_mean_LSE <- function(lx){
+    return(-log(length(lx))+LSE(lx))
+}
+
+#' @importFrom stats dnorm var
+log_lik_post_i <- function(m,d){
+    sigma_eps <- m$sigma_eps_posterior
+    yp <- m$rating_curve_mean_posterior
+    rc <- m$rating_curve
+    idx <- as.numeric(merge(cbind("rowname"=rownames(rc),rc),d,by.x="h",by.y=colnames(d)[2],all.y = T)$rowname)
+    llp_i <- sapply( 1:nrow(d), function(n) { dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],], log = T ) } )
+    return(llp_i)
+}
+
 calc_waic <- function(m,d){
-  sigma_eps <- m$sigma_eps_posterior
-  yp <- m$rating_curve_mean_posterior
-  rc <- m$rating_curve
-  idx <- as.numeric(merge(cbind("rowname"=rownames(rc),rc),d,by.x="h",by.y=colnames(d)[2],all.y = T)$rowname)
-  lppd <- sum( sapply( 1:nrow(d), function(n) { log( mean( dlnorm( d[n,1], log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],] ) ) ) } ) )
-  p_waic <- sum( sapply( 1:nrow(d), function(n) { var( log( dlnorm( d[n,1], log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],]) ) ) } ) )
-  waic <- -2*(lppd-p_waic)
-  return(list("waic"=waic,"lppd"=lppd,"p_waic"=p_waic))
+    llp_i <- log_lik_post_i(m,d)
+    lppd_i <- sapply( 1:nrow(d), function(n) { log_mean_LSE( llp_i[,n] ) } )
+    p_waic_i <- sapply( 1:nrow(d), function(n) { var( llp_i[,n]  ) } )
+    waic_i <- -2*(lppd_i - p_waic_i)
+    lppd <- sum( lppd_i )
+    p_waic <- sum( p_waic_i )
+    waic <- sum(waic_i)
+    return(list("waic"=waic,"lppd"=lppd,"p_waic"=p_waic,"waic_i"=waic_i))
+}
+
+log_ml_harmonic_mean_est <- function(m,d){
+    llp_i <- log_lik_post_i(m,d)
+    llp <- llp_i %*% matrix(rep(1,nrow(d)),ncol=1)
+    log_ml_hme <- log(length(llp)) - LSE(-llp)
+    return(log_ml_hme)
+}
+
+post_model_prob_m1 <- function(m0,m1,d){
+    log_ml_hme_m1 <- log_ml_harmonic_mean_est(m1,d)
+    log_ml_hme_m0 <- log_ml_harmonic_mean_est(m0,d)
+    BF <- exp(log_ml_hme_m1-log_ml_hme_m0)
+    PMP_m1 <- 1/(1+(1/BF))
+    return(PMP_m1)
 }
 
