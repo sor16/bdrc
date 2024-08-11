@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">bdrc</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -70,16 +70,16 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for plm0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for plm</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gplm0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for gplm</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, wide <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -88,16 +88,16 @@
 <dd><p>an object of class "plm0", "plm", "gplm0" or "gplm".</p></dd>
 
 
+<dt>...</dt>
+<dd><p>not used in this function</p></dd>
+
+
 <dt>newdata</dt>
 <dd><p>a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.</p></dd>
 
 
 <dt>wide</dt>
 <dd><p>a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>not used in this function</p></dd>
 
 </dl></div>
     <div id="value">
@@ -109,10 +109,10 @@
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>predict.plm0</code>: Predict method for plm0</p></li>
-<li><p><code>predict.plm</code>: Predict method for plm</p></li>
-<li><p><code>predict.gplm0</code>: Predict method for gplm0</p></li>
-<li><p><code>predict.gplm</code>: Predict method for gplm</p></li>
+<ul><li><p><code>predict(plm0)</code>: Predict method for plm0</p></li>
+<li><p><code>predict(plm)</code>: Predict method for plm</p></li>
+<li><p><code>predict(gplm0)</code>: Predict method for gplm0</p></li>
+<li><p><code>predict(gplm)</code>: Predict method for gplm</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -150,11 +150,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, <a href="https://github.com/RafaelVias" class="external-link">Rafael Vias</a>.</p>
+  <p></p><p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, Rafael Daníel Vias.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
