@@ -11,7 +11,7 @@ Description: Fits a discharge rating curve based on the power-law and the genera
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
 Imports:
     ggplot2,
     grid,
@@ -25,5 +25,6 @@ Suggests:
     covr,
     vdiffr
 VignetteBuilder: knitr
+URL: https://sor16.github.io/bdrc
 BugReports: https://github.com/sor16/bdrc/issues
 Encoding: UTF-8

@@ -1,3 +1,8 @@
+template:
+  bootstrap: 5
+
+url: https://sor16.github.io/bdrc/
+
 development:
   mode: auto
 home:
@@ -10,7 +15,7 @@ authors:
     href: https://github.com/sor16
   Axel Orn Jansson:
     href: https://github.com/axelornj
-  Rafael Vias:
+  Rafael Daniel Vias:
     href: https://github.com/RafaelVias
 
 reference:

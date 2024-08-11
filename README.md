@@ -45,10 +45,9 @@ devtools::install_github("sor16/bdrc")
 
 It is very simple to fit a discharge rating curve with the *bdrc*
 package. All you need are two mandatory input arguments, formula and
-data. The formula is of the form y\~x where y is discharge in
-m![^3/](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5E3%2F "^3/")s
-and x is water elevation in m (it is very important that the data is in
-the correct units). data is a data.frame which must include x and y as
+data. The formula is of the form y~x where y is discharge in m^3/s and x
+is water elevation in m (it is very important that the data is in the
+correct units). data is a data.frame which must include x and y as
 column names. As an example, we will use data from the Swedish gauging
 station *Krokfors*, which is one of the datasets that come with the
 package. In this table, the Q column denotes discharge while W denotes
@@ -64,6 +63,8 @@ recommend taking a look at our two vignettes.
 
 ## References
 
-Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022).
-*Generalization of the power-law rating curve using hydrodynamic theory
-and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711.
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö.,
+Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the
+power-law rating curve using hydrodynamic theory and Bayesian
+hierarchical modeling*, Environmetrics, 33(2):e2711. doi:
+<https://doi.org/10.1002/env.2711>

@@ -20,7 +20,7 @@ A data.frame with the summary of the results of the game
 evaluate_game uses WAIC, DIC, or the posterior model probabilities, calculated with Bayes factor, to determine whether one model is more appropriate than the other given the data at hand.
 }
 \references{
-Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711.
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
 }
 \seealso{
 \code{\link{tournament}}
