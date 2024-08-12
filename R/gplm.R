@@ -211,10 +211,10 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
 
-  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-  w=solve(L,RC$y-X%*%RC$mu_x)
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
+  X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
+  L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
+  w=compute_w(L,RC$y,X,RC$mu_x)
+  p=-0.5%*%matMult(t(w),w)-sum(log(diag(L))) +
     pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
     pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +
     pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
@@ -222,11 +222,11 @@ gplm.density_evaluation_known_c <- function(theta,RC){
     pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
 
-  W=solve(L,X%*%Sig_x)
-  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
-  x=as.matrix(x_u-t(W)%*%solve(L,sss))
-  yp=(X %*% x)[1:RC$n,]
+  W=compute_W(L,X,Sig_x)
+  x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
+  sss=matMult(X,x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  x=compute_x(x_u,W,L,sss)
+  yp=matMult(X,x)[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
@@ -252,11 +252,11 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
 
-  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-  w=solve(L,RC$y-X%*%RC$mu_x)
+  X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
+  L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
+  w=compute_w(L,RC$y,X,RC$mu_x)
 
-  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+  p=-0.5%*%matMult(t(w),w)-sum(log(diag(L)))+
     pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
     pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
     pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +
@@ -264,11 +264,11 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
     pri('eta_minus1',z=z) +
     pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
-  W=solve(L,X%*%Sig_x)
-  x_u=RC$mu_x+t(chol(Sig_x))%*%rnorm(RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
-  x=as.matrix(x_u-t(W)%*%solve(L,sss))
-  yp=(X %*% x)[1:RC$n,]
+  W=compute_W(L,X,Sig_x)
+  x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
+  sss=matMult(X,x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  x=compute_x(x_u,W,L,sss)
+  yp=matMult(X,x)[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
@@ -299,11 +299,11 @@ gplm.calc_Dhat <- function(theta,RC){
   R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
 
-  X=rbind(cbind(1,l,diag(l)%*%RC$A),RC$Z)
-  L=t(chol(X%*%Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-  w=solve(L,RC$y-X%*%RC$mu_x)
-  x=RC$mu_x+Sig_x%*%(t(X)%*%solve(t(L),w))
-  yp=(X %*% x)[1:RC$n,]
+  X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
+  L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
+  w=compute_w(L,RC$y,X,RC$mu_x)
+  x=RC$mu_x+matMult(Sig_x,matMult(t(X),solveArma(t(L),w)))
+  yp=matMult(X,matrix(x))[1:RC$n,]
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
   return(D)
 }
@@ -334,16 +334,16 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
   sigma_21=sigma_all[(n+1):(n+m),1:n]
   #parameters for the posterior of beta_u
-  mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
-  Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  mu_x_u=matMult(sigma_21,solveArma(sigma_11,x[3:length(x)]) )
+  Sigma_x_u=sigma_22-matMult(sigma_21,solveArma2(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+  beta_u=t(mu_x_u)+matMult(t(rnorm(ncol(Sigma_x_u))),choleskyDecomp(Sigma_x_u))
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$h_u-RC$c)
   X=if(length(l)>1) cbind(rep(1,m),l,diag(l)) else matrix(c(1,l,l),nrow=1)
   x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
-  yp_u <- c(X%*%x_u)
+  yp_u <- c(matMult(X,matrix(x_u)))
   #make sure the log discharge at point of zero discharge is -Inf
   #yp_u[1] <- -Inf
   ypo_u = yp_u + rnorm(m) * sqrt(varr_u)
@@ -377,10 +377,10 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
   sigma_21=sigma_all[(n+1):(n+m),1:n]
   #parameters for the posterior of beta_u
-  mu_x_u=sigma_21%*%solve(sigma_11,x[3:length(x)])
-  Sigma_x_u=(sigma_22-sigma_21%*%solve(sigma_11,sigma_12))
+  mu_x_u=matMult(sigma_21,solveArma(sigma_11,x[3:length(x)]) )
+  Sigma_x_u=sigma_22-matMult(sigma_21,solveArma2(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=as.numeric(mu_x_u) + rnorm(ncol(Sigma_x_u)) %*% chol(Sigma_x_u)
+  beta_u=t(mu_x_u)+matMult(t(rnorm(ncol(Sigma_x_u))),choleskyDecomp(Sigma_x_u))
   above_c <- -(exp(zeta)-RC$h_min) < RC$h_u
   m_above_c <- sum(above_c)
   #buidling blocks of the explanatory matrix X calculated
@@ -389,7 +389,7 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   #vector of parameters
   x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
-  yp_u <- c(X%*%x_u)
+  yp_u <- c(matMult(X,matrix(x_u)))
   ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
   return(list('x'=beta_u,'sigma_eps'=varr_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }

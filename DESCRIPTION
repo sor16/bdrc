@@ -16,6 +16,8 @@ Imports:
     ggplot2,
     grid,
     gridExtra,
+    Rcpp,
+    RcppArmadillo,
     rlang,
     scales
 Suggests:
@@ -28,3 +30,6 @@ VignetteBuilder: knitr
 URL: https://sor16.github.io/bdrc
 BugReports: https://github.com/sor16/bdrc/issues
 Encoding: UTF-8
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
