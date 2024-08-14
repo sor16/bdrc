@@ -150,6 +150,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_MCMC_summary_cpp
+DataFrame get_MCMC_summary_cpp(const arma::mat& X, const Nullable<NumericVector>& h);
+RcppExport SEXP _bdrc_get_MCMC_summary_cpp(SEXP XSEXP, SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Nullable<NumericVector>& >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_MCMC_summary_cpp(X, h));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bdrc_matMult", (DL_FUNC) &_bdrc_matMult, 2},
@@ -163,6 +175,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bdrc_compute_W", (DL_FUNC) &_bdrc_compute_W, 3},
     {"_bdrc_compute_x_u", (DL_FUNC) &_bdrc_compute_x_u, 3},
     {"_bdrc_compute_x", (DL_FUNC) &_bdrc_compute_x, 4},
+    {"_bdrc_get_MCMC_summary_cpp", (DL_FUNC) &_bdrc_get_MCMC_summary_cpp, 2},
     {NULL, NULL, 0}
 };
 

@@ -63,7 +63,7 @@ arma::vec compute_w(const arma::mat& L, const arma::vec& y, const arma::mat& X, 
 // [[Rcpp::export]]
 arma::mat compute_W(const arma::mat& L, const arma::mat& X, const arma::mat& Sig_x) {
     arma::mat XSig = X * Sig_x;
-    arma::mat W = arma::solve(L, XSig);
+    arma::mat W = arma::solve(arma::trimatl(L), XSig, arma::solve_opts::fast);
     return W;
 }
 
@@ -81,4 +81,39 @@ arma::mat compute_x(const arma::mat& x_u, const arma::mat& W, const arma::mat& L
     arma::mat result = x_u - Wt_L_inv * sss;
     return result;
 }
+
+// [[Rcpp::export]]
+DataFrame get_MCMC_summary_cpp(const arma::mat& X, const Nullable<NumericVector>& h = R_NilValue) {
+    int n = X.n_rows;
+    mat summary_dat(n, 3);
+    for(int i = 0; i < n; ++i) {
+        rowvec row = X.row(i);
+        row = sort(row);
+        int size = row.n_elem;
+        summary_dat(i, 0) = row(std::floor(0.025 * (size - 1)));
+        summary_dat(i, 1) = row(std::floor(0.5 * (size - 1)));
+        summary_dat(i, 2) = row(std::floor(0.975 * (size - 1)));
+    }
+    if (h.isNotNull()) {
+        NumericVector h_vec(h);
+        if (h_vec.length() != n) {
+            stop("Length of h must match the number of rows in X");
+        }
+        return DataFrame::create(
+            Named("h") = h_vec,
+            Named("lower") = summary_dat.col(0),
+            Named("median") = summary_dat.col(1),
+            Named("upper") = summary_dat.col(2)
+        );
+    } else {
+        return DataFrame::create(
+            Named("lower") = summary_dat.col(0),
+            Named("median") = summary_dat.col(1),
+            Named("upper") = summary_dat.col(2)
+        );
+    }
+}
+
+
+
 
