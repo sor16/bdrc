@@ -212,6 +212,7 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
+
   #Matern covariance
   R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
@@ -219,6 +220,7 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
+
   p=-0.5%*%matMult(t(w),w)-sum(log(diag(L))) +
     pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
     pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +
@@ -231,6 +233,7 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
   sss=matMult(X,x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
+
   yp=matMult(X,x)[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
@@ -311,6 +314,7 @@ gplm.calc_Dhat <- function(theta,RC){
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
+
   #Matern covariance
   R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
   Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
