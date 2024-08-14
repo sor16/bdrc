@@ -45,3 +45,7 @@ compute_x <- function(x_u, W, L, sss) {
     .Call(`_bdrc_compute_x`, x_u, W, L, sss)
 }
 
+get_MCMC_summary_cpp <- function(X, h = NULL) {
+    .Call(`_bdrc_get_MCMC_summary_cpp`, X, h)
+}
+
