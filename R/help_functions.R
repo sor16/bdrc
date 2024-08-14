@@ -16,7 +16,7 @@ priors <- function(model,c_param=NULL) {
         RC$sig_b <- 0.426;
         RC$Sig_x <- rbind(c(RC$sig_a^2, RC$p_ab*RC$sig_a*RC$sig_b), c(RC$p_ab*RC$sig_a*RC$sig_b, RC$sig_b^2))
         RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b))
-        RC$Sig_xinv <- solve(RC$Sig_x)
+        RC$Sig_xinv <- matInverse(RC$Sig_x)
         RC$Sinvmu <- RC$Sig_xinv%*%RC$mu_x
     }else{
         RC$sig_b <- 0.01;
@@ -77,7 +77,7 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
   RC$theta_m <- optim_obj$par
   RC$H <- optim_obj$hessian
   proposal_scaling <- 2.38^2/RC$theta_length
-  RC$LH <- t(chol(RC$H))/sqrt(proposal_scaling)
+  RC$LH <- t(choleskyDecomp(RC$H))/sqrt(proposal_scaling)
   h_min_pred <- ifelse(is.null(RC$c),RC$h_min-exp(RC$theta_m[1]),RC$c)
   h_max_pred <- h_max
   if(is.null(h_max_pred)){
@@ -134,7 +134,7 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     density_eval_old <- density_eval_m
     acceptance_vec <- rep(FALSE,nr_iter)
     for(i in 1:nr_iter){
-        theta_new <- theta_old+solve(t(RC$LH),rnorm(RC$theta_length,0,1))
+        theta_new <- theta_old+solveArma(t(RC$LH),rnorm(RC$theta_length,0,1))
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
         if (logR>log(runif(1))){
@@ -222,21 +222,6 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
   output_list$acceptance_rate <- sum(output_list$acceptance_vec)/ncol(output_list$acceptance_vec)
   output_list$param_mean <- output_list$param_var <- output_list$variogram_chain <- NULL
   return(output_list)
-}
-
-#' @importFrom stats quantile
-get_MCMC_summary <- function(X,h=NULL){
-    summary_dat <- apply(X,1,function(x) {
-                      c(quantile(x,probs=0.025,na.rm=TRUE),
-                        quantile(x,probs=0.5,na.rm=TRUE),
-                        quantile(x,probs=0.975,na.rm=TRUE))
-                    })
-    summary_dat <- as.data.frame(t(summary_dat))
-    names(summary_dat) <- c('lower','median','upper')
-    if(!is.null(h)){
-        summary_dat <- data.frame(h=h,summary_dat,row.names=NULL)
-    }
-    return(summary_dat)
 }
 
 get_param_names <- function(model,c_param){
@@ -565,7 +550,7 @@ calc_waic <- function(m,d){
 
 log_ml_harmonic_mean_est <- function(m,d){
     llp_i <- log_lik_post_i(m,d)
-    llp <- llp_i %*% matrix(rep(1,nrow(d)),ncol=1)
+    llp <- matMult(llp_i,matrix(rep(1,nrow(d)),ncol=1))
     log_ml_hme <- log(length(llp)) - LSE(-llp)
     return(log_ml_hme)
 }
