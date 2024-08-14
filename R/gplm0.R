@@ -104,15 +104,15 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(result_obj$beta_posterior)),nrow=nrow(result_obj$beta_posterior),byrow=TRUE) + result_obj$beta_posterior
     result_obj$Deviance_posterior <- c(MCMC_output_list$D)
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
-    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique_sorted)
-    result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique_sorted)
-    result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
+    result_obj$rating_curve <- get_MCMC_summary_cpp(result_obj$rating_curve_posterior,h=h_unique_sorted)
+    result_obj$rating_curve_mean <- get_MCMC_summary_cpp(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
+    result_obj$beta_summary <- get_MCMC_summary_cpp(result_obj$beta_posterior,h=h_unique_sorted)
+    result_obj$f_summary <- get_MCMC_summary_cpp(result_obj$f_posterior,h=h_unique_sorted)
+    result_obj$param_summary <- get_MCMC_summary_cpp(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
     result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
     row.names(result_obj$param_summary) <- param_names
-    result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
+    result_obj$Deviance_summary <- get_MCMC_summary_cpp(MCMC_output_list$D)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
     result_obj$effective_num_param_DIC <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
