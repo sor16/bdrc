@@ -121,16 +121,16 @@ gplm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NU
   result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx,][h_unique_order,])
   result_obj$Deviance_posterior <- c(MCMC_output_list$D)
   #summary objects
-  result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
-  result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
-  result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior,h=h_unique_sorted)
-  result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior,h=h_unique_sorted)
-  result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior,h=h_unique_sorted)
-  result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
+  result_obj$rating_curve <- get_MCMC_summary_cpp(result_obj$rating_curve_posterior,h=h_unique_sorted)
+  result_obj$rating_curve_mean <- get_MCMC_summary_cpp(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
+  result_obj$beta_summary <- get_MCMC_summary_cpp(result_obj$beta_posterior,h=h_unique_sorted)
+  result_obj$f_summary <- get_MCMC_summary_cpp(result_obj$f_posterior,h=h_unique_sorted)
+  result_obj$sigma_eps_summary <- get_MCMC_summary_cpp(result_obj$sigma_eps_posterior,h=h_unique_sorted)
+  result_obj$param_summary <- get_MCMC_summary_cpp(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
   result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
   result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
   row.names(result_obj$param_summary) <- param_names
-  result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
+  result_obj$Deviance_summary <- get_MCMC_summary_cpp(MCMC_output_list$D)
   #Deviance calculations
   result_obj$D_hat <- MCMC_output_list$D_hat
   result_obj$effective_num_param_DIC <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
@@ -158,7 +158,7 @@ gplm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=
   c_upper <- NULL
   if(is.null(c_param)){
     RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
-    lhmc_sd <- sqrt(diag(solve(RC_plm0$H)))[1]
+    lhmc_sd <- sqrt(diag(matInverse(RC_plm0$H)))[1]
     lhmc_mode <- RC_plm0$theta_m[1]
     if(exp(lhmc_mode - 1.96*lhmc_sd)> 2){
       warning('Dataset lacks measurements near point of zero flow and thus the model infers its upper bound (see c_upper in run_info).')
@@ -202,14 +202,19 @@ gplm.density_evaluation_known_c <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  l=c(log(RC$h-RC$c))
+  # repeated calculations
+  phi_b <- exp(log_phi_b)
+  var_b <- exp(2*log_sig_b)
+  sqrt_5 <- sqrt(5)
+  sqrt_varr <- sqrt(varr)
 
+  l=c(log(RC$h-RC$c))
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
-  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
+  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -224,12 +229,12 @@ gplm.density_evaluation_known_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=matMult(X,x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  sss=matMult(X,x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
   yp=matMult(X,x)[1:RC$n,]
   #posterior predictive draw
-  ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+  ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
   return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
@@ -248,9 +253,16 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
+
+  # repeated calculations
+  phi_b <- exp(log_phi_b)
+  var_b <- exp(2*log_sig_b)
+  sqrt_5 <- sqrt(5)
+  sqrt_varr <- sqrt(varr)
+
   #Matern covariance
-  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
+  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -266,12 +278,12 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=matMult(X,x_u)-RC$y+rbind(sqrt(varr)*as.matrix(rnorm(RC$n)),0)
+  sss=matMult(X,x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
   yp=matMult(X,x)[1:RC$n,]
   #posterior predictive draw
-  ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+  ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
   return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
@@ -290,14 +302,18 @@ gplm.calc_Dhat <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  l=c(log(RC$h-RC$h_min+exp(zeta)))
+  # repeated calculations
+  phi_b <- exp(log_phi_b)
+  var_b <- exp(2*log_sig_b)
+  sqrt_5 <- sqrt(5)
 
+  l=c(log(RC$h-RC$h_min+exp(zeta)))
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
   #Matern covariance
-  R_Beta=(1+sqrt(5)*RC$dist/exp(log_phi_b)+5*RC$dist^2/(3*exp(log_phi_b)^2))*exp(-sqrt(5)*RC$dist/exp(log_phi_b))+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,exp(2*log_sig_b)*R_Beta))
+  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
+  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -318,6 +334,9 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   z <- theta[5:9]
   eta <- c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
+  # repeated calculations
+  sqrt_5 <- sqrt(5)
+
   n=RC$n_unique
   m=RC$n_u
   #get sample of data variance using splines
@@ -328,7 +347,7 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   dist_mat=as.matrix(dist(h_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/2
-  sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+  sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -361,6 +380,9 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   z <- theta[6:10]
   eta <- c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
+  # repeated calculations
+  sqrt_5 <- sqrt(5)
+
   n=RC$n_unique
   m=RC$n_u
   #get sample of data variance using splines
@@ -371,7 +393,7 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   dist_mat=as.matrix(dist(h_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/2
-  sigma_all=sig_b^2*(1 + sqrt(5)*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt(5)*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+  sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
