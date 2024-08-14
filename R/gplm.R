@@ -202,16 +202,16 @@ gplm.density_evaluation_known_c <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
+  l=c(log(RC$h-RC$c))
+  varr=c(RC$epsilon*exp(RC$B%*%eta))
+  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
+  Sig_eps=diag(c(varr,0))
+
   # repeated calculations
   phi_b <- exp(log_phi_b)
   var_b <- exp(2*log_sig_b)
   sqrt_5 <- sqrt(5)
   sqrt_varr <- sqrt(varr)
-
-  l=c(log(RC$h-RC$c))
-  varr=c(RC$epsilon*exp(RC$B%*%eta))
-  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
-  Sig_eps=diag(c(varr,0))
 
   #Matern covariance
   R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
@@ -221,7 +221,7 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
 
-  p=-0.5%*%matMult(t(w),w)-sum(log(diag(L))) +
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
     pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
     pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +
     pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
@@ -231,10 +231,10 @@ gplm.density_evaluation_known_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=matMult(X,x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
 
-  yp=matMult(X,x)[1:RC$n,]
+  yp=(X%*%x)[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
@@ -271,7 +271,7 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
 
-  p=-0.5%*%matMult(t(w),w)-sum(log(diag(L)))+
+  p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
     pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
     pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
     pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb) +
@@ -281,9 +281,9 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=matMult(X,x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
+  sss=(X%*%x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
-  yp=matMult(X,x)[1:RC$n,]
+  yp=(X%*%x)[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
@@ -305,15 +305,15 @@ gplm.calc_Dhat <- function(theta,RC){
 
   eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  # repeated calculations
-  phi_b <- exp(log_phi_b)
-  var_b <- exp(2*log_sig_b)
-  sqrt_5 <- sqrt(5)
-
   l=c(log(RC$h-RC$h_min+exp(zeta)))
   varr=c(RC$epsilon*exp(RC$B%*%eta))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(c(varr,0))
+
+  # repeated calculations
+  phi_b <- exp(log_phi_b)
+  var_b <- exp(2*log_sig_b)
+  sqrt_5 <- sqrt(5)
 
   #Matern covariance
   R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
@@ -322,8 +322,8 @@ gplm.calc_Dhat <- function(theta,RC){
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
-  x=RC$mu_x+matMult(Sig_x,matMult(t(X),solveArma(t(L),w)))
-  yp=matMult(X,matrix(x))[1:RC$n,]
+  x=RC$mu_x+(Sig_x%*%(t(X)%*%solveArma(t(L),w)))
+  yp=(X%*%x)[1:RC$n,]
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
   return(D)
 }
@@ -366,7 +366,7 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   X=if(length(l)>1) cbind(rep(1,m),l,diag(l)) else matrix(c(1,l,l),nrow=1)
   x_u=c(x[1:2],beta_u)
   #sample from the posterior of discharge y
-  yp_u <- c(matMult(X,matrix(x_u)))
+  yp_u <- c(X%*%x_u)
   #make sure the log discharge at point of zero discharge is -Inf
   #yp_u[1] <- -Inf
   ypo_u = yp_u + rnorm(m) * sqrt(varr_u)
@@ -415,7 +415,7 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   #vector of parameters
   x_u=c(x[1:2],beta_u[above_c])
   #sample from the posterior of discharge y
-  yp_u <- c(matMult(X,matrix(x_u)))
+  yp_u <- c(X%*%x_u)
   ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
   return(list('x'=beta_u,'sigma_eps'=varr_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
 }

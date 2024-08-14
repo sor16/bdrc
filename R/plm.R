@@ -166,25 +166,31 @@ plm.density_evaluation_known_c <- function(theta,RC){
     lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
     l=c(log(RC$h-RC$c))
-
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
     if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
+
+    # repeated calculations
+    sqrt_varr <- sqrt(varr)
+
     X=cbind(1,l)
-    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-    w=solve(L,RC$y-X%*%RC$mu_x)
+    L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
+    w=compute_w(L,RC$y,X,RC$mu_x)
+
     p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
-    W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
-    x=as.matrix(x_u-t(W)%*%solve(L,sss))
+
+    W=compute_W(L,X,RC$Sig_x)
+    x_u=compute_x_u(RC$mu_x,RC$Sig_x,nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt_varr*as.matrix(rnorm(RC$n))
+    x=compute_x(x_u,W,L,sss)
+
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
@@ -197,27 +203,32 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
     lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
     l=c(log(RC$h-RC$h_min+exp(zeta)))
-
     varr=c(RC$epsilon*exp(RC$B%*%lambda))
     if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
+
+    # repeated calculations
+    sqrt_varr <- sqrt(varr)
+
     X=cbind(1,l)
-    L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-    w=solve(L,RC$y-X%*%RC$mu_x)
+    L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
+    w=compute_w(L,RC$y,X,RC$mu_x)
+
     p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
       pri('c', zeta = zeta, lambda_c = RC$lambda_c) +
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
 
-    W=solve(L,X%*%RC$Sig_x)
-    x_u=RC$mu_x+t(chol(RC$Sig_x))%*%rnorm(nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt(varr)*as.matrix(rnorm(RC$n))
-    x=as.matrix(x_u-t(W)%*%solve(L,sss))
+    W=compute_W(L,X,RC$Sig_x)
+    x_u=compute_x_u(RC$mu_x,RC$Sig_x,nrow(RC$mu_x))
+    sss=(X%*%x_u)-RC$y+sqrt_varr*as.matrix(rnorm(RC$n))
+    x=compute_x(x_u,W,L,sss)
+
     yp=X%*%x
     #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt(varr)
-    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+    ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
@@ -234,15 +245,15 @@ plm.calc_Dhat <- function(theta,RC){
   lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
   l=c(log(RC$h-RC$h_min+exp(zeta)))
-
   varr=c(RC$epsilon*exp(RC$B%*%lambda))
   if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
   Sig_eps=diag(varr)
+
   X=cbind(1,l)
-  L=t(chol(X%*%RC$Sig_x%*%t(X)+Sig_eps+diag(nrow(Sig_eps))*RC$nugget))
-  w=solve(L,RC$y-X%*%RC$mu_x)
-  x=RC$mu_x+RC$Sig_x%*%(t(X)%*%solve(t(L),w))
-  yp=(X %*% x)[1:RC$n,]
+  L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
+  w=compute_w(L,RC$y,X,RC$mu_x)
+  x=RC$mu_x+(RC$Sig_x%*%(t(X)%*%solveArma(t(L),w)))
+  yp=(X%*%x)[1:RC$n,]
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
   return(D)
 }
