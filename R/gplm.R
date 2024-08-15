@@ -231,10 +231,10 @@ gplm.density_evaluation_known_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
+  sss=(matMult(X,x_u))-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
 
-  yp=(X%*%x)[1:RC$n,]
+  yp=(matMult(X,x))[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
@@ -281,9 +281,9 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
 
   W=compute_W(L,X,Sig_x)
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
-  sss=(X%*%x_u)-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
+  sss=(matMult(X,x_u))-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
-  yp=(X%*%x)[1:RC$n,]
+  yp=(matMult(X,x))[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
@@ -323,7 +323,7 @@ gplm.calc_Dhat <- function(theta,RC){
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
   x=RC$mu_x+(Sig_x%*%(t(X)%*%solveArma(t(L),w)))
-  yp=(X%*%x)[1:RC$n,]
+  yp=(matMult(X,x))[1:RC$n,]
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
   return(D)
 }
@@ -360,7 +360,7 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   mu_x_u=matMult(sigma_21,solveArma(sigma_11,x[3:length(x)]) )
   Sigma_x_u=sigma_22-matMult(sigma_21,solveArma2(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=t(mu_x_u)+matMult(t(rnorm(ncol(Sigma_x_u))),choleskyDecomp(Sigma_x_u))
+  beta_u=t(mu_x_u)+(t(rnorm(ncol(Sigma_x_u)))%*%choleskyDecomp(Sigma_x_u))
   #buidling blocks of the explanatory matrix X calculated
   l=log(RC$h_u-RC$c)
   X=if(length(l)>1) cbind(rep(1,m),l,diag(l)) else matrix(c(1,l,l),nrow=1)
@@ -406,7 +406,7 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   mu_x_u=matMult(sigma_21,solveArma(sigma_11,x[3:length(x)]) )
   Sigma_x_u=sigma_22-matMult(sigma_21,solveArma2(sigma_11,sigma_12))
   #a sample from posterior of beta_u drawn
-  beta_u=t(mu_x_u)+matMult(t(rnorm(ncol(Sigma_x_u))),choleskyDecomp(Sigma_x_u))
+  beta_u=t(mu_x_u)+(t(rnorm(ncol(Sigma_x_u)))%*%choleskyDecomp(Sigma_x_u))
   above_c <- -(exp(zeta)-RC$h_min) < RC$h_u
   m_above_c <- sum(above_c)
   #buidling blocks of the explanatory matrix X calculated
