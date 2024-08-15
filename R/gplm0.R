@@ -208,7 +208,9 @@ gplm0.density_evaluation_known_c <- function(theta,RC){
     yp=(matMult(X,x))[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+
     D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
+
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
@@ -252,7 +254,9 @@ gplm0.density_evaluation_unknown_c <- function(theta,RC){
     yp=(matMult(X,x))[1:RC$n,]
     #posterior predictive draw
     ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+
     D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
+
     return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"D"=D))
 }
 
@@ -287,7 +291,9 @@ gplm0.calc_Dhat <- function(theta,RC){
   x=RC$mu_x+(Sig_x%*%(t(X)%*%solveArma(t(L),w)))
 
   yp=(matMult(X,x))[1:RC$n,]
+
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+
   return(D)
 }
 #' @importFrom stats rnorm dist

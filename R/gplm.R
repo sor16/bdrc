@@ -283,10 +283,13 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
   x_u=compute_x_u(RC$mu_x,Sig_x,RC$n_unique+2)
   sss=(matMult(X,x_u))-RC$y+rbind(sqrt_varr*as.matrix(rnorm(RC$n)),0)
   x=compute_x(x_u,W,L,sss)
+
   yp=(matMult(X,x))[1:RC$n,]
   #posterior predictive draw
   ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
+
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
+
   return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
 }
 
@@ -323,8 +326,11 @@ gplm.calc_Dhat <- function(theta,RC){
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
   w=compute_w(L,RC$y,X,RC$mu_x)
   x=RC$mu_x+(Sig_x%*%(t(X)%*%solveArma(t(L),w)))
+
   yp=(matMult(X,x))[1:RC$n,]
+
   D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+
   return(D)
 }
 
