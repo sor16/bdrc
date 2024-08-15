@@ -195,7 +195,7 @@ gplm0.density_evaluation_known_c <- function(theta,RC){
     L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
     w=compute_w(L,RC$y,X,RC$mu_x)
 
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+    p=-0.5%*%sum(w^2)-sum(log(diag(L)))+
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
       pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +
       pri('phi_b', log_phi_b = log_phi_b, lambda_pb = RC$lambda_pb)
@@ -238,7 +238,7 @@ gplm0.density_evaluation_unknown_c <- function(theta,RC){
     L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
     w=compute_w(L,RC$y,X,RC$mu_x)
 
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+    p=-0.5%*%sum(w^2)-sum(log(diag(L)))+
       pri('c',zeta = zeta,lambda_c = RC$lambda_c) +
       pri('sigma_eps2',log_sig_eps2 = log_sig_eps2,lambda_se=RC$lambda_se) +
       pri('sigma_b',log_sig_b = log_sig_b, lambda_sb = RC$lambda_sb) +

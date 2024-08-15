@@ -177,7 +177,7 @@ plm.density_evaluation_known_c <- function(theta,RC){
     L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
     w=compute_w(L,RC$y,X,RC$mu_x)
 
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L)))+
+    p=-0.5%*%sum(w^2)-sum(log(diag(L)))+
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
       pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
@@ -214,7 +214,7 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
     L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
     w=compute_w(L,RC$y,X,RC$mu_x)
 
-    p=-0.5%*%t(w)%*%w-sum(log(diag(L))) +
+    p=-0.5%*%sum(w^2)-sum(log(diag(L))) +
       pri('c', zeta = zeta, lambda_c = RC$lambda_c) +
       pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
       pri('eta_minus1',z=z) +
