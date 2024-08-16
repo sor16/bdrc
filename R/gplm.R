@@ -210,12 +210,12 @@ gplm.density_evaluation_known_c <- function(theta,RC){
   # repeated calculations
   phi_b <- exp(log_phi_b)
   var_b <- exp(2*log_sig_b)
-  sqrt_5 <- sqrt(5)
   sqrt_varr <- sqrt(varr)
 
   #Matern covariance
-  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
+  R_Beta=(1+RC$sqrt5_dist/phi_b+RC$dist2_5d3/(phi_b^2))*exp(-RC$sqrt5_dist/phi_b)+RC$I_n_unique_nugget
+  Sig_x <- RC$Sig_x_prep
+  Sig_x[3:(RC$n_unique+2),3:(RC$n_unique+2)] <- var_b*R_Beta
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -260,12 +260,12 @@ gplm.density_evaluation_unknown_c <- function(theta,RC){
   # repeated calculations
   phi_b <- exp(log_phi_b)
   var_b <- exp(2*log_sig_b)
-  sqrt_5 <- sqrt(5)
   sqrt_varr <- sqrt(varr)
 
   #Matern covariance
-  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
+  R_Beta=(1+RC$sqrt5_dist/phi_b+RC$dist2_5d3/(phi_b^2))*exp(-RC$sqrt5_dist/phi_b)+RC$I_n_unique_nugget
+  Sig_x <- RC$Sig_x_prep
+  Sig_x[3:(RC$n_unique+2),3:(RC$n_unique+2)] <- var_b*R_Beta
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -316,11 +316,11 @@ gplm.calc_Dhat <- function(theta,RC){
   # repeated calculations
   phi_b <- exp(log_phi_b)
   var_b <- exp(2*log_sig_b)
-  sqrt_5 <- sqrt(5)
 
   #Matern covariance
-  R_Beta=(1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget
-  Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*R_Beta))
+  R_Beta=(1+RC$sqrt5_dist/phi_b+RC$dist2_5d3/(phi_b^2))*exp(-RC$sqrt5_dist/phi_b)+RC$I_n_unique_nugget
+  Sig_x <- RC$Sig_x_prep
+  Sig_x[3:(RC$n_unique+2),3:(RC$n_unique+2)] <- var_b*R_Beta
 
   X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
   L=compute_L(X,Sig_x,Sig_eps,RC$nugget)
@@ -356,7 +356,7 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   #calculating distance matrix for h_all
   dist_mat=as.matrix(dist(h_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
-  #Matern covariance formula used for v=5/2
+  #Matern covariance formula used for v=5/3
   sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]

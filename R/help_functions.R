@@ -58,6 +58,10 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
     RC$Z <- cbind(t(c(0,1)),t(rep(0,RC$n_unique)))
     RC$m1 <- matrix(0,nrow=2,ncol=RC$n_unique)
     RC$m2 <- matrix(0,nrow=RC$n_unique,ncol=2)
+    RC$sqrt5_dist <- sqrt(5)*RC$dist
+    RC$dist2_5d3 <- 5/3*RC$dist^2
+    RC$I_n_unique_nugget <- diag(RC$n_unique)*RC$nugget
+    RC$Sig_x_prep <- rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,matrix(0,RC$n_unique,RC$n_unique)))
   }
   if(!is.null(RC$c)){
     density_fun_name <- paste0(model,'.density_evaluation_known_c')
