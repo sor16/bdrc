@@ -304,20 +304,13 @@ gplm0.predict_u_known_c <- function(theta,x,RC){
     sig_b=exp(theta[2])
     phi_b=exp(theta[3])
 
-    # repeated calculations
-    sqrt_5 <- sqrt(5)
-
     n=RC$n_unique
     m=RC$n_u
     #get sample of data variance using splines
     varr_u = rep(exp(log_sig_eps2),m)
-    #combine stages from data with unobserved stages
-    h_all=c(RC$h_unique,RC$h_u)
-    #calculating distance matrix for h_all
-    dist_mat=as.matrix(dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + RC$sqrt5_dist_all/phi_b+(RC$dist_all2_5d3)/(phi_b^2))*exp(-RC$sqrt5_dist_all/phi_b) + RC$I_all_nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -347,20 +340,13 @@ gplm0.predict_u_unknown_c <- function(theta,x,RC){
     sig_b=exp(theta[3])
     phi_b=exp(theta[4])
 
-    # repeated calculations
-    sqrt_5 <- sqrt(5)
-
     n=RC$n_unique
     m=RC$n_u
     #get sample of data variance using splines
     varr_u = rep(exp(log_sig_eps2),m)
-    #combine stages from data with unobserved stages
-    h_all=c(RC$h_unique,RC$h_u)
-    #calculating distance matrix for h_all
-    dist_mat=as.matrix(dist(h_all))
     #Covariance of the joint prior for betas from data and beta unobserved.
     #Matern covariance formula used for v=5/2
-    sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+    sigma_all=sig_b^2*(1 + RC$sqrt5_dist_all/phi_b+(RC$dist_all2_5d3)/(phi_b^2))*exp(-RC$sqrt5_dist_all/phi_b) + RC$I_all_nugget
     sigma_11=sigma_all[1:n,1:n]
     sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
     sigma_12=sigma_all[1:n,(n+1):(n+m)]

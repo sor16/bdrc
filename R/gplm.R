@@ -344,20 +344,13 @@ gplm.predict_u_known_c <- function(theta,x,RC){
   z <- theta[5:9]
   eta <- c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  # repeated calculations
-  sqrt_5 <- sqrt(5)
-
   n=RC$n_unique
   m=RC$n_u
   #get sample of data variance using splines
   varr_u = c(exp(RC$B_u %*% eta))
-  #combine stages from data with unobserved stages
-  h_all=c(RC$h_unique,RC$h_u)
-  #calculating distance matrix for h_all
-  dist_mat=as.matrix(dist(h_all))
   #Covariance of the joint prior for betas from data and beta unobserved.
   #Matern covariance formula used for v=5/3
-  sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+  sigma_all=sig_b^2*(1 + RC$sqrt5_dist_all/phi_b+(RC$dist_all2_5d3)/(phi_b^2))*exp(-RC$sqrt5_dist_all/phi_b) + RC$I_all_nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
@@ -390,37 +383,30 @@ gplm.predict_u_unknown_c <- function(theta,x,RC){
   z <- theta[6:10]
   eta <- c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
-  # repeated calculations
-  sqrt_5 <- sqrt(5)
-
   n=RC$n_unique
   m=RC$n_u
-  #get sample of data variance using splines
+  # get sample of data variance using splines
   varr_u = c(exp(RC$B_u %*% eta))
-  #combine stages from data with unobserved stages
-  h_all=c(RC$h_unique,RC$h_u)
-  #calculating distance matrix for h_all
-  dist_mat=as.matrix(dist(h_all))
-  #Covariance of the joint prior for betas from data and beta unobserved.
-  #Matern covariance formula used for v=5/2
-  sigma_all=sig_b^2*(1 + sqrt_5*dist_mat/phi_b+(5*dist_mat^2)/(3*phi_b^2))*exp(-sqrt_5*dist_mat/phi_b) + diag(length(h_all))*RC$nugget
+  # Covariance of the joint prior for betas from data and beta unobserved.
+  # Matern covariance formula used for v=5/2
+  sigma_all=sig_b^2*(1 + RC$sqrt5_dist_all/phi_b+(RC$dist_all2_5d3)/(phi_b^2))*exp(-RC$sqrt5_dist_all/phi_b) + RC$I_all_nugget
   sigma_11=sigma_all[1:n,1:n]
   sigma_22=sigma_all[(n+1):(m+n),(n+1):(m+n)]
   sigma_12=sigma_all[1:n,(n+1):(n+m)]
   sigma_21=sigma_all[(n+1):(n+m),1:n]
-  #parameters for the posterior of beta_u
+  # parameters for the posterior of beta_u
   mu_x_u=matMult(sigma_21,solveArma(sigma_11,x[3:length(x)]) )
   Sigma_x_u=sigma_22-matMult(sigma_21,solveArma2(sigma_11,sigma_12))
-  #a sample from posterior of beta_u drawn
+  # a sample from posterior of beta_u drawn
   beta_u=t(mu_x_u)+(t(rnorm(ncol(Sigma_x_u)))%*%choleskyDecomp(Sigma_x_u))
   above_c <- -(exp(zeta)-RC$h_min) < RC$h_u
   m_above_c <- sum(above_c)
-  #buidling blocks of the explanatory matrix X calculated
+  # buidling blocks of the explanatory matrix X calculated
   l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
   X=if(length(l)>1) cbind(rep(1,m_above_c),l,diag(l)) else matrix(c(1,l,l),nrow=1)
-  #vector of parameters
+  # vector of parameters
   x_u=c(x[1:2],beta_u[above_c])
-  #sample from the posterior of discharge y
+  # sample from the posterior of discharge y
   yp_u <- c(X%*%x_u)
   ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
   return(list('x'=beta_u,'sigma_eps'=varr_u,'y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u)))
