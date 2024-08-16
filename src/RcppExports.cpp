@@ -162,6 +162,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// distance_matrix
+arma::mat distance_matrix(const arma::vec& x);
+RcppExport SEXP _bdrc_distance_matrix(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(distance_matrix(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// create_A_cpp
+arma::mat create_A_cpp(const arma::vec& h);
+RcppExport SEXP _bdrc_create_A_cpp(SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(create_A_cpp(h));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bdrc_matMult", (DL_FUNC) &_bdrc_matMult, 2},
@@ -176,6 +198,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bdrc_compute_x_u", (DL_FUNC) &_bdrc_compute_x_u, 3},
     {"_bdrc_compute_x", (DL_FUNC) &_bdrc_compute_x, 4},
     {"_bdrc_get_MCMC_summary_cpp", (DL_FUNC) &_bdrc_get_MCMC_summary_cpp, 2},
+    {"_bdrc_distance_matrix", (DL_FUNC) &_bdrc_distance_matrix, 1},
+    {"_bdrc_create_A_cpp", (DL_FUNC) &_bdrc_create_A_cpp, 1},
     {NULL, NULL, 0}
 };
 

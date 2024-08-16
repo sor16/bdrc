@@ -49,3 +49,11 @@ get_MCMC_summary_cpp <- function(X, h = NULL) {
     .Call(`_bdrc_get_MCMC_summary_cpp`, X, h)
 }
 
+distance_matrix <- function(x) {
+    .Call(`_bdrc_distance_matrix`, x)
+}
+
+create_A_cpp <- function(h) {
+    .Call(`_bdrc_create_A_cpp`, h)
+}
+

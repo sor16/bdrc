@@ -114,6 +114,37 @@ DataFrame get_MCMC_summary_cpp(const arma::mat& X, const Nullable<NumericVector>
     }
 }
 
+// [[Rcpp::export]]
+arma::mat distance_matrix(const arma::vec& x) {
+    int n = x.n_elem;
+    arma::mat dist_mat(n, n, arma::fill::zeros);
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            double dist = std::abs(x(i) - x(j));
+            dist_mat(i, j) = dist;
+            dist_mat(j, i) = dist; // Since distance is symmetric
+        }
+    }
+    return dist_mat;
+}
 
+// [[Rcpp::export]]
+arma::mat create_A_cpp(const arma::vec& h) {
+    int n = h.n_elem;
+    arma::vec unique_h = arma::unique(h);
+    int unique_n = unique_h.n_elem;
+    arma::mat A = arma::zeros<arma::mat>(n, unique_n);
+    A(0, 0) = 1;
+    int i = 0;
+    for (int ii = 1; ii < n; ++ii) {
+        if (h(ii) == h(ii - 1)) {
+            A(ii, i) = 1;
+        } else {
+            i += 1;
+            A(ii, i) = 1;
+        }
+    }
+    return A;
+}
 
 
