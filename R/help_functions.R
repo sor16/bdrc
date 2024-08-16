@@ -64,12 +64,6 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
     RC$dist <- NULL
     RC$I_n_unique_nugget <- diag(RC$n_unique)*RC$nugget
     RC$Sig_x_prep <- rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,matrix(0,RC$n_unique,RC$n_unique)))
-    # predict_u
-    RC$dist_all <- as.matrix(dist(c(RC$h_unique,RC$h_u)))
-    RC$I_all_nugget <- diag(RC$n_unique+RC$n_u)*RC$nugget
-    RC$sqrt5_dist_all <- sqrt(5)*RC$dist_all
-    RC$dist_all2_5d3 <- 5/3*RC$dist_all^2
-    RC$dist_all <- NULL
   }
   if(!is.null(RC$c)){
     density_fun_name <- paste0(model,'.density_evaluation_known_c')
@@ -102,6 +96,14 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
   if(model %in% c('plm','gplm')){
     h_u_std <- ifelse(RC$h_u < min(RC$h),0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
     RC$B_u <- B_splines(h_u_std)
+  }
+  if(model %in% c("gplm","gplm0")){
+      # predict_u
+      RC$dist_all <- as.matrix(dist(c(RC$h_unique,RC$h_u)))
+      RC$I_all_nugget <- diag(RC$n_unique+RC$n_u)*RC$nugget
+      RC$sqrt5_dist_all <- sqrt(5)*RC$dist_all
+      RC$dist_all2_5d3 <- 5/3*RC$dist_all^2
+      RC$dist_all <- NULL
   }
   #determine length of each part of the output, in addition to theta
   RC$desired_output <- get_desired_output(model,RC)
