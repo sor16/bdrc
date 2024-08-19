@@ -17,7 +17,6 @@ Imports:
     grid,
     gridExtra,
     Rcpp,
-    RcppArmadillo,
     rlang,
     scales
 Suggests:
