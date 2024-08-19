@@ -302,7 +302,7 @@ plot_fun <- function(x,type='rating_curve',param=NULL,transformed=FALSE,title=NU
     }else if(type=='autocorrelation'){
         auto_dat <- do.call('rbind',lapply(param,function(p) data.frame(lag=x$autocorrelation$lag,param=p,corr=x$autocorrelation[,p])))
         param_expr <- parse(text=get_param_expression(param))
-        max_lag <- nrow(x$autocorrelation)
+        max_lag <- dim(x$autocorrelation)[1]
         p <- ggplot(data=auto_dat, aes(x=.data$lag,y=.data$corr,color=.data$param)) +
              geom_hline(yintercept=0) +
              geom_line() +

@@ -66,12 +66,13 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NUL
     stopifnot(is.null(c_param) | is.double(c_param))
     stopifnot(is.null(h_max) | is.double(h_max))
     stopifnot(is.null(num_cores) | is.numeric(num_cores))
-    stopifnot(length(forcepoint)==nrow(data) & is.logical(forcepoint))
+    stopifnot(length(forcepoint)==dim(data)[1] & is.logical(forcepoint))
     formula_args <- all.vars(formula)
     stopifnot(length(formula_args)==2 & all(formula_args %in% names(data)))
     model_dat <- as.data.frame(data[,all.vars(formula)])
     forcepoint <- forcepoint[order(model_dat[,2,drop=TRUE])]
     model_dat <- model_dat[order(model_dat[,2,drop=TRUE]),]
+    if( dim(model_dat)[1]<2 ) stop('At least two paired observations of stage and discharge are required to fit a rating curve')
     Q <- model_dat[,1,drop=TRUE]
     h <- model_dat[,2,drop=TRUE]
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
@@ -105,14 +106,14 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NUL
     result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx,][h_unique_order,])
     result_obj$Deviance_posterior <- c(MCMC_output_list$D)
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary_cpp(result_obj$rating_curve_posterior,h=h_unique_sorted)
-    result_obj$rating_curve_mean <- get_MCMC_summary_cpp(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
-    result_obj$sigma_eps_summary <- get_MCMC_summary_cpp(result_obj$sigma_eps_posterior,h=h_unique_sorted)
-    result_obj$param_summary <- get_MCMC_summary_cpp(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
+    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
+    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
+    result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior,h=h_unique_sorted)
+    result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1,],MCMC_output_list$x[2,],MCMC_output_list$theta))
     result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
     result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
     row.names(result_obj$param_summary) <- param_names
-    result_obj$Deviance_summary <- get_MCMC_summary_cpp(MCMC_output_list$D)
+    result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
     result_obj$effective_num_param_DIC <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
@@ -122,6 +123,7 @@ plm <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NUL
     result_obj$lppd <- waic_list$lppd
     result_obj$effective_num_param_WAIC <- waic_list$p_waic
     result_obj$WAIC <- waic_list$waic
+    result_obj$WAIC_i <- waic_list$waic_i
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
@@ -153,53 +155,78 @@ plm.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=r
   }
   output_list$x[1,] <- exp(output_list$x[1,])
   output_list[['h']] <- c(RC$h,RC$h_u)
-  output_list[['acceptance_rate']] <- sum(output_list[['acceptance_vec']])/ncol(output_list[['acceptance_vec']])
   output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin)
   return(output_list)
 }
 
-#' @importFrom stats rnorm dnorm
-plm.density_evaluation_known_c <- function(theta,RC){
-    log_sig_eta <- theta[1]
-    eta_1 <- theta[2]
-    z <- theta[3:7]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
-
-    l=c(log(RC$h-RC$c))
-    varr=c(RC$epsilon*exp(RC$B%*%lambda))
-    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
-    Sig_eps=diag(varr)
-
-    # repeated calculations
-    sqrt_varr <- sqrt(varr)
-
-    X=cbind(1,l)
-    L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
-    w=compute_w(L,RC$y,X,RC$mu_x)
-
-    p=-0.5%*%sum(w^2)-sum(log(diag(L)))+
-      pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
-      pri('eta_minus1',z=z) +
-      pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
-
-    W=compute_W(L,X,RC$Sig_x)
-    x_u=compute_x_u(RC$mu_x,RC$Sig_x,nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt_varr*as.matrix(rnorm(RC$n))
-    x=compute_x(x_u,W,L,sss)
-
-    yp=X%*%x
-    #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
-    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
-    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
+plm.density_evaluation_unknown_c <- function(theta, RC) {
+    return(plm_density_evaluation_unknown_c_cpp(
+        theta = theta,
+        P = RC$P,
+        h = RC$h,
+        B = RC$B,
+        y = RC$y,
+        epsilon = RC$epsilon,
+        Sig_x = RC$Sig_x,
+        mu_x = RC$mu_x,
+        h_min = RC$h_min,
+        nugget = RC$nugget,
+        lambda_c = RC$lambda_c,
+        lambda_eta_1 = RC$lambda_eta_1,
+        lambda_seta = RC$lambda_seta
+    ))
 }
 
-#' @importFrom stats rnorm dnorm
-plm.density_evaluation_unknown_c <- function(theta,RC){
-    zeta <- theta[1]
-    log_sig_eta <- theta[2]
-    eta_1 <- theta[3]
-    z <- theta[4:8]
+plm.density_evaluation_known_c <- function(theta, RC) {
+    return(plm_density_evaluation_known_c_cpp(
+        theta = theta,
+        P = RC$P,
+        h = RC$h,
+        B = RC$B,
+        y = RC$y,
+        epsilon = RC$epsilon,
+        Sig_x = RC$Sig_x,
+        mu_x = RC$mu_x,
+        c = RC$c,
+        nugget = RC$nugget,
+        lambda_eta_1 = RC$lambda_eta_1,
+        lambda_seta = RC$lambda_seta
+    ))
+}
+
+plm.predict_u_unknown_c <- function(theta, x, RC) {
+    return(plm_predict_u_unknown_c_cpp(
+        theta = theta,
+        x = x,
+        P = RC$P,
+        B_u = RC$B_u,
+        h_u = RC$h_u,
+        h_min = RC$h_min,
+        n_u = length(RC$h_u)
+    ))
+}
+
+plm.predict_u_known_c <- function(theta, x, RC) {
+    return(plm_predict_u_known_c_cpp(
+        theta = theta,
+        x = x,
+        P = RC$P,
+        B_u = RC$B_u,
+        h_u = RC$h_u,
+        c = RC$c
+    ))
+}
+
+#' @importFrom stats dnorm
+plm.calc_Dhat <- function(theta,RC){
+    theta_median <- sapply(1:dim(theta)[1],function(x) median(theta[x,]))
+    if(!is.null(RC$c)){
+        theta_median <- c(log(RC$h_min-RC$c),theta_median)
+    }
+    zeta <- theta_median[1]
+    log_sig_eta <- theta_median[2]
+    eta_1 <- theta_median[3]
+    z <- theta_median[4:8]
     lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
 
     l=c(log(RC$h-RC$h_min+exp(zeta)))
@@ -207,95 +234,12 @@ plm.density_evaluation_unknown_c <- function(theta,RC){
     if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
     Sig_eps=diag(varr)
 
-    # repeated calculations
-    sqrt_varr <- sqrt(varr)
-
     X=cbind(1,l)
     L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
     w=compute_w(L,RC$y,X,RC$mu_x)
-
-    p=-0.5%*%sum(w^2)-sum(log(diag(L))) +
-      pri('c', zeta = zeta, lambda_c = RC$lambda_c) +
-      pri('eta_1',eta_1=eta_1,lambda_eta_1=RC$lambda_eta_1) +
-      pri('eta_minus1',z=z) +
-      pri('sigma_eta',log_sig_eta=log_sig_eta,lambda_seta=RC$lambda_seta)
-
-    W=compute_W(L,X,RC$Sig_x)
-    x_u=compute_x_u(RC$mu_x,RC$Sig_x,nrow(RC$mu_x))
-    sss=(X%*%x_u)-RC$y+sqrt_varr*as.matrix(rnorm(RC$n))
-    x=compute_x(x_u,W,L,sss)
-
-    yp=X%*%x
-    #posterior predictive draw
-    ypo=yp+as.matrix(rnorm(RC$n))*sqrt_varr
-    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt_varr,log = T) )
-    return(list("p"=p,"x"=x,"y_post"=yp,"y_post_pred"=ypo,"sigma_eps"=varr,"D"=D))
+    x=RC$mu_x+(RC$Sig_x%*%(t(X)%*%solveArma(t(L),w)))
+    yp=(X%*%x)[1:RC$n,]
+    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+    return(D)
 }
-
-#' @importFrom stats dnorm
-plm.calc_Dhat <- function(theta,RC){
-  theta_median <- apply(theta,1,median)
-  if(!is.null(RC$c)){
-    theta_median <- c(log(RC$h_min-RC$c),theta_median)
-  }
-  zeta <- theta_median[1]
-  log_sig_eta <- theta_median[2]
-  eta_1 <- theta_median[3]
-  z <- theta_median[4:8]
-  lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
-
-  l=c(log(RC$h-RC$h_min+exp(zeta)))
-  varr=c(RC$epsilon*exp(RC$B%*%lambda))
-  if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
-  Sig_eps=diag(varr)
-
-  X=cbind(1,l)
-  L=compute_L(X,RC$Sig_x,Sig_eps,RC$nugget)
-  w=compute_w(L,RC$y,X,RC$mu_x)
-  x=RC$mu_x+(RC$Sig_x%*%(t(X)%*%solveArma(t(L),w)))
-  yp=(X%*%x)[1:RC$n,]
-  D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
-  return(D)
-}
-
-#' @importFrom stats rnorm
-plm.predict_u_known_c <- function(theta,x,RC){
-    log_sig_eta2 <- theta[1]
-    eta_1 <- theta[2]
-    z <- theta[3:7]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*z)))
-    m <- length(RC$h_u)
-    #calculate spline variance from B_splines
-    varr_u <- c(exp(RC$B_u %*% lambda))
-    l <- log(RC$h_u-RC$c)
-    X <- cbind(rep(1,m),l)
-    #sample from the posterior of discharge y
-    yp_u <- c(X%*%x)
-    ypo_u <- yp_u  + rnorm(m) * sqrt(varr_u)
-    return(list('y_post'=yp_u,'y_post_pred'=ypo_u,'sigma_eps'=varr_u))
-}
-
-#' @importFrom stats rnorm
-plm.predict_u_unknown_c <- function(theta,x,RC){
-    #collecting parameters from the MCMC sample
-    zeta=theta[1]
-    log_sig_eta2 <- theta[2]
-    eta_1 <- theta[3]
-    z <- theta[4:8]
-    lambda=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta2)*z)))
-    m=length(RC$h_u)
-    #calculate spline variance from B_splines
-    varr_u <- c(exp(RC$B_u %*% lambda))
-    above_c <- RC$h_min-exp(zeta) < RC$h_u
-    m_above_c <- sum(above_c)
-    #building blocks of the explanatory matrix X calculated
-    l=log(RC$h_u[above_c]-RC$h_min+exp(zeta))
-    X=cbind(rep(1,m_above_c),l)
-    #sample from the posterior of discharge y
-    yp_u <- c(X%*%x)
-    ypo_u = yp_u + rnorm(m_above_c) * sqrt(varr_u[above_c])
-    return(list('y_post'=c(rep(-Inf,m-m_above_c),yp_u),'y_post_pred'=c(rep(-Inf,m-m_above_c),ypo_u),'sigma_eps'=varr_u))
-}
-
-
 

@@ -44,7 +44,7 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
     RC$epsilon <- rep(1,RC$n)
     RC$epsilon[forcepoint] <- 1/RC$n
     if(model %in% c('plm','gplm')){
-        RC$P <- lower.tri(matrix(rep(1,36),6,6),diag=TRUE)*1
+        RC$P <- lower.tri(matrix(1,6,6),diag=TRUE)*1
         h_tilde <- RC$h-min(RC$h)
         RC$B <- B_splines(t(h_tilde)/h_tilde[RC$n])
     }
@@ -91,21 +91,13 @@ get_model_components <- function(model,y,h,c_param,h_max,forcepoint,h_min){
         h_u_std <- ifelse(RC$h_u < min(RC$h),0.0,ifelse(RC$h_u>RC$h_max,1.0,(RC$h_u-min(RC$h))/(RC$h_max-min(RC$h))))
         RC$B_u <- B_splines(h_u_std)
     }
+    if(model %in% c('gplm','gplm0')){
+        RC$dist_all <- distance_matrix(c(RC$h_unique,RC$h_u))
+    }
     #determine length of each part of the output, in addition to theta
     RC$desired_output <- get_desired_output(model,RC)
+    RC$model <- model
     return(RC)
-}
-
-initiate_output_list <- function(desired_output,nr_iter){
-    output_list <- list()
-    for(elem in names(desired_output)){
-        output_list[[elem]] <- matrix(0,nrow=desired_output[[elem]][['observed']]+desired_output[[elem]][['unobserved']],ncol=nr_iter)
-    }
-    return(output_list)
-}
-
-calc_variogram <- function(i,param_mat,burnin=2000,nr_iter=20000){
-    rowSums((param_mat[,(i+1):ncol(param_mat)] - param_mat[,1:(ncol(param_mat)-i)])^2)
 }
 
 #' @importFrom stats rnorm runif
@@ -115,12 +107,15 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     density_eval_m <- density_fun(theta_m,RC)
     theta_old <- theta_m
     density_eval_old <- density_eval_m
-    acceptance_vec <- rep(FALSE,nr_iter)
+    acceptance_vec <- logical(nr_iter)
+    LH_t_solve <- solve(t(RC$LH))
+    log_unif <- log(runif(nr_iter))
+    rnorm_vec <- matrix(rnorm(RC$theta_length * nr_iter), nrow = RC$theta_length)
     for(i in 1:nr_iter){
-        theta_new <- theta_old+solveArma(t(RC$LH),rnorm(RC$theta_length,0,1))
+        theta_new <- theta_old + LH_t_solve %*% rnorm_vec[, i]
         density_eval_new <- density_fun(theta_new,RC)
         logR <- density_eval_new[['p']]-density_eval_old[['p']]
-        if (logR>log(runif(1))){
+        if (logR>log_unif[i]){
             acceptance_vec[i] <- TRUE
             theta_old <- theta_new
             density_eval_old <- density_eval_new
@@ -136,14 +131,13 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     param_mat2 <- param_mat[,seq(burnin+split_idx+1,nr_iter)]
     param_mean <- cbind(rowMeans(param_mat1),rowMeans(param_mat2))
     param_var <- cbind(apply(param_mat1,1,var),apply(param_mat2,1,var))
-    variogram_chain <- cbind(sapply(1:T_max,calc_variogram,param_mat1,burnin,nr_iter),
-                             sapply(1:T_max,calc_variogram,param_mat2,burnin,nr_iter))
+    variogram_chain <- variogram_chain(T_max, param_mat1, param_mat2, burnin, nr_iter)
     rm(param_mat,param_mat1,param_mat2)
     idx <- seq(burnin,nr_iter,thin)
     acceptance_vec <- acceptance_vec[idx]
     theta_mat <- theta_mat[,idx,drop=FALSE]
-    output_list <- sapply(output_list,FUN=function(x) x[,idx,drop=FALSE],simplify=FALSE,USE.NAMES=TRUE)
-    for(i in 1:ncol(theta_mat)){
+    output_list <- sapply(output_list,FUN=function(x) x[,idx,drop=FALSE], simplify=FALSE,USE.NAMES=TRUE)
+    for(i in 1:dim(theta_mat)[2]){
         unobserved_list <- unobserved_prediction_fun(theta_mat[,i],output_list[['x']][1:(RC$desired_output[['x']][['observed']]),i],RC)
         for(elem in names(unobserved_list)){
             output_list[[elem]][(RC$desired_output[[elem]][['observed']]+1):nrow(output_list[[elem]]),i] <- unobserved_list[[elem]]
@@ -153,9 +147,10 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
     output_list$param_mean <- param_mean
     output_list$param_var <- param_var
     output_list$variogram_chain <- variogram_chain
-    output_list$acceptance_vec <- t(as.matrix(acceptance_vec))
+    output_list$acceptance_rate <- mean(acceptance_vec)
     return(output_list)
 }
+
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
 get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
     #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
@@ -181,7 +176,7 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
         }
         cl <- makeCluster(num_cores,setup_strategy='sequential')
         clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
-        clusterExport(cl,c('run_MCMC','initiate_output_list','pri','calc_variogram',
+        clusterExport(cl,c('run_MCMC','initiate_output_list','pri','variogram_chain',
                            'theta_m','RC','density_fun','unobserved_prediction_fun',
                            'parallel','nr_iter','burnin','thin','T_max'),envir = environment())
         MCMC_output_list <- parLapply(cl,1:num_chains,run_MCMC_wrapper)
@@ -195,16 +190,49 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
     }
     m <- 2*num_chains
     n <- round(0.5*(nr_iter-burnin))
-    variogram <- sapply(1:T_max,function(i) rowMeans(output_list$variogram_chain[,T_max*seq(0,m-1)+i])/(n-i))
+    variogram_chain <- output_list$variogram_chain
+    variogram <- matrix(0, nrow = nrow(variogram_chain), ncol = T_max)
+    for (i in 1:T_max) {
+        variogram[, i] <- rowMeans(variogram_chain[, T_max * seq(0, m - 1) + i, drop = FALSE]) / (n - i)
+    }
     between_chain_var <- n*apply(output_list$param_mean,1,var)
     within_chain_var <- rowMeans(output_list$param_var)
     chain_var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
     output_list$r_hat <- sqrt(chain_var_hat/within_chain_var)
     output_list$autocorrelation <- 1-variogram/(2*matrix(rep(chain_var_hat,T_max),nrow=nrow(variogram)))
     output_list$effective_num_samples <-round(m*n/(1+2*rowSums(output_list$autocorrelation)))
-    output_list$acceptance_rate <- sum(output_list$acceptance_vec)/ncol(output_list$acceptance_vec)
+    output_list$acceptance_rate <- sum(output_list$acceptance_rate)/dim(output_list$acceptance_rate)[2]
     output_list$param_mean <- output_list$param_var <- output_list$variogram_chain <- NULL
     return(output_list)
+}
+
+get_MCMC_summary <- function(X, h = NULL) {
+    get_MCMC_summary_cpp(X, h)
+}
+
+initiate_output_list <- function(desired_output,nr_iter){
+    output_list <- list()
+    for(elem in names(desired_output)){
+        output_list[[elem]] <- matrix(0,nrow=desired_output[[elem]][['observed']]+desired_output[[elem]][['unobserved']],ncol=nr_iter)
+    }
+    return(output_list)
+}
+
+get_desired_output <- function(model,RC){
+    const_var <- model %in% c('plm0','gplm0')
+    const_b <- model %in% c('plm0','plm')
+    desired_output <- list('y_post'=list('observed'=RC$n,'unobserved'=RC$n_u),
+                           'y_post_pred'=list('observed'=RC$n,'unobserved'=RC$n_u),
+                           'D'=list('observed'=1,'unobserved'=0))
+    if(!const_var){
+        desired_output$sigma_eps <- list('observed'=RC$n,'unobserved'=RC$n_u)
+    }
+    if(!const_b){
+        desired_output$x <- list('observed'=2+RC$n_unique,'unobserved'=RC$n_u)
+    }else{
+        desired_output$x <- list('observed'=2,'unobserved'=0)
+    }
+    return(desired_output)
 }
 
 get_param_names <- function(model,c_param){
@@ -303,43 +331,6 @@ get_transformed_param <- function(v,param_name,mod,...){
     return(out_v)
 }
 
-get_desired_output <- function(model,RC){
-    const_var <- model %in% c('plm0','gplm0')
-    const_b <- model %in% c('plm0','plm')
-    desired_output <- list('y_post'=list('observed'=RC$n,'unobserved'=RC$n_u),
-                           'y_post_pred'=list('observed'=RC$n,'unobserved'=RC$n_u),
-                           'D'=list('observed'=1,'unobserved'=0))
-    if(!const_var){
-        desired_output$sigma_eps <- list('observed'=RC$n,'unobserved'=RC$n_u)
-    }
-    if(!const_b){
-        desired_output$x <- list('observed'=2+RC$n_unique,'unobserved'=RC$n_u)
-    }else{
-        desired_output$x <- list('observed'=2,'unobserved'=0)
-    }
-    return(desired_output)
-}
-
-pri <- function(type,...){
-    args = list(...)
-    if(type == 'c'){
-        p <- args$zeta - exp(args$zeta)*args$lambda_c
-    }else if(type == 'sigma_eps2'){
-        p <- 0.5*args$log_sig_eps2 - exp(0.5*args$log_sig_eps2)*args$lambda_se
-    }else if(type == 'sigma_b'){
-        p <- args$log_sig_b - exp(args$log_sig_b)*args$lambda_sb
-    }else if(type == 'phi_b'){
-        p <- - 0.5*args$log_phi_b - args$lambda_pb*sqrt(0.5)*exp(-0.5*args$log_phi_b)
-    }else if(type == 'eta_1'){
-        p <- 0.5*args$eta_1 - exp(0.5*args$eta_1)*args$lambda_eta_1
-    }else if(type == 'eta_minus1'){
-        p <- -0.5*t(as.matrix(args$z))%*%as.matrix(args$z)
-    }else if(type == 'sigma_eta'){
-        p <- args$log_sig_eta - exp(args$log_sig_eta)*args$lambda_seta
-    }
-    return(p)
-}
-
 h_unobserved <- function(RC,h_min=NA,h_max=NA){
     h_u=NULL
     h=100*c(RC$h) #work in cm
@@ -350,8 +341,8 @@ h_unobserved <- function(RC,h_min=NA,h_max=NA){
     distwithdata=rbind(h,distvect,c(h[2:length(h)],1000))
     distfilter=distwithdata[,distvect>max_h_diff,drop=FALSE]
     #remove dummy distance
-    distfilter=as.matrix(distfilter[,-ncol(distfilter)])
-    if(ncol(distfilter)!=0){
+    distfilter=as.matrix(distfilter[,-dim(distfilter)[2]])
+    if(dim(distfilter)[2]!=0){
         #make sequence from the ranges with length.out equal to corresponding elelement in distvect
         h_u=0.01*unlist(apply(distfilter,2,FUN=function(x){setdiff(seq(x[1],x[3],length.out=2+ceiling(x[2]/max_h_diff)),c(x[1],x[3]))
         }))
@@ -455,21 +446,8 @@ get_residuals_dat <- function(m){
     return(resid_dat)
 }
 
-
-#' @importFrom stats var
-chain_statistics <- function(chains){
-    chains_length <- nrow(chains)
-    split_idx <- round(0.5*chains_length)
-    chains1 <- chains[seq(1,split_idx),]
-    chains2 <- chains[seq(split_idx+1,chains_length),]
-    chains_mean <- c(colMeans(chains1),colMeans(chains2))
-    chains_var <- c(apply(chains1,2,var),apply(chains2,2,var))
-    n <- round(0.5*chains_length)
-    m <- ncol(chains)*2
-    within_chain_var <- mean(chains_var)
-    between_chain_var <- n*var(chains_mean)
-    var_hat <- ((n-1)*within_chain_var + between_chain_var)/n
-    return(list('W'=within_chain_var,'var_hat'=var_hat))
+chain_statistics <- function(chains) {
+    return(chain_statistics_cpp(chains))
 }
 
 R_hat <- function(chains){
@@ -491,8 +469,8 @@ get_rhat_dat <- function(m,param,smoothness=20){
     names(draws_list) <- param
     rhat_dat <- lapply(param,function(x){
         draws  <- draws_list[[x]]
-        real_iter <- seq(4*thin+burnin,((nrow(draws))*thin)+burnin,by=smoothness*thin)
-        by_n <- seq(4,nrow(draws),by=smoothness)
+        real_iter <- seq(4*thin+burnin,((dim(draws)[1])*thin)+burnin,by=smoothness*thin)
+        by_n <- seq(4,dim(draws)[1],by=smoothness)
         data.frame('iterations'=real_iter,'parameters'=rep(x,length(by_n)),'Rhat'=sapply(by_n, function(r) R_hat(draws[1:r,])))
     })
     return(do.call('rbind',rhat_dat))
@@ -513,27 +491,54 @@ log_lik_post_i <- function(m,d){
     yp <- m$rating_curve_mean_posterior
     rc <- m$rating_curve
     idx <- as.numeric(merge(cbind("rowname"=rownames(rc),rc),d,by.x="h",by.y=colnames(d)[2],all.y = T)$rowname)
-    return(sapply( 1:nrow(d), function(n) { dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],], log = T ) } ))
+    return(sapply( 1:dim(d)[1], function(n) { dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],], log = T ) } ))
 }
 
-calc_waic <- function(m,d){
-    llp_i <- log_lik_post_i(m,d)
-    lppd_i <- sapply( 1:nrow(d), function(n) { log_mean_LSE( llp_i[,n] ) } )
-    p_waic_i <- sapply( 1:nrow(d), function(n) { var( llp_i[,n]  ) } )
+calc_waic <- function(m, d) {
+    # Calculate the log likelihood for each posterior sample
+    llp_i <- log_lik_post_i(m, d)
+
+    # Compute the log pointwise predictive density (lppd)
+    lppd_i <- sapply( 1:dim(d)[1], function(n) {
+        log_mean_LSE(llp_i[, n])
+    })
+
+    # Compute the variance of log-likelihood for each observation (p_waic)
+    p_waic_i <- sapply( 1:dim(d)[1], function(n) {
+        var(llp_i[, n])
+    })
+
     waic_i <- -2*(lppd_i - p_waic_i)
-    return(list("waic"=sum(waic_i),"lppd"=sum( lppd_i ),"p_waic"=sum( p_waic_i ),"waic_i"=waic_i))
+
+    return(list("waic" = sum(waic_i),
+                "lppd" = sum(lppd_i),
+                "p_waic" = sum(p_waic_i),
+                "waic_i" = waic_i
+    ))
 }
 
-log_ml_harmonic_mean_est <- function(m,d){
-    llp_i <- log_lik_post_i(m,d)
-    llp <- matMult(llp_i,matrix(rep(1,nrow(d)),ncol=1))
+log_ml_harmonic_mean_est <- function(m, d) {
+    # Compute the log likelihood for each posterior sample
+    llp_i <- log_lik_post_i(m, d)
+
+    llp <- matMult(llp_i, matrix(rep(1, dim(d)[1]), ncol=1))
+
     return(log(length(llp)) - LSE(-llp))
 }
 
-post_model_prob_m1 <- function(m0,m1,d){
+post_model_prob_m1 <- function(m0, m1, d) {
     log_ml_hme_m1 <- log_ml_harmonic_mean_est(m1,d)
     log_ml_hme_m0 <- log_ml_harmonic_mean_est(m0,d)
-    BF <- exp(log_ml_hme_m1-log_ml_hme_m0)
-    return( 1/(1+(1/BF)) )
+
+    BF <- exp(log_ml_hme_m1 - log_ml_hme_m0)
+
+    return(1 / (1 + (1 / BF)))
+}
+
+SE_Delta_WAIC <- function(m0, m1){
+    waic0 <- calc_waic(m0, m0$data)$waic_i
+    waic1 <- calc_waic(m1, m1$data)$waic_i
+
+    return(sqrt(length(waic1) * var(waic0 - waic1)))
 }
 
