@@ -123,7 +123,7 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison.
 #' @export
 print.tournament <- function(x,...){
-    cat(paste0('Tournament with winner ',class(x$winner)))
+    cat(paste0('Tournament winner: ',class(x$winner)))
 }
 
 #' Summary method for a discharge rating curve tournament
