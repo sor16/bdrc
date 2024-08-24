@@ -152,17 +152,18 @@ run_MCMC <- function(theta_m,RC,density_fun,unobserved_prediction_fun,nr_iter=20
 }
 
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
-get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
-    #pb <- utils::txtProgressBar(min=0, max=nr_iter*(1 + (1-parallel)*(num_chains-1)),style=3)
+get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fun,parallel,num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5,verbose){
     if(num_chains>4){
         stop('Max number of chains is 4. Please pick a lower number of chains')
     }
     T_max <- 50
+
     run_MCMC_wrapper <- function(i){
         run_MCMC(theta_m=theta_m,RC=RC,density_fun=density_fun,
                  unobserved_prediction_fun=unobserved_prediction_fun,
                  nr_iter=nr_iter,burnin=burnin,thin=thin,T_max=T_max)
     }
+
     if(parallel){
         num_cores_on_device <- detectCores()
         num_cores_default <- min(num_cores_on_device,num_chains)
@@ -174,6 +175,13 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
         }else{
             num_cores <- num_cores_default
         }
+        if(verbose){
+            if(num_cores==1){
+                cat("Sequential sampling (4 chains in 1 job) ...\n")
+            }else{
+                cat(sprintf("Multiprocess sampling (4 chains in %d jobs) ...\n",num_cores ))
+            }
+        }
         cl <- makeCluster(num_cores,setup_strategy='sequential')
         clusterSetRNGStream(cl=cl) #set RNG to type L'Ecuyer
         clusterExport(cl,c('run_MCMC','initiate_output_list','pri','variogram_chain',
@@ -182,6 +190,7 @@ get_MCMC_output_list <- function(theta_m,RC,density_fun,unobserved_prediction_fu
         MCMC_output_list <- parLapply(cl,1:num_chains,run_MCMC_wrapper)
         stopCluster(cl)
     }else{
+        if(verbose) cat("Sequential sampling (4 chains in 1 job) ...\n")
         MCMC_output_list <- lapply(1:num_chains,run_MCMC_wrapper)
     }
     output_list <- list()
@@ -223,7 +232,7 @@ get_desired_output <- function(model,RC){
     const_b <- model %in% c('plm0','plm')
     desired_output <- list('y_post'=list('observed'=RC$n,'unobserved'=RC$n_u),
                            'y_post_pred'=list('observed'=RC$n,'unobserved'=RC$n_u),
-                           'D'=list('observed'=1,'unobserved'=0))
+                           'log_lik'=list('observed'=1,'unobserved'=0))
     if(!const_var){
         desired_output$sigma_eps <- list('observed'=RC$n,'unobserved'=RC$n_u)
     }
@@ -476,29 +485,38 @@ get_rhat_dat <- function(m,param,smoothness=20){
     return(do.call('rbind',rhat_dat))
 }
 
+# log-sum-exp
 LSE <- function(lx){
     lx_max <- which.max(lx)
     return(log1p(sum(exp(lx[-lx_max]-lx[lx_max])))+lx[lx_max])
 }
 
+# computes log-mean with log-sum-exp trick (LSE)
 log_mean_LSE <- function(lx){
     return(-log(length(lx))+LSE(lx))
 }
 
 #' @importFrom stats dnorm var
-log_lik_post_i <- function(m,d){
+log_lik_i <- function(m, d){
+    # get the mean and sd posterior samples
     sigma_eps <- m$sigma_eps_posterior
     yp <- m$rating_curve_mean_posterior
+
+    # code to find the rows (stage values) in rating curve mean (yp) and SD (sigma_eps) corresponding to the observations (d)
     rc <- m$rating_curve
-    idx <- as.numeric(merge(cbind("rowname"=rownames(rc),rc),d,by.x="h",by.y=colnames(d)[2],all.y = T)$rowname)
-    return(sapply( 1:dim(d)[1], function(n) { dnorm( log(d[n,1]), log(yp[idx[n],]), if(grepl("0",class(m))) sigma_eps else sigma_eps[idx[n],], log = T ) } ))
+    idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = colnames(d)[2], all.y = T)$rowname)
+
+    # compute pointwise log-likelihood
+    return(sapply(1:dim(d)[1], function(n){
+        dnorm( log(d[n, 1]), log(yp[idx[n], ]), if(grepl("0", class(m))) sigma_eps else sigma_eps[idx[n], ], log = T )
+    }))
 }
 
 calc_waic <- function(m, d) {
-    # Calculate the log likelihood for each posterior sample
-    llp_i <- log_lik_post_i(m, d)
+    # Calculate pointwise log likelihood
+    llp_i <- log_lik_i(m, d)
 
-    # Compute the log pointwise predictive density (lppd)
+    # Compute log pointwise predictive density (lppd)
     lppd_i <- sapply( 1:dim(d)[1], function(n) {
         log_mean_LSE(llp_i[, n])
     })
@@ -519,7 +537,7 @@ calc_waic <- function(m, d) {
 
 log_ml_harmonic_mean_est <- function(m, d) {
     # Compute the log likelihood for each posterior sample
-    llp_i <- log_lik_post_i(m, d)
+    llp_i <- log_lik_i(m, d)
 
     llp <- matMult(llp_i, matrix(rep(1, dim(d)[1]), ncol=1))
 
@@ -541,4 +559,46 @@ SE_Delta_WAIC <- function(m0, m1){
 
     return(sqrt(length(waic1) * var(waic0 - waic1)))
 }
+
+
+convergence_diagnostics_warnings <- function(param_summary){
+
+    rhat_values <- param_summary$r_hat
+    n_eff <- param_summary$eff_n_samples
+    param_vec <- rownames(param_summary)
+
+    print_suggestion <- FALSE
+    # Gelman-Rubin statistic (Rhat)
+    if (any(rhat_values > 1.1)) {
+        print_suggestion <- TRUE
+        cat("\u26A0 Warning: Some chains are not mixing well. Parameters with Rhat > 1.1:\n")
+
+        # Print the parameters with problematic Rhat values
+        non_converged <- param_vec[rhat_values > 1.1]
+        for (param in non_converged) {
+            cat(sprintf("  - %s: Rhat = %.3f\n", param, param_summary[param,"r_hat"] ))
+        }
+    } else {
+        cat("\u2714 All chains have mixed well (Rhat < 1.1).\n")
+    }
+    # Effective number of samples
+    if ( any(n_eff < 400)) {
+        print_suggestion <- TRUE
+        cat("\u26A0 Warning: Some parameters have a low effective number of samples (eff_n_samples < 400), which may indicate highly autocorrelated MCMC samples:\n")
+
+        # Print the parameters with low effective sample size
+        low_n_eff <- param_vec[n_eff < 400]
+        for (param in low_n_eff) {
+            cat(sprintf("  - %s: eff_n_samples = %.1f\n", param, n_eff[param]))
+        }
+    } else {
+        cat("\u2714 Effective sample sizes sufficient (eff_n_samples > 400).\n")
+    }
+    if(print_suggestion) cat("\u2139 Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.\n")
+
+}
+
+
+
+
 

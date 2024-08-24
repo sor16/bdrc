@@ -1,13 +1,15 @@
 #' Generalized power-law model with a constant variance
 #'
 #' gplm0 is used to fit a discharge rating curve for paired measurements of stage and discharge using a generalized power-law model with a constant variance as described in Hrafnkelsson et al. (2022). See "Details" for a more elaborate description of the model.
-#' @param formula an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).
-#' @param data data.frame containing the variables specified in formula.
-#' @param c_param stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
-#' @param h_max maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
-#' @param parallel logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
-#' @param num_cores integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.
-#' @param forcepoint logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#'
+#' @param formula An object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).
+#' @param data A data.frame containing the variables specified in formula.
+#' @param c_param The largest stage value for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.
+#' @param h_max The maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.
+#' @param parallel A logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.
+#' @param num_cores An integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.
+#' @param forcepoint A logical vector of the same length as the number of rows in data. If an element at index \eqn{i} is TRUE it indicates that the rating curve should be forced through the \eqn{i}-th measurement. Use with care, as this will strongly influence the resulting rating curve.
+#' @param verbose A logical value indicating whether to print progress and diagnostic information. If `TRUE`, the function will print messages as it runs. If `FALSE`, the function will run silently. Default is `TRUE`.
 #'
 #' @details The generalized power-law model is of the form
 #' \deqn{Q=a(h-c)^{f(h)}}
@@ -17,34 +19,37 @@
 #' where \eqn{\varepsilon} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon^2}, independent of stage. The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 #' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 
-#' @return gplm0 returns an object of class "gplm0". An object of class "gplm0" is a list containing the following components: \cr
-#' \item{\code{rating_curve}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior predictive distribution of the rating curve.}
-#' \item{\code{rating_curve_mean}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the mean of the rating curve.}
-#' \item{\code{param_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
-#' \item{\code{beta_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of \eqn{\beta}.}
-#' \item{\code{Deviance_summary}}{a data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the deviance.}
-#' \item{\code{rating_curve_posterior}}{a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).}
-#' \item{\code{rating_curve_mean_posterior}}{a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
-#' \item{\code{a_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
-#' \item{\code{b_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
-#' \item{\code{c_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
-#' \item{\code{sigma_eps_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\varepsilon}}.}
-#' \item{\code{sigma_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\beta}}.}
-#' \item{\code{phi_beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_{\beta}}.}
-#' \item{\code{sigma_eta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\eta}}.}
-#' \item{\code{beta_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta}.}
-#' \item{\code{Deviance_posterior}}{a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.}
-#' \item{\code{D_hat}}{deviance at the median value of the parameters.}
-#' \item{\code{effective_num_param_DIC}}{effective number of parameters, which is calculated as median(Deviance_posterior) minus D_hat.}
-#' \item{\code{DIC}}{Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.}
-#' \item{\code{lppd}}{log pointwise predictive probability of the observed data under the model}
-#' \item{\code{effective_num_param_WAIC}}{effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.}
-#' \item{\code{WAIC}}{Watanabe-Akaike information criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).}
-#' \item{\code{autocorrelation}}{a data frame with the autocorrelation of each parameter for different lags.}
-#' \item{\code{acceptance_rate}}{proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
-#' \item{\code{formula}}{object of type "formula" provided by the user.}
-#' \item{\code{data}}{data provided by the user, ordered by stage.}
-#' \item{\code{run_info}}{information about the input arguments and the specific parameters used in the MCMC chain.}
+#' @return gplm0 returns an object of class "gplm0". An object of class "gplm0" is a list containing the following components:
+#' \describe{
+#'   \item{\code{rating_curve}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior predictive distribution of the rating curve.}
+#'   \item{\code{rating_curve_mean}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the mean of the rating curve.}
+#'   \item{\code{param_summary}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
+#'   \item{\code{beta_summary}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of \eqn{\beta}.}
+#'   \item{\code{posterior_log_likelihood_summary}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior log-likelihood values.}
+#'   \item{\code{rating_curve_posterior}}{A matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).}
+#'   \item{\code{rating_curve_mean_posterior}}{A matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
+#'   \item{\code{a_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
+#'   \item{\code{b_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
+#'   \item{\code{c_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
+#'   \item{\code{sigma_eps_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\varepsilon}}.}
+#'   \item{\code{sigma_beta_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\beta}}.}
+#'   \item{\code{phi_beta_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\phi_{\beta}}.}
+#'   \item{\code{sigma_eta_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\eta}}.}
+#'   \item{\code{beta_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\beta}.}
+#'   \item{\code{posterior_log_likelihood}}{A numeric vector containing the full thinned posterior log-likelihood values, excluding burn-in samples.}
+#'   \item{\code{D_hat}}{A statistic defined as -2 times the log-likelihood evaluated at the median value of the parameters.}
+#'   \item{\code{effective_num_param_DIC}}{The effective number of parameters, which is calculated as median(-2*posterior_log_likelihood) minus D_hat.}
+#'   \item{\code{DIC}}{The Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.}
+#'   \item{\code{lppd}}{The log pointwise predictive density of the observed data under the model.}
+#'   \item{\code{WAIC}}{The Widely Applicable Information Criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).}
+#'   \item{\code{WAIC_i}}{The pointwise WAIC values, where WAIC := sum(WAIC_i).}
+#'   \item{\code{effective_num_param_WAIC}}{The effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.}
+#'   \item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
+#'   \item{\code{acceptance_rate}}{The proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
+#'   \item{\code{formula}}{An object of type "formula" provided by the user.}
+#'   \item{\code{data}}{The data provided by the user, ordered by stage.}
+#'   \item{\code{run_info}}{The information about the input arguments and the specific parameters used in the MCMC chain.}
+#' }
 #' @references Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). Bayesian Data Analysis, Third Edition. Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis. doi: https://doi.org/10.1201/b16018
 #' @references Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
 #' @references Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639. doi: https://doi.org/10.1111/1467-9868.00353
@@ -58,7 +63,7 @@
 #' summary(gplm0.fit)
 #' }
 #' @export
-gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data))){
+gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=NULL,forcepoint=rep(FALSE,nrow(data)),verbose=TRUE){
     #argument checking
     stopifnot(inherits(formula,'formula'))
     stopifnot(inherits(data,'data.frame'))
@@ -76,7 +81,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     h <- model_dat[,2,drop=TRUE]
     if(!is.null(c_param) && min(h)<c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q<=0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
-    MCMC_output_list <- gplm0.inference(y=log(Q),h=h,c_param=c_param,h_max=h_max,parallel=parallel,forcepoint=forcepoint,num_cores=num_cores)
+    MCMC_output_list <- gplm0.inference(y=log(Q),h=h,c_param=c_param,h_max=h_max,parallel=parallel,forcepoint=forcepoint,num_cores=num_cores,verbose=verbose)
     param_names <- get_param_names('gplm0',c_param)
     #prepare S3 model object to be returned
     result_obj=list()
@@ -103,7 +108,7 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx,][h_unique_order,])
     result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x),][h_unique_order,]
     result_obj$f_posterior <- matrix(rep(result_obj$b_posterior,nrow(result_obj$beta_posterior)),nrow=nrow(result_obj$beta_posterior),byrow=TRUE) + result_obj$beta_posterior
-    result_obj$Deviance_posterior <- c(MCMC_output_list$D)
+    result_obj$posterior_log_likelihood <- c(MCMC_output_list$log_lik)
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior,h=h_unique_sorted)
     result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior,h=h_unique_sorted)
@@ -113,10 +118,10 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
     result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
     row.names(result_obj$param_summary) <- param_names
-    result_obj$Deviance_summary <- get_MCMC_summary(MCMC_output_list$D)
+    result_obj$posterior_log_likelihood_summary <- get_MCMC_summary(MCMC_output_list$log_lik)
     #Deviance calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
-    result_obj$effective_num_param_DIC <- result_obj$Deviance_summary[,'median']-result_obj$D_hat
+    result_obj$effective_num_param_DIC <- -2*result_obj$posterior_log_likelihood_summary[,'median']-result_obj$D_hat
     result_obj$DIC <- result_obj$D_hat + 2*result_obj$effective_num_param_DIC
     #WAIC calculations
     waic_list <- calc_waic(result_obj,model_dat)
@@ -134,10 +139,16 @@ gplm0 <- function(formula,data,c_param=NULL,h_max=NULL,parallel=TRUE,num_cores=N
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
+    if(verbose){
+        cat("\nMCMC sampling completed!\n")
+        cat(sprintf("\nDiagnostics:\nAcceptance rate: %.2f%%.\n", result_obj$acceptance_rate * 100))
+        convergence_diagnostics_warnings(result_obj$param_summary)
+    }
     return(result_obj)
 }
 #' @importFrom stats dist optim
-gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5){
+gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint=rep(FALSE,length(h)),num_cores=NULL,num_chains=4,nr_iter=20000,burnin=2000,thin=5,verbose){
+    if(verbose) cat("Progress:\nInitializing Metropolis MCMC algorithm...\n")
     c_upper <- NULL
     if(is.null(c_param)){
         RC_plm0 <- get_model_components('plm0',y,h,c_param,h_max,forcepoint,h_min=NULL)
@@ -152,7 +163,7 @@ gplm0.inference <- function(y,h,c_param=NULL,h_max=NULL,parallel=TRUE,forcepoint
     output_list <- get_MCMC_output_list(theta_m=RC$theta_m,RC=RC,density_fun=RC$density_fun,
                                         unobserved_prediction_fun=RC$unobserved_prediction_fun,
                                         parallel=parallel,num_cores=num_cores,num_chains=num_chains,nr_iter=nr_iter,
-                                        burnin=burnin,thin=thin)
+                                        burnin=burnin,thin=thin,verbose=verbose)
     output_list$D_hat <- gplm0.calc_Dhat(output_list$theta,RC)
     #refinement of list elements
     if(is.null(RC$c)){
@@ -262,7 +273,7 @@ gplm0.calc_Dhat <- function(theta,RC){
 
     yp=(matMult(X,x))[1:RC$n,]
 
-    D=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+    Dhat=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
 
-    return(D)
+    return(Dhat)
 }

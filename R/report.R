@@ -33,9 +33,9 @@ get_report_components <- function(x,type=1){
         output_list$main_page_plots <- plot_grob(m_obj[[1]],type='panel')
         output_list$main_page_table <- lapply(m_obj,function(m){
                                             param <- get_param_names(class(m),m$run_info$c_param)
-                                            table <- rbind(m$param_summary[,c('lower','median','upper')],c(m$Deviance_summary))
+                                            table <- rbind(m$param_summary[,c('lower','median','upper')],c(m$posterior_log_likelihood_summary))
                                             names(table) <- paste0(names(table),c('-2.5%','-50%','-97.5%'))
-                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Deviance")
+                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Posterior log-likelihood")
                                             table <- format(round(table,digits=3),nsmall=3)
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
@@ -54,10 +54,10 @@ get_report_components <- function(x,type=1){
         output_list$main_page_plots <- plot_tournament_grob(t_obj)
         output_list$main_page_table <- lapply(m_obj,function(m){
                                             param <- get_param_names(class(m),m$run_info$c_param)
-                                            table <- rbind(m$param_summary,data.frame(m$Deviance_summary,r_hat=NA,eff_n_samples=NA))
+                                            table <- rbind(m$param_summary,data.frame(m$posterior_log_likelihood_summary,r_hat=NA,eff_n_samples=NA))
                                             table[,c('lower','median','upper','r_hat')] <- format(round(table[,c('lower','median','upper','r_hat')],digits=3),nsmall=3)
-                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Deviance")
-                                            table['Deviance',c('eff_n_samples','r_hat')] <- ''
+                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Posterior log-likelihood")
+                                            table['Posterior log-likelihood',c('eff_n_samples','r_hat')] <- ''
                                             names(table) <- c(paste0(names(table[,c('lower','median','upper')]),c('-2.5%','-50%','-97.5%')),'eff_n_samples','r_hat')
                                             tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
                                         })
@@ -82,7 +82,7 @@ get_report_components <- function(x,type=1){
         col_idx2 <- !(names(tour_table) %in% c('round','game','model','winner'))
         tour_table[,col_idx2] <- round(tour_table[,col_idx2],digits=2)
         output_list$tour_table <- tableGrob(tour_table[,col_idx1],theme=ttheme_minimal(),rows=NULL)
-        output_list$dev_boxplot <- autoplot(t_obj,type='deviance')
+        output_list$dev_boxplot <- autoplot(t_obj,type='boxplot')
         output_list$tournament_results <- plot_tournament_grob(t_obj,type='tournament_results')
         output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
             plot_grob(x,type='convergence_diagnostics')
@@ -164,15 +164,15 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' Report pages for a discharge rating curve or tournament
 #'
 #' Get a list of the pages of a report on a discharge rating curve model or tournament
-#' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
-#' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
-#'                    \itemize{
-#'                       \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
-#'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
-#'                    }
-#' @param ... further arguments passed to other methods (currently unused).
+#' @param x An object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
+#' @param type An integer denoting what type of report is to be produced. Defaults to type 1. Possible types are:
+#'   \describe{
+#'     \item{\code{1}}{Produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
+#'     \item{\code{2}}{Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+#'   }
+#' @param ... Further arguments passed to other methods (currently unused).
 #' @return A list of objects of type "grob" that correspond to the pages in a rating curve report.
-#' @seealso \code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
+#' @seealso \code{\link{tournament}} for running a tournament, \code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 #' @examples
 #' \donttest{
 #' data(krokfors)
@@ -216,16 +216,16 @@ get_report_pages.tournament <- function(x,type=1,...){
 #' Report for a discharge rating curve or tournament
 #'
 #' Save a pdf file with a report of a discharge rating curve object or tournament.
-#' @param x an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
-#' @param path file path to which the pdf file of the report is saved. If NULL, the current working directory is used.
-#' @param type an integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are
-#'                    \itemize{
-#'                       \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
-#'                       \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
-#'                    }
-#' @param ... further arguments passed to other methods (currently unused).
-#' @details  This function can only be used in an interactive R session as it asks permission from the user to write to their file system.
-#' @return No return value, called for side effects
+#' @param x An object of class "tournament", "plm0", "plm", "gplm0" or "gplm".
+#' @param path A file path to which the pdf file of the report is saved. If NULL, the current working directory is used.
+#' @param type An integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are:
+#'   \describe{
+#'     \item{\code{1}}{Produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
+#'     \item{\code{2}}{Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+#'   }
+#' @param ... Further arguments passed to other methods (currently unused).
+#' @details This function can only be used in an interactive R session as it asks permission from the user to write to their file system.
+#' @return No return value, called for side effects.
 #' @seealso \code{\link{get_report}} for generating and saving a report.
 #' @examples
 #' \donttest{

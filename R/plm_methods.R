@@ -58,28 +58,30 @@ histogram_breaks <-function(x){
         return(default_breaks)
     }
 }
+
+
 #' Plot bdrc model objects
 #'
-#' Visualize results from model objects in bdrc, plm0, plm, gplm0,gplm
-#' @param x an object of class "plm0","plm","gplm0" or "gplm".
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                       \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot. Defaults to NULL, i.e. no title.
-#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
-#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
-#' @return returns an object of class ggplot2.
+#' Visualize results from model objects in bdrc, plm0, plm, gplm0, gplm
+#' @param x An object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param type A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
+#'   \describe{
+#'     \item{\code{rating_curve}}{Plots the rating curve.}
+#'     \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+#'     \item{\code{f}}{Plots the power-law exponent.}
+#'     \item{\code{beta}}{Plots the random effect in the power-law exponent.}
+#'     \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+#'     \item{\code{residuals}}{Plots the log residuals.}
+#'     \item{\code{trace}}{Plots trace plots of parameters given in param.}
+#'     \item{\code{histogram}}{Plots histograms of parameters given in param.}
+#'     \item{\code{panel}}{Plots a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps".}
+#'   }
+#' @param param A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title A character denoting the title of the plot. Defaults to NULL, i.e. no title.
+#' @param xlim A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
+#' @param ylim A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
+#' @return Returns an object of class ggplot2.
 #' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin element_text theme
 #' @importFrom rlang .data
 #' @importFrom stats median
@@ -426,26 +428,26 @@ summary.plm0 <- function(object,...){
 #' Autoplot method for discharge rating curves
 #'
 #' Visualize discharge rating curve model objects
-#' @param object an object of class "plm0","plm","gplm0" or "gplm".
-#' @param ... other plotting parameters (not used in this function)
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot
-#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
-#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#' @param object An object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... Other plotting parameters (not used in this function).
+#' @param type A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
+#'   \describe{
+#'     \item{\code{rating_curve}}{Plots the rating curve.}
+#'     \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+#'     \item{\code{f}}{Plots the power-law exponent.}
+#'     \item{\code{beta}}{Plots the random effect in the power-law exponent.}
+#'     \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+#'     \item{\code{residuals}}{Plots the log residuals.}
+#'     \item{\code{trace}}{Plots trace plots of parameters given in param.}
+#'     \item{\code{histogram}}{Plots histograms of parameters given in param.}
+#'   }
+#' @param param A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title A character denoting the title of the plot.
+#' @param xlim A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
+#' @param ylim A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
 #'
-#' @return returns an object of class "ggplot2".
+#' @return Returns an object of class "ggplot2".
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
 #' @examples
 #' \donttest{
@@ -473,25 +475,25 @@ autoplot.plm0 <- function(object,...,type='rating_curve',param=NULL,transformed=
 #' Plot method for discharge rating curves
 #'
 #' Visualize discharge rating curve model objects
-#' @param x object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param ... other plotting parameters (not used in this function)
-#' @param type a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-#'                    \itemize{
-#'                       \item{"rating_curve"}{ to plot the rating curve.}
-#'                       \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'                       \item{"f"}{ to plot the power-law exponent.}
-#'                       \item{"beta"}{ to plot the random effect in the power-law exponent.}
-#'                       \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'                       \item{"residuals"}{ to plot the log residuals.}
-#'                       \item{"trace"}{ to plot trace plots of parameters given in param.}
-#'                       \item{"histogram"}{ to plot histograms of parameters given in param.}
-#'                       \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
-#'                    }
-#' @param param a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
-#' @param title a character denoting the title of the plot
-#' @param xlim numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
-#' @param ylim numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".
+#' @param x An object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param ... Other plotting parameters (not used in this function).
+#' @param type A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
+#'   \describe{
+#'     \item{\code{rating_curve}}{Plots the rating curve.}
+#'     \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+#'     \item{\code{f}}{Plots the power-law exponent.}
+#'     \item{\code{beta}}{Plots the random effect in the power-law exponent.}
+#'     \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+#'     \item{\code{residuals}}{Plots the log residuals.}
+#'     \item{\code{trace}}{Plots trace plots of parameters given in param.}
+#'     \item{\code{histogram}}{Plots histograms of parameters given in param.}
+#'     \item{\code{panel}}{Plots a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps".}
+#'   }
+#' @param param A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
+#' @param transformed A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param title A character denoting the title of the plot.
+#' @param xlim A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
+#' @param ylim A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
 #'
 #' @return No return value, called for side effects.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{spread_draws}} and \code{\link{gather_draws}} to work directly with the MCMC samples.
@@ -529,11 +531,18 @@ plot.plm0 <- function(x,...,type='rating_curve',param=NULL,transformed=FALSE,tit
 #' Predict method for discharge rating curves
 #'
 #' Predict the discharge for given stage values based on a discharge rating curve model object.
-#' @param object an object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param newdata a numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
-#' @param wide a logical value denoting whether to produce a wide prediction output.If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.
-#' @param ... not used in this function
-#' @return an object of class "data.frame" with four columns, h (stage), lower (2.5\% posterior predictive quantile), median (50\% posterior predictive quantile), upper (97.5\% posterior predictive quantile). If wide=TRUE, a matrix as described above (see wide parameter) is returned.
+#' @param object An object of class "plm0", "plm", "gplm0" or "gplm".
+#' @param newdata A numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.
+#' @param wide A logical value denoting whether to produce a wide prediction output. If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.
+#' @param ... Not used in this function.
+#' @return An object of class "data.frame" with four columns:
+#'   \describe{
+#'     \item{\code{h}}{The stage.}
+#'     \item{\code{lower}}{The 2.5\% posterior predictive quantile.}
+#'     \item{\code{median}}{The 50\% posterior predictive quantile.}
+#'     \item{\code{upper}}{The 97.5\% posterior predictive quantile.}
+#'   }
+#'   If wide=TRUE, a matrix as described above (see wide parameter) is returned.
 #' @seealso \code{\link{plm0}}, \code{\link{plm}}, \code{\link{gplm0}} and \code{\link{gplm}} for fitting a discharge rating curve and \code{\link{summary.plm0}}, \code{\link{summary.plm}}, \code{\link{summary.gplm0}} and \code{\link{summary.gplm}} for summaries. It is also useful to look at \code{\link{plot.plm0}}, \code{\link{plot.plm}}, \code{\link{plot.gplm0}} and \code{\link{plot.gplm}} to help visualize all aspects of the fitted discharge rating curve. Additionally, \code{\link{spread_draws}} and \code{\link{spread_draws}} help working directly with the MCMC samples.
 #' @examples
 #' \donttest{

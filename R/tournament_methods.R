@@ -1,22 +1,23 @@
-#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
-plot_tournament_fun <- function(x,type='deviance'){
-    if(type=='deviance'){
-        deviance_post_dat <- lapply(x$contestants,function(m){
-            data.frame(model=class(m),D=c(m$Deviance_posterior))
+#' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point labs
+plot_tournament_fun <- function(x,type='boxplot'){
+    if(type=='boxplot'){
+        # DmC: Deviance minus the constant C
+        DmC_post_dat <- lapply(x$contestants,function(m){
+            data.frame(model=class(m),DmC=c(-2*m$posterior_log_likelihood))
         })
-        deviance_post_dat <- do.call(rbind,deviance_post_dat)
+        DmC_post_dat <- do.call(rbind,DmC_post_dat)
         WAIC_dat <- lapply(x$contestants,function(m){
             data.frame(model=class(m),WAIC=c(m$WAIC))
         })
         WAIC_dat <- do.call(rbind,WAIC_dat)
-        p <- ggplot(data=deviance_post_dat,aes(x=.data$model,y=.data$D)) +
+        p <- ggplot(data=DmC_post_dat,aes(x=.data$model,y=.data$DmC)) +
             geom_boxplot(size=0.4,width=0.4,color="black",outlier.size=0.2,outlier.shape=21,outlier.fill="gray90",fill="gray90") +
             stat_boxplot(geom='errorbar',width=0.2) +
             geom_line(data=WAIC_dat,aes(x=.data$model,y=.data$WAIC,group=1),color='gray30') +
             geom_point(data=WAIC_dat,aes(x=.data$model,y=.data$WAIC),size=3,shape=23,fill='red2',color='black') +
             theme_bdrc() +
-            xlab('') +
-            ylab('Deviance & WAIC')
+            labs(y='',x='') +
+            ggtitle('-2( Posterior log-likelihood ) & WAIC')
     }
     return(p)
 }
@@ -92,8 +93,9 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
                                       x$summary$model[5:6],
                                       paste0('Tournament winner  =>  ',class(x$winner),
                                              paste0(rep(' ',20),collapse=' '))))
-        method <- if(grepl("WAIC",x$info$method)) "WAIC" else if(grepl("DIC",x$info$method)) "DIC" else "Post_prob"
-        result_dat <- data.frame(mc_stat=paste0(ifelse(method=='Post_prob',paste0("P="),paste0(method,"=\n")),round(x$summary[[method]],digits=if(method=="Post_prob") 2 else 1 )),
+        method <- if(grepl("WAIC",x$info$method)) "WAIC" else if(grepl("DIC",x$info$method)) "DIC" else "PMP"
+        n_digits <- if(method=="PMP") 2 else 1
+        result_dat <- data.frame(mc_stat=paste0(ifelse(method=='PMP',paste0("P="),paste0(method,"=\n")),format(round(x$summary[[method]],digits=n_digits ),nsmall=n_digits)),
                                  winner=x$summary$winner,
                                  x=c(loc_pts$x[1:4],0.8*(loc_pts$x[5:6]-1.5)+1.5),
                                  y=loc_pts$y[1:6]+0.5)
@@ -118,8 +120,8 @@ plot_tournament_grob <- function(x,type='panel',transformed=FALSE){
 #' Print method for discharge rating curve tournament
 #'
 #' Print the results of a tournament of discharge rating curve model comparisons
-#' @param x an object of class "tournament"
-#' @param ... not used in this function
+#' @param x An object of class "tournament"
+#' @param ... Not used in this function
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament, \code{\link{summary.tournament}} for summaries and \code{\link{plot.tournament}} for visualizing the mode comparison.
 #' @export
 print.tournament <- function(x,...){
@@ -129,7 +131,7 @@ print.tournament <- function(x,...){
 #' Summary method for a discharge rating curve tournament
 #'
 #' Print the summary of a tournament of model comparisons
-#' @param object an object of class "tournament"
+#' @param object An object of class "tournament"
 #' @param ... not used in this function
 #' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
 #' @examples
@@ -148,13 +150,13 @@ summary.tournament <- function(object,...){
 #'
 #' Compare the four discharge rating curves from the tournament object in different ways
 #'
-#' @param object an object of class "tournament"
-#' @param ... other plotting parameters (not used in this function)
-#' @param type a character denoting what type of plot should be drawn. Possible types are
-#' \itemize{
-#'  \item{"deviance"}{ to plot the deviance of the four models.}
+#' @param object An object of class "tournament"
+#' @param ... Other plotting parameters (not used in this function)
+#' @param type A character denoting what type of plot should be drawn. Possible types are
+#' \describe{
+#'   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values transformed to the deviance scale.}
 #' }
-#' @return returns an object of class "ggplot2".
+#' @return Returns an object of class "ggplot2".
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
 #' \donttest{
@@ -167,11 +169,11 @@ summary.tournament <- function(object,...){
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
-autoplot.tournament <- function(object,...,type='deviance'){
-    legal_types <- c('deviance')
+autoplot.tournament <- function(object,...,type='boxplot'){
+    legal_types <- c('boxplot')
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n - ',paste(legal_types,collapse='\n - ')))
-    }else if(type=="deviance"){
+    }else if(type=="boxplot"){
         p <- plot_tournament_fun(object,type=type)
     }
     return(p)
@@ -182,19 +184,19 @@ autoplot.tournament <- function(object,...,type='deviance'){
 #'
 #' Compare the four models from the tournament object in multiple ways
 #'
-#' @param x an object of class "tournament"
-#' @param ... other plotting parameters (not used in this function)
-#' @param type a character denoting what type of plot should be drawn. Possible types are
-#' \itemize{
-#'   \item{"deviance"}{ to plot the deviance of the four models.}
-#'   \item{"rating_curve"}{ to plot the rating curve.}
-#'   \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-#'   \item{"f"}{ to plot the power-law exponent.}
-#'   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-#'   \item{"residuals"}{ to plot the log residuals.}
-#'   \item{"tournament_results"}{ to plot tournament results visually, game for game.}
-#'  }
-#' @param transformed a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param x An object of class "tournament"
+#' @param ... Other plotting parameters (not used in this function)
+#' @param type A character denoting what type of plot should be drawn. Possible types are:
+#' \describe{
+#'   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values, on the deviance scale.}
+#'   \item{\code{rating_curve}}{Plots the rating curve.}
+#'   \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+#'   \item{\code{f}}{Plots the power-law exponent.}
+#'   \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+#'   \item{\code{residuals}}{Plots the log residuals.}
+#'   \item{\code{tournament_results}}{Plots tournament results visually, game for game.}
+#' }
+#' @param transformed A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
 #' @return No return value, called for side effects
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
@@ -204,7 +206,7 @@ autoplot.tournament <- function(object,...,type='deviance'){
 #' t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
 #' plot(t_obj)
 #' plot(t_obj,transformed=TRUE)
-#' plot(t_obj,type='deviance')
+#' plot(t_obj,type='boxplot')
 #' plot(t_obj,type='f')
 #' plot(t_obj,type='sigma_eps')
 #' plot(t_obj,type='residuals')
@@ -214,11 +216,11 @@ autoplot.tournament <- function(object,...,type='deviance'){
 #' @importFrom gridExtra grid.arrange
 #' @export
 plot.tournament <- function(x,...,type='tournament_results',transformed=FALSE){
-    legal_types <- c("deviance","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
+    legal_types <- c("boxplot","tournament_results","rating_curve","rating_curve_mean","sigma_eps","f","residuals","convergence_diagnostics","panel","tournament_results")
     error_msg <- paste0('Type not recognized. Possible types are:',paste(legal_types,collapse='\n - '))
     if( is.null(type) ){
         stop(error_msg)
-    }else if(type=='deviance'){
+    }else if(type=='boxplot'){
         p <- autoplot(x,type=type)
     }else if(type%in%legal_types){
         p <- plot_tournament_grob(x,type=type,transformed=transformed,...)
