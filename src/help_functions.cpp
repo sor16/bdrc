@@ -15,8 +15,6 @@ using namespace Rcpp;
 using namespace arma;
 
 
-
-
 // [[Rcpp::export]]
 arma::mat matMult(const arma::mat& A, const arma::mat& B) {
     return A * B;
@@ -151,22 +149,30 @@ arma::mat create_A_cpp(const arma::vec& h) {
 
 // [[Rcpp::export]]
 double pri(const std::string& type, const arma::vec& args) {
+    double result = 0.0;
     if (type == "c") {
-        return args(0) - std::exp(args(0)) * args(1);
+        result = args(0) - std::exp(args(0)) * args(1);
     } else if (type == "sigma_eps2") {
-        return 0.5 * args(0) - std::exp(0.5 * args(0)) * args(1);
+        result = 0.5 * args(0) - std::exp(0.5 * args(0)) * args(1);
     } else if (type == "sigma_b") {
-        return args(0) - std::exp(args(0)) * args(1);
+        result = args(0) - std::exp(args(0)) * args(1);
     } else if (type == "phi_b") {
-        return -0.5 * args(0) - args(1) * std::sqrt(0.5) * std::exp(-0.5 * args(0));
+        result = -0.5 * args(0) - args(1) * std::sqrt(0.5) * std::exp(-0.5 * args(0));
     } else if (type == "eta_1") {
-        return 0.5 * args(0) - std::exp(0.5 * args(0)) * args(1);
+        result = 0.5 * args(0) - std::exp(0.5 * args(0)) * args(1);
     } else if (type == "eta_minus1") {
-        return -0.5 * arma::dot(args, args);
+        result = -0.5 * arma::dot(args, args);
     } else if (type == "sigma_eta") {
-        return args(0) - std::exp(args(0)) * args(1);
+        result = args(0) - std::exp(args(0)) * args(1);
     }
-    return 0.0;
+
+    if (!std::isfinite(result)) {
+        Rcpp::Rcout << "Warning: Non-finite pri value. Type: " << type
+                    << ", Args: " << args.t() << std::endl;
+        return -std::numeric_limits<double>::max();
+    }
+
+    return result;
 }
 
 double log_of_normal_pdf(double x, double mu, double sigma) {
@@ -207,4 +213,6 @@ Rcpp::List chain_statistics_cpp(const arma::mat& chains) {
         Rcpp::Named("var_hat") = var_hat
     );
 }
+
+
 

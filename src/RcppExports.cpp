@@ -11,6 +11,21 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// compute_bf_ti_cpp
+Rcpp::List compute_bf_ti_cpp(const arma::mat& log_lik_m1, const arma::mat& log_lik_m2, int n_temperatures, int n_samples, int n_bootstrap);
+RcppExport SEXP _bdrc_compute_bf_ti_cpp(SEXP log_lik_m1SEXP, SEXP log_lik_m2SEXP, SEXP n_temperaturesSEXP, SEXP n_samplesSEXP, SEXP n_bootstrapSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type log_lik_m1(log_lik_m1SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type log_lik_m2(log_lik_m2SEXP);
+    Rcpp::traits::input_parameter< int >::type n_temperatures(n_temperaturesSEXP);
+    Rcpp::traits::input_parameter< int >::type n_samples(n_samplesSEXP);
+    Rcpp::traits::input_parameter< int >::type n_bootstrap(n_bootstrapSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_bf_ti_cpp(log_lik_m1, log_lik_m2, n_temperatures, n_samples, n_bootstrap));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gplm_density_evaluation_unknown_c_cpp
 Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::mat& dist, const arma::mat& A, const arma::vec& y, const arma::vec& epsilon, double h_min, double nugget, int n_unique, const arma::vec& mu_x, const arma::mat& Sig_ab, const arma::mat& Z, double lambda_c, double lambda_sb, double lambda_pb, double lambda_eta_1, double lambda_seta);
 RcppExport SEXP _bdrc_gplm_density_evaluation_unknown_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP distSEXP, SEXP ASEXP, SEXP ySEXP, SEXP epsilonSEXP, SEXP h_minSEXP, SEXP nuggetSEXP, SEXP n_uniqueSEXP, SEXP mu_xSEXP, SEXP Sig_abSEXP, SEXP ZSEXP, SEXP lambda_cSEXP, SEXP lambda_sbSEXP, SEXP lambda_pbSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
@@ -518,6 +533,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_bdrc_compute_bf_ti_cpp", (DL_FUNC) &_bdrc_compute_bf_ti_cpp, 5},
     {"_bdrc_gplm_density_evaluation_unknown_c_cpp", (DL_FUNC) &_bdrc_gplm_density_evaluation_unknown_c_cpp, 19},
     {"_bdrc_gplm_density_evaluation_known_c_cpp", (DL_FUNC) &_bdrc_gplm_density_evaluation_known_c_cpp, 18},
     {"_bdrc_gplm_predict_u_unknown_c_cpp", (DL_FUNC) &_bdrc_gplm_predict_u_unknown_c_cpp, 11},

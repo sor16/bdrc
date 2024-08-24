@@ -74,17 +74,16 @@ Rcpp::List gplm0_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     arma::mat x = x_u - W.t() * arma::solve(L, sss, arma::solve_opts::fast);
     arma::vec yp = arma::vec(X * x).subvec(0, n-1);
     arma::vec ypo = yp + arma::randn(n) % arma::sqrt(varr);
-    double D = 0.0;
+    double log_lik = 0.0;
     for(size_t i = 0; i < n; ++i) {
-        D += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
+        log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
-    D *= -2.0;
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
         Rcpp::Named("x") = x,
         Rcpp::Named("y_post") = yp,
         Rcpp::Named("y_post_pred") = ypo,
-        Rcpp::Named("D") = D
+        Rcpp::Named("log_lik") = log_lik
     );
 }
 
@@ -143,17 +142,16 @@ Rcpp::List gplm0_density_evaluation_known_c_cpp(const arma::vec& theta,
     arma::mat x = x_u - W.t() * arma::solve(L, sss, arma::solve_opts::fast);
     arma::vec yp = arma::vec(X * x).subvec(0, n-1);
     arma::vec ypo = yp + arma::randn(n) % arma::sqrt(varr);
-    double D = 0.0;
+    double log_lik = 0.0;
     for(size_t i = 0; i < n; ++i) {
-        D += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
+        log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
-    D *= -2.0;
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
         Rcpp::Named("x") = x,
         Rcpp::Named("y_post") = yp,
         Rcpp::Named("y_post_pred") = ypo,
-        Rcpp::Named("D") = D
+        Rcpp::Named("log_lik") = log_lik
     );
 }
 
