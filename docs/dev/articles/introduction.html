@@ -66,7 +66,8 @@
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Introduction</h1>
                         <h4 data-toc-skip class="author">Solvi
-Rognvaldsson, Rafael Vias, Birgir Hrafnkelsson and Axel Orn Jansson</h4>
+Rognvaldsson, Rafael Daniel Vias, Birgir Hrafnkelsson and Axel Orn
+Jansson</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/vignettes/introduction.Rmd" class="external-link"><code>vignettes/introduction.Rmd</code></a></small>
@@ -96,10 +97,10 @@ Hrafnkelsson et al. (2022).</p>
 that varies with water elevation. The generalized power law is
 introduced in Hrafnkelsson et al. (2022).</p>
 <p>For further details about the different models, see Hrafnkelsson et
-al. (2022). The models differ in their complexity, <tt>gplm</tt> being
-the most flexible and complex model. We will focus on the use of
-<tt>gplm</tt> throughout this introduction vignette and explore the
-different ways to fit the <tt>gplm</tt> and visualize its output.
+al. (2022). The models differ in their complexity, <code>gplm</code>
+being the most flexible and complex model. We will focus on the use of
+<code>gplm</code> throughout this introduction vignette and explore the
+different ways to fit the <code>gplm</code> and visualize its output.
 However, the API of the functions for the other three models are
 completely identical so this vignette also helps users to run those
 models.</p>
@@ -141,54 +142,86 @@ Krokfors, that comes with the package:</p>
 <h2 id="fitting-a-discharge-rating-curve">Fitting a discharge rating curve<a class="anchor" aria-label="anchor" href="#fitting-a-discharge-rating-curve"></a>
 </h2>
 <p>It is very simple to fit a discharge rating curve with the
-<em>bdrc</em> package. All you need are two mandatory input arguments,
-<tt>formula</tt> and <tt>data</tt>. The <tt>formula</tt> is of the form
-<tt>y</tt>~<tt>x</tt>, where <tt>y</tt> is the discharge in square
-meters per second
+<code>bdrc</code> package. All you need are two mandatory input
+arguments, <code>formula</code> and <code>data</code>. The
+<code>formula</code> is of the form <code>y~x</code>, where
+<code>y</code> is the discharge in square meters per second
 (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi></mi><mn>3</mn></msup><mi>/</mi></mrow><annotation encoding="application/x-tex">^3/</annotation></semantics></math>s),
-and <tt>x</tt> is the water elevation in meters (m). It is very
-important that the data is in the correct units! The <tt>data</tt>
-argument must be a data.frame including <tt>x</tt> and <tt>y</tt> as
-column names. In our case, the Krokfors data has the discharge and water
-elevation measurements stored in columns named <tt>Q</tt> and
-<tt>W</tt>, respectively. We are ready to fit a discharge rating curve
-using the <tt>gplm</tt> function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,<span class="at">data=</span>krokfors,<span class="at">parallel=</span><span class="cn">TRUE</span>,<span class="at">num_cores=</span><span class="dv">2</span>) <span class="co"># parallel=TRUE by default and by default, the number of cores is detected on the machine</span></span></code></pre></div>
-<p>The <tt>gplm</tt> function returns an object of class “gplm” which we
-can summarize and visualize using familiar functions such as</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Formula: </span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; a 1.50       1.94       2.23       </span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; b 1.83       1.84       1.84       </span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; c           7.71211    7.8102     7.856     </span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.42368    0.7066     1.288     </span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.57452    1.1910     2.874     </span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00329    0.0912     0.534     </span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.93445   -4.2566    -3.557     </span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.94891   -4.0659    -2.280     </span></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.87756   -4.2049    -1.611     </span></span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.71587   -4.4949    -1.223     </span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.24321   -4.6293    -0.680     </span></span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; eta_6      -8.78471   -4.6121    -0.250     </span></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt; WAIC: -27.83511</span></span></code></pre></div>
+and <code>x</code> is the water elevation in meters (m). It is very
+important that the data is in the correct units! The <code>data</code>
+argument must be a <code>data.frame</code> including <code>x</code> and
+<code>y</code> as column names. In our case, the Krokfors data has the
+discharge and water elevation measurements stored in columns named
+<code>Q</code> and <code>W</code>, respectively. We are ready to fit a
+discharge rating curve using the <code>gplm</code> function:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q <span class="sc">~</span> W, <span class="at">data =</span> krokfors, <span class="at">parallel =</span> <span class="cn">TRUE</span>, <span class="at">num_cores =</span> <span class="dv">2</span>) <span class="co"># by default parallel=TRUE and the number of cores is detected on the machine</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; Progress:</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Initializing Metropolis MCMC algorithm...</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; Multiprocess sampling (4 chains in 2 jobs) ...</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; MCMC sampling completed!</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; Diagnostics:</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; Acceptance rate: 25.33%.</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; ✔ All chains have mixed well (Rhat &lt; 1.1).</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span></span></code></pre></div>
+<p>The function prints out a summary of the fitting process and key MCMC
+diagnostics. These include the acceptance rate, chain mixing (assessed
+via the Gelman-Rubin statistic,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>R</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{R}</annotation></semantics></math>),
+and effective sample sizes. The checkmarks (<code>✔</code>) indicate
+that the algorithm has met important criteria for reliability. However,
+sometimes you may encounter warnings (<code>⚠</code>). For example:</p>
+<pre><code><span><span class="co">#&gt; ⚠ Warning: Some chains are not mixing well. Parameters with Rhat &gt; 1.1:</span></span>
+<span><span class="co">#&gt;   - sigma_eta: Rhat = 1.281</span></span></code></pre>
+<p>This warning suggests that certain parameters (in this case,
+sigma_eta) haven’t mixed well across chains, which could affect the
+reliability of the results. In such cases, the function provides
+advice:</p>
+<pre><code><span><span class="co">#&gt; ℹ Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.</span></span></code></pre>
+<p>This output helps you assess whether the discharge rating curve has
+been fitted successfully and reliably using the specified data. The
+function can be made to run silently by setting
+<code>verbose=FALSE</code>.</p>
+<p>Note that <code>parallel=TRUE</code> is the default setting,
+utilizing all available cores on the machine. You can adjust the number
+of cores with the <code>num_cores</code> argument if needed.</p>
+<p>The <code>gplm</code> function returns an object of class
+<em>gplm</em> which we can summarize and visualize using familiar
+functions such as</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(gplm.fit)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; Formula: </span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;  Q ~ W</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Latent parameters:</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt;   lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; a 1.47       1.94       2.23       </span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; b 1.83       1.84       1.84       </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; Hyperparameters:</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;            lower-2.5% median-50% upper-97.5%</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; c           7.70955    7.8089     7.855     </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; sigma_beta  0.42275    0.6942     1.258     </span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; phi_beta    0.54941    1.1775     2.861     </span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; sigma_eta   0.00298    0.0934     0.498     </span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; eta_1      -4.91521   -4.2508    -3.535     </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; eta_2      -5.97953   -4.0555    -2.264     </span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; eta_3      -6.92387   -4.1874    -1.612     </span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; eta_4      -7.66667   -4.4852    -1.160     </span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; eta_5      -8.33270   -4.6096    -0.757     </span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; eta_6      -8.81259   -4.6718    -0.311     </span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; WAIC: -27.81763</span></span></code></pre></div>
 <p>and</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>In the next section, we will dive deeper into visualizing the “gplm”
-object.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
+<p>In the next section, we will dive deeper into visualizing the
+<em>gplm</em> object.</p>
 </div>
 <div class="section level2">
 <h2 id="visualizing-posterior-distributions-of-different-parameters">Visualizing posterior distributions of different parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-different-parameters"></a>
 </h2>
-<p>The <em>bdrc</em> package provides several tools to visualize the
+<p>The <code>bdrc</code> package provides several tools to visualize the
 results from model objects which can give insight into the physical
 properties of the river at hand. For instance, the hyperparameter
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
@@ -196,8 +229,8 @@ corresponds to the water elevation of zero discharge. To visualize the
 posterior of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
 we can write</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'c'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'histogram'</span>, <span class="at">param =</span> <span class="st">'c'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>Technically, instead of inferring
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
 directly,
@@ -210,33 +243,33 @@ is strictly positive, a transformation
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ζ</mi><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>h</mi><mrow><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>−</mo><mi>c</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\zeta=log(h_{min}-c)</annotation></semantics></math>
 is used for the Bayesian inference so that it has support on the real
 line. To plot the transformed posterior we write</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'c'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>The <tt>param</tt> argument can also be a vector containing multiple
-parameter names. For example, to visualize the posterior distributions
-of the parameters
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'histogram'</span>, <span class="at">param =</span> <span class="st">'c'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;"></p>
+<p>The <code>param</code> argument can also be a vector containing
+multiple parameter names. For example, to visualize the posterior
+distributions of the parameters
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
 we can write</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="fu">c</span>(<span class="st">'a'</span>,<span class="st">'c'</span>))</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'histogram'</span>, <span class="at">param =</span> <span class="fu">c</span>(<span class="st">'a'</span>, <span class="st">'c'</span>))</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>There is a shorthand to visualize the hyperparameters all at once</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-9-1.png" width="960" style="display: block; margin: auto;"></p>
-<p>Similarly, writing ‘latent_parameters’ plots the latent parameters in
-one plot. To plot the hyperparameters transformed on the same scale as
-in the Bayesian inference, we write</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'histogram'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-10-1.png" width="960" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'histogram'</span>, <span class="at">param =</span> <span class="st">'hyperparameters'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-11-1.png" width="960" style="display: block; margin: auto;"></p>
+<p>Similarly, writing <code>"latent_parameters"</code> plots the latent
+parameters in one plot. To plot the hyperparameters transformed on the
+same scale as in the Bayesian inference, we write</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'histogram'</span>, <span class="at">param =</span> <span class="st">'hyperparameters'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-12-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>Finally, we can visualize the components of the model that are
 allowed (depending on the model) to vary with water elevation, that is,
 the power-law exponent,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(h)</annotation></semantics></math>,
 and the standard deviation of the error terms at the response level,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>ε</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma_{\varepsilon}(h)</annotation></semantics></math>.
-Both <tt>gplm0</tt> and <tt>gplm</tt> generalize the power-law exponent
-by modeling it as a sum of a constant term,
+Both <code>gplm0</code> and <code>gplm</code> generalize the power-law
+exponent by modeling it as a sum of a constant term,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>,
 and Gaussian process,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta(h)</annotation></semantics></math>,
@@ -245,65 +278,67 @@ namely
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\beta(h)</annotation></semantics></math>
 is assumed to be twice differentiable with mean zero. On the other hand,
-<tt>plm</tt> and <tt>plm0</tt> both model the power-law exponent as a
-constant by setting
+<code>plm</code> and <code>plm0</code> both model the power-law exponent
+as a constant by setting
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\beta(h)=0</annotation></semantics></math>,
 which gives
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">f(h)=b</annotation></semantics></math>.
 We can plot the inferred power-law exponent with</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'f'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>Both <tt>plm</tt> and <tt>gplm</tt> model the standard deviation of
-the error terms at the response level,
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'f'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
+<p>Both <code>plm</code> and <code>gplm</code> model the standard
+deviation of the error terms at the response level,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mi>ε</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma_{\varepsilon}(h)</annotation></semantics></math>,
 as a function of water elevation, using B-splines basis functions, while
-<tt>plm0</tt> and <tt>gplm0</tt> model the standard deviation as a
-constant. We can plot the inferred standard deviation by writing</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'sigma_eps'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
-<p>To get a visual summary of your model, the ‘panel’ option in the plot
-type is useful:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'panel'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
+<code>plm0</code> and <code>gplm0</code> model the standard deviation as
+a constant. We can plot the inferred standard deviation by writing</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'sigma_eps'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;"></p>
+<p>To get a visual summary of your model, the <code>"panel"</code>
+option in the plot type is useful:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'panel'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="assessing-model-fitness-and-convergence">Assessing model fitness and convergence<a class="anchor" aria-label="anchor" href="#assessing-model-fitness-and-convergence"></a>
+<h2 id="assessing-model-fit-and-convergence">Assessing model fit and convergence<a class="anchor" aria-label="anchor" href="#assessing-model-fit-and-convergence"></a>
 </h2>
 <p>The package has several functions for convergence diagnostics of a
-bdrc model, most notably the residual plot, trace plots, autocorrelation
-plots, and Gelman-Rubin diagnostic plots. The log-residuals can be
-plotted with</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'residuals'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-14-1.png" width="768" style="display: block; margin: auto;"></p>
+<code>bdrc</code> model, most notably the residual plot, trace plots,
+autocorrelation plots, and Gelman-Rubin diagnostic plots. The
+log-residuals can be plotted with</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'residuals'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-16-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The log-residuals are calculated by subtracting the posterior
 estimate (median) of the log-discharge,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>Q</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">log(\hat{Q})</annotation></semantics></math>,
 from the observed log-discharge,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>Q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">log(Q)</annotation></semantics></math>.
-Additionally, the plot includes the 95% predictive intervals of log(Q)
-(- -) and 95% credible intervals for the expected value of log(Q) (—),
-the latter reflecting the rating curve uncertainty.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'c'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-15-1.png" width="960" style="display: block; margin: auto;"></p>
+Additionally, the plot includes the 95% predictive intervals of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>Q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(Q)</annotation></semantics></math>
+(- -) and 95% credible intervals for the expected value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>Q</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(Q)</annotation></semantics></math>
+(—), the latter reflecting the rating curve uncertainty.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'trace'</span>, <span class="at">param =</span> <span class="st">'c'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-17-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>To plot a trace plot for all the transformed hyperparameters, we
 write</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'trace'</span>,<span class="at">param=</span><span class="st">'hyperparameters'</span>,<span class="at">transformed=</span><span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-16-1.png" width="960" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'trace'</span>, <span class="at">param =</span> <span class="st">'hyperparameters'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-18-1.png" width="960" style="display: block; margin: auto;"></p>
 <p>To assess the mixing and convergence of the MCMC chains for each
 parameter, you can visualize the Gelman-Rubin statistic,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>R</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{R}</annotation></semantics></math>,
 as presented by Gelman and Rubin (1992) with:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'r_hat'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'r_hat'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-19-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>And finally, autocorrelation of parameters can be assessed with</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit,<span class="at">type=</span><span class="st">'autocorrelation'</span>)</span></code></pre></div>
-<p><img src="introduction_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(gplm.fit, <span class="at">type =</span> <span class="st">'autocorrelation'</span>)</span></code></pre></div>
+<p><img src="introduction_files/figure-html/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
-<h2 id="customization-of-models">Customization of models<a class="anchor" aria-label="anchor" href="#customization-of-models"></a>
+<h2 id="customizing-the-models">Customizing the models<a class="anchor" aria-label="anchor" href="#customizing-the-models"></a>
 </h2>
-<p>There are ways to further customize the <tt>gplm</tt> function. In
-some instances, the parameter of zero discharge,
+<p>There are ways to further customize the <code>gplm</code> function.
+In some instances, the parameter of zero discharge,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
 is known, and you might want to fix the model parameter to the known
 value. In addition, you might want to extrapolate the rating curve to
@@ -312,7 +347,7 @@ Assume 7.65 m is the known value of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
 and you want to calculate the rating curve for water elevation values up
 to 10 m, then your function call would look like this</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q<span class="sc">~</span>W,krokfors,<span class="at">c_param=</span><span class="fl">7.65</span>,<span class="at">h_max=</span><span class="dv">10</span>,<span class="at">parallel=</span><span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit.known_c <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q <span class="sc">~</span> W, krokfors, <span class="at">c_param =</span> <span class="fl">7.65</span>, <span class="at">h_max =</span> <span class="dv">10</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="prediction-for-an-equally-spaced-grid-of-water-elevations">Prediction for an equally spaced grid of water elevations<a class="anchor" aria-label="anchor" href="#prediction-for-an-equally-spaced-grid-of-water-elevations"></a>
@@ -323,111 +358,111 @@ values in the range from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
 and h_max are accepted, as that is the range in which the Bayesian
 inference was performed</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="sc">&gt;</span> h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">8</span>,<span class="dv">9</span>,<span class="at">by=</span><span class="fl">0.01</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="sc">&gt;</span> rating_curve_h_grid <span class="ot">&lt;-</span> <span class="fu">predict</span>(gplm.fit,<span class="at">newdata=</span>h_grid)</span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">print</span>(rating_curve_h_grid)</span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt;        h      lower     median     upper</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; 1   8.00 0.06163328 0.08270752 0.1111879</span></span>
-<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; 2   8.01 0.06739421 0.09041000 0.1208589</span></span>
-<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; 3   8.02 0.07364158 0.09877837 0.1318364</span></span>
-<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt; 4   8.03 0.07988896 0.10714673 0.1428140</span></span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt; 5   8.04 0.08629765 0.11567736 0.1540129</span></span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt; 6   8.05 0.09360354 0.12511039 0.1664427</span></span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a><span class="co">#&gt; 7   8.06 0.10090942 0.13454342 0.1788724</span></span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt; 8   8.07 0.10839807 0.14413626 0.1913006</span></span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a><span class="co">#&gt; 9   8.08 0.11651192 0.15427579 0.2037235</span></span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="co">#&gt; 10  8.09 0.12462576 0.16441532 0.2161463</span></span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a><span class="co">#&gt; 11  8.10 0.13278452 0.17485156 0.2291399</span></span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="co">#&gt; 12  8.11 0.14104807 0.18598012 0.2434656</span></span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a><span class="co">#&gt; 13  8.12 0.14931161 0.19710867 0.2577913</span></span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a><span class="co">#&gt; 14  8.13 0.15757516 0.20823723 0.2721170</span></span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a><span class="co">#&gt; 15  8.14 0.16685505 0.21993478 0.2872112</span></span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a><span class="co">#&gt; 16  8.15 0.17675100 0.23197725 0.3027713</span></span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a><span class="co">#&gt; 17  8.16 0.18664696 0.24401971 0.3183314</span></span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a><span class="co">#&gt; 18  8.17 0.19637028 0.25680451 0.3356573</span></span>
-<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a><span class="co">#&gt; 19  8.18 0.20608769 0.26961468 0.3530435</span></span>
-<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a><span class="co">#&gt; 20  8.19 0.21611184 0.28271149 0.3706802</span></span>
-<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a><span class="co">#&gt; 21  8.20 0.22681457 0.29644247 0.3888710</span></span>
-<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a><span class="co">#&gt; 22  8.21 0.23751730 0.31017345 0.4070618</span></span>
-<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a><span class="co">#&gt; 23  8.22 0.24860815 0.32450089 0.4254459</span></span>
-<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a><span class="co">#&gt; 24  8.23 0.25990283 0.33914160 0.4439315</span></span>
-<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a><span class="co">#&gt; 25  8.24 0.27119751 0.35378232 0.4624171</span></span>
-<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a><span class="co">#&gt; 26  8.25 0.28204791 0.36935394 0.4811805</span></span>
-<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a><span class="co">#&gt; 27  8.26 0.29289831 0.38492556 0.4999439</span></span>
-<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a><span class="co">#&gt; 28  8.27 0.30486210 0.40061590 0.5198067</span></span>
-<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a><span class="co">#&gt; 29  8.28 0.31809836 0.41644192 0.5409261</span></span>
-<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a><span class="co">#&gt; 30  8.29 0.33133461 0.43226795 0.5620454</span></span>
-<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a><span class="co">#&gt; 31  8.30 0.34452526 0.44936232 0.5827024</span></span>
-<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a><span class="co">#&gt; 32  8.31 0.35771264 0.46654728 0.6033263</span></span>
-<span id="cb20-37"><a href="#cb20-37" tabindex="-1"></a><span class="co">#&gt; 33  8.32 0.37116789 0.48374553 0.6256679</span></span>
-<span id="cb20-38"><a href="#cb20-38" tabindex="-1"></a><span class="co">#&gt; 34  8.33 0.38502494 0.50096372 0.6505859</span></span>
-<span id="cb20-39"><a href="#cb20-39" tabindex="-1"></a><span class="co">#&gt; 35  8.34 0.39922128 0.51928739 0.6736392</span></span>
-<span id="cb20-40"><a href="#cb20-40" tabindex="-1"></a><span class="co">#&gt; 36  8.35 0.41364381 0.53834804 0.6954493</span></span>
-<span id="cb20-41"><a href="#cb20-41" tabindex="-1"></a><span class="co">#&gt; 37  8.36 0.42890591 0.55728499 0.7204843</span></span>
-<span id="cb20-42"><a href="#cb20-42" tabindex="-1"></a><span class="co">#&gt; 38  8.37 0.44437789 0.57619102 0.7463256</span></span>
-<span id="cb20-43"><a href="#cb20-43" tabindex="-1"></a><span class="co">#&gt; 39  8.38 0.45642481 0.59522118 0.7760268</span></span>
-<span id="cb20-44"><a href="#cb20-44" tabindex="-1"></a><span class="co">#&gt; 40  8.39 0.46890216 0.61437858 0.8051869</span></span>
-<span id="cb20-45"><a href="#cb20-45" tabindex="-1"></a><span class="co">#&gt; 41  8.40 0.48525334 0.63468113 0.8294766</span></span>
-<span id="cb20-46"><a href="#cb20-46" tabindex="-1"></a><span class="co">#&gt; 42  8.41 0.50160452 0.65498369 0.8537662</span></span>
-<span id="cb20-47"><a href="#cb20-47" tabindex="-1"></a><span class="co">#&gt; 43  8.42 0.51808287 0.67564392 0.8790889</span></span>
-<span id="cb20-48"><a href="#cb20-48" tabindex="-1"></a><span class="co">#&gt; 44  8.43 0.53489649 0.69724712 0.9071348</span></span>
-<span id="cb20-49"><a href="#cb20-49" tabindex="-1"></a><span class="co">#&gt; 45  8.44 0.55171012 0.71885033 0.9351807</span></span>
-<span id="cb20-50"><a href="#cb20-50" tabindex="-1"></a><span class="co">#&gt; 46  8.45 0.56895651 0.74084271 0.9640151</span></span>
-<span id="cb20-51"><a href="#cb20-51" tabindex="-1"></a><span class="co">#&gt; 47  8.46 0.58673184 0.76331077 0.9938131</span></span>
-<span id="cb20-52"><a href="#cb20-52" tabindex="-1"></a><span class="co">#&gt; 48  8.47 0.60450717 0.78577883 1.0236111</span></span>
-<span id="cb20-53"><a href="#cb20-53" tabindex="-1"></a><span class="co">#&gt; 49  8.48 0.62369895 0.80992991 1.0547931</span></span>
-<span id="cb20-54"><a href="#cb20-54" tabindex="-1"></a><span class="co">#&gt; 50  8.49 0.64374060 0.83509080 1.0868054</span></span>
-<span id="cb20-55"><a href="#cb20-55" tabindex="-1"></a><span class="co">#&gt; 51  8.50 0.66378226 0.86025169 1.1188178</span></span>
-<span id="cb20-56"><a href="#cb20-56" tabindex="-1"></a><span class="co">#&gt; 52  8.51 0.68209018 0.88510789 1.1515583</span></span>
-<span id="cb20-57"><a href="#cb20-57" tabindex="-1"></a><span class="co">#&gt; 53  8.52 0.69996468 0.90988792 1.1844809</span></span>
-<span id="cb20-58"><a href="#cb20-58" tabindex="-1"></a><span class="co">#&gt; 54  8.53 0.71968564 0.93542539 1.2188628</span></span>
-<span id="cb20-59"><a href="#cb20-59" tabindex="-1"></a><span class="co">#&gt; 55  8.54 0.74093432 0.96158955 1.2544521</span></span>
-<span id="cb20-60"><a href="#cb20-60" tabindex="-1"></a><span class="co">#&gt; 56  8.55 0.76228640 0.98806009 1.2896638</span></span>
-<span id="cb20-61"><a href="#cb20-61" tabindex="-1"></a><span class="co">#&gt; 57  8.56 0.78388622 1.01526473 1.3239709</span></span>
-<span id="cb20-62"><a href="#cb20-62" tabindex="-1"></a><span class="co">#&gt; 58  8.57 0.80551207 1.04251911 1.3584820</span></span>
-<span id="cb20-63"><a href="#cb20-63" tabindex="-1"></a><span class="co">#&gt; 59  8.58 0.82773628 1.07091664 1.3976828</span></span>
-<span id="cb20-64"><a href="#cb20-64" tabindex="-1"></a><span class="co">#&gt; 60  8.59 0.84996049 1.09931417 1.4368835</span></span>
-<span id="cb20-65"><a href="#cb20-65" tabindex="-1"></a><span class="co">#&gt; 61  8.60 0.87218470 1.12771170 1.4760843</span></span>
-<span id="cb20-66"><a href="#cb20-66" tabindex="-1"></a><span class="co">#&gt; 62  8.61 0.89516647 1.15877985 1.5165488</span></span>
-<span id="cb20-67"><a href="#cb20-67" tabindex="-1"></a><span class="co">#&gt; 63  8.62 0.91830201 1.19039005 1.5572698</span></span>
-<span id="cb20-68"><a href="#cb20-68" tabindex="-1"></a><span class="co">#&gt; 64  8.63 0.94143755 1.22200025 1.5979908</span></span>
-<span id="cb20-69"><a href="#cb20-69" tabindex="-1"></a><span class="co">#&gt; 65  8.64 0.96706246 1.25492965 1.6386659</span></span>
-<span id="cb20-70"><a href="#cb20-70" tabindex="-1"></a><span class="co">#&gt; 66  8.65 0.99420760 1.28866468 1.6793131</span></span>
-<span id="cb20-71"><a href="#cb20-71" tabindex="-1"></a><span class="co">#&gt; 67  8.66 1.02135275 1.32239970 1.7199603</span></span>
-<span id="cb20-72"><a href="#cb20-72" tabindex="-1"></a><span class="co">#&gt; 68  8.67 1.04911687 1.35645771 1.7664187</span></span>
-<span id="cb20-73"><a href="#cb20-73" tabindex="-1"></a><span class="co">#&gt; 69  8.68 1.07777017 1.39097969 1.8212249</span></span>
-<span id="cb20-74"><a href="#cb20-74" tabindex="-1"></a><span class="co">#&gt; 70  8.69 1.10642347 1.42550166 1.8760311</span></span>
-<span id="cb20-75"><a href="#cb20-75" tabindex="-1"></a><span class="co">#&gt; 71  8.70 1.13526829 1.46117262 1.9285816</span></span>
-<span id="cb20-76"><a href="#cb20-76" tabindex="-1"></a><span class="co">#&gt; 72  8.71 1.16487923 1.50143948 1.9721089</span></span>
-<span id="cb20-77"><a href="#cb20-77" tabindex="-1"></a><span class="co">#&gt; 73  8.72 1.19449016 1.54170634 2.0156363</span></span>
-<span id="cb20-78"><a href="#cb20-78" tabindex="-1"></a><span class="co">#&gt; 74  8.73 1.22410110 1.58197321 2.0591636</span></span>
-<span id="cb20-79"><a href="#cb20-79" tabindex="-1"></a><span class="co">#&gt; 75  8.74 1.25664051 1.62383290 2.1128280</span></span>
-<span id="cb20-80"><a href="#cb20-80" tabindex="-1"></a><span class="co">#&gt; 76  8.75 1.28939325 1.66580863 2.1672308</span></span>
-<span id="cb20-81"><a href="#cb20-81" tabindex="-1"></a><span class="co">#&gt; 77  8.76 1.32214600 1.70778437 2.2216337</span></span>
-<span id="cb20-82"><a href="#cb20-82" tabindex="-1"></a><span class="co">#&gt; 78  8.77 1.35675320 1.75209498 2.2803767</span></span>
-<span id="cb20-83"><a href="#cb20-83" tabindex="-1"></a><span class="co">#&gt; 79  8.78 1.39229796 1.79758605 2.3413141</span></span>
-<span id="cb20-84"><a href="#cb20-84" tabindex="-1"></a><span class="co">#&gt; 80  8.79 1.42784273 1.84307712 2.4022515</span></span>
-<span id="cb20-85"><a href="#cb20-85" tabindex="-1"></a><span class="co">#&gt; 81  8.80 1.46451594 1.89029642 2.4647465</span></span>
-<span id="cb20-86"><a href="#cb20-86" tabindex="-1"></a><span class="co">#&gt; 82  8.81 1.50290816 1.94014839 2.5296142</span></span>
-<span id="cb20-87"><a href="#cb20-87" tabindex="-1"></a><span class="co">#&gt; 83  8.82 1.54130037 1.99000037 2.5944819</span></span>
-<span id="cb20-88"><a href="#cb20-88" tabindex="-1"></a><span class="co">#&gt; 84  8.83 1.58065552 2.04043458 2.6603728</span></span>
-<span id="cb20-89"><a href="#cb20-89" tabindex="-1"></a><span class="co">#&gt; 85  8.84 1.62654719 2.09482105 2.7332095</span></span>
-<span id="cb20-90"><a href="#cb20-90" tabindex="-1"></a><span class="co">#&gt; 86  8.85 1.67243886 2.14920753 2.8060462</span></span>
-<span id="cb20-91"><a href="#cb20-91" tabindex="-1"></a><span class="co">#&gt; 87  8.86 1.71833053 2.20359401 2.8788829</span></span>
-<span id="cb20-92"><a href="#cb20-92" tabindex="-1"></a><span class="co">#&gt; 88  8.87 1.76422220 2.25798048 2.9517196</span></span>
-<span id="cb20-93"><a href="#cb20-93" tabindex="-1"></a><span class="co">#&gt; 89  8.88 1.81075168 2.31809106 3.0243237</span></span>
-<span id="cb20-94"><a href="#cb20-94" tabindex="-1"></a><span class="co">#&gt; 90  8.89 1.85755450 2.38065483 3.0968282</span></span>
-<span id="cb20-95"><a href="#cb20-95" tabindex="-1"></a><span class="co">#&gt; 91  8.90 1.90435733 2.44321859 3.1693327</span></span>
-<span id="cb20-96"><a href="#cb20-96" tabindex="-1"></a><span class="co">#&gt; 92  8.91 1.95566381 2.50867695 3.2568810</span></span>
-<span id="cb20-97"><a href="#cb20-97" tabindex="-1"></a><span class="co">#&gt; 93  8.92 2.00856448 2.57515993 3.3497544</span></span>
-<span id="cb20-98"><a href="#cb20-98" tabindex="-1"></a><span class="co">#&gt; 94  8.93 2.06146515 2.64164290 3.4426279</span></span>
-<span id="cb20-99"><a href="#cb20-99" tabindex="-1"></a><span class="co">#&gt; 95  8.94 2.11425558 2.70934440 3.5282224</span></span>
-<span id="cb20-100"><a href="#cb20-100" tabindex="-1"></a><span class="co">#&gt; 96  8.95 2.16701440 2.77739534 3.6117295</span></span>
-<span id="cb20-101"><a href="#cb20-101" tabindex="-1"></a><span class="co">#&gt; 97  8.96 2.21977321 2.84544629 3.6952365</span></span>
-<span id="cb20-102"><a href="#cb20-102" tabindex="-1"></a><span class="co">#&gt; 98  8.97 2.28284634 2.92415353 3.7931915</span></span>
-<span id="cb20-103"><a href="#cb20-103" tabindex="-1"></a><span class="co">#&gt; 99  8.98 2.34824989 3.00526847 3.8944107</span></span>
-<span id="cb20-104"><a href="#cb20-104" tabindex="-1"></a><span class="co">#&gt; 100 8.99 2.41365344 3.08638341 3.9956300</span></span>
-<span id="cb20-105"><a href="#cb20-105" tabindex="-1"></a><span class="co">#&gt; 101 9.00 2.47883686 3.16815388 4.0978049</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="sc">&gt;</span> h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">8</span>, <span class="dv">9</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="sc">&gt;</span> rating_curve_h_grid <span class="ot">&lt;-</span> <span class="fu">predict</span>(gplm.fit, <span class="at">newdata =</span> h_grid)</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">print</span>(rating_curve_h_grid)</span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt;        h      lower     median     upper</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; 1   8.00 0.06138853 0.08252241 0.1108601</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt; 2   8.01 0.06708762 0.09009315 0.1207313</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; 3   8.02 0.07340524 0.09850833 0.1316830</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; 4   8.03 0.07972287 0.10692352 0.1426346</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co">#&gt; 5   8.04 0.08620981 0.11547827 0.1537808</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&gt; 6   8.05 0.09363849 0.12480929 0.1660087</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; 7   8.06 0.10106716 0.13414031 0.1782366</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a><span class="co">#&gt; 8   8.07 0.10861541 0.14364701 0.1906011</span></span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co">#&gt; 9   8.08 0.11657272 0.15375469 0.2034327</span></span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="co">#&gt; 10  8.09 0.12453002 0.16386237 0.2162643</span></span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a><span class="co">#&gt; 11  8.10 0.13257126 0.17428375 0.2295413</span></span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a><span class="co">#&gt; 12  8.11 0.14080833 0.18543710 0.2438577</span></span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a><span class="co">#&gt; 13  8.12 0.14904540 0.19659045 0.2581741</span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; 14  8.13 0.15728247 0.20774380 0.2724905</span></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a><span class="co">#&gt; 15  8.14 0.16662200 0.21960922 0.2875367</span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a><span class="co">#&gt; 16  8.15 0.17662981 0.23190628 0.3030253</span></span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a><span class="co">#&gt; 17  8.16 0.18663761 0.24420333 0.3185138</span></span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a><span class="co">#&gt; 18  8.17 0.19681441 0.25692028 0.3351942</span></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a><span class="co">#&gt; 19  8.18 0.20699699 0.26965158 0.3519154</span></span>
+<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a><span class="co">#&gt; 20  8.19 0.21718541 0.28270330 0.3691020</span></span>
+<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a><span class="co">#&gt; 21  8.20 0.22738677 0.29646391 0.3873184</span></span>
+<span id="cb22-26"><a href="#cb22-26" tabindex="-1"></a><span class="co">#&gt; 22  8.21 0.23758814 0.31022451 0.4055347</span></span>
+<span id="cb22-27"><a href="#cb22-27" tabindex="-1"></a><span class="co">#&gt; 23  8.22 0.24864524 0.32456916 0.4240212</span></span>
+<span id="cb22-28"><a href="#cb22-28" tabindex="-1"></a><span class="co">#&gt; 24  8.23 0.26015179 0.33922056 0.4426497</span></span>
+<span id="cb22-29"><a href="#cb22-29" tabindex="-1"></a><span class="co">#&gt; 25  8.24 0.27165833 0.35387195 0.4612783</span></span>
+<span id="cb22-30"><a href="#cb22-30" tabindex="-1"></a><span class="co">#&gt; 26  8.25 0.28286178 0.36952305 0.4822933</span></span>
+<span id="cb22-31"><a href="#cb22-31" tabindex="-1"></a><span class="co">#&gt; 27  8.26 0.29406524 0.38517416 0.5033083</span></span>
+<span id="cb22-32"><a href="#cb22-32" tabindex="-1"></a><span class="co">#&gt; 28  8.27 0.30595170 0.40092441 0.5238623</span></span>
+<span id="cb22-33"><a href="#cb22-33" tabindex="-1"></a><span class="co">#&gt; 29  8.28 0.31861873 0.41678798 0.5438895</span></span>
+<span id="cb22-34"><a href="#cb22-34" tabindex="-1"></a><span class="co">#&gt; 30  8.29 0.33128577 0.43265156 0.5639167</span></span>
+<span id="cb22-35"><a href="#cb22-35" tabindex="-1"></a><span class="co">#&gt; 31  8.30 0.34430822 0.44895462 0.5841702</span></span>
+<span id="cb22-36"><a href="#cb22-36" tabindex="-1"></a><span class="co">#&gt; 32  8.31 0.35735607 0.46528907 0.6044400</span></span>
+<span id="cb22-37"><a href="#cb22-37" tabindex="-1"></a><span class="co">#&gt; 33  8.32 0.37077354 0.48265853 0.6264057</span></span>
+<span id="cb22-38"><a href="#cb22-38" tabindex="-1"></a><span class="co">#&gt; 34  8.33 0.38474546 0.50158052 0.6509156</span></span>
+<span id="cb22-39"><a href="#cb22-39" tabindex="-1"></a><span class="co">#&gt; 35  8.34 0.39867565 0.51991036 0.6752141</span></span>
+<span id="cb22-40"><a href="#cb22-40" tabindex="-1"></a><span class="co">#&gt; 36  8.35 0.41257803 0.53784545 0.6993718</span></span>
+<span id="cb22-41"><a href="#cb22-41" tabindex="-1"></a><span class="co">#&gt; 37  8.36 0.42648262 0.55691726 0.7236054</span></span>
+<span id="cb22-42"><a href="#cb22-42" tabindex="-1"></a><span class="co">#&gt; 38  8.37 0.44038777 0.57627326 0.7478580</span></span>
+<span id="cb22-43"><a href="#cb22-43" tabindex="-1"></a><span class="co">#&gt; 39  8.38 0.45757675 0.59494617 0.7736702</span></span>
+<span id="cb22-44"><a href="#cb22-44" tabindex="-1"></a><span class="co">#&gt; 40  8.39 0.47458478 0.61391168 0.7996598</span></span>
+<span id="cb22-45"><a href="#cb22-45" tabindex="-1"></a><span class="co">#&gt; 41  8.40 0.48996432 0.63551057 0.8272457</span></span>
+<span id="cb22-46"><a href="#cb22-46" tabindex="-1"></a><span class="co">#&gt; 42  8.41 0.50534386 0.65710945 0.8548316</span></span>
+<span id="cb22-47"><a href="#cb22-47" tabindex="-1"></a><span class="co">#&gt; 43  8.42 0.52119168 0.67855639 0.8824809</span></span>
+<span id="cb22-48"><a href="#cb22-48" tabindex="-1"></a><span class="co">#&gt; 44  8.43 0.53827408 0.69960274 0.9102975</span></span>
+<span id="cb22-49"><a href="#cb22-49" tabindex="-1"></a><span class="co">#&gt; 45  8.44 0.55535648 0.72064909 0.9381141</span></span>
+<span id="cb22-50"><a href="#cb22-50" tabindex="-1"></a><span class="co">#&gt; 46  8.45 0.57229711 0.74245300 0.9669301</span></span>
+<span id="cb22-51"><a href="#cb22-51" tabindex="-1"></a><span class="co">#&gt; 47  8.46 0.58906448 0.76518282 0.9969676</span></span>
+<span id="cb22-52"><a href="#cb22-52" tabindex="-1"></a><span class="co">#&gt; 48  8.47 0.60583185 0.78791264 1.0270050</span></span>
+<span id="cb22-53"><a href="#cb22-53" tabindex="-1"></a><span class="co">#&gt; 49  8.48 0.62287788 0.81159005 1.0567058</span></span>
+<span id="cb22-54"><a href="#cb22-54" tabindex="-1"></a><span class="co">#&gt; 50  8.49 0.64009109 0.83583600 1.0862046</span></span>
+<span id="cb22-55"><a href="#cb22-55" tabindex="-1"></a><span class="co">#&gt; 51  8.50 0.65730430 0.86008196 1.1157034</span></span>
+<span id="cb22-56"><a href="#cb22-56" tabindex="-1"></a><span class="co">#&gt; 52  8.51 0.67837959 0.88498753 1.1480607</span></span>
+<span id="cb22-57"><a href="#cb22-57" tabindex="-1"></a><span class="co">#&gt; 53  8.52 0.70042041 0.91005801 1.1811327</span></span>
+<span id="cb22-58"><a href="#cb22-58" tabindex="-1"></a><span class="co">#&gt; 54  8.53 0.72142896 0.93588196 1.2163209</span></span>
+<span id="cb22-59"><a href="#cb22-59" tabindex="-1"></a><span class="co">#&gt; 55  8.54 0.74158344 0.96232931 1.2532602</span></span>
+<span id="cb22-60"><a href="#cb22-60" tabindex="-1"></a><span class="co">#&gt; 56  8.55 0.76152777 0.98908548 1.2891070</span></span>
+<span id="cb22-61"><a href="#cb22-61" tabindex="-1"></a><span class="co">#&gt; 57  8.56 0.78096859 1.01658161 1.3223361</span></span>
+<span id="cb22-62"><a href="#cb22-62" tabindex="-1"></a><span class="co">#&gt; 58  8.57 0.80060626 1.04414468 1.3558233</span></span>
+<span id="cb22-63"><a href="#cb22-63" tabindex="-1"></a><span class="co">#&gt; 59  8.58 0.82476789 1.07324641 1.3952421</span></span>
+<span id="cb22-64"><a href="#cb22-64" tabindex="-1"></a><span class="co">#&gt; 60  8.59 0.84892951 1.10234815 1.4346609</span></span>
+<span id="cb22-65"><a href="#cb22-65" tabindex="-1"></a><span class="co">#&gt; 61  8.60 0.87309114 1.13144988 1.4740798</span></span>
+<span id="cb22-66"><a href="#cb22-66" tabindex="-1"></a><span class="co">#&gt; 62  8.61 0.89805719 1.16190150 1.5167752</span></span>
+<span id="cb22-67"><a href="#cb22-67" tabindex="-1"></a><span class="co">#&gt; 63  8.62 0.92318652 1.19262710 1.5601358</span></span>
+<span id="cb22-68"><a href="#cb22-68" tabindex="-1"></a><span class="co">#&gt; 64  8.63 0.94831584 1.22335271 1.6034963</span></span>
+<span id="cb22-69"><a href="#cb22-69" tabindex="-1"></a><span class="co">#&gt; 65  8.64 0.97416393 1.25588235 1.6435993</span></span>
+<span id="cb22-70"><a href="#cb22-70" tabindex="-1"></a><span class="co">#&gt; 66  8.65 1.00045096 1.28951372 1.6817129</span></span>
+<span id="cb22-71"><a href="#cb22-71" tabindex="-1"></a><span class="co">#&gt; 67  8.66 1.02673799 1.32314508 1.7198264</span></span>
+<span id="cb22-72"><a href="#cb22-72" tabindex="-1"></a><span class="co">#&gt; 68  8.67 1.05323814 1.35749266 1.7615471</span></span>
+<span id="cb22-73"><a href="#cb22-73" tabindex="-1"></a><span class="co">#&gt; 69  8.68 1.08004443 1.39286907 1.8084491</span></span>
+<span id="cb22-74"><a href="#cb22-74" tabindex="-1"></a><span class="co">#&gt; 70  8.69 1.10685073 1.42824549 1.8553512</span></span>
+<span id="cb22-75"><a href="#cb22-75" tabindex="-1"></a><span class="co">#&gt; 71  8.70 1.13446515 1.46428733 1.9034120</span></span>
+<span id="cb22-76"><a href="#cb22-76" tabindex="-1"></a><span class="co">#&gt; 72  8.71 1.16531211 1.50299087 1.9561078</span></span>
+<span id="cb22-77"><a href="#cb22-77" tabindex="-1"></a><span class="co">#&gt; 73  8.72 1.19615906 1.54169441 2.0088036</span></span>
+<span id="cb22-78"><a href="#cb22-78" tabindex="-1"></a><span class="co">#&gt; 74  8.73 1.22700601 1.58039795 2.0614994</span></span>
+<span id="cb22-79"><a href="#cb22-79" tabindex="-1"></a><span class="co">#&gt; 75  8.74 1.25816709 1.62314579 2.1156189</span></span>
+<span id="cb22-80"><a href="#cb22-80" tabindex="-1"></a><span class="co">#&gt; 76  8.75 1.28935106 1.66618825 2.1698421</span></span>
+<span id="cb22-81"><a href="#cb22-81" tabindex="-1"></a><span class="co">#&gt; 77  8.76 1.32053502 1.70923071 2.2240654</span></span>
+<span id="cb22-82"><a href="#cb22-82" tabindex="-1"></a><span class="co">#&gt; 78  8.77 1.35520242 1.75289393 2.2817313</span></span>
+<span id="cb22-83"><a href="#cb22-83" tabindex="-1"></a><span class="co">#&gt; 79  8.78 1.39163095 1.79687098 2.3411376</span></span>
+<span id="cb22-84"><a href="#cb22-84" tabindex="-1"></a><span class="co">#&gt; 80  8.79 1.42805948 1.84084804 2.4005440</span></span>
+<span id="cb22-85"><a href="#cb22-85" tabindex="-1"></a><span class="co">#&gt; 81  8.80 1.46619139 1.88627784 2.4612200</span></span>
+<span id="cb22-86"><a href="#cb22-86" tabindex="-1"></a><span class="co">#&gt; 82  8.81 1.50691812 1.93392065 2.5238301</span></span>
+<span id="cb22-87"><a href="#cb22-87" tabindex="-1"></a><span class="co">#&gt; 83  8.82 1.54764484 1.98156346 2.5864402</span></span>
+<span id="cb22-88"><a href="#cb22-88" tabindex="-1"></a><span class="co">#&gt; 84  8.83 1.58862486 2.03029283 2.6504561</span></span>
+<span id="cb22-89"><a href="#cb22-89" tabindex="-1"></a><span class="co">#&gt; 85  8.84 1.63132425 2.08639792 2.7240155</span></span>
+<span id="cb22-90"><a href="#cb22-90" tabindex="-1"></a><span class="co">#&gt; 86  8.85 1.67402364 2.14250302 2.7975749</span></span>
+<span id="cb22-91"><a href="#cb22-91" tabindex="-1"></a><span class="co">#&gt; 87  8.86 1.71672303 2.19860812 2.8711343</span></span>
+<span id="cb22-92"><a href="#cb22-92" tabindex="-1"></a><span class="co">#&gt; 88  8.87 1.75942242 2.25471321 2.9446937</span></span>
+<span id="cb22-93"><a href="#cb22-93" tabindex="-1"></a><span class="co">#&gt; 89  8.88 1.80704534 2.31372231 3.0198513</span></span>
+<span id="cb22-94"><a href="#cb22-94" tabindex="-1"></a><span class="co">#&gt; 90  8.89 1.85677834 2.37397599 3.0956939</span></span>
+<span id="cb22-95"><a href="#cb22-95" tabindex="-1"></a><span class="co">#&gt; 91  8.90 1.90651135 2.43422966 3.1715365</span></span>
+<span id="cb22-96"><a href="#cb22-96" tabindex="-1"></a><span class="co">#&gt; 92  8.91 1.95757124 2.49992659 3.2569746</span></span>
+<span id="cb22-97"><a href="#cb22-97" tabindex="-1"></a><span class="co">#&gt; 93  8.92 2.00910082 2.56755028 3.3458092</span></span>
+<span id="cb22-98"><a href="#cb22-98" tabindex="-1"></a><span class="co">#&gt; 94  8.93 2.06063040 2.63517398 3.4346439</span></span>
+<span id="cb22-99"><a href="#cb22-99" tabindex="-1"></a><span class="co">#&gt; 95  8.94 2.11134284 2.70513427 3.5158612</span></span>
+<span id="cb22-100"><a href="#cb22-100" tabindex="-1"></a><span class="co">#&gt; 96  8.95 2.16182095 2.77576464 3.5948940</span></span>
+<span id="cb22-101"><a href="#cb22-101" tabindex="-1"></a><span class="co">#&gt; 97  8.96 2.21229905 2.84639502 3.6739268</span></span>
+<span id="cb22-102"><a href="#cb22-102" tabindex="-1"></a><span class="co">#&gt; 98  8.97 2.27542455 2.92460537 3.7803344</span></span>
+<span id="cb22-103"><a href="#cb22-103" tabindex="-1"></a><span class="co">#&gt; 99  8.98 2.34140761 3.00452835 3.8929271</span></span>
+<span id="cb22-104"><a href="#cb22-104" tabindex="-1"></a><span class="co">#&gt; 100 8.99 2.40739067 3.08445133 4.0055198</span></span>
+<span id="cb22-105"><a href="#cb22-105" tabindex="-1"></a><span class="co">#&gt; 101 9.00 2.47424093 3.16576470 4.1159444</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
