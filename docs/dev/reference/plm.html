@@ -51,7 +51,8 @@
 <span>  h_max <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  num_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  forcepoint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span>  forcepoint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -60,31 +61,35 @@
 
 
 <dl><dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
-<dd><p>an object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form <code>y</code>~<code>x</code> where <code>y</code> is discharge in m\(^3/\)s and <code>x</code> is stage in m (it is very important that the data is in the correct units).</p></dd>
+<dd><p>An object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form <code>y</code>~<code>x</code> where <code>y</code> is discharge in m\(^3/\)s and <code>x</code> is stage in m (it is very important that the data is in the correct units).</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>data.frame containing the variables specified in formula.</p></dd>
+<dd><p>A data.frame containing the variables specified in formula.</p></dd>
 
 
 <dt id="arg-c-param">c_param<a class="anchor" aria-label="anchor" href="#arg-c-param"></a></dt>
-<dd><p>stage for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.</p></dd>
+<dd><p>The largest stage value for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.</p></dd>
 
 
 <dt id="arg-h-max">h_max<a class="anchor" aria-label="anchor" href="#arg-h-max"></a></dt>
-<dd><p>maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.</p></dd>
+<dd><p>The maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.</p></dd>
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.</p></dd>
+<dd><p>A logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.</p></dd>
 
 
 <dt id="arg-num-cores">num_cores<a class="anchor" aria-label="anchor" href="#arg-num-cores"></a></dt>
-<dd><p>integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.</p></dd>
+<dd><p>An integer between 1 and 4 (number of MCMC chains) indicating how many cores to use. Only used if parallel=TRUE. If NULL, the number of cores available on the device is detected automatically.</p></dd>
 
 
 <dt id="arg-forcepoint">forcepoint<a class="anchor" aria-label="anchor" href="#arg-forcepoint"></a></dt>
-<dd><p>logical vector of the same length as the number of rows in data. If an element at index \(i\) is TRUE it indicates that the rating curve should be forced through the \(i\)-th measurement. Use with care, as this will strongly influence the resulting rating curve.</p></dd>
+<dd><p>A logical vector of the same length as the number of rows in data. If an element at index \(i\) is TRUE it indicates that the rating curve should be forced through the \(i\)-th measurement. Use with care, as this will strongly influence the resulting rating curve.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>A logical value indicating whether to print progress and diagnostic information. If `TRUE`, the function will print messages as it runs. If `FALSE`, the function will run silently. Default is `TRUE`.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -102,8 +107,8 @@
 <dt><code>sigma_eps_summary</code></dt>
 <dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior of \(\sigma_{\varepsilon}\).</p></dd>
 
-<dt><code>Deviance_summary</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of the deviance.</p></dd>
+<dt><code>posterior_log_likelihood_summary</code></dt>
+<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior log-likelihood values.</p></dd>
 
 <dt><code>rating_curve_posterior</code></dt>
 <dd><p>a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).</p></dd>
@@ -141,26 +146,29 @@
 <dt><code>eta_6_posterior</code></dt>
 <dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_6\).</p></dd>
 
-<dt><code>Deviance_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of the deviance excluding burn-in samples.</p></dd>
+<dt><code>posterior_log_likelihood</code></dt>
+<dd><p>a numeric vector containing the full thinned posterior log-likelihood values, excluding burn-in samples.</p></dd>
 
 <dt><code>D_hat</code></dt>
-<dd><p>deviance at the median value of the parameters.</p></dd>
+<dd><p>statistic defined as -2 times the log-likelihood evaluated at the median value of the parameters.</p></dd>
 
 <dt><code>effective_num_param_DIC</code></dt>
-<dd><p>effective number of parameters, which is calculated as median(Deviance_posterior) minus D_hat.</p></dd>
+<dd><p>effective number of parameters, which is calculated as median(-2*posterior_log_likelihood) minus D_hat.</p></dd>
 
 <dt><code>DIC</code></dt>
 <dd><p>Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.</p></dd>
 
 <dt><code>lppd</code></dt>
-<dd><p>log pointwise predictive probability of the observed data under the model</p></dd>
+<dd><p>log pointwise predictive density of the observed data under the model</p></dd>
+
+<dt><code>WAIC</code></dt>
+<dd><p>Widely Applicable Information Criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).</p></dd>
+
+<dt><code>WAIC_i</code></dt>
+<dd><p>The pointwise WAIC values, where WAIC := sum(WAIC_i).</p></dd>
 
 <dt><code>effective_num_param_WAIC</code></dt>
 <dd><p>effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.</p></dd>
-
-<dt><code>WAIC</code></dt>
-<dd><p>Watanabe-Akaike information criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).</p></dd>
 
 <dt><code>autocorrelation</code></dt>
 <dd><p>a data frame with the autocorrelation of each parameter for different lags.</p></dd>
@@ -206,27 +214,39 @@ Bayesian inference is based on the posterior density and summary statistics such
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">spanga</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plm.fit</span> <span class="op">&lt;-</span> <span class="fu">plm</span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">spanga</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 23.26%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ⚠ Warning: Some chains are not mixing well. Parameters with Rhat &gt; 1.1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - sigma_eta: Rhat = 1.185</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ℹ Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">plm.fit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Q ~ W</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Latent parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a 11.20      12.56      13.9       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a 11.12      12.55      13.9       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> b  1.91       2.04       2.2       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hyperparameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> c           9.4045    9.452      9.496     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta   0.0255    0.373      0.865     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1      -5.5265   -4.783     -3.742     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2      -7.6882   -6.002     -4.305     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3      -9.0869   -6.993     -4.494     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -9.8542   -7.442     -4.572     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5     -10.6135   -7.712     -4.540     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6     -11.0220   -7.678     -4.178     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c           9.4020    9.453      9.50      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta   0.0125    0.349      0.87      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1      -5.5784   -4.828     -3.77      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2      -7.6875   -5.949     -4.21      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3      -9.0695   -6.918     -4.17      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -9.9277   -7.344     -4.16      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5     -10.6150   -7.595     -3.98      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6     -11.0295   -7.576     -3.62      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -78.32124</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -76.82704</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -67,17 +67,17 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".</p></dd>
+<dd><p>An object of class "tournament", "plm0", "plm", "gplm0" or "gplm".</p></dd>
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are</p><ul><li><p>1 - produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.</p></li>
+<dd><p>An integer denoting what type of report is to be produced. Defaults to type 1. Possible types are</p><ul><li><p>1 - produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.</p></li>
 <li><p>2 - produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.</p></li>
 </ul></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>further arguments passed to other methods (currently unused).</p></dd>
+<dd><p>Further arguments passed to other methods (currently unused).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -104,6 +104,16 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plm0.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plm0.html">plm0</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 36.09%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-in"><span><span class="va">plm0_pages</span> <span class="op">&lt;-</span> <span class="fu">get_report_pages</span><span class="op">(</span><span class="va">plm0.fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

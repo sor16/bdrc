@@ -161,6 +161,16 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plm0.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plm0.html">plm0</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 36.09%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">plm0.fit</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="autoplot.plm0-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">plm0.fit</span>,transformed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>

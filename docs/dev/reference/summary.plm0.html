@@ -88,6 +88,16 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">plm0.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plm0.html">plm0</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 36.09%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">plm0.fit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: </span>
@@ -95,14 +105,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Latent parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   lower-2.5% median-50% upper-97.5%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> a 1.15       1.64       2.12       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b 2.47       2.82       3.21       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b 2.46       2.82       3.21       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hyperparameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> c         7.578      7.676      7.750      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eps 0.151      0.191      0.252      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c         7.580      7.676      7.752      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eps 0.151      0.191      0.253      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -2.982856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -2.864097</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
