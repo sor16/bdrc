@@ -7,31 +7,33 @@
 spread_draws(mod, ..., transformed = FALSE)
 }
 \arguments{
-\item{mod}{an object of class "plm0","plm","gplm0" or "gplm".}
+\item{mod}{An object of class "plm0", "plm", "gplm0" or "gplm".}
 
-\item{...}{any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".}
+\item{...}{Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".}
 
-\item{transformed}{boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.}
+\item{transformed}{A boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.}
 }
 \value{
-Data frame with columns
-\code{chain}
-\code{iter}
-\code{param}
-\code{value}
+A data frame with columns:
+\describe{
+  \item{\code{chain}}{The chain number.}
+  \item{\code{iter}}{The iteration number.}
+  \item{\code{param}}{The parameter name.}
+  \item{\code{value}}{The parameter value.}
+}
 }
 \description{
 Useful to convert MCMC chain draws of particular parameters or output from the model object to a wide format for further data wrangling
 }
 \examples{
 \donttest{
-data(krokfors)
-set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
-hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
-head(hyp_samples)
-rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
-head(rating_curve_samples)
+ data(krokfors)
+ set.seed(1)
+ plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
+ hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
+ head(hyp_samples)
+ rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
+ head(rating_curve_samples)
 }
 }
 \references{

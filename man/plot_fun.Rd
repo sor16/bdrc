@@ -16,35 +16,35 @@ plot_fun(
 )
 }
 \arguments{
-\item{x}{an object of class "plm0","plm","gplm0" or "gplm".}
+\item{x}{An object of class "plm0", "plm", "gplm0" or "gplm".}
 
-\item{type}{a character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are
-\itemize{
-   \item{"rating_curve"}{ to plot the rating curve.}
-   \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-   \item{"f"}{ to plot the power-law exponent.}
-   \item{"beta"}{ to plot the random effect in the power-law exponent.}
-   \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-   \item{"residuals"}{ to plot the log residuals.}
-   \item{"trace"}{ to plot trace plots of parameters given in param.}
-   \item{"histogram"}{ to plot histograms of parameters given in param.}
-   \item{"panel"}{ to plot a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps"}
+\item{type}{A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
+\describe{
+  \item{\code{rating_curve}}{Plots the rating curve.}
+  \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+  \item{\code{f}}{Plots the power-law exponent.}
+  \item{\code{beta}}{Plots the random effect in the power-law exponent.}
+  \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+  \item{\code{residuals}}{Plots the log residuals.}
+  \item{\code{trace}}{Plots trace plots of parameters given in param.}
+  \item{\code{histogram}}{Plots histograms of parameters given in param.}
+  \item{\code{panel}}{Plots a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps".}
 }}
 
-\item{param}{a character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
+\item{param}{A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
 
-\item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+\item{transformed}{A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{title}{a character denoting the title of the plot. Defaults to NULL, i.e. no title.}
+\item{title}{A character denoting the title of the plot. Defaults to NULL, i.e. no title.}
 
-\item{xlim}{numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+\item{xlim}{A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
 
-\item{ylim}{numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve","rating_curve_mean","f","beta","sigma_eps","residuals".}
+\item{ylim}{A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
 }
 \value{
-returns an object of class ggplot2.
+Returns an object of class ggplot2.
 }
 \description{
-Visualize results from model objects in bdrc, plm0, plm, gplm0,gplm
+Visualize results from model objects in bdrc, plm0, plm, gplm0, gplm
 }
 \keyword{internal}

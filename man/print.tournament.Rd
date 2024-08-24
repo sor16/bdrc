@@ -7,9 +7,9 @@
 \method{print}{tournament}(x, ...)
 }
 \arguments{
-\item{x}{an object of class "tournament"}
+\item{x}{An object of class "tournament"}
 
-\item{...}{not used in this function}
+\item{...}{Not used in this function}
 }
 \description{
 Print the results of a tournament of discharge rating curve model comparisons

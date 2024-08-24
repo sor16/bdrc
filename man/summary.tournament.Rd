@@ -7,7 +7,7 @@
 \method{summary}{tournament}(object, ...)
 }
 \arguments{
-\item{object}{an object of class "tournament"}
+\item{object}{An object of class "tournament"}
 
 \item{...}{not used in this function}
 }

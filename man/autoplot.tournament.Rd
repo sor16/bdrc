@@ -4,20 +4,20 @@
 \alias{autoplot.tournament}
 \title{Autoplot method for discharge rating curve tournament}
 \usage{
-\method{autoplot}{tournament}(object, ..., type = "deviance")
+\method{autoplot}{tournament}(object, ..., type = "boxplot")
 }
 \arguments{
-\item{object}{an object of class "tournament"}
+\item{object}{An object of class "tournament"}
 
-\item{...}{other plotting parameters (not used in this function)}
+\item{...}{Other plotting parameters (not used in this function)}
 
-\item{type}{a character denoting what type of plot should be drawn. Possible types are
-\itemize{
- \item{"deviance"}{ to plot the deviance of the four models.}
+\item{type}{A character denoting what type of plot should be drawn. Possible types are
+\describe{
+  \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values transformed to the deviance scale.}
 }}
 }
 \value{
-returns an object of class "ggplot2".
+Returns an object of class "ggplot2".
 }
 \description{
 Compare the four discharge rating curves from the tournament object in different ways

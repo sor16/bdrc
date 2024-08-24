@@ -7,17 +7,17 @@
 evaluate_game(m, method, winning_criteria)
 }
 \arguments{
-\item{m}{a list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"}
+\item{m}{A list of two model objects fit on the same dataset. The allowed model objects are "gplm", "gplm0", "plm" and "plm0"}
 
-\item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
+\item{method}{A string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "PMP".}
 
-\item{winning_criteria}{a numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 2 for methods "WAIC" and "DIC", but defaults to 0.75 for method "Posterior_probability".}
+\item{winning_criteria}{A numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 2 for methods "WAIC" and "DIC", but defaults to 0.75 for method "PMP".}
 }
 \value{
 A data.frame with the summary of the results of the game
 }
 \description{
-evaluate_game uses WAIC, DIC, or the posterior model probabilities, calculated with Bayes factor, to determine whether one model is more appropriate than the other given the data at hand.
+evaluate_game uses the Widely Applicable Information Criterion (WAIC), the Deviance Information Criterion (DIC), or the posterior model probabilities (PMP), calculated with Bayes factor, to determine whether one model is more appropriate than the other given the data at hand.
 }
 \references{
 Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
