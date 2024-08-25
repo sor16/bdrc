@@ -94,96 +94,96 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>plm returns an object of class "plm". An object of class "plm" is a list containing the following components: <br></p>
-<dl><dt><code>rating_curve</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior predictive distribution of the rating curve.</p></dd>
+    <p>plm returns an object of class "plm". An object of class "plm" is a list containing the following components:</p><dl><dt><code>rating_curve</code></dt>
+<dd><p>A data frame with 2.5%, 50% and 97.5% percentiles of the posterior predictive distribution of the rating curve.</p></dd>
 
-<dt><code>rating_curve_mean</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).</p></dd>
+  <dt><code>rating_curve_mean</code></dt>
+<dd><p>A data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of the mean of the rating curve. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).</p></dd>
 
-<dt><code>param_summary</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of latent- and hyperparameters.</p></dd>
+  <dt><code>param_summary</code></dt>
+<dd><p>A data frame with 2.5%, 50% and 97.5% percentiles of the posterior distribution of latent- and hyperparameters.</p></dd>
 
-<dt><code>sigma_eps_summary</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior of \(\sigma_{\varepsilon}\).</p></dd>
+  <dt><code>sigma_eps_summary</code></dt>
+<dd><p>A data frame with 2.5%, 50% and 97.5% percentiles of the posterior of \(\sigma_{\varepsilon}\).</p></dd>
 
-<dt><code>posterior_log_likelihood_summary</code></dt>
-<dd><p>a data frame with 2.5%, 50% and 97.5% percentiles of the posterior log-likelihood values.</p></dd>
+  <dt><code>posterior_log_likelihood_summary</code></dt>
+<dd><p>A data frame with 2.5%, 50% and 97.5% percentiles of the posterior log-likelihood values.</p></dd>
 
-<dt><code>rating_curve_posterior</code></dt>
-<dd><p>a matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).</p></dd>
+  <dt><code>rating_curve_posterior</code></dt>
+<dd><p>A matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).</p></dd>
 
-<dt><code>rating_curve_mean_posterior</code></dt>
-<dd><p>a matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).</p></dd>
+  <dt><code>rating_curve_mean_posterior</code></dt>
+<dd><p>A matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).</p></dd>
 
-<dt><code>a_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(a\).</p></dd>
+  <dt><code>a_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(a\).</p></dd>
 
-<dt><code>b_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(b\).</p></dd>
+  <dt><code>b_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(b\).</p></dd>
 
-<dt><code>c_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(c\).</p></dd>
+  <dt><code>c_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(c\).</p></dd>
 
-<dt><code>sigma_eps_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\sigma_{\varepsilon}\).</p></dd>
+  <dt><code>sigma_eps_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\sigma_{\varepsilon}\).</p></dd>
 
-<dt><code>eta_1_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_1\).</p></dd>
+  <dt><code>eta_1_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_1\).</p></dd>
 
-<dt><code>eta_2_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_2\).</p></dd>
+  <dt><code>eta_2_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_2\).</p></dd>
 
-<dt><code>eta_3_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_3\).</p></dd>
+  <dt><code>eta_3_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_3\).</p></dd>
 
-<dt><code>eta_4_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_4\).</p></dd>
+  <dt><code>eta_4_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_4\).</p></dd>
 
-<dt><code>eta_5_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_5\).</p></dd>
+  <dt><code>eta_5_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_5\).</p></dd>
 
-<dt><code>eta_6_posterior</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_6\).</p></dd>
+  <dt><code>eta_6_posterior</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior samples of the posterior distribution of \(\eta_6\).</p></dd>
 
-<dt><code>posterior_log_likelihood</code></dt>
-<dd><p>a numeric vector containing the full thinned posterior log-likelihood values, excluding burn-in samples.</p></dd>
+  <dt><code>posterior_log_likelihood</code></dt>
+<dd><p>A numeric vector containing the full thinned posterior log-likelihood values, excluding burn-in samples.</p></dd>
 
-<dt><code>D_hat</code></dt>
-<dd><p>statistic defined as -2 times the log-likelihood evaluated at the median value of the parameters.</p></dd>
+  <dt><code>D_hat</code></dt>
+<dd><p>A statistic defined as -2 times the log-likelihood evaluated at the median value of the parameters.</p></dd>
 
-<dt><code>effective_num_param_DIC</code></dt>
-<dd><p>effective number of parameters, which is calculated as median(-2*posterior_log_likelihood) minus D_hat.</p></dd>
+  <dt><code>effective_num_param_DIC</code></dt>
+<dd><p>The effective number of parameters, which is calculated as median(-2*posterior_log_likelihood) minus D_hat.</p></dd>
 
-<dt><code>DIC</code></dt>
-<dd><p>Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.</p></dd>
+  <dt><code>DIC</code></dt>
+<dd><p>The Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.</p></dd>
 
-<dt><code>lppd</code></dt>
-<dd><p>log pointwise predictive density of the observed data under the model</p></dd>
+  <dt><code>lppd</code></dt>
+<dd><p>The log pointwise predictive density of the observed data under the model.</p></dd>
 
-<dt><code>WAIC</code></dt>
-<dd><p>Widely Applicable Information Criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).</p></dd>
+  <dt><code>WAIC</code></dt>
+<dd><p>The Widely Applicable Information Criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).</p></dd>
 
-<dt><code>WAIC_i</code></dt>
+  <dt><code>WAIC_i</code></dt>
 <dd><p>The pointwise WAIC values, where WAIC := sum(WAIC_i).</p></dd>
 
-<dt><code>effective_num_param_WAIC</code></dt>
-<dd><p>effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.</p></dd>
+  <dt><code>effective_num_param_WAIC</code></dt>
+<dd><p>The effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.</p></dd>
 
-<dt><code>autocorrelation</code></dt>
-<dd><p>a data frame with the autocorrelation of each parameter for different lags.</p></dd>
+  <dt><code>autocorrelation</code></dt>
+<dd><p>A data frame with the autocorrelation of each parameter for different lags.</p></dd>
 
-<dt><code>acceptance_rate</code></dt>
-<dd><p>proportion of accepted samples in the thinned MCMC chain (excluding burn-in).</p></dd>
+  <dt><code>acceptance_rate</code></dt>
+<dd><p>The proportion of accepted samples in the thinned MCMC chain (excluding burn-in).</p></dd>
 
-<dt><code>formula</code></dt>
-<dd><p>object of type "formula" provided by the user.</p></dd>
+  <dt><code>formula</code></dt>
+<dd><p>An object of type "formula" provided by the user.</p></dd>
 
-<dt><code>data</code></dt>
-<dd><p>data provided by the user, ordered by stage.</p></dd>
+  <dt><code>data</code></dt>
+<dd><p>The data provided by the user, ordered by stage.</p></dd>
 
-<dt><code>run_info</code></dt>
-<dd><p>information about the input arguments and the specific parameters used in the MCMC chain.</p></dd>
+  <dt><code>run_info</code></dt>
+<dd><p>The information about the input arguments and the specific parameters used in the MCMC chain.</p></dd>
+
 
 </dl></div>
     <div class="section level2">

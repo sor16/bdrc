@@ -89,23 +89,50 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of type "tournament" with the following elements</p><dl><dt><code>contestants</code></dt>
-<dd><p>model objects of types "plm0","plm","gplm0" and "gplm" being compared.</p></dd>
+    <p>An object of type "tournament" with the following elements:</p><dl><dt><code>contestants</code></dt>
+<dd><p>The model objects of types "plm0", "plm", "gplm0" and "gplm" being compared.</p></dd>
 
- <dt><code>winner</code></dt>
-<dd><p>model object of the tournament winner.</p></dd>
+  <dt><code>winner</code></dt>
+<dd><p>The model object of the tournament winner.</p></dd>
 
- <dt><code>summary</code></dt>
-<dd><p>a data frame with information on results of the different games in the tournament.</p></dd>
+  <dt><code>info</code></dt>
+<dd><p>The specifics about the tournament; the overall winner; the method used; and the winning criteria.</p></dd>
 
- <dt><code>info</code></dt>
-<dd><p>specifics about the tournament; the overall winner; the method used; and the winning criteria.</p></dd>
+  <dt><code>summary</code></dt>
+<dd><p>A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:</p><ul><li><p>For method "WAIC":</p><ul><li><p>round: The tournament round</p></li>
+<li><p>comparison: The comparison number</p></li>
+<li><p>model: The model type</p></li>
+<li><p>lppd: Log pointwise predictive density</p></li>
+<li><p>eff_num_param: Effective number of parameters (WAIC)</p></li>
+<li><p>WAIC: Widely Applicable Information Criterion</p></li>
+<li><p>SE_WAIC: Standard error of WAIC</p></li>
+<li><p>Delta_WAIC: Difference in WAIC</p></li>
+<li><p>SE_Delta_WAIC: Standard error of the difference in WAIC</p></li>
+<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
+</ul></li>
+<li><p>For method "DIC":</p><ul><li><p>round: The tournament round</p></li>
+<li><p>comparison: The comparison number</p></li>
+<li><p>model: The model type</p></li>
+<li><p>D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples</p></li>
+<li><p>p_D: Effective number of parameters (DIC)</p></li>
+<li><p>DIC: Deviance Information Criterion</p></li>
+<li><p>Delta_DIC: Difference in DIC</p></li>
+<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
+</ul></li>
+<li><p>For method "PMP":</p><ul><li><p>round: The tournament round</p></li>
+<li><p>comparison: The comparison number</p></li>
+<li><p>model: The model type</p></li>
+<li><p>log_marg_lik: Log marginal likelihood estimated with the harmonic mean</p></li>
+<li><p>post_model_prob: Posterior model probability computed with Bayes factor</p></li>
+<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
+</ul></li>
+</ul><p></p></dd>
 
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Tournament is a model comparison method that uses WAIC (default method) to estimate the expected prediction error of the four models and select the most appropriate model given the data. The first round of model comparisons sets up two games between model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the <code>winning_criteria</code> (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.</p>
+    <p>Tournament is a model comparison method that uses WAIC (default method) to estimate the expected prediction error of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the <code>winning_criteria</code> (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.</p>
 <p>The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to estimate of the expected log pointwise predictive density.</p>
 <p>Method "DIC", or Deviance Information Criterion (see Spiegelhalter (2002)), is similar to the "WAIC" but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density, it uses a point estimate of the posterior distribution.</p>
 <p>Method "PMP" uses the posterior model probabilities, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. This method is not chosen as the default method because the Bayes factor calculations can be quite unstable.</p>
@@ -129,7 +156,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, data <span class="op">=</span> <span class="va">krokfors</span>, num_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament [                                                ] 0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
@@ -188,13 +215,20 @@
 <span class="r-in"><span><span class="va">t_obj</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tournament winner: gplm0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">t_obj</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   round game model      lppd eff_num_param       WAIC Delta_WAIC winner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1    1  gplm 20.779382      6.870566 -27.817631  0.5570133  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1    1 gplm0 20.370954      6.740645 -27.260617         NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1    2   plm  5.584163      4.257375  -2.653577 -0.4065514  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1    2  plm0  5.628423      4.098359  -3.060129         NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     2    3 gplm0 20.370954      6.740645 -27.260617 24.2004887   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     2    3  plm0  5.628423      4.098359  -3.060129         NA  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   round comparison model      lppd eff_num_param       WAIC   SE_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1          1  gplm 20.779382      6.870566 -27.817631 11.891811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1          1 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1          2   plm  5.584163      4.257375  -2.653577  6.663494</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1          2  plm0  5.628423      4.098359  -3.060129  6.693072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     2          3 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     2          3  plm0  5.628423      4.098359  -3.060129  6.693072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Delta_WAIC SE_Delta_WAIC winner</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5570133     0.2415971  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         NA            NA   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.4065514     0.1904362  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         NA            NA   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 24.2004887     9.1834062   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         NA            NA  FALSE</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -70,7 +70,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="tournament.html">tournament</a></span><span class="op">(</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,<span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="tournament.html">tournament</a></span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, <span class="va">krokfors</span>, num_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament [                                                ] 0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
@@ -127,13 +127,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tournament winner: gplm0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">t_obj</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   round game model      lppd eff_num_param       WAIC Delta_WAIC winner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1    1  gplm 20.779382      6.870566 -27.817631  0.5570133  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1    1 gplm0 20.370954      6.740645 -27.260617         NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1    2   plm  5.584163      4.257375  -2.653577 -0.4065514  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1    2  plm0  5.628423      4.098359  -3.060129         NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     2    3 gplm0 20.370954      6.740645 -27.260617 24.2004887   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     2    3  plm0  5.628423      4.098359  -3.060129         NA  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   round comparison model      lppd eff_num_param       WAIC   SE_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1          1  gplm 20.779382      6.870566 -27.817631 11.891811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1          1 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1          2   plm  5.584163      4.257375  -2.653577  6.663494</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1          2  plm0  5.628423      4.098359  -3.060129  6.693072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     2          3 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     2          3  plm0  5.628423      4.098359  -3.060129  6.693072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Delta_WAIC SE_Delta_WAIC winner</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5570133     0.2415971  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         NA            NA   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.4065514     0.1904362  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         NA            NA   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 24.2004887     9.1834062   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         NA            NA  FALSE</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

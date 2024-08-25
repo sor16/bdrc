@@ -61,14 +61,29 @@
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>A character denoting what type of plot should be drawn. Possible types are</p><ul><li><p>"boxplot" create a boxplot of the posterior log-likelihood values, on the deviance scale.</p></li>
-<li><p>"rating_curve" to plot the rating curve.</p></li>
-<li><p>"rating_curve_mean" to plot the posterior mean of the rating curve.</p></li>
-<li><p>"f" to plot the power-law exponent.</p></li>
-<li><p>"sigma_eps" to plot the standard deviation on the data level.</p></li>
-<li><p>"residuals" to plot the log residuals.</p></li>
-<li><p>"tournament_results" to plot tournament results visually, game for game.</p></li>
-</ul></dd>
+<dd><p>A character denoting what type of plot should be drawn. Possible types are:</p><dl><dt><code>boxplot</code></dt>
+<dd><p>Creates a boxplot of the posterior log-likelihood values, on the deviance scale.</p></dd>
+
+  <dt><code>rating_curve</code></dt>
+<dd><p>Plots the rating curve.</p></dd>
+
+  <dt><code>rating_curve_mean</code></dt>
+<dd><p>Plots the posterior mean of the rating curve.</p></dd>
+
+  <dt><code>f</code></dt>
+<dd><p>Plots the power-law exponent.</p></dd>
+
+  <dt><code>sigma_eps</code></dt>
+<dd><p>Plots the standard deviation on the data level.</p></dd>
+
+  <dt><code>residuals</code></dt>
+<dd><p>Plots the log residuals.</p></dd>
+
+  <dt><code>tournament_results</code></dt>
+<dd><p>Plots a diagram showing the tournament results.</p></dd>
+
+
+</dl></dd>
 
 
 <dt id="arg-transformed">transformed<a class="anchor" aria-label="anchor" href="#arg-transformed"></a></dt>
@@ -89,7 +104,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="tournament.html">tournament</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="tournament.html">tournament</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, data <span class="op">=</span> <span class="va">krokfors</span>, num_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament [                                                ] 0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
@@ -146,13 +161,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tournament winner: gplm0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,transformed<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, transformed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.tournament-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,type<span class="op">=</span><span class="st">'boxplot'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,type<span class="op">=</span><span class="st">'f'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,type<span class="op">=</span><span class="st">'sigma_eps'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,type<span class="op">=</span><span class="st">'residuals'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>,type<span class="op">=</span><span class="st">'tournament_results'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, type <span class="op">=</span> <span class="st">'boxplot'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, type <span class="op">=</span> <span class="st">'f'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, type <span class="op">=</span> <span class="st">'sigma_eps'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, type <span class="op">=</span> <span class="st">'residuals'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">t_obj</span>, type <span class="op">=</span> <span class="st">'tournament_results'</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.tournament-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

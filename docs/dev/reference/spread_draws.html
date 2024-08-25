@@ -52,25 +52,33 @@
 
 
 <dl><dt id="arg-mod">mod<a class="anchor" aria-label="anchor" href="#arg-mod"></a></dt>
-<dd><p>an object of class "plm0","plm","gplm0" or "gplm".</p></dd>
+<dd><p>An object of class "plm0", "plm", "gplm0" or "gplm".</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".</p></dd>
+<dd><p>Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".</p></dd>
 
 
 <dt id="arg-transformed">transformed<a class="anchor" aria-label="anchor" href="#arg-transformed"></a></dt>
-<dd><p>boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.</p></dd>
+<dd><p>A boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Data frame with columns
-<code>chain</code>
-<code>iter</code>
-<code>param</code>
-<code>value</code></p>
-    </div>
+    <p>A data frame with columns:</p><dl><dt><code>chain</code></dt>
+<dd><p>The chain number.</p></dd>
+
+  <dt><code>iter</code></dt>
+<dd><p>The iteration number.</p></dd>
+
+  <dt><code>param</code></dt>
+<dd><p>The parameter name.</p></dd>
+
+  <dt><code>value</code></dt>
+<dd><p>The parameter value.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711</p>
@@ -83,9 +91,9 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">plm0.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plm0.html">plm0</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">plm0.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plm0.html">plm0</a></span><span class="op">(</span>formula<span class="op">=</span><span class="va">Q</span><span class="op">~</span><span class="va">W</span>,data<span class="op">=</span><span class="va">krokfors</span>,num_cores<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
@@ -96,8 +104,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 36.09%.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
-<span class="r-in"><span><span class="va">hyp_samples</span> <span class="op">&lt;-</span> <span class="fu">spread_draws</span><span class="op">(</span><span class="va">plm0.fit</span>,<span class="st">'hyperparameters'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">hyp_samples</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">hyp_samples</span> <span class="op">&lt;-</span> <span class="fu">spread_draws</span><span class="op">(</span><span class="va">plm0.fit</span>,<span class="st">'hyperparameters'</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">hyp_samples</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   chain iter        c sigma_eps</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     1    1 7.693275 0.2421924</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     1    2 7.708797 0.2256351</span>
@@ -105,8 +113,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4     1    4 7.666575 0.1807933</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5     1    5 7.658464 0.1570101</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6     1    6 7.709366 0.1968574</span>
-<span class="r-in"><span><span class="va">rating_curve_samples</span> <span class="op">&lt;-</span> <span class="fu">spread_draws</span><span class="op">(</span><span class="va">plm0.fit</span>,<span class="st">'rating_curve'</span>,<span class="st">'rating_curve_mean'</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rating_curve_samples</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">rating_curve_samples</span> <span class="op">&lt;-</span> <span class="fu">spread_draws</span><span class="op">(</span><span class="va">plm0.fit</span>,<span class="st">'rating_curve'</span>,<span class="st">'rating_curve_mean'</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">rating_curve_samples</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   chain iter        h rating_curve rating_curve_mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     1    1 7.673811 0.000000e+00      0.000000e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2     1    2 7.673811 0.000000e+00      0.000000e+00</span>
