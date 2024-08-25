@@ -34,15 +34,51 @@ An object of type "tournament" with the following elements:
 \describe{
   \item{\code{contestants}}{The model objects of types "plm0", "plm", "gplm0" and "gplm" being compared.}
   \item{\code{winner}}{The model object of the tournament winner.}
-  \item{\code{summary}}{A data frame with information on results of the different games in the tournament.}
   \item{\code{info}}{The specifics about the tournament; the overall winner; the method used; and the winning criteria.}
+  \item{\code{summary}}{A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:
+    \itemize{
+      \item For method "WAIC":
+        \itemize{
+          \item round: The tournament round
+          \item comparison: The comparison number
+          \item model: The model type
+          \item lppd: Log pointwise predictive density
+          \item eff_num_param: Effective number of parameters (WAIC)
+          \item WAIC: Widely Applicable Information Criterion
+          \item SE_WAIC: Standard error of WAIC
+          \item Delta_WAIC: Difference in WAIC
+          \item SE_Delta_WAIC: Standard error of the difference in WAIC
+          \item winner: Logical value indicating if the model was selected in the corresponding comparison
+        }
+      \item For method "DIC":
+        \itemize{
+          \item round: The tournament round
+          \item comparison: The comparison number
+          \item model: The model type
+          \item D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples
+          \item p_D: Effective number of parameters (DIC)
+          \item DIC: Deviance Information Criterion
+          \item Delta_DIC: Difference in DIC
+          \item winner: Logical value indicating if the model was selected in the corresponding comparison
+        }
+      \item For method "PMP":
+        \itemize{
+          \item round: The tournament round
+          \item comparison: The comparison number
+          \item model: The model type
+          \item log_marg_lik: Log marginal likelihood estimated with the harmonic mean
+          \item post_model_prob: Posterior model probability computed with Bayes factor
+          \item winner: Logical value indicating if the model was selected in the corresponding comparison
+        }
+    }
+  }
 }
 }
 \description{
 tournament compares four rating curve models of different complexities and determines the model that provides the best fit of the data at hand.
 }
 \details{
-Tournament is a model comparison method that uses WAIC (default method) to estimate the expected prediction error of the four models and select the most appropriate model given the data. The first round of model comparisons sets up two games between model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the \code{winning_criteria} (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.
+Tournament is a model comparison method that uses WAIC (default method) to estimate the expected prediction error of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the \code{winning_criteria} (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 
 The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to estimate of the expected log pointwise predictive density.
 
@@ -56,7 +92,7 @@ When methods "WAIC" or "DIC" are used, the \code{winning_criteria} should be a r
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj <- tournament(formula = Q ~ W, data = krokfors, num_cores = 2)
 t_obj
 summary(t_obj)
 }

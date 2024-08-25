@@ -19,7 +19,7 @@
   \item{\code{f}}{Plots the power-law exponent.}
   \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
   \item{\code{residuals}}{Plots the log residuals.}
-  \item{\code{tournament_results}}{Plots tournament results visually, game for game.}
+  \item{\code{tournament_results}}{Plots a diagram showing the tournament results.}
 }}
 
 \item{transformed}{A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
@@ -34,14 +34,14 @@ Compare the four models from the tournament object in multiple ways
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj <- tournament(formula = Q ~ W, data = krokfors, num_cores = 2)
 plot(t_obj)
-plot(t_obj,transformed=TRUE)
-plot(t_obj,type='boxplot')
-plot(t_obj,type='f')
-plot(t_obj,type='sigma_eps')
-plot(t_obj,type='residuals')
-plot(t_obj,type='tournament_results')
+plot(t_obj, transformed = TRUE)
+plot(t_obj, type = 'boxplot')
+plot(t_obj, type = 'f')
+plot(t_obj, type = 'sigma_eps')
+plot(t_obj, type = 'residuals')
+plot(t_obj, type = 'tournament_results')
 }
 }
 \seealso{

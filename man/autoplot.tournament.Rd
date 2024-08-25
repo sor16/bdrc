@@ -27,7 +27,7 @@ Compare the four discharge rating curves from the tournament object in different
 library(ggplot2)
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj <- tournament(formula = Q ~ W, data = krokfors, num_cores = 2)
 autoplot(t_obj)
 }
 }

@@ -18,7 +18,7 @@ Print the summary of a tournament of model comparisons
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(Q~W,krokfors,num_cores=2)
+t_obj <- tournament(Q ~ W, krokfors, num_cores = 2)
 summary(t_obj)
 }
 }
