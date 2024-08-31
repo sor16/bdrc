@@ -9,6 +9,8 @@ test_that("gplm0 can handle different inputs", {
     expect_error(gplm0(Q ~ W, krokfors, c_param = min(krokfors$W) + 0.5)) # c_param higher than lowest stage measurements
     expect_error(gplm0(Q ~ W, krokfors, c_param = 1L)) # c_param not double
     expect_error(gplm0(Q ~ W, krokfors, h_max = max(krokfors$W) - 0.5)) #h_max lower than highest stage measurement
+    expect_error(gplm0(Q ~ W, krokfors[1,]), "At least two paired observations of stage and discharge")
+    expect_error(gplm0(Q ~ W, -1 * krokfors), "All discharge measurements must but strictly greater than zero")
     skip_on_cran()
     krokfors_new_names <- krokfors
     names(krokfors_new_names) <- c('t1', 't2')
@@ -75,10 +77,116 @@ test_that("the gplm0 object with known c with a maximum stage value is in tact",
     expect_true(max(diff(gplm0.fit_known_c$rating_curve$h)) <= (0.05 + tol)) # added tolerance
 })
 
+test_that("gplm0 sends a warning about the estimated c_upper parameter", {
+    W_grid <- seq(2.1,10,0.5)
+    data_far_from_c <- data.frame("W" = W_grid,
+                                  "Q" = 5 + exp(rnorm(length(W_grid), 0, 0.05)) * (W_grid ^ 2.5))
+    set.seed(1)
+    expect_warning(gplm0(Q ~ W,data_far_from_c, verbose = FALSE, num_cores = 2), "Dataset lacks measurements near point of zero flow and thus")
+})
 
-# test_that("gplm0 output remains unchanged", {
-#     skip_on_cran()
-#     skip_on_ci()
-#     skip_on_covr()
-#     expect_equal_to_reference(gplm0.fit,file='../cached_results/gplm0.fit.rds',update=TRUE)
-# })
+# C++ functions tests
+
+
+test_that("gplm0.density_evaluation_unknown_c works correctly", {
+    RC <- get_model_components('gplm0',
+                               y = y,
+                               h = h,
+                               c_param = NULL,
+                               h_max = max(h),
+                               forcepoint = rep(FALSE, length(h)),
+                               h_min = min(h))
+
+    theta <- c(log(1), log(0.1), log(0.1), log(1))
+    result <- gplm0.density_evaluation_unknown_c(theta, RC)
+
+    expect_type(result, "list")
+    expect_true("p" %in% names(result))
+    expect_true(is.numeric(result$p))
+    expect_true("x" %in% names(result))
+    expect_true("y_post" %in% names(result))
+    expect_true("y_post_pred" %in% names(result))
+    expect_true("log_lik" %in% names(result))
+})
+
+test_that("gplm0.density_evaluation_known_c works correctly", {
+    RC <- get_model_components('gplm0',
+                               y = y,
+                               h = h,
+                               c_param = min(h) - 0.1,
+                               h_max = max(h),
+                               forcepoint = rep(FALSE, length(h)),
+                               h_min = min(h))
+
+    theta <- c(log(0.1), log(0.1), log(1))
+    result <- gplm0.density_evaluation_known_c(theta, RC)
+
+    expect_type(result, "list")
+    expect_true("p" %in% names(result))
+    expect_true(is.numeric(result$p))
+    expect_true("x" %in% names(result))
+    expect_true("y_post" %in% names(result))
+    expect_true("y_post_pred" %in% names(result))
+    expect_true("log_lik" %in% names(result))
+})
+
+test_that("gplm0.predict_u_unknown_c works correctly", {
+    RC <- get_model_components('gplm0',
+                               y = y,
+                               h = h,
+                               c_param = NULL,
+                               h_max = max(h),
+                               forcepoint = rep(FALSE, length(h)),
+                               h_min = min(h))
+
+    theta <- c(log(1), log(0.1), log(0.1), log(1))
+    x <- c(1, 2, rep(0, length(unique(h))))
+
+    result <- gplm0.predict_u_unknown_c(theta, x, RC)
+
+    expect_type(result, "list")
+    expect_true(all(c("x", "y_post", "y_post_pred") %in% names(result)))
+    expect_true(all(sapply(result, is.numeric)))
+    expect_equal(length(result$x), RC$n_u)
+    expect_equal(length(result$y_post), RC$n_u)
+    expect_equal(length(result$y_post_pred), RC$n_u)
+})
+
+test_that("gplm0.predict_u_known_c works correctly", {
+    RC <- get_model_components('gplm0',
+                               y = y,
+                               h = h,
+                               c_param = min(h) - 0.1,
+                               h_max = max(h),
+                               forcepoint = rep(FALSE, length(h)),
+                               h_min = min(h))
+
+    theta <- c(log(0.1), log(0.1), log(1))
+    x <- c(1, 2, rep(0, length(unique(h))))
+
+    result <- gplm0.predict_u_known_c(theta, x, RC)
+
+    expect_type(result, "list")
+    expect_true(all(c("x", "y_post", "y_post_pred") %in% names(result)))
+    expect_true(all(sapply(result, is.numeric)))
+    expect_equal(length(result$x), RC$n_u)
+    expect_equal(length(result$y_post), RC$n_u)
+    expect_equal(length(result$y_post_pred), RC$n_u)
+})
+
+test_that("gplm0.calc_Dhat works correctly", {
+    RC <- get_model_components('gplm0',
+                               y = y,
+                               h = h,
+                               c_param = NULL,
+                               h_max = max(h),
+                               forcepoint = rep(FALSE, length(h)),
+                               h_min = min(h))
+
+    theta <- matrix(c(log(1), log(0.1), log(0.1), log(1)), nrow = 4)
+    result <- gplm0.calc_Dhat(theta, RC)
+
+    expect_type(result, "double")
+    expect_true(is.finite(result))
+})
+

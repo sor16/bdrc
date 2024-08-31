@@ -1,4 +1,4 @@
-context('Advanced data wrangling of bdrc model objects')
+context("Extract draws functions")
 
 check_spread_draws_MCMC_mat_concordance <- function(mod, dat){
     components <- unique(names(dat)[!(names(dat) %in% c('chain', 'iter', 'h'))])
@@ -34,7 +34,7 @@ check_gather_draws_MCMC_mat_concordance <- function(mod, dat){
 }
 
 test_that("check different inputs to spread draws and gather draws", {
-    skip_on_cran()
+    # skip_on_cran()
     expect_equal(spread_draws(plm0.fit, 'c', 'sigma_eps'),
                  spread_draws(plm0.fit, c('c', 'sigma_eps')))
     expect_equal(spread_draws(plm.fit, 'c', paste0('eta_', 1:3)),
@@ -57,7 +57,7 @@ test_that("check different inputs to spread draws and gather draws", {
 })
 
 test_that("spread draws and gather draws are concordant with MCMC matrices", {
-    skip_on_cran()
+    # skip_on_cran()
     #spread_draws
     check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit, 'c', 'sigma_eps'))
     check_spread_draws_MCMC_mat_concordance(plm0.fit,spread_draws(plm0.fit, 'rating_curve', 'rating_curve_mean', 'c'))
@@ -84,6 +84,73 @@ test_that("spread draws and gather draws are concordant with MCMC matrices", {
     check_gather_draws_MCMC_mat_concordance(gplm.fit,spread_draws(gplm.fit, 'rating_curve', 'rating_curve_mean', 'sigma_eps', 'beta', 'f', 'sigma_eta'))
 })
 
-## TODO test transformed
+test_that("spread_draws handles various input combinations", {
+    # Test with single parameter
+    single_param <- spread_draws(plm0.fit, "c")
+    expect_true("c" %in% names(single_param))
+    expect_equal(ncol(single_param), 3)
+
+    # Test with multiple parameters
+    multi_param <- spread_draws(plm0.fit, "c", "sigma_eps")
+    expect_true(all(c("c", "sigma_eps") %in% names(multi_param)))
+    expect_equal(ncol(multi_param), 4)
+
+    # Test with transformed parameter
+    transformed_param <- spread_draws(plm0.fit, "c", transformed = TRUE)
+    expect_true("log(h_min-c)" %in% names(transformed_param))
+
+    # Test with rating curve
+    rc_param <- spread_draws(plm0.fit, "rating_curve")
+    expect_true("rating_curve" %in% names(rc_param))
+    expect_true("h" %in% names(rc_param))
+})
+
+test_that("gather_draws handles various input combinations", {
+    # Test with single parameter
+    single_param <- gather_draws(plm0.fit, "c")
+    expect_equal(unique(single_param$name), "c")
+    expect_equal(ncol(single_param), 4)
+
+    # Test with multiple parameters
+    multi_param <- gather_draws(plm0.fit, "c", "sigma_eps")
+    expect_equal(sort(unique(multi_param$name)), c("c", "sigma_eps"))
+
+    # Test with transformed parameter
+    transformed_param <- gather_draws(plm0.fit, "c", transformed = TRUE)
+    expect_true(any(grepl("log\\(h_min-c\\)", transformed_param$name)))
+
+    # Test with rating curve
+    rc_param <- gather_draws(plm0.fit, "rating_curve")
+    expect_true("rating_curve" %in% unique(rc_param$name))
+    expect_true("h" %in% names(rc_param))
+})
+
+test_that("spread_draws and gather_draws handle errors correctly", {
+    # Test with invalid parameter name
+    expect_error(spread_draws(plm0.fit, "invalid_param"), "Does not recognize the following input arguments")
+    expect_error(gather_draws(plm0.fit, "invalid_param"), "Does not recognize the following input arguments")
+
+    # Test with invalid model object
+    invalid_model <- list(class = "invalid")
+    expect_error(spread_draws(invalid_model, "c"), "mod must be of class")
+    expect_error(gather_draws(invalid_model, "c"), "mod must be of class")
+})
+
+test_that("spread_draws and gather_draws produce consistent results", {
+    params <- c("c", "sigma_eps", "rating_curve")
+    spread_result <- spread_draws(plm0.fit, params)
+    gather_result <- gather_draws(plm0.fit, params)
+
+    # Check that the number of rows is consistent
+    expect_equal(nrow(spread_result), nrow(gather_result) / length(params))
+
+    # Check that the values are consistent
+    for (param in params) {
+        spread_values <- spread_result[[param]]
+        gather_values <- gather_result$value[gather_result$name == param]
+        expect_equal(spread_values, gather_values)
+    }
+})
+
 
 
