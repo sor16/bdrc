@@ -23,114 +23,247 @@ knitr::opts_chunk$set(
 
 This vignette explores the ways you can compare the fit of the different discharge rating curve models provided in the `bdrc` package. The package includes four different models to fit a discharge rating curve of different complexities. These are:
 
-```plm0() ``` - Power-law model with a constant error variance (hence the 0). This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
+* ```plm0() ``` - Power-law model with constant log-error variance.  
 
-```plm() ``` - Power-law model with error variance that varies with water elevation.
+* ```plm() ``` - Power-law model with stage-dependent log-error variance.  
 
-```gplm0() ``` - Generalized power-law model with a constant error variance (hence the 0). The generalized power law is introduced in Hrafnkelsson et al. (2022).
+* ```gplm0() ``` - Generalized power-law model with constant log-error variance.  
 
-```gplm() ``` - Generalized power-law model with error variance that varies with water elevation. The generalized power law is introduced in Hrafnkelsson et al. (2022).
+* ```gplm() ``` - Generalized power-law model with stage-dependent log-error variance.  
 
+The '0' indicates that the variance of the log-transformed errors is modeled as a constant. The `plm0` model is simply a Bayesian hierarchical implementation of the classical power-law model, widely used in hydrological practice. For more details on these models, refer to Hrafnkelsson et al. (2022). For an brief overview of the underlying theory, see our [Background](background.html) vignette. For guidance on applying these models to your data, refer to the [Introduction](introduction.html) vignette. 
 
-To learn more about the models, see Hrafnkelsson et al. (2022). To learn about how to run the models on your data, see the [introduction vignette](introduction.html). The tournament is a model comparison method that uses the Widely Applicable Information Criterion (WAIC) (see Watanabe (2010)) to select the most appropriate of the four models given the data. The WAIC consists of two terms, a measure of the goodness-of-fit, and a penalizing term to account for model complexity (effective number of parameters). The first round of model comparisons sets up model types, _gplm_ vs _gplm0_, and _plm_ vs. _plm0_. The two comparisons are conducted such that if the WAIC of the more complex model ( _gplm_ and _plm_, respectively ) is smaller than the WAIC of the simpler models ( _gplm0_ and _plm0_, respectively ) by a pre-specified value called the winning criteria (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data. In each match, the difference in WAIC is defined as $\Delta\text{WAIC}=\text{WAIC}_{\text{simple}}-\text{WAIC}_{\text{complex}}$. A positive value of $\Delta\text{WAIC}$ indicates that the more complex model is a more appropriate model, but the more complex model only goes through to the final round if $\Delta\text{WAIC}$ is greater than the winning criteria.
+## The tournament method
 
-To introduce the tournament function, we will use a dataset from the stream gauging station Krokfors in Sweden that comes with the package:
+The tournament method uses the Widely Applicable Information Criterion (WAIC) (Watanabe, 2010) to select the most appropriate model for a given dataset. The WAIC balances two factors:
+
+1. Goodness-of-fit: How well the model fits the observed data.
+
+2. Model complexity: A penalty term accounting for the effective number of parameters.
+
+A lower WAIC indicates a better balance between model fit and complexity, making it the preferred model.
+
+The tournament process occurs in two rounds:
+
+1. First round: 
+
+   - `gplm` vs `gplm0`
+   
+   - `plm` vs `plm0`
+<br>
+2. Final round:
+
+   - Winners of the first round face off
+
+In each comparison, we calculate $\Delta\text{WAIC} = \text{WAIC}_{\text{simple}} - \text{WAIC}_{\text{complex}}$. A positive $\Delta\text{WAIC}$ suggests the complex model is more appropriate. However, to advance to the next round, $\Delta\text{WAIC}$ must exceed a pre-specified "winning criteria" (default value = 2). This threshold helps ensure that we only choose a more complex model if it offers a substantial improvement.
+
+The default winning criteria of 2 is based on statistical guidelines for model selection (Burnham & Anderson, 2002), balancing the trade-off between model fit and complexity. It helps prevent overfitting by requiring evidence to justify a more complex model.
+In the following sections, we'll provide code examples demonstrating how to conduct the power-law tournament with your own data using the `bdrc` package.
+
+## Introducing the Tournament Function
+
+To demonstrate the tournament function, we'll use a real-world dataset from the Krokfors stream gauging station in Sweden, which is included in the `bdrc` package:
+
 ```{r,message=FALSE}
 library(bdrc)
 data(krokfors)
-krokfors
+head(krokfors)
 ```
 
+The Krokfors dataset contains 27 observations of discharge measurements from a stream gauging station. Each observation consists of two variables:
+
+* `W`: Water level (stage) measured in meters above a fixed reference point.
+
+* `Q`: Discharge, measured in cubic meters per second (m³/s).
+
+The Krokfors data is particularly suitable for demonstrating the tournament function as it provides a real-world example of the type of data typically used in discharge rating curve analysis. The dataset will help illustrate how different models perform across the range of observed water levels and discharges.
+
+
 ## Running a tournament
-The tournament function is easy to use. All you need are two mandatory input arguments: `formula` and `data`. The `formula` is of the form `y ~ x`, where `y` is the discharge in m$^3/$s, and `x` is the water elevation in m (it is very important that the data is in the correct units). The `data` argument must be a `data.frame` including `x` and `y` as column names. In our case, the dataset from Krokfors has a column named `Q` which includes the discharge measurements, and a column `W` which includes the water elevation measurements. We are ready to run our first tournament:
+
+The tournament function is straightforward to use, requiring two main arguments:
+
+* `formula`: Specifies the relationship between discharge and water elevation (e.g., `Q ~ W`).
+
+* `data`: A `data.frame` with column names corresponding to the variables specified in the formula.
+
+It is very important that the discharge is represented in cubic meters per second (m³/s) and the water elevation in meters (m). 
+
+Let's run our first tournament:
+
 ```{r, cache=TRUE}
 set.seed(1) # set seed for reproducibility
 t_obj <- tournament(Q ~ W, krokfors, parallel = TRUE, num_cores = 2) # by default parallel=TRUE and the number of cores is detected on the machine
 ```
 
-The function runs the four models and then the tournament. If you have already run the four different kinds of models, `plm0`, `plm`, `gplm0` and `gplm`, and they are stored in objects, say `plm0.fit`, `plm.fit`, `gplm0.fit` and `gplm.fit`, then you can alternatively run the tournament very efficiently in the following way:
-```{r,eval=FALSE}
-t_obj <- tournament(list(plm0.fit, plm.fit, gplm0.fit, gplm.fit))
-```
+This output provides valuable information about the MCMC sampling process for each model:
 
-Evaluating the tournament object gives you the name of the winner
+1. Progress:  
+<br>
+    - Shows the overall progress of the tournament as each of the four models is fitted sequentially.
+    - Indicates the start of the Markov Chain Monte Carlo (MCMC) process for each model.
+    - Provides information on how the sampling process is being distributed across your computer's CPU cores. In this example, we see that the 4 chain sampling process is being distributed across 2 CPU cores (4 chains in 2 jobs).  
+<br>
+2. Diagnostics:  
+<br>
+   - Acceptance rate: The proportion of proposed parameter values that were accepted in the MCMC sampling scheme.
+   - Chain mixing: A message reporting if the different MCMC chains have mixed well.
+   - Effective sample size: A message reporting if enough independent samples have been drawn from the posterior distribution.
+
+If some parameters do not meet the criteria for chain mixing or effective sample size (Gelman-rubin statistic (`Rhat`) < 1.1 for mixing and effective number of samples (`eff_n_samples`) > 400 for sample size), the function will print out a warning. This helps you identify potential issues with the MCMC sampling for specific parameters.
+
+These diagnostics help ensure the reliability of our results. Good chain mixing and sufficient effective sample sizes indicate that our MCMC sampling has likely converged to the true posterior distribution. The function can be made to run silently by setting `verbose = FALSE`.
+
+Note: By default, `parallel=TRUE` and the function automatically detects the number of available cores. Parallel processing is used to run multiple MCMC chains simultaneously, significantly reducing computation time for complex models or large datasets.
+
+To see the tournament winner:
 ```{r}
 t_obj # or alternatively print(t_obj)
 ```
 
-For a more detailed summary of the results of the tournament, write
+If you've already fitted the four models separately and stored in objects (e.g., `plm0.fit`, `plm.fit`, `gplm0.fit`, `gplm.fit`), you can run the tournament more efficiently:
+```{r,eval=FALSE}
+t_obj <- tournament(list(plm0.fit, plm.fit, gplm0.fit, gplm.fit))
+```
+
+
+For a more comprehensive summary of the tournament results:
 ```{r}
 summary(t_obj)
 ```
 
-In the first round, `gplm0` is favored over `gplm`, and `plm0` over `plm`, based on their respective $\Delta\text{WAIC}$ values. In the final comparison (round 2, comparison 3), `gplm0` emerges as the tournament winner, evidenced by a large positive $\Delta\text{WAIC}$ of ~24 when compared to `plm0`. This indicates that `gplm0` provides the best balance between model complexity and fit to the data. 
+The first round of the tournament favors `gplm0` over `gplm`, and `plm0` over `plm`, based on their respective $\Delta\text{WAIC}$ values. In the final round, `gplm0` emerges as the overall winner, with a substantial positive $\Delta\text{WAIC}$ of ~24 when compared to `plm0`. This indicates that `gplm0` provides the best balance between model complexity and fit to the data.
 
-The standard error of the estimated WAIC difference, $\text{SE}(\Delta\text{WAIC})$, denoted as `SE_Delta_WAIC`, is rather large at ~9. This suggests some uncertainty in the magnitude of this difference. However, it's important to note that despite the small sample size, the `SE_Delta_WAIC` is less than half the $\Delta\text{WAIC}$ estimate. This provides some confidence in the preference for `gplm0`, as the difference in WAIC is more than two standard errors away from zero. Lets further investigate this comparison.
+The standard error of the estimated WAIC difference, denoted as `SE_Delta_WAIC`, is rather large at ~9. This suggests some uncertainty in the magnitude of this difference. However, it's important to note that despite the small sample size, the `SE_Delta_WAIC` is less than half the $\Delta\text{WAIC}$ estimate. This provides some confidence in the preference for `gplm0`, as the difference in WAIC is more than two standard errors away from zero. Lets further investigate this comparison.
 
-## Comparing different components of the models
-To gain a deeper understanding of the model comparison results, we can utilize various visualization tools. These tools allow us to examine different aspects of the models and their performance. To begin, let's create a visual summary of the results from the different comparisons in the tournament.
+## Visualizing the model comparisons
+
+To gain deeper insights into the model comparison results, we can use various visualization tools:
+
+#### 1. Tournament results diagram:
 
 ```{r, fig.width=8, fig.height=6, fig.alt="<em>A diagram showing the results of the power-law tournament. The diagram progresses from bottom (four initial models) to top (single winner). Each model's residual plot is shown at the bottom, with corresponding WAIC values above. Green WAIC values indicate the more parsimonious models in each comparison for these data. The first round selects gplm0 and plm0, which advance to the final comparison. gplm0 emerges as the tournament winner, indicated by its green WAIC value and the name at the top of the diagram.</em>"}
 plot(t_obj) #default plot type is type='tournament_results'
 ```
 
-An informative way of comparing the goodness-of-fit of the models is to compare the posteriors of the log-likelihood values. The values are commonly shown on the deviance scale, i.e., minus 2 times the log-likelihood. A lower value on the deviance scale implies a better fit to the data. To plot a boxplot of the posterior log-likelihood values for each model, we write
+This diagram illustrates the tournament progression from the initial four models to the final winner. It shows each model's residual plot at the bottom, with corresponding WAIC values above. Green WAIC values indicate the selected model for each comparison.
+
+#### 2. Log-likelihood comparison:
+
 ```{r, fig.width=8, fig.height=6, fig.alt="A comparative boxplot displaying posterior log-likelihood values for the models, with corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale for direct comparison with WAIC. Each boxplot represents the distribution of log-likelihood values computed with the samples from the posterior distribution of the corresponding model. This visualization allows for easy comparison of model performance and fit across the four models."}
 plot(t_obj, type = 'boxplot')
 ```
 
-The red diamonds on the plot denote the WAIC values for the respective models. Next, to plot the four rating curves that were estimated by the different models, write
+This boxplot compares the posterior log-likelihood values for each model, with the corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale (-2 * log-likelihood) for a direct comparison with WAIC. Lower values indicate better fit.
+
+#### 3. Rating curve comparison:
+
 ```{r, fig.width=8, fig.height=6, fig.alt="A plot comparing the rating curves estimated by four models. The graph shows water level (stage) on the y-axis and discharge on the x-axis. Each model's estimated rating curve is represented by a solid line, with dotted lines showing the 95% prediction interval. This visualization enables assessment of model fit across the range of water levels, highlighting differences in predictive capabilities. Optimal performance is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval."}
 plot(t_obj, type = 'rating_curve')
 ```
 
-Another useful plot is the residual plot 
+This plot compares the estimated rating curves from all four models. It shows water level (stage) vs. discharge, with solid lines representing the estimated curves and dotted lines showing 95% prediction intervals. This visualization helps assess model fit across different water levels. Optimal model fit is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval.
+
+#### 4. Residual plot comparison:
+
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj, type = 'residuals')
 ```
 
-The differences between the four models lie in the modeling of the power-law exponent, $f(h)$, and the error variance at the response level, $\sigma^2_{\varepsilon}(h)$. Thus, it is insightful to look at the posterior of the power-law exponent for the different models
+The residual plots also help assess how well each model fits the data by showing differences between observed and predicted values across water levels. This can reveal patterns in model performance and highlight any systematic under- or over-predictions. Optimal model fit is indicated by the rating curve mean (solid horizontal line) following the mean of the observations, and 95% of observations falling within the 95% prediction interval (dotted lines).
+
+#### 5. Model Component Comparisons:
+
+The differences between the four models lie in the treatment of the power-law exponent, $f(h)$, and the log-error standard deviation, $\sigma^2_{\varepsilon}(h)$, as either constants or stage-dependent functions. Therefore, it is insightful to examine the posterior distributions of these elements across the different models to determine whether stage dependence exists or if the assumption of constancy is appropriate.
+
+##### Power-law exponent comparison:
+
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj, type = 'f')
 ```
 
-and the standard deviation of the error terms at the response level
+The plots show that the exponent is clearly not constant over the water elevations. This observation supports the use of the generalized power-law models (`gplm` and `gplm0`) over the classical power-law models (`plm` and `plm0`), as they allow for this non-constant behavior of the power-law exponent.
+
+##### Log-error standard deviation comparison:
+
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj, type = 'sigma_eps')
 ```
 
-Finally, the panel option is useful to gain insight into all different model components of the winning model, which in this case is `gplm0`:
+In contrast to the exponent, the log-error standard deviation does not show a clear non-constant trend over the water elevations. This observation suggests that models with constant error variance (`plm0` and `gplm0`) might be sufficient for this dataset, aligning with the tournament results that selected `gplm0`.
+
+#### 6. Winning model panel:
+
+Finally, the `panel` option is useful to gain insight into all different model components of the winning model, which in this case is `gplm0`:
+
 ```{r, fig.width=8, fig.height=6}
 plot(t_obj, type = 'panel', transformed = TRUE)
 ```
 
+This panel plot provides a comprehensive view of the winning model's components, including the rating curve, residuals, power-law exponent, and the log-error standard deviation. This visualization is particularly useful for understanding how the different elements of the winning model work together and how they relate to the observed data. The `transformed = TRUE` argument transforms the rating curve and observations onto the modeling scale (log-scale).
+
 ## Customizing tournaments
-There are a few ways to customize the tournament further. For example, if the parameter of zero discharge $c$ is known, you might want to fix that parameter to the known value in the model. Assume $7.65$ m is the known value of $c$. Then you can directly run a tournament with the $c$ parameter fixed in all the models
+
+There are several ways to customize the tournament further:
+
+#### 1. Fixing the `c` parameters:
+
+If the parameter of zero discharge $c$ is known, you might want to fix that parameter to the known value in the model. Assume $7.65$ m is the known value of $c$. Then you can directly run a tournament with the $c$ parameter fixed in all the models:
+
 ```{r,eval=FALSE}
 t_obj_known_c <- tournament(formula = Q ~ W , data = krokfors, c_param = 7.65)
 ```
 
-One can also change the winning criteria (default value = 2) which sets the threshold that the more complex model in each model comparison must exceed, in terms of the model comparison criteria (default method is `"WAIC"`). For example, increasing the value to `winning_criteria = 5` raises the threshold that the more complex model must exceed to be selected in a comparison, thus favoring model simplicity more than if the default value of 2 were used. To re-evaluate a previously run tournament using a different winning criteria, the most efficient way is to input the list of stored model objects in the existing tournament object. In our case we have the tournament stored in `t_obj`, so we can write
+#### 2. Adjusting the winning criteria:
+
+You can change the winning criteria (default value = 2) which sets the threshold that the more complex model in each model comparison must exceed. For example, increasing the value to `winning_criteria = 5` raises the threshold, thus favoring model simplicity more. To re-evaluate a previously run tournament using a different winning criteria, you can simply the `summary` function:
+
 ```{r}
-t_obj_conservative <- tournament(t_obj$contestants, winning_criteria = 5)
-summary(t_obj_conservative)
+summary(t_obj, winning_criteria = 5)
 ```
 
-There is also an option to change the method used to estimate the predictive performance of the models. The default method is `"WAIC"` (see Watanabe (2010)) which is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density. Other allowed methods are `"DIC"` and `"PMP"`. The DIC (see Spiegelhalter (2002)) is similar to WAIC but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density, it uses a point estimate of the posterior distribution. Both methods `"WAIC"` and `"DIC"` have a default value of 2 for the winning criteria. We again run the efficient re-evaluation of the tournament
+For the method `"WAIC"`, you can also specify a more complex winning criteria as a string expression:
+
 ```{r}
-t_obj_DIC <- tournament(t_obj$contestants, method = "DIC")
-summary(t_obj_DIC)
+summary(t_obj, winning_criteria = "Delta_WAIC > 2 & Delta_WAIC - SE_Delta_WAIC > 0")
 ```
 
-The third and final method that can be chosen is `"PMP"`, which uses the posterior model probabilities, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. When using the method `"PMP"`, the value of the winning criteria should be a real number between 0 and 1, since this represents the threshold value that the posterior probability of the more complex model has to surpass to be selected as the appropriate model. The default value in this case for the winning criteria is 0.75, which again slightly favors model simplicity. The value 0.75 should give similar results to the other two methods with their respective default values of 2. The method `"PMP"` is not chosen as the default method because the Bayes factor calculations can be quite unstable. Let's now use this method, but raise the winning criteria from 0.75 to 0.9 
+This criteria requires that the difference in WAIC is greater than 2 and that this difference minus its standard error is greater than 0, providing a more conservative approach to model selection.
+
+Note: Only `Delta_WAIC` and `SE_Delta_WAIC` are allowed as variables in the winning_criteria expressions. 
+
+#### 3. Changing the model comparison method:
+
+The default method is `"WAIC"`, but you can also use `"DIC"` or `"PMP"`:
+
+* `"WAIC"` (default):
+
+   WAIC (Watanabe, 2010) is a fully Bayesian method that uses the full set of posterior draws to calculate the best possible estimate of the expected log pointwise predictive density.
+
+* `"DIC"`:
+
+   DIC (Spiegelhalter, 2002) is similar to WAIC but uses a point estimate of the posterior distribution instead of the full set of posterior draws.
+
 ```{r}
-t_obj_prob <- tournament(t_obj$contestants, method = "PMP", winning_criteria = 0.9)
-summary(t_obj_prob) 
+summary(t_obj, method = "DIC")
 ```
 
-We see that the results of the tournament do not change in this example, and the winner of the third and final comparison is still `gplm0`.
+* `"PMP"` (posterior model probabilities):
+
+   The posterior model probabilities are computed with Bayes factors (Jeffreys, 1961; Kass and Raftery, 1995), assuming all models are equally likely a priori. The winning criteria for method `"PMP"` should be between 0 and 1, representing the threshold for the posterior probability of the more complex model. The default is 0.75, which should give similar results to the other two methods with their respective default values of 2. The method `"PMP"` is not chosen as the default method because the Bayes factor calculations can be quite unstable. Let's now use this method, but raise the winning criteria from 0.75 to 0.9 
+```{r}
+summary(t_obj, method = "PMP", winning_criteria = 0.9)
+```
+
+Note that when using the summary function to change the method or winning criteria, the tournament is re-run with the new parameters using the original contestant models. This allows for efficient comparison of different methods or criteria without having to refit the models.
+
+These examples demonstrate how different methods and winning criteria can be applied to model comparison. While it's valuable to explore these options, we generally recommend using the WAIC method, as it provides a robust and theoretically sound approach to model selection. WAIC uses the full posterior distribution and is particularly well-suited for hierarchical models.
+
+In the case of the Krokfors dataset, we see that the results of the tournament do not change despite these customizations, and the winner of the third and final comparison is still `gplm0`. This consistency across different methods and criteria suggests that `gplm0` is indeed the most appropriate model for this particular dataset. 
 
 ## References
+
+Burnham, K. P. and Anderson, D. R. (eds) (2002). *Information and Likelihood Theory: A Basis for Model Selection and Inference*. New York, NY: Springer New York. 49–97, doi: https://doi.org/10.1007/978-0-387-22456-5_2
 
 Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
 
