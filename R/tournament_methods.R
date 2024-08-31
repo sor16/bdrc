@@ -130,20 +130,54 @@ print.tournament <- function(x, ...){
 
 #' Summary method for a discharge rating curve tournament
 #'
-#' Print the summary of a tournament of model comparisons
+#' Print the summary of a tournament of model comparisons. This function allows for an efficient and fast re-run of the tournament with different methods or winning criteria.
+#'
 #' @param object An object of class "tournament"
-#' @param ... not used in this function
-#' @seealso  \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
+#' @param method Optional; a string specifying the method to use for the summary. If NULL, uses the method from the original tournament. Options are "WAIC", "DIC", or "PMP".
+#' @param winning_criteria Optional; specifies new winning criteria for the summary. If NULL, uses the criteria from the original tournament. See Details in \code{\link{tournament}} for proper formatting.
+#' @param ... Not used in this function
+#'
+#' @details
+#' If either \code{method} or \code{winning_criteria} is provided, the function re-runs the tournament with the new parameters using the fitted models.
+#'
+#' @return Prints the summary to the console.
+#'
+#' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the model comparison
+#'
 #' @examples
 #' \donttest{
 #' data(krokfors)
 #' set.seed(1)
 #' t_obj <- tournament(Q ~ W, krokfors, num_cores = 2)
 #' summary(t_obj)
+#'
+#' # Re-run summary with different method
+#' summary(t_obj, method = "DIC")
+#'
+#' # Re-run summary with different winning criteria
+#' summary(t_obj, winning_criteria = "Delta_WAIC > 3")
 #' }
+#'
 #' @export
-summary.tournament <- function(object, ...){
-    object$summary
+summary.tournament <- function(object, method = NULL, winning_criteria = NULL, ...) {
+    print_warning <- FALSE
+    if(is.null(method) & is.null(winning_criteria)){
+        out <- tournament_summary_output(object$summary, object$info$method, object$info$winning_criteria)
+    } else {
+        if(!is.null(method) & is.null(winning_criteria)){
+            new_t_obj <- tournament(object$contestants, method = method, verbose = FALSE)
+        } else if(is.null(method) & !is.null(winning_criteria)){
+            new_t_obj <- tournament(object$contestants, method = object$info$method, winning_criteria = winning_criteria, verbose = FALSE)
+        } else if(!is.null(method) & !is.null(winning_criteria)){
+            new_t_obj <- tournament(object$contestants, method = method, winning_criteria = winning_criteria, verbose = FALSE)
+        }
+        out <- tournament_summary_output(new_t_obj$summary, new_t_obj$info$method, new_t_obj$info$winning_criteria)
+        if(new_t_obj$info$method=="PMP") {
+            print_warning <- TRUE
+        }
+    }
+    invisible(out)
+    if(print_warning) cat( '\n\u26A0 Warning: The Harmonic Mean Estimator (HME) is used to estimate the Bayes Factor for the posterior model probability (PMP), which is known to be unstable and potentially unreliable. We recommend using method "WAIC" (Widely Applicable Information Criterion) for model comparison instead.\n' )
 }
 
 #' Autoplot method for discharge rating curve tournament
@@ -151,8 +185,8 @@ summary.tournament <- function(object, ...){
 #' Compare the four discharge rating curves from the tournament object in different ways
 #'
 #' @param object An object of class "tournament"
-#' @param ... Other plotting parameters (not used in this function)
 #' @param type A character denoting what type of plot should be drawn. Possible types are
+#' @param ... Not used in this function
 #' \describe{
 #'   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values transformed to the deviance scale.}
 #' }
@@ -169,7 +203,7 @@ summary.tournament <- function(object, ...){
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point xlab ylab
 #' @importFrom rlang .data
 #' @export
-autoplot.tournament <- function(object, ..., type = 'boxplot'){
+autoplot.tournament <- function(object, type = 'boxplot', ...){
     legal_types <- c('boxplot')
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n - ', paste(legal_types, collapse = '\n - ')))
@@ -180,12 +214,11 @@ autoplot.tournament <- function(object, ..., type = 'boxplot'){
 }
 
 
-#' Plot method for discharge rating curve tournament
+#' Plot method for a discharge rating curve tournament
 #'
 #' Compare the four models from the tournament object in multiple ways
 #'
 #' @param x An object of class "tournament"
-#' @param ... Other plotting parameters (not used in this function)
 #' @param type A character denoting what type of plot should be drawn. Possible types are:
 #' \describe{
 #'   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values, on the deviance scale.}
@@ -197,6 +230,7 @@ autoplot.tournament <- function(object, ..., type = 'boxplot'){
 #'   \item{\code{tournament_results}}{Plots a diagram showing the tournament results.}
 #' }
 #' @param transformed A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.
+#' @param ... Not used in this function
 #' @return No return value, called for side effects
 #' @seealso \code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{summary.tournament}} for summaries.
 #' @examples
@@ -215,7 +249,7 @@ autoplot.tournament <- function(object, ..., type = 'boxplot'){
 #' @importFrom grid grid.draw
 #' @importFrom gridExtra grid.arrange
 #' @export
-plot.tournament <- function(x, ..., type = 'tournament_results', transformed = FALSE){
+plot.tournament <- function(x, type = 'tournament_results', transformed = FALSE, ...){
     legal_types <- c("boxplot", "tournament_results", "rating_curve", "rating_curve_mean", "sigma_eps", "f", "residuals", "convergence_diagnostics", "panel", "tournament_results")
     error_msg <- paste0('Type not recognized. Possible types are:', paste(legal_types, collapse = '\n - '))
     if( is.null(type) ){
@@ -236,4 +270,123 @@ plot.tournament <- function(x, ..., type = 'tournament_results', transformed = F
             grid.draw(p)
         }
     }
+}
+
+#' Internal function to generate a summary output for a discharge rating curve tournament
+#'
+#' This function takes the summary results of a tournament object and produces a formatted
+#' console output displaying the results of model comparisons. It supports different
+#' model selection criteria: WAIC, DIC, and PMP.
+#'
+#' @param results A data.frame containing the summary results of a tournament.
+#'   The structure of this data.frame determines which model-selection criterion
+#'   was used (WAIC, DIC, or PMP).
+#' @param method A string indicating the method used for model comparison ("WAIC", "DIC", or "PMP").
+#' @param winning_criteria The criteria used to determine the winning model.
+#'
+#' @details
+#' The function automatically detects the model-selection criterion used based on
+#' the columns present in the input data frame. It then formats and prints a
+#' summary of the tournament results, including the overall winner and detailed
+#' results for each comparison.
+#'
+#' @keywords internal
+#'
+#' @return This function does not return a value; it prints the formatted summary
+#' to the console.
+tournament_summary_output <- function(results, method, winning_criteria) {
+    if(!(method %in% c("WAIC", "DIC", "PMP"))) stop("Unknown method for tournament model comparison. Methods allowed are: 'WAIC' (default), 'DIC', and 'PMP'.")
+    # Determine the method used and set appropriate columns
+    if ("WAIC" %in% names(results)) {
+        criteria_cols <- c("lppd", "eff_num_param", "WAIC", "SE_WAIC", "Delta_WAIC", "SE_Delta_WAIC")
+        line_length <- 94
+    } else if ("DIC" %in% names(results)) {
+        criteria_cols <- c("D_hat", "eff_num_param", "DIC", "Delta_DIC")
+        line_length <- 70
+    } else if ("log_marg_lik" %in% names(results)) {
+        criteria_cols <- c("log_marg_lik", "PMP")
+        line_length <- 51
+    }
+
+    # Round numeric columns
+    results[criteria_cols] <- lapply(results[criteria_cols], function(x) round(x, digits = 4))
+
+    # Find the overall winner (winner of last comparison)
+    overall_winner <- results$model[results$round == max(results$round) & results$winner]
+
+    # Print summary header
+    cat("\n=== Tournament Model Comparison Summary ===\n\n")
+    cat("Method:", method, "\n")
+    if (method == "PMP") {
+        cat("Winning Criteria: PMP of complex model >", winning_criteria, "\n")
+    } else if (method == "DIC") {
+        cat("Winning Criteria: Delta_DIC >", winning_criteria, "\n")
+    } else if (method == "WAIC") {
+        if(is.numeric(winning_criteria)) {
+            cat("Winning Criteria: Delta_WAIC >", winning_criteria, "\n")
+        } else {
+            cat("Winning Criteria:", winning_criteria, "\n")
+        }
+    }
+    cat("Overall Winner:", overall_winner, "\n\n")
+
+    # Function to print a single comparison's results
+    print_comparison <- function(comparison_data) {
+        cat("Comparison", unique(comparison_data$comparison), "Results:\n")
+        cat(paste(rep("-", line_length), collapse = ""), "\n")
+
+        # Print column headers based on the method
+        if (method == "WAIC") {
+            cat(sprintf("%-8s %-6s %-6s %-8s %-14s %-10s %-10s %-10s %-12s\n",
+                        "rank", "model", "winner", "lppd", "eff_num_param", "WAIC", "SE_WAIC", "Delta_WAIC", "SE_Delta_WAIC"))
+        } else if (method == "DIC") {
+            cat(sprintf("%-8s %-6s %-6s %-10s %-14s %-10s %-10s\n",
+                        "rank", "model", "winner", "D_hat", "eff_num_param", "DIC", "Delta_DIC"))
+        } else if (method == "PMP") {
+            cat(sprintf("%-8s %-6s %-6s %-20s %-15s\n",
+                        "rank", "model", "winner", "log_marg_lik", "PMP"))
+        }
+
+        # Print each row
+        for (i in 1:nrow(comparison_data)) {
+            row <- comparison_data[i, ]
+            if (method == "WAIC") {
+                cat(sprintf("%-8s %-6s %-6s %-8.4f %-14.4f %-10.4f %-10.4f %-10s %-12s\n",
+                            row$rank,
+                            row$model,
+                            ifelse(row$winner, "<---", ""),
+                            row$lppd,
+                            row$eff_num_param,
+                            row$WAIC,
+                            row$SE_WAIC,
+                            ifelse(is.na(row$Delta_WAIC), "", sprintf("%.4f", row$Delta_WAIC)),
+                            ifelse(is.na(row$SE_Delta_WAIC), "", sprintf("%.4f", row$SE_Delta_WAIC))))
+            } else if (method == "DIC") {
+                cat(sprintf("%-8s %-6s %-6s %-10.4f %-14.4f %-10.4f %-10s\n",
+                            row$rank,
+                            row$model,
+                            ifelse(row$winner, "<---", ""),
+                            row$D_hat,
+                            row$eff_num_param,
+                            row$DIC,
+                            ifelse(is.na(row$Delta_DIC), "", sprintf("%.4f", row$Delta_DIC))))
+            } else if (method == "PMP") {
+                cat(sprintf("%-8s %-6s %-6s %-20.4f %-15.4f\n",
+                            row$rank,
+                            row$model,
+                            ifelse(row$winner, "<---", ""),
+                            row$log_marg_lik,
+                            row$PMP))
+            }
+        }
+        cat("\n")
+    }
+
+    # Print results for each comparison
+    for (comparison in unique(results$comparison)) {
+        print_comparison(results[results$comparison == comparison, ])
+    }
+
+    # Print footer
+    cat("=== End of Summary ===\n")
 }

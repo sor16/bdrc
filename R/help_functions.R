@@ -153,9 +153,6 @@ run_MCMC <- function(theta_m, RC, density_fun, unobserved_prediction_fun, nr_ite
 
 #' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
 get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction_fun, parallel, num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
-    if(num_chains > 4){
-        stop('Max number of chains is 4. Please pick a lower number of chains')
-    }
     T_max <- 50
 
     run_MCMC_wrapper <- function(i){
@@ -384,70 +381,60 @@ h_unobserved <- function(RC, h_min = NA, h_max = NA){
 }
 
 B_splines <- function(ZZ){
-    kx <- 2                                      # The number of equally spaced interior knots.
-    dx <- 1 / (kx + 1)                           # Delta x and Delta y.
-    M <- 4                                       # The order of the splines.
-    Nx <- kx + M                                 # Determine the number of functions.
-    epsilon_x <-  dx * seq(0, kx + 1, by = 1)    # The epsilon-knots
 
-    # The tau-knots.
-    tau_x <- c(rep(epsilon_x[1], M),
-               epsilon_x[2:(kx + 1)],
-               rep(epsilon_x[kx + 2], M))
+    kx <- 2                                    #The number of equally spaced interior knots.
+    dx <- 1 / (kx + 1)                         #Delta x and Delta y.
+    M <- 4                                     #The order of the splines.
+    Nx <- kx + M                               #Determine the number of functions.
+    epsilon_x <- dx * seq(0, kx + 1, by = 1)   #The epsilon-knots
 
-    # Pre-compute some common values
-    dx_cube <- dx^3
-    inv_dx_cube <- 1 / dx_cube
-    half_inv_dx_cube <- 0.5 * inv_dx_cube
-    quarter_inv_dx_cube <- 0.25 * inv_dx_cube
-    sixth_inv_dx_cube <- inv_dx_cube / 6
+    #the tau-knots.
+    tau_x <- matrix(0, nrow = 1, ncol = (kx + 2 * M))
+    tau_x[1:M] <- epsilon_x[1] * matrix(1, nrow = 1, ncol = M)
+    tau_x[(M + 1):(kx + M)] <- epsilon_x[2:(kx + 1)]
+    tau_x[(kx + M + 1):(kx + 2 * M)] <- epsilon_x[kx + 2] * matrix(1, nrow = 1, ncol = M)
 
-    # Compute the x-splines.
-    XX <- matrix(0, nrow = Nx, ncol = length(ZZ))
+    #Vector with values of x and y.
+    lx <- length(ZZ)
 
-    # Pre-compute common conditions
-    cond_M <- (tau_x[M] <= ZZ) & (ZZ < tau_x[M + 1])
-    cond_M1 <- (tau_x[M + 1] <= ZZ) & (ZZ < tau_x[M + 2])
-    cond_M2 <- (tau_x[M + 2] <= ZZ) & (ZZ < tau_x[M + 3])
-    cond_kx2 <- (tau_x[kx + 2] <= ZZ) & (ZZ < tau_x[kx + 3])
-    cond_kx3 <- (tau_x[kx + 3] <= ZZ) & (ZZ < tau_x[kx + 4])
-    cond_kx4 <- (tau_x[kx + 4] <= ZZ) & (ZZ < tau_x[kx + 5])
+    #Compute the x-splines and the y-splines.
+    XX <- matrix(0, nrow = (kx + M), ncol = length(ZZ))
 
     # i = 1
-    XX[1, ] <- inv_dx_cube * (tau_x[M + 1] - ZZ)^3 * cond_M
+    XX[1, ] <- (1/dx^3)*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])
 
     # i = 2
-    XX[2, ] <- inv_dx_cube * (ZZ - tau_x[2]) * (tau_x[M + 1] - ZZ)^2 * cond_M +
-        half_inv_dx_cube * (tau_x[M + 2] - ZZ) * (ZZ - tau_x[3]) * (tau_x[M+1] - ZZ) * cond_M +
-        quarter_inv_dx_cube * (tau_x[M + 2] - ZZ)^2 * (ZZ - tau_x[M]) * cond_M +
-        quarter_inv_dx_cube * (tau_x[M + 2] - ZZ)^3 * cond_M1
+    XX[2, ] <- (1/dx^3)*(ZZ-tau_x[2])*(tau_x[M+1]-ZZ)*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/2/dx^3)*(tau_x[M+2]-ZZ)*(ZZ-tau_x[3])*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/4/dx^3)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/4/dx^3)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])
 
     # i = 3
-    XX[3, ] <- half_inv_dx_cube * (ZZ - tau_x[3])^2 * (tau_x[M + 1] - ZZ) * cond_M +
-        quarter_inv_dx_cube * (ZZ - tau_x[3]) * (tau_x[M + 2] - ZZ) * (ZZ - tau_x[M]) * cond_M +
-        quarter_inv_dx_cube * (ZZ - tau_x[3]) * (tau_x[M + 2] - ZZ)^2 * cond_M1 +
-        sixth_inv_dx_cube * (tau_x[M + 3] - ZZ) * (ZZ - tau_x[M])^2 * cond_M +
-        sixth_inv_dx_cube * (tau_x[M + 3] - ZZ) * (ZZ - tau_x[M]) * (tau_x[M + 2] - ZZ) * cond_M1 +
-        sixth_inv_dx_cube * (tau_x[M + 3] - ZZ)^2 * (ZZ - tau_x[M + 1]) * cond_M1 +
-        sixth_inv_dx_cube * (tau_x[M + 3] - ZZ)^3 * cond_M2
+    XX[3, ] <- (1/2/dx^3)*(ZZ-tau_x[3])*(ZZ-tau_x[3])*(tau_x[M+1]-ZZ)*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/4/dx^3)*(ZZ-tau_x[3])*(tau_x[M+2]-ZZ)*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/4/dx^3)*(ZZ-tau_x[3])*(tau_x[M+2]-ZZ)*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+        (1/6/dx^3)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M])*(ZZ-tau_x[M])*(tau_x[M]<=ZZ)*(ZZ<tau_x[M+1])+
+        (1/6/dx^3)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M])*(tau_x[M+2]-ZZ)*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+        (1/6/dx^3)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(ZZ-tau_x[M+1])*(tau_x[M+1]<=ZZ)*(ZZ<tau_x[M+2])+
+        (1/6/dx^3)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(tau_x[M+3]-ZZ)*(tau_x[M+2]<=ZZ)*(ZZ<tau_x[M+3])
 
     # i = kx + 2
-    XX[kx + 2, ] <- - sixth_inv_dx_cube * (tau_x[kx + 2] - ZZ)^3 * cond_kx2 -
-        sixth_inv_dx_cube * (tau_x[kx + 2] - ZZ)^2 * (ZZ - tau_x[kx + 4]) * cond_kx3 -
-        sixth_inv_dx_cube * (tau_x[kx + 2] - ZZ) * (ZZ - tau_x[kx + 5]) * (tau_x[kx + 3] - ZZ) * cond_kx3 -
-        sixth_inv_dx_cube * (tau_x[kx + 2] - ZZ) * (ZZ - tau_x[kx + 5])^2 * cond_kx4 -
-        quarter_inv_dx_cube * (ZZ - tau_x[kx + 6]) * (tau_x[kx + 3] - ZZ)^2 * cond_kx3 -
-        quarter_inv_dx_cube * (ZZ - tau_x[kx + 6]) * (tau_x[kx + 3] - ZZ) * (ZZ - tau_x[kx + 5]) * cond_kx4 -
-        half_inv_dx_cube * (ZZ - tau_x[kx + 6])^2 * (tau_x[kx + 4] - ZZ) * cond_kx4
+    XX[kx+2, ] <- -(1/6/dx^3)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]<=ZZ)*(ZZ<tau_x[kx+3])-
+        (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+4])*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+        (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+        (1/6/dx^3)*(tau_x[kx+2]-ZZ)*(ZZ-tau_x[kx+5])*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+        (1/4/dx^3)*(ZZ-tau_x[kx+6])*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+        (1/4/dx^3)*(ZZ-tau_x[kx+6])*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+        (1/2/dx^3)*(ZZ-tau_x[kx+6])*(ZZ-tau_x[kx+6])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])
 
     # i = kx + 3
-    XX[kx + 3, ] <- - quarter_inv_dx_cube * (tau_x[kx + 3] - ZZ)^3 * cond_kx3 -
-        quarter_inv_dx_cube * (tau_x[kx + 3] - ZZ)^2 * (ZZ - tau_x[kx + 5]) * cond_kx4 -
-        half_inv_dx_cube * (tau_x[kx + 3] - ZZ) * (ZZ - tau_x[kx + 6]) * (tau_x[kx + 4] - ZZ) * cond_kx4 -
-        inv_dx_cube * (ZZ - tau_x[kx + 7]) * (tau_x[kx + 4] - ZZ)^2 * cond_kx4
+    XX[kx+3, ] <- - (1/4/dx^3)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]<=ZZ)*(ZZ<tau_x[kx+4])-
+        (1/4/dx^3)*(tau_x[kx+3]-ZZ)*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+5])*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+        (1/2/dx^3)*(tau_x[kx+3]-ZZ)*(ZZ-tau_x[kx+6])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])-
+        (1/dx^3)*(ZZ-tau_x[kx+7])*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<tau_x[kx+5])
 
     # i = kx + 4
-    XX[kx + 4, ] <- - inv_dx_cube * (tau_x[kx + 4] - ZZ)^3 * cond_kx4
+    XX[kx+4, ] <- -(1/dx^3)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]-ZZ)*(tau_x[kx+4]<=ZZ)*(ZZ<=tau_x[kx+5])
 
     return(t(XX))
 }
@@ -634,6 +621,7 @@ convergence_diagnostics_warnings <- function(param_summary){
     if(print_suggestion) cat("\u2139 Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.\n")
 
 }
+
 
 
 
