@@ -44,22 +44,22 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'plm0'</span></span>
-<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'plm'</span></span>
-<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gplm0'</span></span>
-<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gplm'</span></span>
-<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'tournament'</span></span>
-<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">get_report_pages</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,14 +75,10 @@
 <dd><p>Produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.</p></dd>
 
   <dt><code>2</code></dt>
-<dd><p>Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.</p></dd>
+<dd><p>Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows a summary of the tournament model comparison, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.</p></dd>
 
 
 </dl></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Further arguments passed to other methods (currently unused).</p></dd>
 
 </dl></div>
     <div class="section level2">

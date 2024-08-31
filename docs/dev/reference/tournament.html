@@ -76,7 +76,7 @@
 
 
 <dt id="arg-winning-criteria">winning_criteria<a class="anchor" aria-label="anchor" href="#arg-winning-criteria"></a></dt>
-<dd><p>A numerical value which sets a threshold the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.</p></dd>
+<dd><p>Specifies the criteria for model selection. For "WAIC", it can be a numeric value or a string expression. For "DIC", it must be a numeric value. For "PMP", it must be a numeric value between 0 and 1. See Details section.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -101,6 +101,7 @@
   <dt><code>summary</code></dt>
 <dd><p>A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:</p><ul><li><p>For method "WAIC":</p><ul><li><p>round: The tournament round</p></li>
 <li><p>comparison: The comparison number</p></li>
+<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
 <li><p>model: The model type</p></li>
 <li><p>lppd: Log pointwise predictive density</p></li>
 <li><p>eff_num_param: Effective number of parameters (WAIC)</p></li>
@@ -112,18 +113,20 @@
 </ul></li>
 <li><p>For method "DIC":</p><ul><li><p>round: The tournament round</p></li>
 <li><p>comparison: The comparison number</p></li>
+<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
 <li><p>model: The model type</p></li>
 <li><p>D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples</p></li>
-<li><p>p_D: Effective number of parameters (DIC)</p></li>
+<li><p>eff_num_param: Effective number of parameters (DIC)</p></li>
 <li><p>DIC: Deviance Information Criterion</p></li>
 <li><p>Delta_DIC: Difference in DIC</p></li>
 <li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
 </ul></li>
 <li><p>For method "PMP":</p><ul><li><p>round: The tournament round</p></li>
 <li><p>comparison: The comparison number</p></li>
+<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
 <li><p>model: The model type</p></li>
-<li><p>log_marg_lik: Log marginal likelihood estimated with the harmonic mean</p></li>
-<li><p>post_model_prob: Posterior model probability computed with Bayes factor</p></li>
+<li><p>log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator</p></li>
+<li><p>PMP: Posterior model probability computed with Bayes factor</p></li>
 <li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
 </ul></li>
 </ul><p></p></dd>
@@ -136,7 +139,7 @@
 <p>The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to estimate of the expected log pointwise predictive density.</p>
 <p>Method "DIC", or Deviance Information Criterion (see Spiegelhalter (2002)), is similar to the "WAIC" but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density, it uses a point estimate of the posterior distribution.</p>
 <p>Method "PMP" uses the posterior model probabilities, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. This method is not chosen as the default method because the Bayes factor calculations can be quite unstable.</p>
-<p>When methods "WAIC" or "DIC" are used, the <code>winning_criteria</code> should be a real number. The winning criteria is a threshold value which the more complex model in each model comparison must exceed for it to be declared the more appropriate model. Setting the winning criteria slightly above 0 (default value = 2 for both "WAIC" and "DIC") gives the less complex model in each comparison a slight advantage. When method "PMP" is used, the winning criteria should be a real value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison must exceed for it to be declared the more appropriate model. In all three cases, the default value is selected so as to give the less complex models a slight advantage, and should give more or less consistent results when applying the tournament to real world data.</p>
+<p>When method "WAIC" is used, the <code>winning_criteria</code> can be either a numeric value or a string expression. If numeric, it sets the threshold which the more complex model must exceed to be declared the more appropriate model. If a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC (e.g., "Delta_WAIC &gt; 2 &amp; Delta_WAIC - SE_Delta_WAIC &gt; 0"). For method "DIC", <code>winning_criteria</code> must be a numeric value. For method "PMP", the winning criteria should be a numeric value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison must exceed to be declared the more appropriate model. In all cases, the default values are selected to give the less complex models a slight advantage, which should give more or less consistent results when applying the tournament to real world data.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -157,7 +160,7 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">t_obj</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, data <span class="op">=</span> <span class="va">krokfors</span>, num_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament [                                                ] 0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament  [                                                ] 0%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
@@ -170,7 +173,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - gplm finished  [============                                    ] 25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm finished   [============                                    ] 25%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
@@ -183,7 +186,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - gplm0 finished [========================                        ] 50%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm0 finished  [========================                        ] 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
@@ -196,7 +199,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - plm finished   [====================================            ] 75%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm finished    [====================================            ] 75%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
@@ -209,26 +212,212 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - plm0 finished  [================================================] 100%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tournament winner: gplm0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm0 finished   [================================================] 100%</span>
 <span class="r-in"><span><span class="va">t_obj</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Tournament winner: gplm0</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">t_obj</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   round comparison model      lppd eff_num_param       WAIC   SE_WAIC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     1          1  gplm 20.779382      6.870566 -27.817631 11.891811</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2     1          1 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     1          2   plm  5.584163      4.257375  -2.653577  6.663494</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     1          2  plm0  5.628423      4.098359  -3.060129  6.693072</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     2          3 gplm0 20.370954      6.740645 -27.260617 12.036003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6     2          3  plm0  5.628423      4.098359  -3.060129  6.693072</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Delta_WAIC SE_Delta_WAIC winner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.5570133     0.2415971  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2         NA            NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.4065514     0.1904362  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4         NA            NA   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 24.2004887     9.1834062   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6         NA            NA  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Tournament Model Comparison Summary ===</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Method: WAIC </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Winning Criteria: Delta_WAIC &gt; 2 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Overall Winner: gplm0 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 1 Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complex  gplm          20.7794  6.8706         -27.8176   11.8918    0.5570     0.2416      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 2 Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complex  plm           5.5842   4.2574         -2.6536    6.6635     -0.4066    0.1904      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  plm0   &lt;---   5.6284   4.0984         -3.0601    6.6931                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 3 Results:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complex  gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360    24.2005    9.1834      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  plm0          5.6284   4.0984         -3.0601    6.6931                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === End of Summary ===</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using different methods and winning criteria</span></span></span>
+<span class="r-in"><span><span class="va">t_obj_dic</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>,</span></span>
+<span class="r-in"><span>                        <span class="va">krokfors</span>,</span></span>
+<span class="r-in"><span>                        num_cores <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                        method <span class="op">=</span> <span class="st">"DIC"</span>,</span></span>
+<span class="r-in"><span>                        winning_criteria <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament  [                                                ] 0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 24.81%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm finished   [============                                    ] 25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 31.42%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm0 finished  [========================                        ] 50%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 26.60%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm finished    [====================================            ] 75%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 36.02%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm0 finished   [================================================] 100%</span>
+<span class="r-in"><span><span class="va">t_obj_pmp</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>,</span></span>
+<span class="r-in"><span>                        <span class="va">krokfors</span>,</span></span>
+<span class="r-in"><span>                        num_cores <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                        method <span class="op">=</span> <span class="st">"PMP"</span>,</span></span>
+<span class="r-in"><span>                        winning_criteria <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament  [                                                ] 0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 25.10%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm finished   [============                                    ] 25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 31.05%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm0 finished  [========================                        ] 50%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 25.47%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm finished    [====================================            ] 75%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 35.76%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm0 finished   [================================================] 100%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ⚠ Warning: The Harmonic Mean Estimator (HME) is used to estimate the Bayes Factor for the posterior model probability (PMP), which is known to be unstable and potentially unreliable. We recommend using method "WAIC" (Widely Applicable Information Criterion) for model comparison instead.</span>
+<span class="r-in"><span><span class="va">t_obj_waic_expr</span> <span class="op">&lt;-</span> <span class="fu">tournament</span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>,</span></span>
+<span class="r-in"><span>                              <span class="va">krokfors</span>,</span></span>
+<span class="r-in"><span>                              num_cores <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>                              winning_criteria <span class="op">=</span> <span class="st">"Delta_WAIC &gt; 2 &amp; Delta_WAIC - SE_Delta_WAIC &gt; 0"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Running tournament  [                                                ] 0%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 25.78%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm finished   [============                                    ] 25%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 31.19%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  gplm0 finished  [========================                        ] 50%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 25.85%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm finished    [====================================            ] 75%</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Progress:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Initializing Metropolis MCMC algorithm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multiprocess sampling (4 chains in 2 jobs) ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 35.55%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✔  plm0 finished   [================================================] 100%</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

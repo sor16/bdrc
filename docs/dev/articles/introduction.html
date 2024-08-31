@@ -81,21 +81,55 @@ between water elevation and discharge in a river. The rating curve is
 estimated from paired observations of water elevation and discharge and
 it is used to predict discharge for a given water elevation. This is the
 main practical usage of rating curves, as water elevation is
-substantially easier to directly observe than discharge. Four different
-discharge rating curve models are implemented in this R package using a
-Bayesian hierarchical model:</p>
-<p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with a constant error variance
-(hence the 0). This is a Bayesian hierarchical implementation of the
-most commonly used discharge rating curve model in hydrological
-practice.</p>
-<p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with error variance that varies
-with water elevation.</p>
-<p><code><a href="../reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant
-error variance (hence the 0). The generalized power law is introduced in
-Hrafnkelsson et al. (2022).</p>
-<p><code><a href="../reference/gplm.html">gplm()</a></code> - Generalized power-law model with error variance
-that varies with water elevation. The generalized power law is
-introduced in Hrafnkelsson et al. (2022).</p>
+substantially easier to directly observe than discharge. This R package
+implements four different discharge rating curve models using a Bayesian
+hierarchical modeling framework:</p>
+<ul>
+<li>
+<p><code><a href="../reference/plm0.html">plm0()</a></code>: Power-law model with constant log-error
+variance</p>
+<ul>
+<li>A Bayesian hierarchical implementation of the most commonly used
+discharge rating curve model in hydrological practice.</li>
+<li>The ‘0’ denotes a constant variance of the log-transformed errors.
+This means that the model assumes the variance is constant across all
+water elevations when viewed on a logarithmic scale.<br><br>
+</li>
+</ul>
+</li>
+<li>
+<p><code><a href="../reference/plm.html">plm()</a></code>: Power-law model with stage-dependent
+log-error variance</p>
+<ul>
+<li>Similar to <code><a href="../reference/plm0.html">plm0()</a></code>, but allows the variance of the
+log-error terms to vary with water elevation.</li>
+<li>Variance of the log-error terms modeled as an exponential of a
+B-spline curve.<br><br>
+</li>
+</ul>
+</li>
+<li>
+<p><code><a href="../reference/gplm0.html">gplm0()</a></code>: Generalized power-law model with constant
+log-error variance</p>
+<ul>
+<li>An extension of the power-law model introduced in Hrafnkelsson et
+al. (2022).</li>
+<li>Power-law exponent modeled as a Gaussian Process.<br><br>
+</li>
+</ul>
+</li>
+<li>
+<p><code><a href="../reference/gplm.html">gplm()</a></code>: Generalized power-law model with
+stage-dependent log-error variance</p>
+<ul>
+<li>Combines the generalized power-law approach with stage-dependent
+log-error variance.</li>
+<li>Power-law exponent modeled as a Gaussian Process.</li>
+<li>Variance of the log-error terms modeled as an exponential of a
+B-spline curve.</li>
+</ul>
+</li>
+</ul>
 <p>For further details about the different models, see Hrafnkelsson et
 al. (2022). The models differ in their complexity, <code>gplm</code>
 being the most flexible and complex model. We will focus on the use of
@@ -109,51 +143,29 @@ models.</p>
 <p>We will use a dataset from a stream gauging station in Sweden, called
 Krokfors, that comes with the package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">data</span>(krokfors)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="sc">&gt;</span> krokfors</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;           W          Q</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; 1  9.478000 10.8211700</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; 2  8.698000  1.5010000</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; 3  9.009000  3.3190000</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; 4  8.097000  0.1595700</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; 5  9.104000  4.5462500</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; 6  8.133774  0.2121178</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; 7  8.569583  1.1580000</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; 8  9.139151  4.8110000</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; 9  9.464250 10.9960000</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; 10 8.009214  0.0984130</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; 11 8.961843  2.7847910</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; 12 8.316000  0.6631890</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; 13 8.828716  1.8911800</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; 14 9.897000 20.2600000</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; 15 7.896000  0.0190000</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; 16 9.534000 12.1000000</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; 17 9.114000  4.3560000</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; 18 8.389000  0.6200000</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; 19 8.999000  2.6800000</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; 20 9.099000  3.7310000</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; 21 8.502000  0.8930000</span></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; 22 8.873000  1.9000000</span></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 23 8.240000  0.3200000</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 24 9.219000  5.9000000</span></span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; 25 9.271000  6.9000000</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; 26 8.370000  0.4420000</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; 27 9.431000  9.0000000</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">head</span>(krokfors)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;          W          Q</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; 1 9.478000 10.8211700</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; 2 8.698000  1.5010000</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; 3 9.009000  3.3190000</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; 4 8.097000  0.1595700</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; 5 9.104000  4.5462500</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; 6 8.133774  0.2121178</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="fitting-a-discharge-rating-curve">Fitting a discharge rating curve<a class="anchor" aria-label="anchor" href="#fitting-a-discharge-rating-curve"></a>
 </h2>
-<p>It is very simple to fit a discharge rating curve with the
-<code>bdrc</code> package. All you need are two mandatory input
-arguments, <code>formula</code> and <code>data</code>. The
-<code>formula</code> is of the form <code>y~x</code>, where
-<code>y</code> is the discharge in square meters per second
-(m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi></mi><mn>3</mn></msup><mi>/</mi></mrow><annotation encoding="application/x-tex">^3/</annotation></semantics></math>s),
-and <code>x</code> is the water elevation in meters (m). It is very
-important that the data is in the correct units! The <code>data</code>
-argument must be a <code>data.frame</code> including <code>x</code> and
-<code>y</code> as column names. In our case, the Krokfors data has the
-discharge and water elevation measurements stored in columns named
-<code>Q</code> and <code>W</code>, respectively. We are ready to fit a
-discharge rating curve using the <code>gplm</code> function:</p>
+<p>Fitting a discharge rating curve with <code>bdrc</code> is
+straightforward. Only two input arguments are mandatory:
+<code>formula</code> and <code>data</code>. The <code>formula</code>
+should of the form <code>y ~ x</code>, where <code>y</code> is the
+discharge in cubic meters per second (m³/s), and <code>x</code> is the
+water elevation (stage) in meters (m). It is crucial that the data is in
+the correct units! The <code>data</code> argument must be a
+<code>data.frame</code> including <code>x</code> and <code>y</code> as
+column names. In our case, the Krokfors data has the discharge and water
+elevation measurements stored in columns named <code>Q</code> and
+<code>W</code>, respectively. We are ready to fit a discharge rating
+curve using the <code>gplm</code> function:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q <span class="sc">~</span> W, <span class="at">data =</span> krokfors, <span class="at">parallel =</span> <span class="cn">TRUE</span>, <span class="at">num_cores =</span> <span class="dv">2</span>) <span class="co"># by default parallel=TRUE and the number of cores is detected on the machine</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; Progress:</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Initializing Metropolis MCMC algorithm...</span></span>
@@ -169,9 +181,9 @@ discharge rating curve using the <code>gplm</code> function:</p>
 diagnostics. These include the acceptance rate, chain mixing (assessed
 via the Gelman-Rubin statistic,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>R</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{R}</annotation></semantics></math>),
-and effective sample sizes. The checkmarks (<code>✔</code>) indicate
-that the algorithm has met important criteria for reliability. However,
-sometimes you may encounter warnings (<code>⚠</code>). For example:</p>
+and effective sample sizes. The checkmarks indicate that the algorithm
+has met important criteria for reliability. However, sometimes you may
+encounter warnings. For example:</p>
 <pre><code><span><span class="co">#&gt; ⚠ Warning: Some chains are not mixing well. Parameters with Rhat &gt; 1.1:</span></span>
 <span><span class="co">#&gt;   - sigma_eta: Rhat = 1.281</span></span></code></pre>
 <p>This warning suggests that certain parameters (in this case,
@@ -358,111 +370,31 @@ values in the range from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
 and h_max are accepted, as that is the range in which the Bayesian
 inference was performed</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="sc">&gt;</span> h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">8</span>, <span class="dv">9</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="sc">&gt;</span> h_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">8</span>, <span class="fl">8.2</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="sc">&gt;</span> rating_curve_h_grid <span class="ot">&lt;-</span> <span class="fu">predict</span>(gplm.fit, <span class="at">newdata =</span> h_grid)</span>
 <span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">print</span>(rating_curve_h_grid)</span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt;        h      lower     median     upper</span></span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; 1   8.00 0.06138853 0.08252241 0.1108601</span></span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt; 2   8.01 0.06708762 0.09009315 0.1207313</span></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; 3   8.02 0.07340524 0.09850833 0.1316830</span></span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; 4   8.03 0.07972287 0.10692352 0.1426346</span></span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co">#&gt; 5   8.04 0.08620981 0.11547827 0.1537808</span></span>
-<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&gt; 6   8.05 0.09363849 0.12480929 0.1660087</span></span>
-<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; 7   8.06 0.10106716 0.13414031 0.1782366</span></span>
-<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a><span class="co">#&gt; 8   8.07 0.10861541 0.14364701 0.1906011</span></span>
-<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co">#&gt; 9   8.08 0.11657272 0.15375469 0.2034327</span></span>
-<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="co">#&gt; 10  8.09 0.12453002 0.16386237 0.2162643</span></span>
-<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a><span class="co">#&gt; 11  8.10 0.13257126 0.17428375 0.2295413</span></span>
-<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a><span class="co">#&gt; 12  8.11 0.14080833 0.18543710 0.2438577</span></span>
-<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a><span class="co">#&gt; 13  8.12 0.14904540 0.19659045 0.2581741</span></span>
-<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; 14  8.13 0.15728247 0.20774380 0.2724905</span></span>
-<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a><span class="co">#&gt; 15  8.14 0.16662200 0.21960922 0.2875367</span></span>
-<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a><span class="co">#&gt; 16  8.15 0.17662981 0.23190628 0.3030253</span></span>
-<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a><span class="co">#&gt; 17  8.16 0.18663761 0.24420333 0.3185138</span></span>
-<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a><span class="co">#&gt; 18  8.17 0.19681441 0.25692028 0.3351942</span></span>
-<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a><span class="co">#&gt; 19  8.18 0.20699699 0.26965158 0.3519154</span></span>
-<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a><span class="co">#&gt; 20  8.19 0.21718541 0.28270330 0.3691020</span></span>
-<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a><span class="co">#&gt; 21  8.20 0.22738677 0.29646391 0.3873184</span></span>
-<span id="cb22-26"><a href="#cb22-26" tabindex="-1"></a><span class="co">#&gt; 22  8.21 0.23758814 0.31022451 0.4055347</span></span>
-<span id="cb22-27"><a href="#cb22-27" tabindex="-1"></a><span class="co">#&gt; 23  8.22 0.24864524 0.32456916 0.4240212</span></span>
-<span id="cb22-28"><a href="#cb22-28" tabindex="-1"></a><span class="co">#&gt; 24  8.23 0.26015179 0.33922056 0.4426497</span></span>
-<span id="cb22-29"><a href="#cb22-29" tabindex="-1"></a><span class="co">#&gt; 25  8.24 0.27165833 0.35387195 0.4612783</span></span>
-<span id="cb22-30"><a href="#cb22-30" tabindex="-1"></a><span class="co">#&gt; 26  8.25 0.28286178 0.36952305 0.4822933</span></span>
-<span id="cb22-31"><a href="#cb22-31" tabindex="-1"></a><span class="co">#&gt; 27  8.26 0.29406524 0.38517416 0.5033083</span></span>
-<span id="cb22-32"><a href="#cb22-32" tabindex="-1"></a><span class="co">#&gt; 28  8.27 0.30595170 0.40092441 0.5238623</span></span>
-<span id="cb22-33"><a href="#cb22-33" tabindex="-1"></a><span class="co">#&gt; 29  8.28 0.31861873 0.41678798 0.5438895</span></span>
-<span id="cb22-34"><a href="#cb22-34" tabindex="-1"></a><span class="co">#&gt; 30  8.29 0.33128577 0.43265156 0.5639167</span></span>
-<span id="cb22-35"><a href="#cb22-35" tabindex="-1"></a><span class="co">#&gt; 31  8.30 0.34430822 0.44895462 0.5841702</span></span>
-<span id="cb22-36"><a href="#cb22-36" tabindex="-1"></a><span class="co">#&gt; 32  8.31 0.35735607 0.46528907 0.6044400</span></span>
-<span id="cb22-37"><a href="#cb22-37" tabindex="-1"></a><span class="co">#&gt; 33  8.32 0.37077354 0.48265853 0.6264057</span></span>
-<span id="cb22-38"><a href="#cb22-38" tabindex="-1"></a><span class="co">#&gt; 34  8.33 0.38474546 0.50158052 0.6509156</span></span>
-<span id="cb22-39"><a href="#cb22-39" tabindex="-1"></a><span class="co">#&gt; 35  8.34 0.39867565 0.51991036 0.6752141</span></span>
-<span id="cb22-40"><a href="#cb22-40" tabindex="-1"></a><span class="co">#&gt; 36  8.35 0.41257803 0.53784545 0.6993718</span></span>
-<span id="cb22-41"><a href="#cb22-41" tabindex="-1"></a><span class="co">#&gt; 37  8.36 0.42648262 0.55691726 0.7236054</span></span>
-<span id="cb22-42"><a href="#cb22-42" tabindex="-1"></a><span class="co">#&gt; 38  8.37 0.44038777 0.57627326 0.7478580</span></span>
-<span id="cb22-43"><a href="#cb22-43" tabindex="-1"></a><span class="co">#&gt; 39  8.38 0.45757675 0.59494617 0.7736702</span></span>
-<span id="cb22-44"><a href="#cb22-44" tabindex="-1"></a><span class="co">#&gt; 40  8.39 0.47458478 0.61391168 0.7996598</span></span>
-<span id="cb22-45"><a href="#cb22-45" tabindex="-1"></a><span class="co">#&gt; 41  8.40 0.48996432 0.63551057 0.8272457</span></span>
-<span id="cb22-46"><a href="#cb22-46" tabindex="-1"></a><span class="co">#&gt; 42  8.41 0.50534386 0.65710945 0.8548316</span></span>
-<span id="cb22-47"><a href="#cb22-47" tabindex="-1"></a><span class="co">#&gt; 43  8.42 0.52119168 0.67855639 0.8824809</span></span>
-<span id="cb22-48"><a href="#cb22-48" tabindex="-1"></a><span class="co">#&gt; 44  8.43 0.53827408 0.69960274 0.9102975</span></span>
-<span id="cb22-49"><a href="#cb22-49" tabindex="-1"></a><span class="co">#&gt; 45  8.44 0.55535648 0.72064909 0.9381141</span></span>
-<span id="cb22-50"><a href="#cb22-50" tabindex="-1"></a><span class="co">#&gt; 46  8.45 0.57229711 0.74245300 0.9669301</span></span>
-<span id="cb22-51"><a href="#cb22-51" tabindex="-1"></a><span class="co">#&gt; 47  8.46 0.58906448 0.76518282 0.9969676</span></span>
-<span id="cb22-52"><a href="#cb22-52" tabindex="-1"></a><span class="co">#&gt; 48  8.47 0.60583185 0.78791264 1.0270050</span></span>
-<span id="cb22-53"><a href="#cb22-53" tabindex="-1"></a><span class="co">#&gt; 49  8.48 0.62287788 0.81159005 1.0567058</span></span>
-<span id="cb22-54"><a href="#cb22-54" tabindex="-1"></a><span class="co">#&gt; 50  8.49 0.64009109 0.83583600 1.0862046</span></span>
-<span id="cb22-55"><a href="#cb22-55" tabindex="-1"></a><span class="co">#&gt; 51  8.50 0.65730430 0.86008196 1.1157034</span></span>
-<span id="cb22-56"><a href="#cb22-56" tabindex="-1"></a><span class="co">#&gt; 52  8.51 0.67837959 0.88498753 1.1480607</span></span>
-<span id="cb22-57"><a href="#cb22-57" tabindex="-1"></a><span class="co">#&gt; 53  8.52 0.70042041 0.91005801 1.1811327</span></span>
-<span id="cb22-58"><a href="#cb22-58" tabindex="-1"></a><span class="co">#&gt; 54  8.53 0.72142896 0.93588196 1.2163209</span></span>
-<span id="cb22-59"><a href="#cb22-59" tabindex="-1"></a><span class="co">#&gt; 55  8.54 0.74158344 0.96232931 1.2532602</span></span>
-<span id="cb22-60"><a href="#cb22-60" tabindex="-1"></a><span class="co">#&gt; 56  8.55 0.76152777 0.98908548 1.2891070</span></span>
-<span id="cb22-61"><a href="#cb22-61" tabindex="-1"></a><span class="co">#&gt; 57  8.56 0.78096859 1.01658161 1.3223361</span></span>
-<span id="cb22-62"><a href="#cb22-62" tabindex="-1"></a><span class="co">#&gt; 58  8.57 0.80060626 1.04414468 1.3558233</span></span>
-<span id="cb22-63"><a href="#cb22-63" tabindex="-1"></a><span class="co">#&gt; 59  8.58 0.82476789 1.07324641 1.3952421</span></span>
-<span id="cb22-64"><a href="#cb22-64" tabindex="-1"></a><span class="co">#&gt; 60  8.59 0.84892951 1.10234815 1.4346609</span></span>
-<span id="cb22-65"><a href="#cb22-65" tabindex="-1"></a><span class="co">#&gt; 61  8.60 0.87309114 1.13144988 1.4740798</span></span>
-<span id="cb22-66"><a href="#cb22-66" tabindex="-1"></a><span class="co">#&gt; 62  8.61 0.89805719 1.16190150 1.5167752</span></span>
-<span id="cb22-67"><a href="#cb22-67" tabindex="-1"></a><span class="co">#&gt; 63  8.62 0.92318652 1.19262710 1.5601358</span></span>
-<span id="cb22-68"><a href="#cb22-68" tabindex="-1"></a><span class="co">#&gt; 64  8.63 0.94831584 1.22335271 1.6034963</span></span>
-<span id="cb22-69"><a href="#cb22-69" tabindex="-1"></a><span class="co">#&gt; 65  8.64 0.97416393 1.25588235 1.6435993</span></span>
-<span id="cb22-70"><a href="#cb22-70" tabindex="-1"></a><span class="co">#&gt; 66  8.65 1.00045096 1.28951372 1.6817129</span></span>
-<span id="cb22-71"><a href="#cb22-71" tabindex="-1"></a><span class="co">#&gt; 67  8.66 1.02673799 1.32314508 1.7198264</span></span>
-<span id="cb22-72"><a href="#cb22-72" tabindex="-1"></a><span class="co">#&gt; 68  8.67 1.05323814 1.35749266 1.7615471</span></span>
-<span id="cb22-73"><a href="#cb22-73" tabindex="-1"></a><span class="co">#&gt; 69  8.68 1.08004443 1.39286907 1.8084491</span></span>
-<span id="cb22-74"><a href="#cb22-74" tabindex="-1"></a><span class="co">#&gt; 70  8.69 1.10685073 1.42824549 1.8553512</span></span>
-<span id="cb22-75"><a href="#cb22-75" tabindex="-1"></a><span class="co">#&gt; 71  8.70 1.13446515 1.46428733 1.9034120</span></span>
-<span id="cb22-76"><a href="#cb22-76" tabindex="-1"></a><span class="co">#&gt; 72  8.71 1.16531211 1.50299087 1.9561078</span></span>
-<span id="cb22-77"><a href="#cb22-77" tabindex="-1"></a><span class="co">#&gt; 73  8.72 1.19615906 1.54169441 2.0088036</span></span>
-<span id="cb22-78"><a href="#cb22-78" tabindex="-1"></a><span class="co">#&gt; 74  8.73 1.22700601 1.58039795 2.0614994</span></span>
-<span id="cb22-79"><a href="#cb22-79" tabindex="-1"></a><span class="co">#&gt; 75  8.74 1.25816709 1.62314579 2.1156189</span></span>
-<span id="cb22-80"><a href="#cb22-80" tabindex="-1"></a><span class="co">#&gt; 76  8.75 1.28935106 1.66618825 2.1698421</span></span>
-<span id="cb22-81"><a href="#cb22-81" tabindex="-1"></a><span class="co">#&gt; 77  8.76 1.32053502 1.70923071 2.2240654</span></span>
-<span id="cb22-82"><a href="#cb22-82" tabindex="-1"></a><span class="co">#&gt; 78  8.77 1.35520242 1.75289393 2.2817313</span></span>
-<span id="cb22-83"><a href="#cb22-83" tabindex="-1"></a><span class="co">#&gt; 79  8.78 1.39163095 1.79687098 2.3411376</span></span>
-<span id="cb22-84"><a href="#cb22-84" tabindex="-1"></a><span class="co">#&gt; 80  8.79 1.42805948 1.84084804 2.4005440</span></span>
-<span id="cb22-85"><a href="#cb22-85" tabindex="-1"></a><span class="co">#&gt; 81  8.80 1.46619139 1.88627784 2.4612200</span></span>
-<span id="cb22-86"><a href="#cb22-86" tabindex="-1"></a><span class="co">#&gt; 82  8.81 1.50691812 1.93392065 2.5238301</span></span>
-<span id="cb22-87"><a href="#cb22-87" tabindex="-1"></a><span class="co">#&gt; 83  8.82 1.54764484 1.98156346 2.5864402</span></span>
-<span id="cb22-88"><a href="#cb22-88" tabindex="-1"></a><span class="co">#&gt; 84  8.83 1.58862486 2.03029283 2.6504561</span></span>
-<span id="cb22-89"><a href="#cb22-89" tabindex="-1"></a><span class="co">#&gt; 85  8.84 1.63132425 2.08639792 2.7240155</span></span>
-<span id="cb22-90"><a href="#cb22-90" tabindex="-1"></a><span class="co">#&gt; 86  8.85 1.67402364 2.14250302 2.7975749</span></span>
-<span id="cb22-91"><a href="#cb22-91" tabindex="-1"></a><span class="co">#&gt; 87  8.86 1.71672303 2.19860812 2.8711343</span></span>
-<span id="cb22-92"><a href="#cb22-92" tabindex="-1"></a><span class="co">#&gt; 88  8.87 1.75942242 2.25471321 2.9446937</span></span>
-<span id="cb22-93"><a href="#cb22-93" tabindex="-1"></a><span class="co">#&gt; 89  8.88 1.80704534 2.31372231 3.0198513</span></span>
-<span id="cb22-94"><a href="#cb22-94" tabindex="-1"></a><span class="co">#&gt; 90  8.89 1.85677834 2.37397599 3.0956939</span></span>
-<span id="cb22-95"><a href="#cb22-95" tabindex="-1"></a><span class="co">#&gt; 91  8.90 1.90651135 2.43422966 3.1715365</span></span>
-<span id="cb22-96"><a href="#cb22-96" tabindex="-1"></a><span class="co">#&gt; 92  8.91 1.95757124 2.49992659 3.2569746</span></span>
-<span id="cb22-97"><a href="#cb22-97" tabindex="-1"></a><span class="co">#&gt; 93  8.92 2.00910082 2.56755028 3.3458092</span></span>
-<span id="cb22-98"><a href="#cb22-98" tabindex="-1"></a><span class="co">#&gt; 94  8.93 2.06063040 2.63517398 3.4346439</span></span>
-<span id="cb22-99"><a href="#cb22-99" tabindex="-1"></a><span class="co">#&gt; 95  8.94 2.11134284 2.70513427 3.5158612</span></span>
-<span id="cb22-100"><a href="#cb22-100" tabindex="-1"></a><span class="co">#&gt; 96  8.95 2.16182095 2.77576464 3.5948940</span></span>
-<span id="cb22-101"><a href="#cb22-101" tabindex="-1"></a><span class="co">#&gt; 97  8.96 2.21229905 2.84639502 3.6739268</span></span>
-<span id="cb22-102"><a href="#cb22-102" tabindex="-1"></a><span class="co">#&gt; 98  8.97 2.27542455 2.92460537 3.7803344</span></span>
-<span id="cb22-103"><a href="#cb22-103" tabindex="-1"></a><span class="co">#&gt; 99  8.98 2.34140761 3.00452835 3.8929271</span></span>
-<span id="cb22-104"><a href="#cb22-104" tabindex="-1"></a><span class="co">#&gt; 100 8.99 2.40739067 3.08445133 4.0055198</span></span>
-<span id="cb22-105"><a href="#cb22-105" tabindex="-1"></a><span class="co">#&gt; 101 9.00 2.47424093 3.16576470 4.1159444</span></span></code></pre></div>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt;       h      lower     median     upper</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; 1  8.00 0.06138853 0.08252241 0.1108601</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt; 2  8.01 0.06708762 0.09009315 0.1207313</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; 3  8.02 0.07340524 0.09850833 0.1316830</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; 4  8.03 0.07972287 0.10692352 0.1426346</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co">#&gt; 5  8.04 0.08620981 0.11547827 0.1537808</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&gt; 6  8.05 0.09363849 0.12480929 0.1660087</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="co">#&gt; 7  8.06 0.10106716 0.13414031 0.1782366</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a><span class="co">#&gt; 8  8.07 0.10861541 0.14364701 0.1906011</span></span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a><span class="co">#&gt; 9  8.08 0.11657272 0.15375469 0.2034327</span></span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a><span class="co">#&gt; 10 8.09 0.12453002 0.16386237 0.2162643</span></span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a><span class="co">#&gt; 11 8.10 0.13257126 0.17428375 0.2295413</span></span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a><span class="co">#&gt; 12 8.11 0.14080833 0.18543710 0.2438577</span></span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a><span class="co">#&gt; 13 8.12 0.14904540 0.19659045 0.2581741</span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a><span class="co">#&gt; 14 8.13 0.15728247 0.20774380 0.2724905</span></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a><span class="co">#&gt; 15 8.14 0.16662200 0.21960922 0.2875367</span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a><span class="co">#&gt; 16 8.15 0.17662981 0.23190628 0.3030253</span></span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a><span class="co">#&gt; 17 8.16 0.18663761 0.24420333 0.3185138</span></span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a><span class="co">#&gt; 18 8.17 0.19681441 0.25692028 0.3351942</span></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a><span class="co">#&gt; 19 8.18 0.20699699 0.26965158 0.3519154</span></span>
+<span id="cb22-24"><a href="#cb22-24" tabindex="-1"></a><span class="co">#&gt; 20 8.19 0.21718541 0.28270330 0.3691020</span></span>
+<span id="cb22-25"><a href="#cb22-25" tabindex="-1"></a><span class="co">#&gt; 21 8.20 0.22738677 0.29646391 0.3873184</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

@@ -67,11 +67,14 @@
 </h2>
 <!-- badges: start -->
 
-<p>This software package fits a discharge rating curve based on the power-law and the generalized power-law from data on paired water elevation and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2022). Four models are implemented:</p>
-<p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with a constant error variance. This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.</p>
-<p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with error variance that varies with water elevation.</p>
-<p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with a constant error variance. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
-<p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with error variance that varies with water elevation. The generalized power-law is introduced in Hrafnkelsson et al. (2022).</p>
+<p>The <code>bdrc</code> package provides tools for fitting discharge rating curves using Bayesian hierarchical models. It implements both traditional power-law and novel generalized power-law models, offering flexibility in handling various hydrological scenarios.</p>
+<p>This package implements four models as described in Hrafnkelsson et al. (2022):</p>
+<ul>
+<li><p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with constant log-error variance.</p></li>
+<li><p><code><a href="reference/plm.html">plm()</a></code> - Power-law model with stage-dependent log-error variance.</p></li>
+<li><p><code><a href="reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with constant log-error variance.</p></li>
+<li><p><code><a href="reference/gplm.html">gplm()</a></code> - Generalized power-law model with stage-dependent log-error variance.</p></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -83,12 +86,34 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sor16/bdrc"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>Fitting a discharge rating curve with bdrc is straightforward:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">bdrc</span><span class="fu">::</span><span class="va"><a href="reference/krokfors.html">krokfors</a></span></span>
+<span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, <span class="va">data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gplm.fit</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gplm.fit</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="key-features">Key-features<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h2>
+<ul>
+<li>Easy-to-use interface for fitting Bayesian discharge rating curves</li>
+<li>Multiple model options to suit different hydrological scenarios</li>
+<li>Built-in visualization tools for model results and diagnostics</li>
+<li>Integrates R and C++ for efficient MCMC sampling using parallel processing</li>
+</ul>
+</div>
+<div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>It is very simple to fit a discharge rating curve with the <code>bdrc</code> package. All you need are two mandatory input arguments: <code>formula</code> and <code>data</code>. The formula is of the form <code>y ~ x</code> where <code>y</code> is discharge in cubic meters per second (m<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi></mi><mn>3</mn></msup><mi>/</mi></mrow><annotation encoding="application/x-tex">^3/</annotation></semantics></math>s) and <code>x</code> is water elevation in m (it is very important that the data is in the correct units). The input <code>data</code> should be a <code>data.frame</code> which must have <code>x</code> and <code>y</code> as column names. As an example, we will use data from the Swedish gauging station Krokfors, which is one of the datasets that come with the package. In this table, the <code>Q</code> column denotes discharge while <code>W</code> denotes water elevation:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, <span class="va">krokfors</span><span class="op">)</span></span></code></pre></div>
-<p>To dig deeper into the functionality of the package and the different ways to visualize a discharge rating curve model for your data, we recommend taking a look at our two vignettes.</p>
+<p>For a deeper dive into the package functionality and visualization options, or the theory behind the models, check out our vignettes:</p>
+<ul>
+<li><a href="background.html">Background</a></li>
+<li><a href="introduction.html">Introduction</a></li>
+<li><a href="tournament.html">Power-law tournament (model-selection)</a></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
