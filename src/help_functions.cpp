@@ -167,8 +167,8 @@ double pri(const std::string& type, const arma::vec& args) {
     }
 
     if (!std::isfinite(result)) {
-        Rcpp::Rcout << "Warning: Non-finite pri value. Type: " << type
-                    << ", Args: " << args.t() << std::endl;
+        // Rcpp::Rcout << "Warning: Non-finite pri value. Type: " << type
+        //             << ", Args: " << args.t() << std::endl;
         return -std::numeric_limits<double>::max();
     }
 
