@@ -29,7 +29,7 @@ get_report(x, path = NULL, type = 1, ...)
 \item{type}{An integer denoting what type of report is to be produced. Defaults to type 1. Only type 1 is permissible for an object of class "plm0", "plm", "gplm0" or "gplm". Possible types are:
 \describe{
   \item{\code{1}}{Produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
-  \item{\code{2}}{Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+  \item{\code{2}}{Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows a summary of the tournament model comparison, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
 
 \item{...}{Further arguments passed to other methods (currently unused).}

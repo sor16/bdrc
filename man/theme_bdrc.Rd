@@ -4,12 +4,12 @@
 \alias{theme_bdrc}
 \title{Custom bdrc theme}
 \usage{
-theme_bdrc(..., scaling = 1)
+theme_bdrc(scaling = 1, ...)
 }
 \arguments{
-\item{...}{not used in this function}
-
 \item{scaling}{a numerical value which can be used to scale up or down the size of the text and titles of a plot that uses \code{theme_bdrc}. Defaults to 1.}
+
+\item{...}{not used in this function}
 }
 \value{
 returns a theme object for the package

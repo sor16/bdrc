@@ -9,52 +9,50 @@
 \usage{
 \method{plot}{plm0}(
   x,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 
 \method{plot}{plm}(
   x,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 
 \method{plot}{gplm0}(
   x,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 
 \method{plot}{gplm}(
   x,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 }
 \arguments{
 \item{x}{An object of class "plm0", "plm", "gplm0" or "gplm".}
-
-\item{...}{Other plotting parameters (not used in this function).}
 
 \item{type}{A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
 \describe{
@@ -78,6 +76,8 @@
 \item{xlim}{A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
 
 \item{ylim}{A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
+
+\item{...}{Not used in this function}
 }
 \value{
 No return value, called for side effects.

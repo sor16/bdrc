@@ -11,13 +11,39 @@ evaluate_comparison(m, method, winning_criteria)
 
 \item{method}{A string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "PMP".}
 
-\item{winning_criteria}{A numerical value which sets the threshold which the first model in the list must exceed for it to be declared the more appropriate model. This value defaults to 2 for methods "WAIC" and "DIC", but defaults to 0.75 for method "PMP".}
+\item{winning_criteria}{For "WAIC", it can be either a numeric value or a string expression. For "DIC", it must be a numeric value. For "PMP", it must be a numeric value between 0 and 1. This sets the threshold for determining the more appropriate model. See Details for more information.}
 }
 \value{
-A data.frame with the summary of the results of each comparison
+A data.frame with the summary of the results of each comparison, including:
+\itemize{
+  \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
+  \item model: The type of model (gplm, gplm0, plm, or plm0)
+  \item Method-specific columns (see Details)
+  \item winner: Logical value indicating if the model was selected
+}
 }
 \description{
 evaluate_comparison uses the Widely Applicable Information Criterion (WAIC), the Deviance Information Criterion (DIC), or the posterior model probabilities (PMP), calculated with Bayes factor, to determine whether one model is more appropriate than the other given the data at hand.
+}
+\details{
+For "WAIC" method:
+\itemize{
+  \item If winning_criteria is numeric, the complex model wins if Delta_WAIC > winning_criteria
+  \item If winning_criteria is a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC
+  \item Returns columns: lppd, eff_num_param, WAIC, SE_WAIC, Delta_WAIC, SE_Delta_WAIC
+}
+For "DIC" method:
+\itemize{
+  \item winning_criteria must be numeric
+  \item The complex model wins if Delta_DIC > winning_criteria
+  \item Returns columns: D_hat, eff_num_param, DIC, Delta_DIC
+}
+For "PMP" method:
+\itemize{
+  \item winning_criteria must be a numeric value between 0 and 1
+  \item The complex model wins if its PMP > winning_criteria
+  \item Returns columns: log_marg_lik, PMP
+}
 }
 \references{
 Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711

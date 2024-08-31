@@ -20,41 +20,41 @@
 
 \method{autoplot}{plm}(
   object,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 
 \method{autoplot}{gplm0}(
   object,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 
 \method{autoplot}{gplm}(
   object,
-  ...,
   type = "rating_curve",
   param = NULL,
   transformed = FALSE,
   title = NULL,
   xlim = NULL,
-  ylim = NULL
+  ylim = NULL,
+  ...
 )
 }
 \arguments{
 \item{object}{An object of class "plm0", "plm", "gplm0" or "gplm".}
 
-\item{...}{Other plotting parameters (not used in this function).}
+\item{...}{Not used in this function}
 
 \item{type}{A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
 \describe{

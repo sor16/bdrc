@@ -4,14 +4,14 @@
 \alias{autoplot.tournament}
 \title{Autoplot method for discharge rating curve tournament}
 \usage{
-\method{autoplot}{tournament}(object, ..., type = "boxplot")
+\method{autoplot}{tournament}(object, type = "boxplot", ...)
 }
 \arguments{
 \item{object}{An object of class "tournament"}
 
-\item{...}{Other plotting parameters (not used in this function)}
+\item{type}{A character denoting what type of plot should be drawn. Possible types are}
 
-\item{type}{A character denoting what type of plot should be drawn. Possible types are
+\item{...}{Not used in this function
 \describe{
   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values transformed to the deviance scale.}
 }}

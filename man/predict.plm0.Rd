@@ -7,22 +7,22 @@
 \alias{predict.gplm}
 \title{Predict method for discharge rating curves}
 \usage{
-\method{predict}{plm0}(object, ..., newdata = NULL, wide = FALSE)
+\method{predict}{plm0}(object, newdata = NULL, wide = FALSE, ...)
 
-\method{predict}{plm}(object, ..., newdata = NULL, wide = FALSE)
+\method{predict}{plm}(object, newdata = NULL, wide = FALSE, ...)
 
-\method{predict}{gplm0}(object, ..., newdata = NULL, wide = FALSE)
+\method{predict}{gplm0}(object, newdata = NULL, wide = FALSE, ...)
 
-\method{predict}{gplm}(object, ..., newdata = NULL, wide = FALSE)
+\method{predict}{gplm}(object, newdata = NULL, wide = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class "plm0", "plm", "gplm0" or "gplm".}
 
-\item{...}{Not used in this function.}
-
 \item{newdata}{A numeric vector of stage values for which to predict. If omitted, the stage values in the data are used.}
 
 \item{wide}{A logical value denoting whether to produce a wide prediction output. If TRUE, then the output is a table with median prediction values for an equally spaced grid of stages with 1 cm increments, each row containing predictions in a decimeter range of stages.}
+
+\item{...}{Not used in this function}
 }
 \value{
 An object of class "data.frame" with four columns:

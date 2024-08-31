@@ -2,14 +2,12 @@
 % Please edit documentation in R/tournament_methods.R
 \name{plot.tournament}
 \alias{plot.tournament}
-\title{Plot method for discharge rating curve tournament}
+\title{Plot method for a discharge rating curve tournament}
 \usage{
-\method{plot}{tournament}(x, ..., type = "tournament_results", transformed = FALSE)
+\method{plot}{tournament}(x, type = "tournament_results", transformed = FALSE, ...)
 }
 \arguments{
 \item{x}{An object of class "tournament"}
-
-\item{...}{Other plotting parameters (not used in this function)}
 
 \item{type}{A character denoting what type of plot should be drawn. Possible types are:
 \describe{
@@ -23,6 +21,8 @@
 }}
 
 \item{transformed}{A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+
+\item{...}{Not used in this function}
 }
 \value{
 No return value, called for side effects
