@@ -85,59 +85,23 @@ substantially easier to directly observe than discharge. This R package
 implements four different discharge rating curve models using a Bayesian
 hierarchical modeling framework:</p>
 <ul>
-<li>
-<p><code><a href="../reference/plm0.html">plm0()</a></code>: Power-law model with constant log-error
-variance</p>
-<ul>
-<li>A Bayesian hierarchical implementation of the most commonly used
-discharge rating curve model in hydrological practice.</li>
-<li>The ‘0’ denotes a constant variance of the log-transformed errors.
-This means that the model assumes the variance is constant across all
-water elevations when viewed on a logarithmic scale.<br><br>
-</li>
-</ul>
-</li>
-<li>
-<p><code><a href="../reference/plm.html">plm()</a></code>: Power-law model with stage-dependent
-log-error variance</p>
-<ul>
-<li>Similar to <code><a href="../reference/plm0.html">plm0()</a></code>, but allows the variance of the
-log-error terms to vary with water elevation.</li>
-<li>Variance of the log-error terms modeled as an exponential of a
-B-spline curve.<br><br>
-</li>
-</ul>
-</li>
-<li>
-<p><code><a href="../reference/gplm0.html">gplm0()</a></code>: Generalized power-law model with constant
-log-error variance</p>
-<ul>
-<li>An extension of the power-law model introduced in Hrafnkelsson et
-al. (2022).</li>
-<li>Power-law exponent modeled as a Gaussian Process.<br><br>
-</li>
-</ul>
-</li>
-<li>
-<p><code><a href="../reference/gplm.html">gplm()</a></code>: Generalized power-law model with
-stage-dependent log-error variance</p>
-<ul>
-<li>Combines the generalized power-law approach with stage-dependent
-log-error variance.</li>
-<li>Power-law exponent modeled as a Gaussian Process.</li>
-<li>Variance of the log-error terms modeled as an exponential of a
-B-spline curve.</li>
-</ul>
-</li>
+<li><p><code><a href="../reference/plm0.html">plm0()</a></code> - Power-law model with constant log-error
+variance.</p></li>
+<li><p><code><a href="../reference/plm.html">plm()</a></code> - Power-law model with stage-dependent
+log-error variance.</p></li>
+<li><p><code><a href="../reference/gplm0.html">gplm0()</a></code> - Generalized power-law model with constant
+log-error variance.</p></li>
+<li><p><code><a href="../reference/gplm.html">gplm()</a></code> - Generalized power-law model with
+stage-dependent log-error variance.</p></li>
 </ul>
 <p>For further details about the different models, see Hrafnkelsson et
-al. (2022). The models differ in their complexity, <code>gplm</code>
-being the most flexible and complex model. We will focus on the use of
+al. (2022). For an brief overview of the underlying theory, see our <a href="background.html">Background</a> vignette.</p>
+<p>The models differ in their complexity, <code>gplm</code> being the
+most flexible and complex model. We will focus on the use of
 <code>gplm</code> throughout this introduction vignette and explore the
 different ways to fit the <code>gplm</code> and visualize its output.
-However, the API of the functions for the other three models are
-completely identical so this vignette also helps users to run those
-models.</p>
+However, the API of the functions for the other three models are almost
+identical so this vignette also helps users to run those models.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">library</span>(bdrc)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">1</span>) <span class="co">#set seed for reproducibility</span></span></code></pre></div>
 <p>We will use a dataset from a stream gauging station in Sweden, called

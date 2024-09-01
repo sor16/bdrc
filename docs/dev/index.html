@@ -67,7 +67,7 @@
 </h2>
 <!-- badges: start -->
 
-<p>The <code>bdrc</code> package provides tools for fitting discharge rating curves using Bayesian hierarchical models. It implements both traditional power-law and novel generalized power-law models, offering flexibility in handling various hydrological scenarios.</p>
+<p>The <code>bdrc</code> package provides tools for fitting discharge rating curves using Bayesian hierarchical models. It implements both the classical power-law and the novel generalized power-law models, offering flexibility in handling various hydrological scenarios.</p>
 <p>This package implements four models as described in Hrafnkelsson et al. (2022):</p>
 <ul>
 <li><p><code><a href="reference/plm0.html">plm0()</a></code> - Power-law model with constant log-error variance.</p></li>
@@ -90,8 +90,9 @@
 </h2>
 <p>Fitting a discharge rating curve with bdrc is straightforward:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">bdrc</span><span class="fu">::</span><span class="va"><a href="reference/krokfors.html">krokfors</a></span></span>
-<span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, <span class="va">data</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sor16.github.io/bdrc">bdrc</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krokfors</span><span class="op">)</span></span>
+<span><span class="va">gplm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gplm.html">gplm</a></span><span class="op">(</span><span class="va">Q</span> <span class="op">~</span> <span class="va">W</span>, <span class="va">krokfors</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gplm.fit</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gplm.fit</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -100,19 +101,20 @@
 </h2>
 <ul>
 <li>Easy-to-use interface for fitting Bayesian discharge rating curves</li>
+<li>Features the novel Generalized power-law rating curve model (Hrafnkelsson et al., 2022)</li>
 <li>Multiple model options to suit different hydrological scenarios</li>
 <li>Built-in visualization tools for model results and diagnostics</li>
-<li>Integrates R and C++ for efficient MCMC sampling using parallel processing</li>
+<li>Integrates R and C++ for efficient MCMC sampling with parallel processing</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>For a deeper dive into the package functionality and visualization options, or the theory behind the models, check out our vignettes:</p>
+<p>For a deeper dive into the package’s functionality, visualization options, and the underlying theory of the models, please check out our vignettes:</p>
 <ul>
 <li><a href="background.html">Background</a></li>
 <li><a href="introduction.html">Introduction</a></li>
-<li><a href="tournament.html">Power-law tournament (model-selection)</a></li>
+<li><a href="tournament.html">Power-law tournament (model selection)</a></li>
 </ul>
 </div>
 <div class="section level2">
