@@ -44,8 +44,9 @@ devtools::install_github("sor16/bdrc")
 Fitting a discharge rating curve with bdrc is straightforward:
 
 ``` r
-data <- bdrc::krokfors
-gplm.fit <- gplm(Q ~ W, data)
+library(bdrc)
+data(krokfors)
+gplm.fit <- gplm(Q ~ W, krokfors)
 summary(gplm.fit)
 plot(gplm.fit)
 ```
