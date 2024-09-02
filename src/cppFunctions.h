@@ -9,7 +9,6 @@
 arma::mat matMult(const arma::mat& A, const arma::mat& B);
 arma::mat choleskyDecomp(const arma::mat& X);
 arma::vec solveArma(const arma::mat& A, const arma::vec& B);
-arma::mat solveArma2(const arma::mat& A, const arma::mat& B);
 arma::mat matInverse(const arma::mat& A);
 arma::mat compute_L(const arma::mat& X, const arma::mat& Sig_x, const arma::mat& Sig_eps, double nugget);
 arma::vec compute_w(const arma::mat& L, const arma::vec& y, const arma::mat& X, const arma::vec& mu_x);

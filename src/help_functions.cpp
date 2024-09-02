@@ -33,12 +33,6 @@ arma::vec solveArma(const arma::mat& A, const arma::vec& B) {
 }
 
 // [[Rcpp::export]]
-arma::mat solveArma2(const arma::mat& A, const arma::mat& B) {
-    arma::mat X = arma::solve(A, B);
-    return X;
-}
-
-// [[Rcpp::export]]
 arma::mat matInverse(const arma::mat& A) {
     arma::mat A_inv = arma::inv(A);
     return A_inv;
