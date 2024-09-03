@@ -45,7 +45,7 @@ head(krokfors)
 ## Fitting a discharge rating curve
 Fitting a discharge rating curve with `bdrc` is straightforward. Only two input arguments are mandatory: `formula` and `data`. The `formula` should of the form `y ~ x`, where `y` is the discharge in cubic meters per second (m³/s), and `x` is the water elevation (stage) in meters (m). It is crucial that the data is in the correct units! The `data` argument must be a `data.frame` including `x` and `y` as column names. In our case, the Krokfors data has the discharge and water elevation measurements stored in columns named `Q` and `W`, respectively. We are ready to fit a discharge rating curve using the `gplm` function:
 ```{r, cache=TRUE}
-gplm.fit <- gplm(Q ~ W, data = krokfors, parallel = TRUE, num_cores = 2) # by default parallel=TRUE and the number of cores is detected on the machine
+gplm.fit <- gplm(Q ~ W, data = krokfors, parallel = TRUE, num_cores = 2)
 ```
 The function prints out a summary of the fitting process and key MCMC diagnostics. These include the acceptance rate, chain mixing (assessed via the Gelman-Rubin statistic, $\hat{R}$), and effective sample sizes. The checkmarks indicate that the algorithm has met important criteria for reliability. However, sometimes you may encounter warnings. For example:
 ```{r,echo=FALSE}

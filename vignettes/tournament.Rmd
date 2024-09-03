@@ -93,7 +93,7 @@ Let's run our first tournament:
 
 ```{r, cache=TRUE}
 set.seed(1) # set seed for reproducibility
-t_obj <- tournament(Q ~ W, krokfors, parallel = TRUE, num_cores = 2) # by default parallel=TRUE and the number of cores is detected on the machine
+t_obj <- tournament(Q ~ W, krokfors, parallel = TRUE, num_cores = 2) 
 ```
 
 This output provides valuable information about the MCMC sampling process for each model:
