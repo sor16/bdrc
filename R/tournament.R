@@ -8,7 +8,7 @@
 #' @return
 #' A data.frame with the summary of the results of each comparison, including:
 #' \itemize{
-#'   \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
+#'   \item complexity: Indicates whether a model is the "more" or "less" complex model in a comparison
 #'   \item model: The type of model (gplm, gplm0, plm, or plm0)
 #'   \item Method-specific columns (see Details)
 #'   \item winner: Logical value indicating if the model was selected
@@ -16,20 +16,20 @@
 #' @details
 #' For "WAIC" method:
 #' \itemize{
-#'   \item If winning_criteria is numeric, the complex model wins if Delta_WAIC > winning_criteria
+#'   \item If winning_criteria is numeric, the more complex model wins if Delta_WAIC > winning_criteria
 #'   \item If winning_criteria is a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC
 #'   \item Returns columns: lppd, eff_num_param, WAIC, SE_WAIC, Delta_WAIC, SE_Delta_WAIC
 #' }
 #' For "DIC" method:
 #' \itemize{
 #'   \item winning_criteria must be numeric
-#'   \item The complex model wins if Delta_DIC > winning_criteria
+#'   \item The more complex model wins if Delta_DIC > winning_criteria
 #'   \item Returns columns: D_hat, eff_num_param, DIC, Delta_DIC
 #' }
 #' For "PMP" method:
 #' \itemize{
 #'   \item winning_criteria must be a numeric value between 0 and 1
-#'   \item The complex model wins if its PMP > winning_criteria
+#'   \item The more complex model wins if its PMP > winning_criteria
 #'   \item Returns columns: log_marg_lik, PMP
 #' }
 #' @references Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
@@ -40,7 +40,7 @@ evaluate_comparison <- function(m, method, winning_criteria){
     if(method == "PMP"){
         log_ml <- sapply(m, function(x) log_ml_harmonic_mean_est(x, x$d))
         PR_m1 <- post_model_prob_m1(m[[2]], m[[1]], m[[1]]$data)
-        df <- data.frame("rank" = c("complex", "reduced"),
+        df <- data.frame("complexity" = c("more", "less"),
                          "log_marg_lik" = log_ml,
                          "PMP" = c(PR_m1, 1 - PR_m1))
         winner <- PR_m1 > winning_criteria
@@ -49,7 +49,7 @@ evaluate_comparison <- function(m, method, winning_criteria){
         eff_num_param_DIC <- sapply(m, function(x) x$effective_num_param_DIC)
         DIC_vec <- sapply(m, function(x) x$DIC)
         DDIC <- DIC_vec[2] - DIC_vec[1]
-        df <- data.frame("rank" = c("complex", "reduced"),
+        df <- data.frame("complexity" = c("more", "less"),
                          "D_hat" = D_hat,
                          "eff_num_param" = eff_num_param_DIC,
                          "DIC" = DIC_vec,
@@ -63,7 +63,7 @@ evaluate_comparison <- function(m, method, winning_criteria){
         eff_num_param_WAIC <- sapply(m, function(x) x$effective_num_param_WAIC)
         WAIC_vec <- sapply(m, function(x) x$WAIC)
         DWAIC <- WAIC_vec[2] - WAIC_vec[1]
-        df <- data.frame("rank" = c("complex", "reduced"),
+        df <- data.frame("complexity" = c("more", "less"),
                          "lppd" = lppd,
                          "eff_num_param" = eff_num_param_WAIC,
                          "WAIC" = WAIC_vec,
@@ -79,7 +79,7 @@ evaluate_comparison <- function(m, method, winning_criteria){
         stop("Unknown method")
     }
 
-    return(data.frame(rank = df$rank, model = sapply(m, class), df[,-1], winner = c(winner, !winner)))
+    return(data.frame(complexity = df$complexity, model = sapply(m, class), df[,-1], winner = c(winner, !winner)))
 }
 
 
@@ -111,41 +111,34 @@ evaluate_comparison <- function(m, method, winning_criteria){
 #'   \item{\code{info}}{The specifics about the tournament; the overall winner; the method used; and the winning criteria.}
 #'   \item{\code{summary}}{A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:
 #'     \itemize{
-#'       \item For method "WAIC":
+#'       \item For all methods:
 #'         \itemize{
 #'           \item round: The tournament round
 #'           \item comparison: The comparison number
-#'           \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
+#'           \item complexity: Indicates whether a model is the "more" or "less" complex model in a comparison
 #'           \item model: The model type
+#'           \item winner: Logical value indicating if the model was selected in the corresponding comparison
+#'         }
+#'       \item Additional columns for method "WAIC":
+#'         \itemize{
 #'           \item lppd: Log pointwise predictive density
 #'           \item eff_num_param: Effective number of parameters (WAIC)
 #'           \item WAIC: Widely Applicable Information Criterion
 #'           \item SE_WAIC: Standard error of WAIC
 #'           \item Delta_WAIC: Difference in WAIC
 #'           \item SE_Delta_WAIC: Standard error of the difference in WAIC
-#'           \item winner: Logical value indicating if the model was selected in the corresponding comparison
 #'         }
-#'       \item For method "DIC":
+#'       \item Additional columns for method "DIC":
 #'         \itemize{
-#'           \item round: The tournament round
-#'           \item comparison: The comparison number
-#'           \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
-#'           \item model: The model type
 #'           \item D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples
 #'           \item eff_num_param: Effective number of parameters (DIC)
 #'           \item DIC: Deviance Information Criterion
 #'           \item Delta_DIC: Difference in DIC
-#'           \item winner: Logical value indicating if the model was selected in the corresponding comparison
 #'         }
-#'       \item For method "PMP":
+#'       \item Additional columns for method "PMP":
 #'         \itemize{
-#'           \item round: The tournament round
-#'           \item comparison: The comparison number
-#'           \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
-#'           \item model: The model type
 #'           \item log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator
 #'           \item PMP: Posterior model probability computed with Bayes factor
-#'           \item winner: Logical value indicating if the model was selected in the corresponding comparison
 #'         }
 #'     }
 #'   }
@@ -184,7 +177,7 @@ evaluate_comparison <- function(m, method, winning_criteria){
 #' }
 #' @export
 tournament <- function(formula = NULL, data = NULL, model_list = NULL, method = 'WAIC', winning_criteria = NULL, verbose = TRUE, ...) {
-    # Set default winning_cirteria
+    # Set default winning_criteria
     default_win_crit <- list(
         'WAIC' = "Delta_WAIC > 2",
         'DIC' = 2,
@@ -199,7 +192,7 @@ tournament <- function(formula = NULL, data = NULL, model_list = NULL, method = 
         stop("The following argument(s) are not recognized: ",paste(unexpected_args, collapse = ", "))
     }
 
-    # Check for erronious "method" and "winning_criteria" inputs
+    # Check for erroneous "method" and "winning_criteria" inputs
     error_msg <- "The method input must contain a string indicating the method to be used for comparing the models. The methods are 'WAIC' (default), 'DIC' and 'PMP'."
     if(is.null(method)){
         stop(error_msg)
@@ -213,13 +206,13 @@ tournament <- function(formula = NULL, data = NULL, model_list = NULL, method = 
             if(!is.numeric(winning_criteria) || length(winning_criteria) != 1 ||
                is.nan(winning_criteria) || is.na(winning_criteria) ||
                is.infinite(winning_criteria) || winning_criteria < 0 || winning_criteria > 1) {
-                stop("For method 'PMP', winning_criteria must be a single number between 0 and 1. Default is 0.75, meaning the complex model needs >75% posterior probability to be chosen. See ?tournament for details.")
+                stop("For method 'PMP', winning_criteria must be a single number between 0 and 1. Default is 0.75, meaning the more complex model needs >75% posterior probability to be chosen. See ?tournament for details.")
             }
         } else if(method == 'WAIC') {
             if(is.numeric(winning_criteria)) {
                 if(length(winning_criteria) != 1 || is.nan(winning_criteria) ||
                    is.na(winning_criteria) || is.infinite(winning_criteria)) {
-                    stop("For method 'WAIC', when numeric, winning_criteria must be a single finite number. Default is 2, equivalent to requiring 'Delta_WAIC > 2' for the complex model to be chosen. See ?tournament for details on numeric and expression inputs.")
+                    stop("For method 'WAIC', when numeric, winning_criteria must be a single finite number. Default is 2, equivalent to requiring 'Delta_WAIC > 2' for the more complex model to be chosen. See ?tournament for details on numeric and expression inputs.")
                 }
                 winning_criteria <- paste("Delta_WAIC >", winning_criteria)
             } else if(is.character(winning_criteria)) {
@@ -242,7 +235,7 @@ tournament <- function(formula = NULL, data = NULL, model_list = NULL, method = 
             if(!is.numeric(winning_criteria) || length(winning_criteria) != 1 ||
                is.nan(winning_criteria) || is.na(winning_criteria) ||
                is.infinite(winning_criteria)) {
-                stop('For method "DIC", winning_criteria must be a single real number. Default is 2, equivalent to requiring "Delta_DIC > 2" for the complex model to be chosen. See ?tournament for more details on choosing this value.')
+                stop('For method "DIC", winning_criteria must be a single real number. Default is 2, equivalent to requiring "Delta_DIC > 2" for the more complex model to be chosen. See ?tournament for more details on choosing this value.')
             }
         }
     }
@@ -307,4 +300,3 @@ tournament <- function(formula = NULL, data = NULL, model_list = NULL, method = 
     if(method == 'PMP' & verbose) cat( '\u26A0 Warning: The Harmonic Mean Estimator (HME) is used to estimate the Bayes Factor for the posterior model probability (PMP), which is known to be unstable and potentially unreliable. We recommend using method "WAIC" (Widely Applicable Information Criterion) for model comparison instead.\n' )
     return(out_obj)
 }
-

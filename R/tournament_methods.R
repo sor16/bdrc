@@ -299,13 +299,13 @@ tournament_summary_output <- function(results, method, winning_criteria) {
     # Determine the method used and set appropriate columns
     if ("WAIC" %in% names(results)) {
         criteria_cols <- c("lppd", "eff_num_param", "WAIC", "SE_WAIC", "Delta_WAIC", "SE_Delta_WAIC")
-        line_length <- 94
+        line_length <- 98
     } else if ("DIC" %in% names(results)) {
         criteria_cols <- c("D_hat", "eff_num_param", "DIC", "Delta_DIC")
-        line_length <- 70
+        line_length <- 74
     } else if ("log_marg_lik" %in% names(results)) {
         criteria_cols <- c("log_marg_lik", "PMP")
-        line_length <- 51
+        line_length <- 55
     }
 
     # Round numeric columns
@@ -318,7 +318,7 @@ tournament_summary_output <- function(results, method, winning_criteria) {
     cat("\n=== Tournament Model Comparison Summary ===\n\n")
     cat("Method:", method, "\n")
     if (method == "PMP") {
-        cat("Winning Criteria: PMP of complex model >", winning_criteria, "\n")
+        cat("Winning Criteria: PMP of more complex model >", winning_criteria, "\n")
     } else if (method == "DIC") {
         cat("Winning Criteria: Delta_DIC >", winning_criteria, "\n")
     } else if (method == "WAIC") {
@@ -337,22 +337,22 @@ tournament_summary_output <- function(results, method, winning_criteria) {
 
         # Print column headers based on the method
         if (method == "WAIC") {
-            cat(sprintf("%-8s %-6s %-6s %-8s %-14s %-10s %-10s %-10s %-12s\n",
-                        "rank", "model", "winner", "lppd", "eff_num_param", "WAIC", "SE_WAIC", "Delta_WAIC", "SE_Delta_WAIC"))
+            cat(sprintf("%-12s %-6s %-6s %-8s %-14s %-10s %-10s %-10s %-12s\n",
+                        "complexity", "model", "winner", "lppd", "eff_num_param", "WAIC", "SE_WAIC", "Delta_WAIC", "SE_Delta_WAIC"))
         } else if (method == "DIC") {
-            cat(sprintf("%-8s %-6s %-6s %-10s %-14s %-10s %-10s\n",
-                        "rank", "model", "winner", "D_hat", "eff_num_param", "DIC", "Delta_DIC"))
+            cat(sprintf("%-12s %-6s %-6s %-10s %-14s %-10s %-10s\n",
+                        "complexity", "model", "winner", "D_hat", "eff_num_param", "DIC", "Delta_DIC"))
         } else if (method == "PMP") {
-            cat(sprintf("%-8s %-6s %-6s %-20s %-15s\n",
-                        "rank", "model", "winner", "log_marg_lik", "PMP"))
+            cat(sprintf("%-12s %-6s %-6s %-20s %-15s\n",
+                        "complexity", "model", "winner", "log_marg_lik", "PMP"))
         }
 
         # Print each row
         for (i in 1:nrow(comparison_data)) {
             row <- comparison_data[i, ]
             if (method == "WAIC") {
-                cat(sprintf("%-8s %-6s %-6s %-8.4f %-14.4f %-10.4f %-10.4f %-10s %-12s\n",
-                            row$rank,
+                cat(sprintf("%-12s %-6s %-6s %-8.4f %-14.4f %-10.4f %-10.4f %-10s %-12s\n",
+                            row$complexity,
                             row$model,
                             ifelse(row$winner, "<---", ""),
                             row$lppd,
@@ -362,8 +362,8 @@ tournament_summary_output <- function(results, method, winning_criteria) {
                             ifelse(is.na(row$Delta_WAIC), "", sprintf("%.4f", row$Delta_WAIC)),
                             ifelse(is.na(row$SE_Delta_WAIC), "", sprintf("%.4f", row$SE_Delta_WAIC))))
             } else if (method == "DIC") {
-                cat(sprintf("%-8s %-6s %-6s %-10.4f %-14.4f %-10.4f %-10s\n",
-                            row$rank,
+                cat(sprintf("%-12s %-6s %-6s %-10.4f %-14.4f %-10.4f %-10s\n",
+                            row$complexity,
                             row$model,
                             ifelse(row$winner, "<---", ""),
                             row$D_hat,
@@ -371,8 +371,8 @@ tournament_summary_output <- function(results, method, winning_criteria) {
                             row$DIC,
                             ifelse(is.na(row$Delta_DIC), "", sprintf("%.4f", row$Delta_DIC))))
             } else if (method == "PMP") {
-                cat(sprintf("%-8s %-6s %-6s %-20.4f %-15.4f\n",
-                            row$rank,
+                cat(sprintf("%-12s %-6s %-6s %-20.4f %-15.4f\n",
+                            row$complexity,
                             row$model,
                             ifelse(row$winner, "<---", ""),
                             row$log_marg_lik,

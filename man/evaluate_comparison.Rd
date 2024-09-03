@@ -16,7 +16,7 @@ evaluate_comparison(m, method, winning_criteria)
 \value{
 A data.frame with the summary of the results of each comparison, including:
 \itemize{
-  \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
+  \item complexity: Indicates whether a model is the "more" or "less" complex model in a comparison
   \item model: The type of model (gplm, gplm0, plm, or plm0)
   \item Method-specific columns (see Details)
   \item winner: Logical value indicating if the model was selected
@@ -28,20 +28,20 @@ evaluate_comparison uses the Widely Applicable Information Criterion (WAIC), the
 \details{
 For "WAIC" method:
 \itemize{
-  \item If winning_criteria is numeric, the complex model wins if Delta_WAIC > winning_criteria
+  \item If winning_criteria is numeric, the more complex model wins if Delta_WAIC > winning_criteria
   \item If winning_criteria is a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC
   \item Returns columns: lppd, eff_num_param, WAIC, SE_WAIC, Delta_WAIC, SE_Delta_WAIC
 }
 For "DIC" method:
 \itemize{
   \item winning_criteria must be numeric
-  \item The complex model wins if Delta_DIC > winning_criteria
+  \item The more complex model wins if Delta_DIC > winning_criteria
   \item Returns columns: D_hat, eff_num_param, DIC, Delta_DIC
 }
 For "PMP" method:
 \itemize{
   \item winning_criteria must be a numeric value between 0 and 1
-  \item The complex model wins if its PMP > winning_criteria
+  \item The more complex model wins if its PMP > winning_criteria
   \item Returns columns: log_marg_lik, PMP
 }
 }

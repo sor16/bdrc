@@ -37,41 +37,34 @@ An object of type "tournament" with the following elements:
   \item{\code{info}}{The specifics about the tournament; the overall winner; the method used; and the winning criteria.}
   \item{\code{summary}}{A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:
     \itemize{
-      \item For method "WAIC":
+      \item For all methods:
         \itemize{
           \item round: The tournament round
           \item comparison: The comparison number
-          \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
+          \item complexity: Indicates whether a model is the "more" or "less" complex model in a comparison
           \item model: The model type
+          \item winner: Logical value indicating if the model was selected in the corresponding comparison
+        }
+      \item Additional columns for method "WAIC":
+        \itemize{
           \item lppd: Log pointwise predictive density
           \item eff_num_param: Effective number of parameters (WAIC)
           \item WAIC: Widely Applicable Information Criterion
           \item SE_WAIC: Standard error of WAIC
           \item Delta_WAIC: Difference in WAIC
           \item SE_Delta_WAIC: Standard error of the difference in WAIC
-          \item winner: Logical value indicating if the model was selected in the corresponding comparison
         }
-      \item For method "DIC":
+      \item Additional columns for method "DIC":
         \itemize{
-          \item round: The tournament round
-          \item comparison: The comparison number
-          \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
-          \item model: The model type
           \item D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples
           \item eff_num_param: Effective number of parameters (DIC)
           \item DIC: Deviance Information Criterion
           \item Delta_DIC: Difference in DIC
-          \item winner: Logical value indicating if the model was selected in the corresponding comparison
         }
-      \item For method "PMP":
+      \item Additional columns for method "PMP":
         \itemize{
-          \item round: The tournament round
-          \item comparison: The comparison number
-          \item rank: Indicates whether a model is the "complex" or "reduced" model in a comparison
-          \item model: The model type
           \item log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator
           \item PMP: Posterior model probability computed with Bayes factor
-          \item winner: Logical value indicating if the model was selected in the corresponding comparison
         }
     }
   }
