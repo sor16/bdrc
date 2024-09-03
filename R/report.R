@@ -3,18 +3,18 @@
 #' @importFrom gridExtra tableGrob ttheme_minimal
 #' @importFrom grid textGrob
 #' @importFrom utils capture.output
-get_report_components <- function(x,type=1){
+get_report_components <- function(x, type = 1){
     error_msg1 <- 'Please provide a single object of types tournament, gplm, gplm0, plm or plm0.'
     error_msg2 <- 'It is only possible to produce a type 1 report for a single model object of type gplm, gplm0, plm or plm0.'
-    legal_types <- c('gplm','gplm0','plm','plm0','tournament')
-    if(!(type %in% c(1,2))){
+    legal_types <- c('gplm', 'gplm0', 'plm', 'plm0', 'tournament')
+    if(!(type %in% c(1, 2))){
         stop('Please input an integer value of 1 or 2 to indicate which type of report is to be produce.')
     }
     if(!(class(x) %in% legal_types)){
         stop(error_msg1)
     }
     if(inherits(x,'tournament')){
-        if(type==1){
+        if(type == 1){
             m_obj <- list(x$winner)
             names(m_obj) <- class(x$winner)
         }else{
@@ -22,55 +22,55 @@ get_report_components <- function(x,type=1){
             t_obj <- x
         }
     }else{
-        if(type==2){
+        if(type == 2){
             stop('It is only possible to produce a type 1 report for a single model object of type gplm, gplm0, plm or plm0.')
         }
         m_obj <- list(x)
         names(m_obj) <- class(x)
     }
     output_list <- list()
-    main_plot_types <- c('rating_curve','residuals','sigma_eps','f')
-    if(type==1){
-        output_list$main_page_plots <- plot_grob(m_obj[[1]],type='panel')
-        output_list$main_page_table <- lapply(m_obj,function(m){
-                                            param <- get_param_names(class(m),m$run_info$c_param)
-                                            table <- rbind(m$param_summary[,c('lower','median','upper')],c(m$posterior_log_likelihood_summary))
-                                            names(table) <- paste0(names(table),c('-2.5%','-50%','-97.5%'))
-                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Posterior log-likelihood")
-                                            table <- format(round(table,digits=3),nsmall=3)
-                                            tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
+    main_plot_types <- c('rating_curve', 'residuals', 'sigma_eps', 'f')
+    if(type == 1){
+        output_list$main_page_plots <- plot_grob(m_obj[[1]], type = 'panel')
+        output_list$main_page_table <- lapply(m_obj, function(m){
+                                            param <- get_param_names(class(m), m$run_info$c_param)
+                                            table <- rbind(m$param_summary[, c('lower', 'median', 'upper')], c(m$posterior_log_likelihood_summary))
+                                            names(table) <- paste0(names(table), c('-2.5%', '-50%', '-97.5%'))
+                                            row.names(table) <- c(sapply(1:length(param), get_param_expression), "Posterior log-likelihood")
+                                            table <- format(round(table, digits=3), nsmall=3)
+                                            tableGrob(table, theme = ttheme_minimal(rowhead = list(fg_params = list(parse = TRUE))))
                                         })
-        p_mat <- predict(m_obj[[1]],wide=TRUE)
-        num_pages <- floor(nrow(p_mat)/41)+1
-        output_list$p_mat_list <- lapply(1:num_pages,function(i){
-            idx <- if(num_pages==1) 1:nrow(p_mat) else if(i==num_pages) ((num_pages-1)*40+1):nrow(p_mat) else ((i-1)*40+1):((i)*40)
-            tableGrob(format(round(p_mat[idx,],digits=3),nsmall=3),
-                      theme=ttheme_minimal(core=list(bg_params = list(fill = c("#F7FBFF","#DEEBF7"), col=NA),fg_params=list(fontface=3)),
-                                           colhead=list(fg_params=list(col="black",fontface=2L)),
-                                           rowhead=list(fg_params=list(col="black",fontface=2L)),
-                                           base_size = 10))
+        p_mat <- predict(m_obj[[1]], wide = TRUE)
+        num_pages <- floor(nrow(p_mat) / 41) + 1
+        output_list$p_mat_list <- lapply(1:num_pages, function(i){
+            idx <- if(num_pages == 1) 1:nrow(p_mat) else if(i == num_pages) ((num_pages - 1) * 40 + 1):nrow(p_mat) else ((i - 1) * 40 + 1):(i * 40)
+            tableGrob(format(round(p_mat[idx, ], digits = 3), nsmall = 3),
+                      theme = ttheme_minimal(core = list(bg_params = list(fill = c("#F7FBFF", "#DEEBF7"), col = NA), fg_params = list(fontface = 3)),
+                                             colhead = list(fg_params = list(col = "black", fontface = 2L)),
+                                             rowhead = list(fg_params = list(col = "black", fontface = 2L)),
+                                             base_size = 10))
         })
         output_list$obj_class <- class(m_obj[[1]])
     }else{
         output_list$main_page_plots <- plot_tournament_grob(t_obj)
-        output_list$main_page_table <- lapply(m_obj,function(m){
-                                            param <- get_param_names(class(m),m$run_info$c_param)
-                                            table <- rbind(m$param_summary,data.frame(m$posterior_log_likelihood_summary,r_hat=NA,eff_n_samples=NA))
-                                            table[,c('lower','median','upper','r_hat')] <- format(round(table[,c('lower','median','upper','r_hat')],digits=3),nsmall=3)
-                                            row.names(table) <- c(sapply(1:length(param),get_param_expression),"Posterior log-likelihood")
-                                            table['Posterior log-likelihood',c('eff_n_samples','r_hat')] <- ''
-                                            names(table) <- c(paste0(names(table[,c('lower','median','upper')]),c('-2.5%','-50%','-97.5%')),'eff_n_samples','r_hat')
-                                            tableGrob(table,theme=ttheme_minimal(rowhead=list(fg_params=list(parse=TRUE))))
+        output_list$main_page_table <- lapply(m_obj, function(m){
+                                            param <- get_param_names(class(m), m$run_info$c_param)
+                                            table <- rbind(m$param_summary, data.frame(m$posterior_log_likelihood_summary, r_hat = NA, eff_n_samples = NA))
+                                            table[, c('lower', 'median', 'upper', 'r_hat')] <- format(round(table[, c('lower', 'median', 'upper', 'r_hat')], digits = 3), nsmall = 3)
+                                            row.names(table) <- c(sapply(1:length(param), get_param_expression), "Posterior log-likelihood")
+                                            table['Posterior log-likelihood', c('eff_n_samples','r_hat')] <- ''
+                                            names(table) <- c(paste0(names(table[, c('lower', 'median', 'upper')]), c('-2.5%', '-50%', '-97.5%')), 'eff_n_samples', 'r_hat')
+                                            tableGrob(table, theme = ttheme_minimal(rowhead = list(fg_params = list(parse = TRUE))))
                                         })
         output_list$tournament_summary <- capture.output(summary(t_obj))
-        output_list$tournament_plot <- plot_tournament_grob(t_obj,type='tournament_results')
-        output_list$conv_diag_plots <- lapply(t_obj$contestants,function(x){
-            plot_grob(x,type='convergence_diagnostics')
+        output_list$tournament_plot <- plot_tournament_grob(t_obj, type = 'tournament_results')
+        output_list$conv_diag_plots <- lapply(t_obj$contestants, function(x){
+            plot_grob(x, type = 'convergence_diagnostics')
         })
-        output_list$mcmc_hist_list <- lapply(m_obj,function(m){
-            params <- get_param_names(class(m),m$run_info$c_param)
+        output_list$mcmc_hist_list <- lapply(m_obj, function(m){
+            params <- get_param_names(class(m), m$run_info$c_param)
             hist_plot_list <- lapply(1:length(params), function(j){
-                autoplot(m,type='histogram',param=params[j],transformed = TRUE,title='')
+                autoplot(m, type = 'histogram', param = params[j], transformed = TRUE, title = '')
             })
         })
     }
@@ -79,71 +79,71 @@ get_report_components <- function(x,type=1){
 
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom grid textGrob
-get_report_pages_fun <- function(x,type=1){
-    report_components <- get_report_components(x,type=type)
-    if(type==1){
+get_report_pages_fun <- function(x, type = 1){
+    report_components <- get_report_components(x, type = type)
+    if(type == 1){
         main_page_plot <- arrangeGrob(report_components$main_page_plots,
                                       report_components$main_page_table[[1]],
-                                      nrow=2,
-                                      as.table=TRUE,
-                                      heights=c(5,3),
-                                      top=textGrob(report_components$obj_class,gp=gpar(fontsize=22,facetype='bold')))
-        predict_mat <- lapply(report_components$p_mat_list,function(p){
+                                      nrow = 2,
+                                      as.table = TRUE,
+                                      heights = c(5, 3),
+                                      top = textGrob(report_components$obj_class, gp = gpar(fontsize = 22, facetype = 'bold')))
+        predict_mat <- lapply(report_components$p_mat_list, function(p){
             arrangeGrob(p,
-                        nrow=1,
-                        as.table=TRUE,
-                        heights=c(1),
-                        top=textGrob(paste0('Tabular Rating Curve - ',report_components$obj_class),gp=gpar(fontsize=22,facetype='bold')))
+                        nrow = 1,
+                        as.table = TRUE,
+                        heights = c(1),
+                        top = textGrob(paste0('Tabular Rating Curve - ', report_components$obj_class), gp = gpar(fontsize = 22, facetype = 'bold')))
         })
-        report_pages <- c(list(main_page_plot),predict_mat)
+        report_pages <- c(list(main_page_plot), predict_mat)
     }else{
-        main_page_plots <- lapply(names(report_components$main_page_plots),function(m){
+        main_page_plots <- lapply(names(report_components$main_page_plots), function(m){
                                   arrangeGrob(report_components$main_page_plots[[m]],
                                               report_components$main_page_table[[m]],
-                                              nrow=2,
-                                              as.table=TRUE,
-                                              heights=c(5,3),
-                                              top=textGrob(m,gp=gpar(fontsize=22,facetype='bold')))
+                                              nrow = 2,
+                                              as.table = TRUE,
+                                              heights = c(5, 3),
+                                              top = textGrob(m, gp = gpar(fontsize = 22, facetype = 'bold')))
                            })
-        tournament_page <- arrangeGrob(textGrob(paste(report_components$tournament_summary, collapse="\n"),
-                                                gp=gpar(fontfamily="mono", fontsize=10),
+        tournament_page <- arrangeGrob(textGrob(paste(report_components$tournament_summary, collapse = "\n"),
+                                                gp = gpar(fontfamily = "mono", fontsize = 10),
                                                 x = unit(0, "npc"),  # Set x position to far left
                                                 just = "left"),
                                        report_components$tournament_plot,
-                                       nrow=2,
-                                       as.table=TRUE,
-                                       heights=c(1,1),
-                                       top=textGrob('Tournament model comparison',gp=gpar(fontsize=22,facetype='bold')))
-        convergence_page <- arrangeGrob(grobs=report_components$conv_diag_plots,
-                                        nrow=4,
-                                        as.table=TRUE)
+                                       nrow = 2,
+                                       as.table = TRUE,
+                                       heights = c(1, 1),
+                                       top = textGrob('Tournament model comparison', gp = gpar(fontsize = 22, facetype = 'bold')))
+        convergence_page <- arrangeGrob(grobs = report_components$conv_diag_plots,
+                                        nrow = 4,
+                                        as.table = TRUE)
         histogram_pages <- lapply(names(report_components$main_page_plots), function(m) {
-                                  arrangeGrob(arrangeGrob(grobs=report_components$mcmc_hist_list[[m]],nrow=4,ncol=3),
-                                              top=textGrob(paste0('Estimated parameters of ',m),gp=gpar(fontsize=20,facetype='bold')))
+                                  arrangeGrob(arrangeGrob(grobs = report_components$mcmc_hist_list[[m]], nrow = 4, ncol = 3),
+                                              top = textGrob(paste0('Estimated parameters of ', m), gp = gpar(fontsize = 20, facetype = 'bold')))
                             })
-        report_pages <- c(main_page_plots,list(tournament_page),list(convergence_page),histogram_pages)
+        report_pages <- c(main_page_plots, list(tournament_page), list(convergence_page), histogram_pages)
     }
     return(report_pages)
 }
 
 #' @importFrom utils askYesNo
 #' @importFrom grDevices pdf dev.off
-save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
+save_report <- function(report_pages, path = NULL, paper = 'a4', width = 9, height = 11){
     if(is.null(path)){
-        path <- paste0(getwd(),'/report.pdf')
+        path <- paste0(getwd(), '/report.pdf')
     }
     if(interactive()){
-        answer <- askYesNo(paste0('Do you wish to save the report as a pdf file at the following location:\n ',path,'?'))
+        answer <- askYesNo(paste0('Do you wish to save the report as a pdf file at the following location:\n ', path, '?'))
     }else{
         stop('Unable to ask permission for writing the report to the file system. get_report() must be used in an interactive R session')
     }
-    if(answer==FALSE | is.na(answer)) stop('Permission to store a pdf file was not granted')
-    pdf(file=path,paper=paper,width=width,height=height)
+    if(answer == FALSE | is.na(answer)) stop('Permission to store a pdf file was not granted')
+    pdf(file = path, paper = paper, width = width, height = height)
     for(i in 1:length(report_pages)){
-        grid.arrange(report_pages[[i]],as.table=TRUE)
+        grid.arrange(report_pages[[i]], as.table = TRUE)
     }
     invisible(dev.off())
-    message(paste0('The report was saved at the following location:\n',path))
+    message(paste0('The report was saved at the following location:\n', path))
 }
 
 #### S3 methods
@@ -166,36 +166,36 @@ save_report <- function(report_pages,path=NULL,paper='a4',width=9,height=11){
 #' plm0_pages <- get_report_pages(plm0.fit)
 #' }
 #' @export
-get_report_pages <- function(x,type=1) UseMethod("get_report_pages")
+get_report_pages <- function(x, type = 1) UseMethod("get_report_pages")
 
 #' @describeIn get_report_pages Get report pages for plm0 model object
 #' @export
-get_report_pages.plm0 <- function(x,type=1){
-    get_report_pages_fun(x,type=type)
+get_report_pages.plm0 <- function(x, type = 1){
+    get_report_pages_fun(x, type = type)
 }
 
 #' @describeIn get_report_pages Get report pages for plm model object
 #' @export
-get_report_pages.plm <- function(x,type=1){
-    get_report_pages_fun(x,type=type)
+get_report_pages.plm <- function(x, type = 1){
+    get_report_pages_fun(x, type = type)
 }
 
 #' @describeIn get_report_pages Get report pages for gplm0 model object
 #' @export
-get_report_pages.gplm0 <- function(x,type=1){
-    get_report_pages_fun(x,type=type)
+get_report_pages.gplm0 <- function(x, type = 1){
+    get_report_pages_fun(x, type = type)
 }
 
 #' @describeIn get_report_pages Get report pages for gplm model object
 #' @export
-get_report_pages.gplm <- function(x,type=1){
-    get_report_pages_fun(x,type=type)
+get_report_pages.gplm <- function(x, type = 1){
+    get_report_pages_fun(x, type = type)
 }
 
 #' @describeIn get_report_pages Get report pages for discharge rating curve tournament model object
 #' @export
-get_report_pages.tournament <- function(x,type=1){
-    get_report_pages_fun(x,type=type)
+get_report_pages.tournament <- function(x, type = 1){
+    get_report_pages_fun(x, type = type)
 }
 
 #' Report for a discharge rating curve or tournament
@@ -222,39 +222,39 @@ get_report_pages.tournament <- function(x,type=1){
 #' get_report(plm0.fit)
 #' }
 #' @export
-get_report <- function(x,path=NULL,type=1,...) UseMethod("get_report")
+get_report <- function(x, path = NULL, type = 1, ...) UseMethod("get_report")
 
 #' @describeIn get_report Get report for plm0 model object
 #' @export
-get_report.plm0 <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages_fun(x,type=type)
-    save_report(report_pages,path=path,...)
+get_report.plm0 <- function(x, path = NULL, type = 1, ...){
+    report_pages <- get_report_pages_fun(x, type = type)
+    save_report(report_pages, path = path, ...)
 }
 
 #' @describeIn get_report Get report for plm model object
 #' @export
-get_report.plm <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages_fun(x,type=type)
-    save_report(report_pages,path=path,...)
+get_report.plm <- function(x, path = NULL, type = 1, ...){
+    report_pages <- get_report_pages_fun(x, type = type)
+    save_report(report_pages, path = path, ...)
 }
 
 #' @describeIn get_report Get report for gplm0 model object
 #' @export
-get_report.gplm0 <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages_fun(x,type=type)
-    save_report(report_pages,path=path,...)
+get_report.gplm0 <- function(x, path = NULL, type = 1, ...){
+    report_pages <- get_report_pages_fun(x, type = type)
+    save_report(report_pages, path = path, ...)
 }
 
 #' @describeIn get_report Get report for gplm
 #' @export
-get_report.gplm <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages_fun(x,type=type)
-    save_report(report_pages,path=path,...)
+get_report.gplm <- function(x, path = NULL, type = 1, ...){
+    report_pages <- get_report_pages_fun(x, type = type)
+    save_report(report_pages, path = path, ...)
 }
 
 #' @describeIn get_report Get report for discharge rating curve tournament
 #' @export
-get_report.tournament <- function(x,path=NULL,type=1,...){
-    report_pages <- get_report_pages_fun(x,type=type)
-    save_report(report_pages,path=path,...)
+get_report.tournament <- function(x, path = NULL, type = 1, ...){
+    report_pages <- get_report_pages_fun(x, type = type)
+    save_report(report_pages, path = path, ...)
 }

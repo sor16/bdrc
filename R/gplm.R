@@ -151,7 +151,7 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
     autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
-    result_obj$autocorrelation <- autocorrelation_df[, c('lag',param_names)]
+    result_obj$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
     # store other information
     result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
@@ -187,99 +187,99 @@ gplm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, 
     output_list$D_hat <- gplm.calc_Dhat(output_list$theta,RC)
     #refinement of list elements
     if(is.null(RC$c)){
-        output_list$theta[1,] <- RC$h_min-exp(output_list$theta[1,])
-        output_list$theta[2,] <- exp(output_list$theta[2,])
-        output_list$theta[3,] <- exp(output_list$theta[3,])
-        output_list$theta[4,] <- exp(output_list$theta[4,])
-        output_list$theta[5:10,] <- RC$P%*%output_list$theta[5:10,]
+        output_list$theta[1, ] <- RC$h_min-exp(output_list$theta[1, ])
+        output_list$theta[2, ] <- exp(output_list$theta[2, ])
+        output_list$theta[3, ] <- exp(output_list$theta[3, ])
+        output_list$theta[4, ] <- exp(output_list$theta[4, ])
+        output_list$theta[5:10, ] <- RC$P%*%output_list$theta[5:10, ]
     }else{
-        output_list$theta[1,] <- exp(output_list$theta[1,])
-        output_list$theta[2,] <- exp(output_list$theta[2,])
-        output_list$theta[3,] <- exp(output_list$theta[3,])
-        output_list$theta[4:9,] <- RC$P%*%output_list$theta[4:9,]
+        output_list$theta[1, ] <- exp(output_list$theta[1, ])
+        output_list$theta[2, ] <- exp(output_list$theta[2, ])
+        output_list$theta[3, ] <- exp(output_list$theta[3, ])
+        output_list$theta[4:9, ] <- RC$P%*%output_list$theta[4:9, ]
     }
-    output_list$x[1,] <- exp(output_list$x[1,])
-    output_list[['h']] <- c(RC$h,RC$h_u)
-    output_list[['run_info']] <- list('c_param'=c_param,'h_max'=h_max,'forcepoint'=forcepoint,'nr_iter'=nr_iter,'num_chains'=num_chains,'burnin'=burnin,'thin'=thin,'c_upper'=c_upper)
+    output_list$x[1, ] <- exp(output_list$x[1, ])
+    output_list[['h']] <- c(RC$h, RC$h_u)
+    output_list[['run_info']] <- list('c_param' = c_param, 'h_max' = h_max, 'forcepoint' = forcepoint, 'nr_iter' = nr_iter, 'num_chains' = num_chains, 'burnin' = burnin, 'thin' = thin, 'c_upper' = c_upper)
     return(output_list)
 }
 
 gplm.density_evaluation_unknown_c <- function(theta, RC) {
-    return( gplm_density_evaluation_unknown_c_cpp( theta=theta,
-                                                   P=RC$P,
-                                                   h=RC$h,
-                                                   B=RC$B,
-                                                   dist=RC$dist,
-                                                   A=RC$A,
-                                                   y=RC$y,
-                                                   epsilon=RC$epsilon,
-                                                   h_min=RC$h_min,
-                                                   nugget=RC$nugget,
-                                                   n_unique=RC$n_unique,
-                                                   mu_x=RC$mu_x,
-                                                   Sig_ab=RC$Sig_ab,
-                                                   Z=RC$Z,
-                                                   lambda_c=RC$lambda_c,
-                                                   lambda_sb=RC$lambda_sb,
-                                                   lambda_pb=RC$lambda_pb,
-                                                   lambda_eta_1=RC$lambda_eta_1,
-                                                   lambda_seta=RC$lambda_seta) )
+    return( gplm_density_evaluation_unknown_c_cpp( theta = theta,
+                                                   P = RC$P,
+                                                   h = RC$h,
+                                                   B = RC$B,
+                                                   dist = RC$dist,
+                                                   A = RC$A,
+                                                   y = RC$y,
+                                                   epsilon = RC$epsilon,
+                                                   h_min = RC$h_min,
+                                                   nugget = RC$nugget,
+                                                   n_unique = RC$n_unique,
+                                                   mu_x = RC$mu_x,
+                                                   Sig_ab = RC$Sig_ab,
+                                                   Z = RC$Z,
+                                                   lambda_c = RC$lambda_c,
+                                                   lambda_sb = RC$lambda_sb,
+                                                   lambda_pb = RC$lambda_pb,
+                                                   lambda_eta_1 = RC$lambda_eta_1,
+                                                   lambda_seta = RC$lambda_seta) )
 }
 
 gplm.density_evaluation_known_c <- function(theta, RC) {
-    return(gplm_density_evaluation_known_c_cpp( theta=theta,
-                                                P=RC$P,
-                                                h=RC$h,
-                                                B=RC$B,
-                                                dist=RC$dist,
-                                                A=RC$A,
-                                                y=RC$y,
-                                                epsilon=RC$epsilon,
-                                                nugget=RC$nugget,
-                                                n_unique=RC$n_unique,
-                                                mu_x=RC$mu_x,
-                                                Sig_ab=RC$Sig_ab,
-                                                Z=RC$Z,
-                                                c=RC$c,
-                                                lambda_sb=RC$lambda_sb,
-                                                lambda_pb=RC$lambda_pb,
-                                                lambda_eta_1=RC$lambda_eta_1,
-                                                lambda_seta=RC$lambda_seta))
+    return(gplm_density_evaluation_known_c_cpp( theta = theta,
+                                                P = RC$P,
+                                                h = RC$h,
+                                                B = RC$B,
+                                                dist = RC$dist,
+                                                A = RC$A,
+                                                y = RC$y,
+                                                epsilon = RC$epsilon,
+                                                nugget = RC$nugget,
+                                                n_unique = RC$n_unique,
+                                                mu_x = RC$mu_x,
+                                                Sig_ab = RC$Sig_ab,
+                                                Z = RC$Z,
+                                                c = RC$c,
+                                                lambda_sb = RC$lambda_sb,
+                                                lambda_pb = RC$lambda_pb,
+                                                lambda_eta_1 = RC$lambda_eta_1,
+                                                lambda_seta = RC$lambda_seta))
 }
 
 gplm.predict_u_unknown_c <- function(theta, x, RC) {
-    return( gplm_predict_u_unknown_c_cpp( theta=theta,
-                                          x=x,
-                                          P=RC$P,
-                                          B_u=RC$B_u,
-                                          h_unique=RC$h_unique,
-                                          h_u=RC$h_u,
-                                          dist_all=RC$dist_all,
-                                          h_min=RC$h_min,
-                                          nugget=RC$nugget,
-                                          n_unique=RC$n_unique,
-                                          n_u=RC$n_u ) )
+    return( gplm_predict_u_unknown_c_cpp( theta = theta,
+                                          x = x,
+                                          P = RC$P,
+                                          B_u = RC$B_u,
+                                          h_unique = RC$h_unique,
+                                          h_u = RC$h_u,
+                                          dist_all = RC$dist_all,
+                                          h_min = RC$h_min,
+                                          nugget = RC$nugget,
+                                          n_unique = RC$n_unique,
+                                          n_u = RC$n_u ) )
 }
 
 gplm.predict_u_known_c <- function(theta, x, RC) {
-    return( gplm_predict_u_known_c_cpp( theta=theta,
-                                        x=x,
-                                        P=RC$P,
-                                        B_u=RC$B_u,
-                                        h_unique=RC$h_unique,
-                                        h_u=RC$h_u,
-                                        dist_all=RC$dist_all,
-                                        c=RC$c,
-                                        nugget=RC$nugget,
-                                        n_unique=RC$n_unique,
-                                        n_u=RC$n_u ) )
+    return( gplm_predict_u_known_c_cpp( theta = theta,
+                                        x = x,
+                                        P = RC$P,
+                                        B_u = RC$B_u,
+                                        h_unique = RC$h_unique,
+                                        h_u = RC$h_u,
+                                        dist_all = RC$dist_all,
+                                        c = RC$c,
+                                        nugget = RC$nugget,
+                                        n_unique = RC$n_unique,
+                                        n_u = RC$n_u ) )
 }
 
 #' @importFrom stats dnorm
-gplm.calc_Dhat <- function(theta,RC){
-    theta_median <- sapply(1:dim(theta)[1],function(x) median(theta[x,]))
+gplm.calc_Dhat <- function(theta, RC){
+    theta_median <- sapply(1:dim(theta)[1], function(x) median(theta[x, ]))
     if(!is.null(RC$c)){
-        theta_median <- c(log(RC$h_min-RC$c),theta_median)
+        theta_median <- c(log(RC$h_min - RC$c), theta_median)
     }
     zeta <- theta_median[1]
     log_sig_b <- theta_median[2]
@@ -288,28 +288,28 @@ gplm.calc_Dhat <- function(theta,RC){
     eta_1 <- theta_median[5]
     z <- theta_median[6:10]
 
-    eta=c(RC$P%*%as.matrix(c(eta_1,exp(log_sig_eta)*z)))
+    eta=c(RC$P %*% as.matrix(c(eta_1, exp(log_sig_eta) * z)))
 
-    l=c(log(RC$h-RC$h_min+exp(zeta)))
-    varr=c(RC$epsilon*exp(RC$B%*%eta))
-    if(any(varr>10^2)) return(list(p=-1e9)) # to avoid numerical instability
+    l=c(log(RC$h - RC$h_min + exp(zeta)))
+    varr=c(RC$epsilon * exp(RC$B %*% eta))
+    if(any(varr > 10^2)) return(list(p = -1e9)) # to avoid numerical instability
 
     # repeated calculations
     phi_b <- exp(log_phi_b)
-    var_b <- exp(2*log_sig_b)
+    var_b <- exp(2 * log_sig_b)
     sqrt_5 <- sqrt(5)
 
     #Matern covariance
-    Sig_x=rbind(cbind(RC$Sig_ab,RC$m1),cbind(RC$m2,var_b*((1+sqrt_5*RC$dist/phi_b+5*RC$dist^2/(3*phi_b^2))*exp(-sqrt_5*RC$dist/phi_b)+diag(RC$n_unique)*RC$nugget)))
+    Sig_x <- rbind(cbind(RC$Sig_ab, RC$m1), cbind(RC$m2, var_b * ((1 + sqrt_5 * RC$dist / phi_b + 5 * RC$dist^2 / (3 * phi_b^2)) * exp(-sqrt_5 * RC$dist / phi_b) + diag(RC$n_unique) * RC$nugget)))
 
-    X=rbind(cbind(1,l,matMult(diag(l),RC$A)),RC$Z)
-    L=compute_L(X,Sig_x,diag(c(varr,0)),RC$nugget)
-    w=compute_w(L,RC$y,X,RC$mu_x)
-    x=RC$mu_x+(Sig_x%*%(t(X)%*%solveArma(t(L),w)))
+    X <- rbind(cbind(1, l, matMult(diag(l), RC$A)), RC$Z)
+    L <- compute_L(X, Sig_x, diag(c(varr, 0)), RC$nugget)
+    w <- compute_w(L, RC$y, X, RC$mu_x)
+    x <- RC$mu_x + (Sig_x %*% (t(X) %*% solveArma(t(L), w)))
 
-    yp=(matMult(X,x))[1:RC$n,]
+    yp=(matMult(X, x))[1:RC$n, ]
 
-    Dhat=-2*sum( dnorm(RC$y[1:RC$n,],yp,sqrt(varr),log = T) )
+    Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], yp, sqrt(varr), log = T))
 
     return(Dhat)
 }
