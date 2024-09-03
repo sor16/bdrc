@@ -6,7 +6,7 @@ Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c
              person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut")),
              person("Rafael Daníel", "Vias", email = "raffidv@gmail.com", role = c("aut"),comment=c(ORCID="0009-0007-2601-6800"))
              )
-Maintainer: Solvi Rognvaldsson <solviro@gmail.com>
+Maintainer: Rafael Daníel Vias <raffidv@gmail.com>
 Description: Fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2020) <arXiv:2010.04769>.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
