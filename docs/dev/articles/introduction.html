@@ -130,7 +130,7 @@ column names. In our case, the Krokfors data has the discharge and water
 elevation measurements stored in columns named <code>Q</code> and
 <code>W</code>, respectively. We are ready to fit a discharge rating
 curve using the <code>gplm</code> function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q <span class="sc">~</span> W, <span class="at">data =</span> krokfors, <span class="at">parallel =</span> <span class="cn">TRUE</span>, <span class="at">num_cores =</span> <span class="dv">2</span>) <span class="co"># by default parallel=TRUE and the number of cores is detected on the machine</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> gplm.fit <span class="ot">&lt;-</span> <span class="fu">gplm</span>(Q <span class="sc">~</span> W, <span class="at">data =</span> krokfors, <span class="at">parallel =</span> <span class="cn">TRUE</span>, <span class="at">num_cores =</span> <span class="dv">2</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; Progress:</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Initializing Metropolis MCMC algorithm...</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; Multiprocess sampling (4 chains in 2 jobs) ...</span></span>

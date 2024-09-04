@@ -86,11 +86,11 @@ test_that("tournament handles verbose input correctly", {
     expect_true( grepl("plm0 finished", t_obj_output))
 
     t_obj_output <- paste(capture.output(tournament(Q ~ W, krokfors, verbose = FALSE, num_cores = 2)), collapse = "")
-    expect_false( grepl("Running tournament", t_obj_output))
+    expect_false(grepl("Running tournament", t_obj_output))
 })
 
 test_that("tournament summary has correct structure", {
-    expect_true(all(c("round", "comparison", "rank", "model", "winner") %in% names(t_obj$summary)))
+    expect_true(all(c("round", "comparison", "complexity", "model", "winner") %in% names(t_obj$summary)))
     expect_equal(nrow(t_obj$summary), 6)
 })
 
@@ -112,7 +112,7 @@ test_that("tournament handles unexpected arguments", {
 
 test_that("tournament checks for consistent data in model_list", {
     # Create a new gplm model with different data
-    different_data_plm0 <- plm0(Q ~ W, data = krokfors[1:4,], num_cores = 2)
+    different_data_plm0 <- plm0(Q ~ W, data = krokfors[1:4, ], num_cores = 2)
 
     inconsistent_data_models <- list(
         plm0 = different_data_plm0,  # Different data

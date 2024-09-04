@@ -65,21 +65,21 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data.frame with the summary of the results of each comparison, including:</p><ul><li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
+    <p>A data.frame with the summary of the results of each comparison, including:</p><ul><li><p>complexity: Indicates whether a model is the "more" or "less" complex model in a comparison</p></li>
 <li><p>model: The type of model (gplm, gplm0, plm, or plm0)</p></li>
 <li><p>Method-specific columns (see Details)</p></li>
 <li><p>winner: Logical value indicating if the model was selected</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For "WAIC" method:</p><ul><li><p>If winning_criteria is numeric, the complex model wins if Delta_WAIC &gt; winning_criteria</p></li>
+    <p>For "WAIC" method:</p><ul><li><p>If winning_criteria is numeric, the more complex model wins if Delta_WAIC &gt; winning_criteria</p></li>
 <li><p>If winning_criteria is a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC</p></li>
 <li><p>Returns columns: lppd, eff_num_param, WAIC, SE_WAIC, Delta_WAIC, SE_Delta_WAIC</p></li>
 </ul><p>For "DIC" method:</p><ul><li><p>winning_criteria must be numeric</p></li>
-<li><p>The complex model wins if Delta_DIC &gt; winning_criteria</p></li>
+<li><p>The more complex model wins if Delta_DIC &gt; winning_criteria</p></li>
 <li><p>Returns columns: D_hat, eff_num_param, DIC, Delta_DIC</p></li>
 </ul><p>For "PMP" method:</p><ul><li><p>winning_criteria must be a numeric value between 0 and 1</p></li>
-<li><p>The complex model wins if its PMP &gt; winning_criteria</p></li>
+<li><p>The more complex model wins if its PMP &gt; winning_criteria</p></li>
 <li><p>Returns columns: log_marg_lik, PMP</p></li>
 </ul></div>
     <div class="section level2">

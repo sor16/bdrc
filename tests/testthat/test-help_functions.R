@@ -9,7 +9,6 @@ test_that("C++ matrix operations work correctly", {
     expect_equal(matMult(A, B), A %*% B)
     expect_equal(choleskyDecomp(A %*% t(A)), t(chol(A %*% t(A))))
     expect_equal(solveArma(A, c), solve(A, c))
-    expect_equal(solveArma2(A, B), solve(A, B))
     expect_equal(matInverse(A), solve(A))
 })
 

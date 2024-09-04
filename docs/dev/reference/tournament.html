@@ -99,35 +99,26 @@
 <dd><p>The specifics about the tournament; the overall winner; the method used; and the winning criteria.</p></dd>
 
   <dt><code>summary</code></dt>
-<dd><p>A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:</p><ul><li><p>For method "WAIC":</p><ul><li><p>round: The tournament round</p></li>
+<dd><p>A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:</p><ul><li><p>For all methods:</p><ul><li><p>round: The tournament round</p></li>
 <li><p>comparison: The comparison number</p></li>
-<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
+<li><p>complexity: Indicates whether a model is the "more" or "less" complex model in a comparison</p></li>
 <li><p>model: The model type</p></li>
-<li><p>lppd: Log pointwise predictive density</p></li>
+<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
+</ul></li>
+<li><p>Additional columns for method "WAIC":</p><ul><li><p>lppd: Log pointwise predictive density</p></li>
 <li><p>eff_num_param: Effective number of parameters (WAIC)</p></li>
 <li><p>WAIC: Widely Applicable Information Criterion</p></li>
 <li><p>SE_WAIC: Standard error of WAIC</p></li>
 <li><p>Delta_WAIC: Difference in WAIC</p></li>
 <li><p>SE_Delta_WAIC: Standard error of the difference in WAIC</p></li>
-<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
 </ul></li>
-<li><p>For method "DIC":</p><ul><li><p>round: The tournament round</p></li>
-<li><p>comparison: The comparison number</p></li>
-<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
-<li><p>model: The model type</p></li>
-<li><p>D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples</p></li>
+<li><p>Additional columns for method "DIC":</p><ul><li><p>D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples</p></li>
 <li><p>eff_num_param: Effective number of parameters (DIC)</p></li>
 <li><p>DIC: Deviance Information Criterion</p></li>
 <li><p>Delta_DIC: Difference in DIC</p></li>
-<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
 </ul></li>
-<li><p>For method "PMP":</p><ul><li><p>round: The tournament round</p></li>
-<li><p>comparison: The comparison number</p></li>
-<li><p>rank: Indicates whether a model is the "complex" or "reduced" model in a comparison</p></li>
-<li><p>model: The model type</p></li>
-<li><p>log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator</p></li>
+<li><p>Additional columns for method "PMP":</p><ul><li><p>log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator</p></li>
 <li><p>PMP: Posterior model probability computed with Bayes factor</p></li>
-<li><p>winner: Logical value indicating if the model was selected in the corresponding comparison</p></li>
 </ul></li>
 </ul><p></p></dd>
 
@@ -224,22 +215,22 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> Overall Winner: gplm0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 1 Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> complex  gplm          20.7794  6.8706         -27.8176   11.8918    0.5570     0.2416      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complexity   model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> more         gplm          20.7794  6.8706         -27.8176   11.8918    0.5570     0.2416      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> less         gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360                           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 2 Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> complex  plm           5.5842   4.2574         -2.6536    6.6635     -0.4066    0.1904      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  plm0   &lt;---   5.6284   4.0984         -3.0601    6.6931                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complexity   model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> more         plm           5.5842   4.2574         -2.6536    6.6635     -0.4066    0.1904      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> less         plm0   &lt;---   5.6284   4.0984         -3.0601    6.6931                            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Comparison 3 Results:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------------------------------- </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> rank     model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> complex  gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360    24.2005    9.1834      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> reduced  plm0          5.6284   4.0984         -3.0601    6.6931                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------------------------------------------------------- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> complexity   model  winner lppd     eff_num_param  WAIC       SE_WAIC    Delta_WAIC SE_Delta_WAIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> more         gplm0  &lt;---   20.3710  6.7406         -27.2606   12.0360    24.2005    9.1834      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> less         plm0          5.6284   4.0984         -3.0601    6.6931                            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> === End of Summary ===</span>
 <span class="r-in"><span></span></span>

@@ -55,7 +55,7 @@ The tournament process occurs in two rounds:
 
    - Winners of the first round face off
 
-In each comparison, we calculate $\Delta\text{WAIC} = \text{WAIC}_{\text{simple}} - \text{WAIC}_{\text{complex}}$. A positive $\Delta\text{WAIC}$ suggests the complex model is more appropriate. However, to advance to the next round, $\Delta\text{WAIC}$ must exceed a pre-specified "winning criteria" (default value = 2). This threshold helps ensure that we only choose a more complex model if it offers a substantial improvement.
+In each comparison, we calculate the WAIC difference of the less and more complex model, $\Delta\text{WAIC} = \text{WAIC}_{\text{less}} - \text{WAIC}_{\text{more}}$. A positive $\Delta\text{WAIC}$ suggests the more complex model is more appropriate. However, to advance to the next round, $\Delta\text{WAIC}$ must exceed a pre-specified "winning criteria" (default value = 2). This threshold helps ensure that we only choose a more complex model if it offers a substantial improvement.
 
 The default winning criteria of 2 is based on statistical guidelines for model selection (Burnham & Anderson, 2002), balancing the trade-off between model fit and complexity. It helps prevent overfitting by requiring evidence to justify a more complex model.
 In the following sections, we'll provide code examples demonstrating how to conduct the power-law tournament with your own data using the `bdrc` package.
@@ -126,8 +126,61 @@ If you've already fitted the four models separately and stored in objects (e.g.,
 t_obj <- tournament(list(plm0.fit, plm.fit, gplm0.fit, gplm.fit))
 ```
 
+The tournament function creates a tournament object which contains four elements: `summary`, `contestants`, `winner`, and `info`. These components are structured as follows:
 
-For a more comprehensive summary of the tournament results:
+* `summary`: A data frame with detailed information on the results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used (`"WAIC"`, `"DIC"`, or `"PMP"`) and include:
+    + Common columns for all methods:  
+    
+        + `round`: Indicates the tournament round (1 or 2). Round 1 compares the generalized and classical power-law models separately (`gplm` vs `gplm0` and `plm` vs `plm0`), whereas Round 2 compares the winners from Round 1.
+        + `comparison`: A numeric identifier for each model comparison (1, 2, or 3). There are two comparisons in Round 1 and one in Round 2.
+        + `complexity`: Indicates whether a model is the "more" or "less" complex model in a given comparison. The "less" complex model is given the advantage defined by the `winning_criteria`.  
+        + `model`: The model type (`plm0`, `plm`, `gplm0`, or `gplm`).
+        + `winner`: A logical value (`TRUE`/`FALSE`) indicating whether the model was selected as the winner.  
+        
+    + Method-specific columns:  
+        
+        + For `WAIC` (Widely Applicable Information Criterion):  
+            
+            + `lppd`: Log-pointwise predictive density, measuring how well the model predicts the observed data
+            + `eff_num_param`: Effective number of parameters, estimating model complexity
+            + `WAIC`: The computed WAIC value, balancing model fit and complexity
+            + `SE_WAIC`: Standard error of the WAIC estimate
+            + `Delta_WAIC`: Difference in WAIC between compared models
+            + `SE_Delta_WAIC`: Standard error of the difference in WAIC  
+
+        + For `DIC` (Deviance Information Criterion):  
+            
+            + `D_hat`: Minus two times the log-likelihood evaluated at the median of the posterior samples
+            + `eff_num_param`: Effective number of parameters, estimating model complexity
+            + `DIC`: The computed DIC value, balancing model fit and complexity
+            + `Delta_DIC`: Difference in DIC between compared models  
+
+        + For `PMP` (Posterior Model Probability):  
+            
+            + `log_marg_lik`: Logarithm of the marginal likelihood, estimated using the harmonic-mean estimator
+            + `PMP`: Posterior model probability computed with Bayes factor, indicating the probability of each model given the data  
+
+* `contestants`: A list containing all of the fitted model objects compared in the tournament: `plm0`, `plm`, `gplm0` and `gplm`.
+
+* `winner`: The model object of the tournament winner, representing the most appropriate model given the data.
+
+* `info`: A list containing specific information about the tournament:
+    + The overall winner
+    + The method used for comparison (`"WAIC"`, `"DIC"`, or `"PMP"`)
+    + The winning criteria applied
+
+
+This structure allows users to easily access both the final results (winner) and the detailed process (summary) of the model comparison, as well as the full model objects for further analysis if needed.  
+
+The method-specific columns provide insights into the model selection process:
+    * For WAIC, lower values indicate better models, with Delta_WAIC showing the magnitude of difference between models.
+    * For DIC, like WAIC, lower values are preferred, with Delta_DIC showing the difference between models.
+    * For PMP, higher probabilities indicate stronger evidence for a model, with values closer to 1 suggesting stronger support.
+
+These metrics help users understand not just which model was selected, but also the strength of evidence for that selection and the relative performance of all compared models.
+
+
+For a comprehensive summary of the tournament results:
 ```{r}
 summary(t_obj)
 ```

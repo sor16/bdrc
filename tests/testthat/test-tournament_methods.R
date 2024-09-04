@@ -71,7 +71,7 @@ test_that("plot_tournament_grob handles different types", {
 test_that("tournament_summary_output formats output correctly", {
     waic_results <- tournament(t_obj$contestants, method = "WAIC")$summary
     output <- capture.output(tournament_summary_output(waic_results, "WAIC", 2))
-    expect_true(any(grepl("rank", output)))
+    expect_true(any(grepl("complexity", output)))
     expect_true(any(grepl("model", output)))
     expect_true(any(grepl("winner", output)))
     expect_true(any(grepl("WAIC", output)))
