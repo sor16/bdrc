@@ -4,7 +4,7 @@
 * Multiple functions rewritten in C++ to speed up the MCMC sampling algorithm and various other tasks.
 * The "Deviance" posterior output has been transformed and renamed "Posterior log-likelihood". The Deviance was previously calculated as -2 times the Posterior log-likelihood.
 * The plot(tournament_obj, type = "Deviance") figure is now created by evaluating plot(tournament_obj, type = "boxplot").
-* The log-likelihood of the models is now computed on the log-scale, rather than transforming back to the real scale.
+* The log-likelihood of the models is now computed with the log-transformed discharge observations (normally distributed), rather than with discharge on the real scale (log-normally distributed).
 * Pointwise WAIC values (WAIC_i) stored to the model objects.
 * Implemented standard error computations for WAIC and Delta_WAIC estimates.
 * Applied log-sum-exp trick in WAIC and Bayes factor calculations for numerical stability.
