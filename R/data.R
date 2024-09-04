@@ -4,8 +4,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "norn"
@@ -16,8 +16,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "krokfors"
@@ -28,8 +28,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "spanga"
@@ -40,8 +40,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "skogsliden"
@@ -52,8 +52,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "kallstorp"
@@ -64,8 +64,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Swedish Meteorological and Hydrological Institute.
 "melby"
@@ -76,8 +76,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
 "jokdal"
@@ -88,8 +88,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
 "jokfjoll"
@@ -100,8 +100,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
 "nordura"
@@ -112,8 +112,8 @@
 #'
 #' @format A data frame with columns:
 #' \describe{
-#'  \item{W}{Measurements of water stage in meters}
-#'  \item{Q}{Measurements of water discharge in cubic meters per second}
+#'  \item{\code{W}}{Measurements of water stage in meters}
+#'  \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 #' }
 #' @source Icelandic Meteorological Office, Landsvirkjun - the National Power Company of Iceland, and the Icelandic Road and Coastal Administration.
 "skjalf"

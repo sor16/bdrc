@@ -1,9 +1,11 @@
-pandoc: 2.11.4
-pkgdown: 1.6.1
+pandoc: 3.1.11
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   background: background.html
   introduction: introduction.html
   tournament: tournament.html
-last_built: 2021-07-27T23:08Z
-
+last_built: 2024-09-04T14:46Z
+urls:
+  reference: https://sor16.github.io/bdrc/reference
+  article: https://sor16.github.io/bdrc/articles

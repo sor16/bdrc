@@ -7,8 +7,8 @@
 \format{
 A data frame with columns:
 \describe{
- \item{W}{Measurements of water stage in meters}
- \item{Q}{Measurements of water discharge in cubic meters per second}
+ \item{\code{W}}{Measurements of water stage in meters}
+ \item{\code{Q}}{Measurements of water discharge in cubic meters per second}
 }
 }
 \source{

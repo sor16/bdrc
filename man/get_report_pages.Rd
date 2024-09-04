@@ -9,28 +9,26 @@
 \alias{get_report_pages.tournament}
 \title{Report pages for a discharge rating curve or tournament}
 \usage{
-get_report_pages(x, type = 1, ...)
+get_report_pages(x, type = 1)
 
-\method{get_report_pages}{plm0}(x, type = 1, ...)
+\method{get_report_pages}{plm0}(x, type = 1)
 
-\method{get_report_pages}{plm}(x, type = 1, ...)
+\method{get_report_pages}{plm}(x, type = 1)
 
-\method{get_report_pages}{gplm0}(x, type = 1, ...)
+\method{get_report_pages}{gplm0}(x, type = 1)
 
-\method{get_report_pages}{gplm}(x, type = 1, ...)
+\method{get_report_pages}{gplm}(x, type = 1)
 
-\method{get_report_pages}{tournament}(x, type = 1, ...)
+\method{get_report_pages}{tournament}(x, type = 1)
 }
 \arguments{
-\item{x}{an object of class "tournament", "plm0", "plm", "gplm0" or "gplm".}
+\item{x}{An object of class "tournament", "plm0", "plm", "gplm0" or "gplm".}
 
-\item{type}{an integer denoting what type of report is to be produced. Defaults to type 1. Possible types are
-\itemize{
-   \item{1 - }{produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
-   \item{2 - }{produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows model comparison plots and tables, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
+\item{type}{An integer denoting what type of report is to be produced. Defaults to type 1. Possible types are:
+\describe{
+  \item{\code{1}}{Produces a report displaying the results of the model (winning model if a tournament provided). The first page contains a panel of four plots and a summary of the posterior distributions of the parameters. On the second page a tabular prediction of discharge on an equally spaced grid of stages is displayed. This prediction table can span multiple pages.}
+  \item{\code{2}}{Produces a ten page report and is only permissible for objects of class "tournament". The first four pages contain a panel of four plots and a summary of the posterior distributions of the parameters for each of the four models in the tournament, the fifth page shows a summary of the tournament model comparison, the sixth page convergence diagnostics plots, and the final four pages shows the histograms of the parameters in each of the four models.}
 }}
-
-\item{...}{further arguments passed to other methods (currently unused).}
 }
 \value{
 A list of objects of type "grob" that correspond to the pages in a rating curve report.
@@ -60,5 +58,5 @@ plm0_pages <- get_report_pages(plm0.fit)
 }
 }
 \seealso{
-\code{\link{tournament}} for running a tournament,\code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
+\code{\link{tournament}} for running a tournament, \code{\link{summary.tournament}} for summaries and \code{\link{get_report}} for generating and saving a report of a tournament object.
 }

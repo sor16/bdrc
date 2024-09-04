@@ -1,12 +1,12 @@
 Package: bdrc
 Title: Bayesian Discharge Rating Curves
-Version: 1.1.0.9000
+Version: 2.0.0
 Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c("aut","cph"),comment=c(ORCID="0000-0003-1864-9652")),
-             person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut","cre"),comment=c(ORCID="0000-0002-4376-3361")),
-             person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut")),
-             person("Rafael Daníel", "Vias", email = "raffidv@gmail.com", role = c("aut"),comment=c(ORCID="0009-0007-2601-6800"))
+             person("Solvi", "Rognvaldsson", email = "solviro@gmail.com", role = c("aut"),comment=c(ORCID="0000-0002-4376-3361")),
+             person(given = "Rafael Daníel", family = "Vias", email = "raffidv@gmail.com", role = c("aut", "cre"), comment=c(ORCID = "0009-0007-2601-6800")),
+             person("Axel Orn", "Jansson", email = "axelorn94@gmail.com", role = c("aut"))
              )
-Maintainer: Solvi Rognvaldsson <solviro@gmail.com>
+Maintainer: Rafael Daníel Vias <raffidv@gmail.com>
 Description: Fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2020) <arXiv:2010.04769>.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
@@ -16,6 +16,7 @@ Imports:
     ggplot2,
     grid,
     gridExtra,
+    Rcpp,
     rlang,
     scales
 Suggests:
@@ -28,3 +29,6 @@ VignetteBuilder: knitr
 URL: https://sor16.github.io/bdrc
 BugReports: https://github.com/sor16/bdrc/issues
 Encoding: UTF-8
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo

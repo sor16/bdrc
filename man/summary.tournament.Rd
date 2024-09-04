@@ -4,24 +4,41 @@
 \alias{summary.tournament}
 \title{Summary method for a discharge rating curve tournament}
 \usage{
-\method{summary}{tournament}(object, ...)
+\method{summary}{tournament}(object, method = NULL, winning_criteria = NULL, ...)
 }
 \arguments{
-\item{object}{an object of class "tournament"}
+\item{object}{An object of class "tournament"}
 
-\item{...}{not used in this function}
+\item{method}{Optional; a string specifying the method to use for the summary. If NULL, uses the method from the original tournament. Options are "WAIC", "DIC", or "PMP".}
+
+\item{winning_criteria}{Optional; specifies new winning criteria for the summary. If NULL, uses the criteria from the original tournament. See Details in \code{\link{tournament}} for proper formatting.}
+
+\item{...}{Not used in this function}
+}
+\value{
+Prints the summary to the console.
 }
 \description{
-Print the summary of a tournament of model comparisons
+Print the summary of a tournament of model comparisons. This function allows for an efficient and fast re-run of the tournament with different methods or winning criteria.
+}
+\details{
+If either \code{method} or \code{winning_criteria} is provided, the function re-runs the tournament with the new parameters using the fitted models.
 }
 \examples{
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(Q~W,krokfors,num_cores=2)
+t_obj <- tournament(Q ~ W, krokfors, num_cores = 2)
 summary(t_obj)
+
+# Re-run summary with different method
+summary(t_obj, method = "DIC")
+
+# Re-run summary with different winning criteria
+summary(t_obj, winning_criteria = "Delta_WAIC > 3")
 }
+
 }
 \seealso{
-\code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the mode comparison
+\code{\link{tournament}} to run a discharge rating curve tournament and \code{\link{plot.tournament}} for visualizing the model comparison
 }

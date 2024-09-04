@@ -10,52 +10,103 @@ tournament(
   model_list = NULL,
   method = "WAIC",
   winning_criteria = NULL,
+  verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{formula}{an object of class "formula", with discharge column name as response and stage column name as a covariate.}
+\item{formula}{An object of class "formula", with discharge column name as response and stage column name as a covariate.}
 
-\item{data}{data.frame containing the variables specified in formula.}
+\item{data}{A data.frame containing the variables specified in formula.}
 
-\item{model_list}{list of exactly four model objects of types "plm0","plm","gplm0" and "gplm" to be used in the tournament. Note that all of the model objects are required to be run with the same data and same c_param.}
+\item{model_list}{A list of exactly four model objects of types "plm0","plm","gplm0" and "gplm" to be used in the tournament. Note that all of the model objects are required to be run with the same data and same c_param.}
 
-\item{method}{a string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "Posterior_probability".}
+\item{method}{A string specifying the method used to estimate the predictive performance of the models. The allowed methods are "WAIC", "DIC" and "PMP".}
 
-\item{winning_criteria}{a numerical value which sets a threshold the more complex model in each model comparison must exceed to be deemed the more appropriate model. See the Details section.}
+\item{winning_criteria}{Specifies the criteria for model selection. For "WAIC", it can be a numeric value or a string expression. For "DIC", it must be a numeric value. For "PMP", it must be a numeric value between 0 and 1. See Details section.}
 
-\item{...}{optional arguments passed to the model functions.}
+\item{verbose}{A logical value indicating whether to print progress and diagnostic information. If `TRUE`, the function will print messages as it runs. If `FALSE`, the function will run silently. Default is `TRUE`.}
+
+\item{...}{Optional arguments passed to the model functions.}
 }
 \value{
-An object of type "tournament" with the following elements
+An object of type "tournament" with the following elements:
 \describe{
- \item{\code{contestants}}{model objects of types "plm0","plm","gplm0" and "gplm" being compared.}
- \item{\code{winner}}{model object of the tournament winner.}
- \item{\code{summary}}{a data frame with information on results of the different games in the tournament.}
- \item{\code{info}}{specifics about the tournament; the overall winner; the method used; and the winning criteria.}
+  \item{\code{contestants}}{The model objects of types "plm0", "plm", "gplm0" and "gplm" being compared.}
+  \item{\code{winner}}{The model object of the tournament winner.}
+  \item{\code{info}}{The specifics about the tournament; the overall winner; the method used; and the winning criteria.}
+  \item{\code{summary}}{A data frame with information on results of the different comparisons in the power-law tournament. The contents of this data frame depend on the method used:
+    \itemize{
+      \item For all methods:
+        \itemize{
+          \item round: The tournament round
+          \item comparison: The comparison number
+          \item complexity: Indicates whether a model is the "more" or "less" complex model in a comparison
+          \item model: The model type
+          \item winner: Logical value indicating if the model was selected in the corresponding comparison
+        }
+      \item Additional columns for method "WAIC":
+        \itemize{
+          \item lppd: Log pointwise predictive density
+          \item eff_num_param: Effective number of parameters (WAIC)
+          \item WAIC: Widely Applicable Information Criterion
+          \item SE_WAIC: Standard error of WAIC
+          \item Delta_WAIC: Difference in WAIC
+          \item SE_Delta_WAIC: Standard error of the difference in WAIC
+        }
+      \item Additional columns for method "DIC":
+        \itemize{
+          \item D_hat: Minus two times the log-likelihood evaluated at the median of the posterior samples
+          \item eff_num_param: Effective number of parameters (DIC)
+          \item DIC: Deviance Information Criterion
+          \item Delta_DIC: Difference in DIC
+        }
+      \item Additional columns for method "PMP":
+        \itemize{
+          \item log_marg_lik: Logarithm of the marginal likelihood estimated, computed with the harmonic-mean estimator
+          \item PMP: Posterior model probability computed with Bayes factor
+        }
+    }
+  }
 }
 }
 \description{
 tournament compares four rating curve models of different complexities and determines the model that provides the best fit of the data at hand.
 }
 \details{
-Tournament is a model comparison method that uses WAIC to estimate the predictive performance of the four models and select the most appropriate model given the data. The first round of model comparisons sets up two games between model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the \code{winning_criteria} (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.
+Tournament is a model comparison method that uses WAIC (default method) to estimate the expected prediction error of the four models and select the most appropriate model given the data. The first round of model comparisons sets up model types, "gplm" vs. "gplm0" and "plm" vs. "plm0". The two comparisons are conducted such that if the WAIC of the more complex model ("gplm" and "plm", respectively) is smaller than the WAIC of the simpler models ("gplm0" and "plm0", respectively) by an input argument called the \code{winning_criteria} (default value = 2), then it is chosen as the more appropriate model. If not, the simpler model is chosen. The more appropriate models move on to the second round and are compared in the same way. The winner of the second round is chosen as the overall tournament winner and deemed the most appropriate model given the data.
 
 The default method "WAIC", or the Widely Applicable Information Criterion (see Watanabe (2010)), is used to estimate the predictive performance of the models. This method is a fully Bayesian method that uses the full set of posterior draws to estimate of the expected log pointwise predictive density.
 
 Method "DIC", or Deviance Information Criterion (see Spiegelhalter (2002)), is similar to the "WAIC" but instead of using the full set of posterior draws to compute the estimate of the expected log pointwise predictive density, it uses a point estimate of the posterior distribution.
 
-Method "Posterior_probability" uses the posterior probabilities of the models, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. This method is not chosen as the default method because the Bayes factor calculations can be quite unstable.
+Method "PMP" uses the posterior model probabilities, calculated with Bayes factor (see Jeffreys (1961) and Kass and Raftery (1995)), to compare the models, where all the models are assumed a priori to be equally likely. This method is not chosen as the default method because the Bayes factor calculations can be quite unstable.
 
-When methods "WAIC" or "DIC" are used, the \code{winning_criteria} should be a real number. The winning criteria is a threshold value which the more complex model in each model comparison must exceed for it to be declared the more appropriate model. Setting the winning criteria slightly above 0 (default value = 2 for both "WAIC" and "DIC") gives the less complex model in each comparison a slight advantage. When method "Posterior_probability" is used, the winning criteria should be a real value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison must exceed for it to be declared the more appropriate model. In all three cases, the default value is selected so as to give the less complex models a slight advantage, and should give more or less consistent results when applying the tournament to real world data.
+When method "WAIC" is used, the \code{winning_criteria} can be either a numeric value or a string expression. If numeric, it sets the threshold which the more complex model must exceed to be declared the more appropriate model. If a string, it must be a valid R expression using Delta_WAIC and/or SE_Delta_WAIC (e.g., "Delta_WAIC > 2 & Delta_WAIC - SE_Delta_WAIC > 0"). For method "DIC", \code{winning_criteria} must be a numeric value. For method "PMP", the winning criteria should be a numeric value between 0 and 1 (default value = 0.75). This sets the threshold value for which the posterior probability of the more complex model, given the data, in each model comparison must exceed to be declared the more appropriate model. In all cases, the default values are selected to give the less complex models a slight advantage, which should give more or less consistent results when applying the tournament to real world data.
 }
 \examples{
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj <- tournament(formula = Q ~ W, data = krokfors, num_cores = 2)
 t_obj
 summary(t_obj)
+
+# Using different methods and winning criteria
+t_obj_dic <- tournament(Q ~ W,
+                        krokfors,
+                        num_cores = 2,
+                        method = "DIC",
+                        winning_criteria = 3)
+t_obj_pmp <- tournament(Q ~ W,
+                        krokfors,
+                        num_cores = 2,
+                        method = "PMP",
+                        winning_criteria = 0.8)
+t_obj_waic_expr <- tournament(Q ~ W,
+                              krokfors,
+                              num_cores = 2,
+                              winning_criteria = "Delta_WAIC > 2 & Delta_WAIC - SE_Delta_WAIC > 0")
 }
 }
 \references{

@@ -18,7 +18,7 @@
 \arguments{
 \item{object}{an object of class "plm0", "plm", "gplm0" or "gplm".}
 
-\item{...}{Not used for this function}
+\item{...}{Not used in this function}
 }
 \description{
 Summarize a discharge rating curve model object

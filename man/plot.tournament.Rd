@@ -2,27 +2,27 @@
 % Please edit documentation in R/tournament_methods.R
 \name{plot.tournament}
 \alias{plot.tournament}
-\title{Plot method for discharge rating curve tournament}
+\title{Plot method for a discharge rating curve tournament}
 \usage{
-\method{plot}{tournament}(x, ..., type = "tournament_results", transformed = FALSE)
+\method{plot}{tournament}(x, type = "tournament_results", transformed = FALSE, ...)
 }
 \arguments{
-\item{x}{an object of class "tournament"}
+\item{x}{An object of class "tournament"}
 
-\item{...}{other plotting parameters (not used in this function)}
+\item{type}{A character denoting what type of plot should be drawn. Possible types are:
+\describe{
+  \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values, on the deviance scale.}
+  \item{\code{rating_curve}}{Plots the rating curve.}
+  \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+  \item{\code{f}}{Plots the power-law exponent.}
+  \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
+  \item{\code{residuals}}{Plots the log residuals.}
+  \item{\code{tournament_results}}{Plots a diagram showing the tournament results.}
+}}
 
-\item{type}{a character denoting what type of plot should be drawn. Possible types are
-\itemize{
-  \item{"deviance"}{ to plot the deviance of the four models.}
-  \item{"rating_curve"}{ to plot the rating curve.}
-  \item{"rating_curve_mean"}{ to plot the posterior mean of the rating curve.}
-  \item{"f"}{ to plot the power-law exponent.}
-  \item{"sigma_eps"}{ to plot the standard deviation on the data level.}
-  \item{"residuals"}{ to plot the log residuals.}
-  \item{"tournament_results"}{ to plot tournament results visually, game for game.}
- }}
+\item{transformed}{A logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
 
-\item{transformed}{a logical value indicating whether the quantity should be plotted on a transformed scale used during the Bayesian inference. Defaults to FALSE.}
+\item{...}{Not used in this function}
 }
 \value{
 No return value, called for side effects
@@ -34,14 +34,14 @@ Compare the four models from the tournament object in multiple ways
 \donttest{
 data(krokfors)
 set.seed(1)
-t_obj <- tournament(formula=Q~W,data=krokfors,num_cores=2)
+t_obj <- tournament(formula = Q ~ W, data = krokfors, num_cores = 2)
 plot(t_obj)
-plot(t_obj,transformed=TRUE)
-plot(t_obj,type='deviance')
-plot(t_obj,type='f')
-plot(t_obj,type='sigma_eps')
-plot(t_obj,type='residuals')
-plot(t_obj,type='tournament_results')
+plot(t_obj, transformed = TRUE)
+plot(t_obj, type = 'boxplot')
+plot(t_obj, type = 'f')
+plot(t_obj, type = 'sigma_eps')
+plot(t_obj, type = 'residuals')
+plot(t_obj, type = 'tournament_results')
 }
 }
 \seealso{
