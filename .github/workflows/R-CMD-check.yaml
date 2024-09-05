@@ -5,11 +5,15 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+
 name: R-CMD-check
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
     strategy:
       fail-fast: false
       matrix:
@@ -19,60 +23,44 @@ jobs:
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+
     steps:
       - uses: actions/checkout@v3
+
       - uses: r-lib/actions/setup-pandoc@v2
+
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-      - name: Print R version and session info
-        run: |
-          Rscript -e "print(R.version)"
-          Rscript -e "print(sessionInfo())"
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libarmadillo-dev liblapack-dev libblas-dev libopenblas-dev
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-      - name: Set up Fortran compiler (macOS)
-        if: runner.os == 'macOS'
+
+      - name: Regenerate Rcpp exports
         run: |
-          brew install gcc
-          echo "FC=/usr/local/bin/gfortran" >> $GITHUB_ENV
-          echo "FLIBS=-L/usr/local/lib/gcc/current -lgfortran -lquadmath -lm" >> $GITHUB_ENV
+          Rscript -e "Rcpp::compileAttributes()"
+          Rscript -e "devtools::document()"
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-      - name: Debug information
-        run: |
-          pwd
-          ls -l
-          R -e "print(.libPaths())"
-      - name: Check package structure
-        run: |
-          ls -R
-      - name: Build package
-        run: |
-          R CMD build .
-      - name: Check built package
-        run: |
-          ls -l *.tar.gz
-      - name: Install and load package
-        run: |
-          PKG_FILE=$(ls -1t *.tar.gz | head -n 1)
-          R CMD INSTALL ${PKG_FILE}
-          Rscript -e "library(bdrc); print(ls('package:bdrc'))"
-      - name: Test coverage
-        run: |
-          covr::codecov(quiet = FALSE, clean = FALSE, install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"), verbose = TRUE)
-        shell: Rscript {0}
-        timeout-minutes: 15
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: check
