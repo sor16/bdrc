@@ -1,2 +1,6 @@
-PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS) -DR_NO_REMAP
-PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+CXX_STD = CXX11
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS) -I/usr/local/Cellar/gcc/14.2.0/include
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CXXFLAGS) -L/usr/local/Cellar/gcc/14.2.0/lib/gcc/current -lgfortran -lquadmath -lm
+
+FLIBS=-L/usr/local/Cellar/gcc/14.2.0/lib/gcc/current -lgfortran -lquadmath -lm
+
