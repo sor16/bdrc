@@ -10,13 +10,12 @@ Maintainer: Rafael Daníel Vias <raffidv@gmail.com>
 Description: Fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2020) <arXiv:2010.04769>.
 Depends: R (>= 3.5.0)
 License: MIT + file LICENSE
-LazyData: true
 RoxygenNote: 7.3.2
 Imports:
     ggplot2,
     grid,
     gridExtra,
-    Rcpp,
+    Rcpp (>= 0.11.0),
     rlang,
     scales
 Suggests:
@@ -30,5 +29,7 @@ URL: https://sor16.github.io/bdrc
 BugReports: https://github.com/sor16/bdrc/issues
 Encoding: UTF-8
 LinkingTo: 
-    Rcpp,
-    RcppArmadillo
+    Rcpp (>= 0.11.0),
+    RcppArmadillo (>= 0.2.35)
+LazyData: yes
+ByteCompile: TRUE

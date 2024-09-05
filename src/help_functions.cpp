@@ -5,14 +5,8 @@
 
 #include "cppFunctions.h"
 
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 using namespace Rcpp;
-using namespace arma;
+
 
 
 // [[Rcpp::export]]
@@ -59,9 +53,9 @@ arma::vec compute_w(const arma::mat& L, const arma::vec& y, const arma::mat& X, 
 // [[Rcpp::export]]
 DataFrame get_MCMC_summary_cpp(const arma::mat& X, const Nullable<NumericVector>& h ) {
     int n = X.n_rows;
-    mat summary_dat(n, 3);
+    arma::mat summary_dat(n, 3);
     for(int i = 0; i < n; ++i) {
-        rowvec row = X.row(i);
+        arma::rowvec row = X.row(i);
         row = sort(row);
         int size = row.n_elem;
         summary_dat(i, 0) = row(std::floor(0.025 * (size - 1)));

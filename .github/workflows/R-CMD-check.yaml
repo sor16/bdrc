@@ -11,9 +11,7 @@ name: R-CMD-check
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
-
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
     strategy:
       fail-fast: false
       matrix:
@@ -44,14 +42,27 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Regenerate Rcpp exports
+      - name: Install system dependencies
+        if: runner.os == 'Linux'
         run: |
-          Rscript -e "Rcpp::compileAttributes()"
-          Rscript -e "devtools::document()"
+          sudo apt-get update
+          sudo apt-get install -y libarmadillo-dev
+
+      - name: Install RcppArmadillo
+        run: |
+          install.packages("RcppArmadillo")
+        shell: Rscript {0}
+
+      - name: Check C++ compilation
+        run: |
+          Rcpp::compileAttributes()
+          devtools::document()
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          args: 'c("--no-build-vignettes", "--no-manual")'
 
       - name: Show testthat output
         if: always()

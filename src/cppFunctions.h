@@ -2,8 +2,9 @@
 #define CPP_FUNCTIONS_H
 
 #define _USE_MATH_DEFINES
-#include <cmath>
+
 #include <RcppArmadillo.h>
+#include <cmath>
 
 // Help function declarations
 arma::mat matMult(const arma::mat& A, const arma::mat& B);

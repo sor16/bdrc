@@ -5,14 +5,8 @@
 
 #include "cppFunctions.h"
 
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
-
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 using namespace Rcpp;
-using namespace arma;
+
 
 
 
