@@ -9,7 +9,7 @@ Authors@R: c(person("Birgir", "Hrafnkelsson", email = "birgirhr@hi.is", role = c
 Maintainer: Rafael Daníel Vias <raffidv@gmail.com>
 Description: Fits a discharge rating curve based on the power-law and the generalized power-law from data on paired stage and discharge measurements in a given river using a Bayesian hierarchical model as described in Hrafnkelsson et al. (2020) <arXiv:2010.04769>.
 Depends: R (>= 3.5.0)
-LazyData: yes
+LazyData: true
 License: MIT + file LICENSE
 RoxygenNote: 7.3.2
 Imports:
@@ -32,5 +32,3 @@ Encoding: UTF-8
 LinkingTo: 
     Rcpp (>= 0.11.0),
     RcppArmadillo (>= 0.2.35)
-
-ByteCompile: TRUE
