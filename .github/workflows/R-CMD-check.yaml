@@ -30,6 +30,10 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
+      - name: Print R version and session info
+        run: |
+          Rscript -e "print(R.version)"
+          Rscript -e "print(sessionInfo())"
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
@@ -39,13 +43,15 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libopenblas-dev
-
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+      - name: Test package loading
+        run: |
+          Rscript -e "install.packages('bdrc', repos = NULL, type = 'source')"
+          Rscript -e "library(bdrc); print(ls('package:bdrc'))"
