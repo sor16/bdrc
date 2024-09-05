@@ -38,16 +38,17 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libarmadillo-dev liblapack-dev libblas-dev
+          sudo apt-get install -y libarmadillo-dev liblapack-dev libblas-dev libopenblas-dev
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
+      - name: Set up Fortran compiler (macOS)
+        if: runner.os == 'macOS'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libopenblas-dev
+          brew install gcc
+          echo "FC=/usr/local/bin/gfortran" >> $GITHUB_ENV
+          echo "FLIBS=-L/usr/local/lib/gcc/current -lgfortran -lquadmath -lm" >> $GITHUB_ENV
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
@@ -70,3 +71,8 @@ jobs:
           PKG_FILE=$(ls -1t *.tar.gz | head -n 1)
           R CMD INSTALL ${PKG_FILE}
           Rscript -e "library(bdrc); print(ls('package:bdrc'))"
+      - name: Test coverage
+        run: |
+          covr::codecov(quiet = FALSE, clean = FALSE, install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"), verbose = TRUE)
+        shell: Rscript {0}
+        timeout-minutes: 15
