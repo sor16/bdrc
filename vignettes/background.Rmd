@@ -61,14 +61,14 @@ where $\epsilon_i$ follows a normal distribution with mean zero and variance $\s
 
 Chow, V. (1959). *Open-Channel Hydraulics*. McGraw-Hill. New York.
 
-Clarke, R. (1999). *Uncertainty in the estimation of mean annual flood due to rating-curve indefinition.* Journal of Hydrology 222(1-4). 185–190.
+Clarke, R. (1999). *Uncertainty in the estimation of mean annual flood due to rating-curve indefinition.* Journal of Hydrology 222(1-4). 185–190. doi: https://doi.org/10.1016/s0022-1694(99)00097-9
 
-Clarke, R., Mendiondo, E., Brusa L. (2000). *Uncertainties in mean discharges from two large South American rivers due to rating curve variability.* Hydrological Sciences 45(2). 221–236.
+Clarke, R., Mendiondo, E., Brusa L. (2000). *Uncertainties in mean discharges from two large South American rivers due to rating curve variability.* Hydrological Sciences 45(2). 221–236. doi: https://doi.org/10.1080/02626660009492321
 
-Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711. 
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling*, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
 
 Matérn, B. (1960). *Spatial variation. Stochastic models and their application to some problems in forest surveys and other sampling investigations.* Meddelanden från statens Skogsforskningsinstitut. 49(5).
 
-Venetis, C. (1970). *A note on the estimation of the parameters in logarithmic stage-discharge relationships with estimates of their error.* International Association of Scientific Hydrology. Bulletin XV 2(6). 105–111.
+Venetis, C. (1970). *A note on the estimation of the parameters in logarithmic stage-discharge relationships with estimates of their error.* International Association of Scientific Hydrology. Bulletin XV 2(6). 105–111. doi: https://doi.org/10.1080/02626667009493957
 
 
