@@ -1,3 +1,5 @@
+# bdrc (development version)
+
 # bdrc 2.0.0
 
 * Integrated C++ via Rcpp and RcppArmadillo packages for significant performance improvements.
