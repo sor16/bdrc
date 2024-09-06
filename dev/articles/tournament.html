@@ -27,7 +27,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bdrc</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.0.0.0000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ Rognvaldsson, Rafael Daniel Vias, Birgir Hrafnkelsson and Axel Orn
 Jansson</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/vignettes/tournament.Rmd" class="external-link"><code>vignettes/tournament.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/vignettes/tournament.Rmd" class="external-link"><code>vignettes/tournament.Rmd</code></a></small>
       <div class="d-none name"><code>tournament.Rmd</code></div>
     </div>
 
@@ -294,10 +294,8 @@ objects (e.g., <code>plm0.fit</code>, <code>plm.fit</code>,
 <code>gplm0.fit</code>, <code>gplm.fit</code>), you can run the
 tournament more efficiently:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">&gt;</span> t_obj <span class="ot">&lt;-</span> <span class="fu">tournament</span>(<span class="fu">list</span>(plm0.fit, plm.fit, gplm0.fit, gplm.fit))</span></code></pre></div>
-<p>The tournament function creates a tournament object which contains
-four elements: <code>summary</code>, <code>contestants</code>,
-<code>winner</code>, and <code>info</code>. These components are
-structured as follows:</p>
+<p>The tournament function creates a tournament object which
+contains:</p>
 <ul>
 <li>
 <p><code>summary</code>: A data frame with detailed information on
@@ -392,7 +390,7 @@ factor, indicating the probability of each model given the data</li>
 </ul>
 </li>
 <li><p><code>contestants</code>: A list containing all of the fitted
-model objects compared in the tournament: <code>plm0</code>,
+model objects compared in the tournament, <code>plm0</code>,
 <code>plm</code>, <code>gplm0</code> and <code>gplm</code>.</p></li>
 <li><p><code>winner</code>: The model object of the tournament winner,
 representing the most appropriate model given the data.</p></li>
@@ -420,7 +418,7 @@ stronger support.</p>
 <p>These metrics help users understand not just which model was
 selected, but also the strength of evidence for that selection and the
 relative performance of all compared models.</p>
-<p>For a comprehensive summary of the tournament results:</p>
+<p>For a more comprehensive summary of the tournament results:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(t_obj)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; === Tournament Model Comparison Summary ===</span></span>
@@ -694,7 +692,7 @@ posterior draws.</p>
 <span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; Comparison 1 Results:</span></span>
 <span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------- </span></span>
 <span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; complexity   model  winner D_hat      eff_num_param  DIC        Delta_DIC </span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; more         gplm          -42.7732   6.0631         -30.6470   0.8498    </span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; more         gplm          -42.7732   6.0631         -30.6471   0.8498    </span></span>
 <span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt; less         gplm0  &lt;---   -42.4880   6.3454         -29.7972             </span></span>
 <span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; Comparison 2 Results:</span></span>
@@ -802,7 +800,7 @@ learning theory</em>. Journal of Machine Learning Research, 11,
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, Rafael Daníel Vias, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>.</p>
+  <p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, Rafael Daníel Vias.</p>
 </div>
 
 <div class="pkgdown-footer-right">
