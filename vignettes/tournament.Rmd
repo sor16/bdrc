@@ -31,7 +31,7 @@ This vignette explores the ways you can compare the fit of the different dischar
 
 * ```gplm() ``` - Generalized power-law model with stage-dependent log-error variance.  
 
-The '0' indicates that the variance of the log-transformed errors is modeled as a constant. The `plm0` model is simply a Bayesian hierarchical implementation of the classical power-law model, widely used in hydrological practice. For more details on these models, refer to Hrafnkelsson et al. (2022). For an brief overview of the underlying theory, see our [Background](background.html) vignette. For guidance on applying these models to your data, refer to the [Introduction](introduction.html) vignette. 
+The '0' indicates that the variance of the log-transformed errors is modeled as a constant. The `plm0` model is simply a Bayesian hierarchical implementation of the classical power-law model, widely used in hydrological practice. For more details on these models, refer to Hrafnkelsson et al. (2022). For an brief overview of the underlying theory, see our [Background](https://sor16.github.io/bdrc/articles/background.html) vignette. For guidance on applying these models to your data, refer to the [Introduction](https://sor16.github.io/bdrc/articles/introduction.html) vignette. 
 
 ## The tournament method
 

@@ -67,9 +67,10 @@ For a deeper dive into the package’s functionality, visualization
 options, and the underlying theory of the models, please check out our
 vignettes:
 
-- [Background](background.html)
-- [Introduction](introduction.html)
-- [Power-law tournament (model selection)](tournament.html)
+- [Background](https://sor16.github.io/bdrc/articles/background.html)
+- [Introduction](https://sor16.github.io/bdrc/articles/introduction.html)
+- [Power-law tournament (model
+  selection)](https://sor16.github.io/bdrc/articles/tournament.html)
 
 ## References
 

@@ -26,8 +26,8 @@ Suggests:
     covr,
     vdiffr
 VignetteBuilder: knitr
-URL: https://sor16.github.io/bdrc
-BugReports: https://github.com/sor16/bdrc/issues
+URL: https://sor16.github.io/bdrc/
+BugReports: https://github.com/sor16/bdrc/issues/
 Encoding: UTF-8
 LinkingTo: 
     Rcpp (>= 0.11.0),
