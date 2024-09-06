@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bdrc</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.1.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.0.0.0000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Power-law model with variance that varies with stage.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/R/plm.R" class="external-link"><code>R/plm.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/R/plm.R" class="external-link"><code>R/plm.R</code></a></small>
       <div class="d-none name"><code>plm.Rd</code></div>
     </div>
 
@@ -221,9 +221,9 @@ Bayesian inference is based on the posterior density and summary statistics such
 <span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 23.26%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 24.38%.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ⚠ Warning: Some chains are not mixing well. Parameters with Rhat &gt; 1.1:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   - sigma_eta: Rhat = 1.185</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - sigma_eta: Rhat = 1.183</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ℹ Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">plm.fit</span><span class="op">)</span></span></span>
@@ -232,21 +232,21 @@ Bayesian inference is based on the posterior density and summary statistics such
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Q ~ W</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Latent parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a 11.12      12.55      13.9       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b  1.91       2.04       2.2       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a 11.07      12.51      13.79      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b  1.92       2.05       2.21      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hyperparameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> c           9.4020    9.453      9.50      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta   0.0125    0.349      0.87      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1      -5.5784   -4.828     -3.77      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2      -7.6875   -5.949     -4.21      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3      -9.0695   -6.918     -4.17      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -9.9277   -7.344     -4.16      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5     -10.6150   -7.595     -3.98      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6     -11.0295   -7.576     -3.62      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c           9.40099   9.451      9.493     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta   0.00737   0.349      0.838     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1      -5.58296  -4.839     -3.778     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2      -7.61506  -5.951     -4.135     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3      -9.01113  -6.856     -3.948     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -9.84284  -7.299     -3.829     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5     -10.57394  -7.597     -3.569     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6     -10.96708  -7.528     -3.451     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -76.82704</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -76.60638</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
@@ -255,7 +255,7 @@ Bayesian inference is based on the posterior density and summary statistics such
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>, Rafael Daníel Vias.</p>
+  <p>Developed by <a href="https://english.hi.is/staff/birgirhr" class="external-link">Birgir Hrafnkelsson</a>, <a href="https://github.com/sor16" class="external-link">Solvi Rognvaldsson</a>, Rafael Daníel Vias, <a href="https://github.com/axelornj" class="external-link">Axel Orn Jansson</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
