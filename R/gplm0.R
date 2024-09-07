@@ -80,7 +80,7 @@ gplm0 <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, 
     Q <- model_dat[, 1, drop = TRUE]
     h <- model_dat[, 2, drop = TRUE]
     if(!is.null(c_param) && min(h) < c_param) stop('c_param must be lower than the minimum stage value in the data')
-    if(any(Q <= 0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
+    if(any(Q <= 0)) stop('All discharge measurements must be strictly greater than zero. If you know the stage of zero discharge, use c_param.')
     MCMC_output_list <- gplm0.inference(y = log(Q), h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
     param_names <- get_param_names('gplm0', c_param)
     #prepare S3 model object to be returned

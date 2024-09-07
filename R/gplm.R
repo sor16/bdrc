@@ -81,22 +81,47 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     stopifnot(is.null(num_cores) | is.numeric(num_cores))
     stopifnot(length(forcepoint) == dim(data)[1] & is.logical(forcepoint))
     formula_args <- all.vars(formula)
-    stopifnot(length(formula_args) == 2 & all(formula_args %in% names(data)))
-    model_dat <- as.data.frame(data[,all.vars(formula)])
-    forcepoint <- forcepoint[order(model_dat[, 2,drop = TRUE])]
-    model_dat <- model_dat[order(model_dat[, 2, drop = TRUE]),]
+    stopifnot(length(formula_args) %in% 2:3 & all(formula_args %in% names(data)))
+
+    # Parse the extended formula
+    parsed_formula <- parse_extended_formula(formula)
+
+    # Extract relevant information
+    discharge_var <- parsed_formula$discharge
+    error_var <- parsed_formula$discharge_error
+    stage_var <- parsed_formula$stage
+
+    # Check if variables exist in the data
+    if (!discharge_var %in% names(data)) stop(paste("Discharge variable", discharge_var, "not found in data."))
+    if (!is.null(error_var) && !(error_var %in% names(data))) stop(paste("Discharge measurment error variable", error_var, "not found in data."))
+    if (!stage_var %in% names(data)) stop(paste("Water level (stage) variable", stage_var, "not found in data."))
+
+    # Prepare data
+    model_dat <- as.data.frame(data[, formula_args])
+    forcepoint <- forcepoint[order(model_dat[, stage_var, drop = TRUE])]
+    model_dat <- model_dat[order(model_dat[, stage_var, drop = TRUE]), ]
+    Q <- model_dat[, discharge_var, drop = TRUE]
+    h <- model_dat[, stage_var, drop = TRUE]
+
+    # Handle Q_sigma and compute y_sigma
+    if (!is.null(error_var)) {
+        Q_sigma <- model_dat[, error_var, drop = TRUE]
+    } else {
+        Q_sigma <- rep(0, length(Q))
+    }
+
     if(dim(model_dat)[1] < 2) stop('At least two paired observations of stage and discharge are required to fit a rating curve')
-    Q <- model_dat[, 1, drop = TRUE]
-    h <- model_dat[, 2, drop = TRUE]
     if(!is.null(c_param) && min(h) < c_param) stop('c_param must be lower than the minimum stage value in the data')
-    if(any(Q <= 0)) stop('All discharge measurements must but strictly greater than zero. If you know the stage of zero discharge, use c_param.')
-    MCMC_output_list <- gplm.inference(y = log(Q), h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
+    if(any(Q <= 0)) stop('All discharge measurements must be strictly greater than zero. If you know the stage of zero discharge, use c_param.')
+    if(any(Q_sigma < 0)) stop('All discharge measurement errors must be strictly greater than zero.')
+    MCMC_output_list <- gplm.inference(y = log(Q), Q_sigma = Q_sigma, h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
     param_names <- get_param_names('gplm', c_param)
+
     #prepare S3 model object to be returned
-    result_obj=list()
+    result_obj <- list()
     attr(result_obj, "class") <- "gplm"
-    result_obj$a_posterior = MCMC_output_list$x[1, ]
-    result_obj$b_posterior = MCMC_output_list$x[2, ]
+    result_obj$a_posterior <- MCMC_output_list$x[1, ]
+    result_obj$b_posterior <- MCMC_output_list$x[2, ]
     if(is.null(c_param)){
         result_obj$c_posterior <- MCMC_output_list$theta[1, ]
         result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2, ]
@@ -126,6 +151,7 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     result_obj$f_posterior <- matrix(rep(result_obj$b_posterior, nrow(result_obj$beta_posterior)), nrow = nrow(result_obj$beta_posterior), byrow = TRUE) + result_obj$beta_posterior
     result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx, ][h_unique_order, ])
     result_obj$posterior_log_likelihood <- c(MCMC_output_list$log_lik)
+
     #summary objects
     result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior, h = h_unique_sorted)
     result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior, h = h_unique_sorted)
@@ -137,21 +163,25 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
     row.names(result_obj$param_summary) <- param_names
     result_obj$posterior_log_likelihood_summary <- get_MCMC_summary(MCMC_output_list$log_lik)
+
     # DIC calculations
     result_obj$D_hat <- MCMC_output_list$D_hat
     result_obj$effective_num_param_DIC <- -2 * result_obj$posterior_log_likelihood_summary[, 'median'] - result_obj$D_hat
     result_obj$DIC <- result_obj$D_hat + 2 * result_obj$effective_num_param_DIC
+
     #WAIC calculations
     waic_list <- calc_waic(result_obj, model_dat)
     result_obj$lppd <- waic_list$lppd
     result_obj$effective_num_param_WAIC <- waic_list$p_waic
     result_obj$WAIC <- waic_list$waic
     result_obj$WAIC_i <- waic_list$waic_i
+
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
     autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
     result_obj$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
+
     # store other information
     result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
@@ -170,7 +200,7 @@ gplm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, 
     if(verbose) cat("Progress:\nInitializing Metropolis MCMC algorithm...\n")
     c_upper <- NULL
     if(is.null(c_param)){
-        RC_plm0 <- get_model_components('plm0', y, h, c_param, h_max, forcepoint, h_min = NULL)
+        RC_plm0 <- get_model_components('plm0', y, Q_sigma, h, c_param, h_max, forcepoint, h_min = NULL)
         lhmc_sd <- sqrt(diag(matInverse(RC_plm0$H)))[1]
         lhmc_mode <- RC_plm0$theta_m[1]
         if(exp(lhmc_mode - 1.96 * lhmc_sd) > 2){

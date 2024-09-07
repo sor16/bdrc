@@ -1,5 +1,5 @@
 priors <- function(model, c_param = NULL) {
-    RC = list()
+    RC <-  list()
     #Prior parameters for all models
     RC$mu_a <- 3
     RC$mu_b <- 1.835
@@ -34,9 +34,11 @@ priors <- function(model, c_param = NULL) {
     return(RC)
 }
 
-get_model_components <- function(model, y, h, c_param, h_max, forcepoint, h_min){
+get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoint, h_min){
     RC <- priors(model, c_param)
     RC$y <- as.matrix(y)
+    RC$y_sigma <- sqrt(log(1 + (Q_sigma/exp(y))^2))
+    RC$Q_sigma <- Q_sigma
     RC$h <- h
     RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
     RC$h_max <- max(RC$h)
@@ -623,7 +625,28 @@ convergence_diagnostics_warnings <- function(param_summary){
 }
 
 
+parse_extended_formula <- function(formula) {
+    forbidden_operators <- "[+:\\*/^\\-]"
+    error_msg <- "Invalid formula. Use 'discharge ~ stage' for models without measurement error, or 'discharge | discharge_error ~ stage' for models with measurement error. Replace with your variable names."
 
+    formula_str <- as.character(formula)
+    if(length(formula_str) != 3) stop(error_msg)
 
+    lhs <- formula_str[2]
+    rhs <- formula_str[3]
+    lhs_n <- length(all.vars(as.formula(paste0("1 ~", lhs))))
+    rhs_n <- length(all.vars(as.formula(paste0("1 ~", rhs))))
+
+    if(!(lhs_n %in% 1:2) | (rhs_n != 1)) stop(error_msg)
+    if(lhs_n == 2 & !grepl("|", lhs)) stop(error_msg)
+    if(grepl(forbidden_operators,paste(lhs, rhs))) stop(error_msg)
+
+    lhs_parts <- strsplit(lhs, "\\|")[[1]]
+    discharge <- trimws(lhs_parts[1])
+    discharge_error <- if (length(lhs_parts) > 1) trimws(lhs_parts[2]) else NULL
+    stage <- trimws(rhs)
+
+    list(discharge = discharge, discharge_error = discharge_error, stage = stage)
+}
 
 
