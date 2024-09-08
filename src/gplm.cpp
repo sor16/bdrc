@@ -19,6 +19,7 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
                                                  const arma::mat& dist,
                                                  const arma::mat& A,
                                                  const arma::vec& y,
+                                                 const arma::vec& tau,
                                                  const arma::vec& epsilon,
                                                  double h_min,
                                                  double nugget,
@@ -38,6 +39,7 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     double eta_1 = theta(4);
     arma::vec z = theta.subvec(5, 9);
     int n = h.n_elem;
+
     arma::vec eta = P * arma::join_vert(arma::vec({eta_1}), std::exp(log_sig_eta) * z);
     arma::vec l = arma::log(h - h_min + std::exp(zeta));
     arma::vec log_varr = B * eta;
@@ -45,25 +47,38 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     if (arma::any(varr > 100)) {
         return Rcpp::List::create(Rcpp::Named("p") = -1e9);
     }
-    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({0.0})));
+
+    // Construct Sigma_eps using tau (transformed measurement errors) and add zero at the end for mean-zero GP
+    arma::mat Sig_eps = arma::diagmat(arma::join_vert(arma::square(tau), arma::vec({0.0})));
+
+    // Construct Sigma_u2 (for y_true) without adding zero at the end
+    arma::mat Sig_u2 = arma::diagmat(varr);
+
     // Matern covariance
     arma::mat R_Beta = (1.0 + std::sqrt(5.0) * dist / std::exp(log_phi_b) +
         5.0 * arma::square(dist) / (3.0 * std::pow(std::exp(log_phi_b), 2))) %
         arma::exp(-std::sqrt(5.0) * dist / std::exp(log_phi_b));
     R_Beta.diag() += nugget;
+
+    // Construct Sigma_x
     arma::mat Sig_x = arma::join_cols(
-        arma::join_rows(Sig_ab, arma::zeros(2, n_unique)),
-        arma::join_rows(arma::zeros(n_unique, 2), std::exp(2 * log_sig_b) * R_Beta)
+        arma::join_rows(Sig_ab, arma::zeros(2, n_unique), arma::zeros(2, n)),
+        arma::join_rows(arma::zeros(n_unique, 2), std::exp(2 * log_sig_b) * R_Beta, arma::zeros(n_unique, n)),
+        arma::join_rows(arma::zeros(n, 2 + n_unique), Sig_u2)
     );
+
+    // Construct X matrix
     arma::mat X = arma::join_cols(
-        arma::join_rows(arma::ones(n, 1), l, arma::diagmat(l) * A),
+        arma::join_rows(arma::ones(n, 1), l, arma::diagmat(l) * A, arma::eye(n, n)),
         Z
     );
+
     // Compute L using Cholesky decomposition
     arma::mat M = X * Sig_x * X.t() + Sig_eps;
     M.diag() += nugget;
     arma::mat L = arma::chol(M, "lower");
     arma::vec w = arma::solve(L, y - X * mu_x, arma::solve_opts::fast);
+
     double p = -0.5 * arma::dot(w, w) - arma::sum(arma::log(L.diag())) +
         pri("c", arma::vec({zeta, lambda_c})) +
         pri("sigma_b", arma::vec({log_sig_b, lambda_sb})) +
@@ -71,28 +86,46 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
         pri("eta_1", arma::vec({eta_1, lambda_eta_1})) +
         pri("eta_minus1", z) +
         pri("sigma_eta", arma::vec({log_sig_eta, lambda_seta}));
+
     // Compute posterior samples
     arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
     arma::mat chol_Sig_x = arma::chol(Sig_x);
-    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(n_unique + 2);
-    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({0.0}));
+    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(mu_x.n_elem);
+    arma::vec sss = X * x_u - y + arma::join_vert(tau % arma::randn(n), arma::vec({0.0}));
     arma::mat Wt_L_inv = W.t() * arma::inv(L);
-    arma::mat x = x_u - Wt_L_inv * sss;
-    arma::vec yp = arma::vec(X * x).subvec(0, n-1);
-    arma::vec ypo = yp + arma::randn(n) % arma::sqrt(varr);
-    // Replace NaN with -inf in yp and ypo
-    yp.elem(arma::find_nonfinite(yp)).fill(-arma::datum::inf);
-    ypo.elem(arma::find_nonfinite(ypo)).fill(-arma::datum::inf);
+    arma::vec x = x_u - Wt_L_inv * sss;
+
+    // Extract components from x
+    arma::vec beta = x.subvec(0, 1);  // a_0 and b
+    arma::vec u1 = x.subvec(2, 1 + n_unique);  // β(h)
+    arma::vec u2 = x.subvec(2 + n_unique, x.n_elem - 1);  // δ
+
+    // Compute μ
+    arma::vec mu = beta(0) + (beta(1) + A * u1) % l;
+
+    // Compute y_true
+    arma::vec y_true = mu + u2;
+
+    // Compute y_true_post_pred
+    arma::vec y_true_post_pred = arma::vec(X * x).subvec(0, n-1); // Add  ( + tau % arma::randn(n) ) to compute y_post_pred;
+
+    // Replace NaN with -inf in mu, y_true and y_true_post_pred
+    mu.elem(arma::find_nonfinite(mu)).fill(-arma::datum::inf);
+    y_true.elem(arma::find_nonfinite(y_true)).fill(-arma::datum::inf);
+    y_true_post_pred.elem(arma::find_nonfinite(y_true_post_pred)).fill(-arma::datum::inf);
+
     // Compute log_lik
     double log_lik = 0.0;
     for(size_t i = 0; i < n; ++i) {
-        log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
+        log_lik += log_of_normal_pdf(y(i), mu(i), std::sqrt(varr(i) + std::pow(tau(i), 2)));
     }
+
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
         Rcpp::Named("x") = x,
-        Rcpp::Named("y_post") = yp,
-        Rcpp::Named("y_post_pred") = ypo,
+        Rcpp::Named("mu_post") = mu,
+        Rcpp::Named("y_true") = y_true,
+        Rcpp::Named("y_true_post_pred") = y_true_post_pred,
         Rcpp::Named("sigma_eps") = varr,
         Rcpp::Named("log_lik") = log_lik
     );

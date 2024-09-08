@@ -196,7 +196,7 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
 }
 
 #' @importFrom stats dist optim
-gplm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, forcepoint = rep(FALSE, length(h)), num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
+gplm.inference <- function(y, Q_sigma, h, c_param = NULL, h_max = NULL, parallel = TRUE, forcepoint = rep(FALSE, length(h)), num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
     if(verbose) cat("Progress:\nInitializing Metropolis MCMC algorithm...\n")
     c_upper <- NULL
     if(is.null(c_param)){
@@ -208,7 +208,7 @@ gplm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, 
             c_upper <- min(h) - exp(lhmc_mode - 1.96 * lhmc_sd)
         }
     }
-    RC <- get_model_components('gplm', y, h, c_param, h_max, forcepoint, h_min = c_upper)
+    RC <- get_model_components('gplm', y, Q_sigma, h, c_param, h_max, forcepoint, h_min = c_upper)
     output_list <- get_MCMC_output_list(theta_m = RC$theta_m, RC = RC, density_fun = RC$density_fun,
                                         unobserved_prediction_fun = RC$unobserved_prediction_fun,
                                         parallel = parallel, num_cores = num_cores, num_chains = num_chains, nr_iter = nr_iter,
@@ -242,6 +242,7 @@ gplm.density_evaluation_unknown_c <- function(theta, RC) {
                                                    dist = RC$dist,
                                                    A = RC$A,
                                                    y = RC$y,
+                                                   tau = RC$tau,
                                                    epsilon = RC$epsilon,
                                                    h_min = RC$h_min,
                                                    nugget = RC$nugget,

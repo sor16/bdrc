@@ -37,7 +37,7 @@ priors <- function(model, c_param = NULL) {
 get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoint, h_min){
     RC <- priors(model, c_param)
     RC$y <- as.matrix(y)
-    RC$y_sigma <- sqrt(log(1 + (Q_sigma/exp(y))^2))
+    RC$tau <- sqrt(log(1 + (Q_sigma/exp(y))^2))
     RC$Q_sigma <- Q_sigma
     RC$h <- h
     RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
@@ -56,8 +56,8 @@ get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoin
         RC$n_unique <- length(RC$h_unique)
         RC$A <- create_A_cpp(RC$h)
         RC$dist <- distance_matrix(RC$h_unique)
-        RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique)))
-        RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique)))
+        RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique + RC$n)))
+        RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique + RC$n)))
         RC$m1 <- matrix(0, nrow = 2, ncol = RC$n_unique)
         RC$m2 <- matrix(0, nrow = RC$n_unique, ncol = 2)
     }
