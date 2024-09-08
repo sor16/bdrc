@@ -95,6 +95,9 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     arma::mat Wt_L_inv = W.t() * arma::inv(L);
     arma::vec x = x_u - Wt_L_inv * sss;
 
+    // Extract subset of x (excluding delta values)
+    arma::vec x_subset = x.subvec(0, 1 + n_unique);
+
     // Extract components from x
     arma::vec beta = x.subvec(0, 1);  // a_0 and b
     arma::vec u1 = x.subvec(2, 1 + n_unique);  // β(h)
@@ -122,7 +125,7 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
 
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
-        Rcpp::Named("x") = x,
+        Rcpp::Named("x") = x_subset,
         Rcpp::Named("mu_post") = mu,
         Rcpp::Named("y_true") = y_true,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred,
@@ -230,8 +233,8 @@ Rcpp::List gplm_predict_u_unknown_c_cpp(const arma::vec& theta,
     int n = n_unique;
     int m = n_u;
     arma::vec beta_u(m);
-    arma::vec yp_u(m, arma::fill::value(-arma::datum::inf));
-    arma::vec ypo_u(m, arma::fill::value(-arma::datum::inf));
+    arma::vec mu_u(m, arma::fill::value(-arma::datum::inf));
+    arma::vec y_true_post_pred_u(m, arma::fill::value(-arma::datum::inf));
     arma::vec varr_u(m);
     double zeta = theta(0);
     double sig_b = std::exp(theta(1));
@@ -269,20 +272,20 @@ Rcpp::List gplm_predict_u_unknown_c_cpp(const arma::vec& theta,
         for (int j = 0; j < m_above_c; ++j) {
             x_u(j+2) = beta_u(above_c(j));
         }
-        arma::vec yp_u_temp = X * x_u;
+        arma::vec mu_u_temp = X * x_u;
         for (int j = 0; j < m_above_c; ++j) {
-            yp_u(above_c(j)) = yp_u_temp(j);
-            ypo_u(above_c(j)) = yp_u_temp(j) + arma::randn() * std::sqrt(varr_u(above_c(j)));
+            mu_u(above_c(j)) = mu_u_temp(j);
+            y_true_post_pred_u(above_c(j)) = mu_u_temp(j) + arma::randn() * std::sqrt(varr_u(above_c(j)));
         }
     }
-    // Replace NaN with -inf in yp_u and ypo_u
-    yp_u.elem(arma::find_nonfinite(yp_u)).fill(-arma::datum::inf);
-    ypo_u.elem(arma::find_nonfinite(ypo_u)).fill(-arma::datum::inf);
+    // Replace NaN with -inf in mu_u and y_true_post_pred_u
+    mu_u.elem(arma::find_nonfinite(mu_u)).fill(-arma::datum::inf);
+    y_true_post_pred_u.elem(arma::find_nonfinite(y_true_post_pred_u)).fill(-arma::datum::inf);
     return Rcpp::List::create(
         Rcpp::Named("x") = arma::trans(beta_u),
         Rcpp::Named("sigma_eps") = varr_u,
-        Rcpp::Named("y_post") = yp_u,
-        Rcpp::Named("y_post_pred") = ypo_u
+        Rcpp::Named("mu_post") = mu_u,
+        Rcpp::Named("y_true_post_pred") = y_true_post_pred_u
     );
 }
 

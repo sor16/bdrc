@@ -37,8 +37,8 @@ priors <- function(model, c_param = NULL) {
 get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoint, h_min){
     RC <- priors(model, c_param)
     RC$y <- as.matrix(y)
-    RC$tau <- sqrt(log(1 + (Q_sigma/exp(y))^2))
     RC$Q_sigma <- Q_sigma
+    RC$tau <- if(is.null(Q_sigma)) NULL else sqrt(log(1 + (Q_sigma/exp(y))^2))
     RC$h <- h
     RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
     RC$h_max <- max(RC$h)
@@ -56,8 +56,13 @@ get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoin
         RC$n_unique <- length(RC$h_unique)
         RC$A <- create_A_cpp(RC$h)
         RC$dist <- distance_matrix(RC$h_unique)
-        RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique + RC$n)))
-        RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique + RC$n)))
+        if(is.null(Q_sigma)){
+            RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique)))
+            RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique)))
+        }else{
+            RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique + RC$n)))
+            RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique + RC$n)))
+        }
         RC$m1 <- matrix(0, nrow = 2, ncol = RC$n_unique)
         RC$m2 <- matrix(0, nrow = RC$n_unique, ncol = 2)
     }
@@ -229,9 +234,12 @@ initiate_output_list <- function(desired_output, nr_iter){
 get_desired_output <- function(model, RC){
     const_var <- model %in% c('plm0', 'gplm0')
     const_b <- model %in% c('plm0', 'plm')
-    desired_output <- list('y_post' = list('observed' = RC$n, 'unobserved' = RC$n_u),
-                           'y_post_pred' = list('observed' = RC$n, 'unobserved' = RC$n_u),
+    desired_output <- list('mu_post' = list('observed' = RC$n, 'unobserved' = RC$n_u),
+                           'y_true_post_pred' = list('observed' = RC$n, 'unobserved' = RC$n_u),
                            'log_lik' = list('observed' = 1, 'unobserved' = 0))
+    if(!is.null(RC$Q_sigma)){
+        desired_output$y_true <- list('observed' = RC$n, 'unobserved' = 0)
+    }
     if(!const_var){
         desired_output$sigma_eps <- list('observed' = RC$n, 'unobserved' = RC$n_u)
     }
@@ -523,24 +531,29 @@ log_mean_LSE <- function(lx){
 }
 
 #' @importFrom stats dnorm var
-log_lik_i <- function(m, d){
+log_lik_i <- function(m, d, RC){
     # get the mean and sd posterior samples
-    sigma_eps <- m$sigma_eps_posterior
-    yp <- m$rating_curve_mean_posterior
+    sigma_eps <- m$posterior$sigma_eps
+    yp <- m$posterior$rating_curve_mean
 
     # code to find the rows (stage values) in rating curve mean (yp) and SD (sigma_eps) corresponding to the observations (d)
-    rc <- m$rating_curve
-    idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = colnames(d)[2], all.y = T)$rowname)
+    rc <- m$summary$rating_curve
+    idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = colnames(d)[ncol(d)], all.y = T)$rowname)
 
     # compute pointwise log-likelihood
+    if(is.null(RC$Q_sigma)){
+        tau <- rep(0,RC$n)
+    }else{
+        tau <- RC$tau
+    }
     return(sapply(1:dim(d)[1], function(n){
-        dnorm( log(d[n, 1]), log(yp[idx[n], ]), if(grepl("0", class(m))) sigma_eps else sigma_eps[idx[n], ], log = T)
+        dnorm( log(d[n, 1]), log(yp[idx[n], ]), if(grepl("0", class(m))) sqrt(sigma_eps^2 + tau[n]^2) else sqrt(sigma_eps[idx[n], ]^2 + tau[n]^2), log = T)
     }))
 }
 
-calc_waic <- function(m, d) {
+calc_waic <- function(m, d, RC) {
     # Calculate pointwise log likelihood
-    llp_i <- log_lik_i(m, d)
+    llp_i <- log_lik_i(m, d, RC)
 
     # Compute log pointwise predictive density (lppd)
     lppd_i <- sapply( 1:dim(d)[1], function(n) {
@@ -561,9 +574,9 @@ calc_waic <- function(m, d) {
     ))
 }
 
-log_ml_harmonic_mean_est <- function(m, d) {
+log_ml_harmonic_mean_est <- function(m, d, RC) {
     # Compute the log likelihood for each posterior sample
-    llp_i <- log_lik_i(m, d)
+    llp_i <- log_lik_i(m, d, RC)
 
     llp <- matMult(llp_i, matrix(rep(1, dim(d)[1]), ncol = 1))
 

@@ -107,36 +107,38 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     if (!is.null(error_var)) {
         Q_sigma <- model_dat[, error_var, drop = TRUE]
     } else {
-        Q_sigma <- rep(0, length(Q))
+        Q_sigma <- NULL
     }
 
     if(dim(model_dat)[1] < 2) stop('At least two paired observations of stage and discharge are required to fit a rating curve')
     if(!is.null(c_param) && min(h) < c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q <= 0)) stop('All discharge measurements must be strictly greater than zero. If you know the stage of zero discharge, use c_param.')
-    if(any(Q_sigma < 0)) stop('All discharge measurement errors must be strictly greater than zero.')
+    if(!is.null(Q_sigma) & any(Q_sigma < 0)) stop('All discharge measurement errors must be strictly greater than zero.')
+
     MCMC_output_list <- gplm.inference(y = log(Q), Q_sigma = Q_sigma, h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
     param_names <- get_param_names('gplm', c_param)
 
     #prepare S3 model object to be returned
-    result_obj <- list()
+    result_obj <- list(posterior = list(), log_likelihood = list(), summary = list(), diagnostics = list())
     attr(result_obj, "class") <- "gplm"
-    result_obj$a_posterior <- MCMC_output_list$x[1, ]
-    result_obj$b_posterior <- MCMC_output_list$x[2, ]
+
+    result_obj$posterior$a <- MCMC_output_list$x[1, ]
+    result_obj$posterior$b <- MCMC_output_list$x[2, ]
     if(is.null(c_param)){
-        result_obj$c_posterior <- MCMC_output_list$theta[1, ]
-        result_obj$sigma_beta_posterior <- MCMC_output_list$theta[2, ]
-        result_obj$phi_beta_posterior <- MCMC_output_list$theta[3, ]
-        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[4, ]
+        result_obj$posterior$c <- MCMC_output_list$theta[1, ]
+        result_obj$posterior$sigma_beta <- MCMC_output_list$theta[2, ]
+        result_obj$posterior$phi_beta <- MCMC_output_list$theta[3, ]
+        result_obj$posterior$sigma_eta <- MCMC_output_list$theta[4, ]
         for(i in 5:dim(MCMC_output_list$theta)[1]){
-            result_obj[[paste0('eta_', i - 4, '_posterior')]] <- MCMC_output_list$theta[i, ]
+            result_obj$posterior[[paste0('eta_', i - 4)]] <- MCMC_output_list$theta[i, ]
         }
     }else{
-        result_obj$c_posterior <- NULL
-        result_obj$sigma_beta_posterior <- MCMC_output_list$theta[1, ]
-        result_obj$phi_beta_posterior <- MCMC_output_list$theta[2, ]
-        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[3, ]
+        result_obj$posterior$c <- NULL
+        result_obj$posterior$sigma_beta <- MCMC_output_list$theta[1, ]
+        result_obj$posterior$phi_beta <- MCMC_output_list$theta[2, ]
+        result_obj$posterior$sigma_eta <- MCMC_output_list$theta[3, ]
         for(i in 4:dim(MCMC_output_list$theta)[1]){
-            result_obj[[paste0('eta_', i - 3, '_posterior')]] <- MCMC_output_list$theta[i, ]
+            result_obj$posterior[[paste0('eta_', i - 3)]] <- MCMC_output_list$theta[i, ]
         }
     }
     unique_h_idx <- !duplicated(MCMC_output_list$h)
@@ -144,46 +146,44 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     h_unique_order <- order(h_unique)
     h_unique_sorted <- h_unique[h_unique_order]
     h_idx_data <- match(h,h_unique_sorted)
-    result_obj$theta <- MCMC_output_list$theta
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx, ][h_unique_order, ])
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx, ][h_unique_order, ])
-    result_obj$beta_posterior <- MCMC_output_list$x[3:nrow(MCMC_output_list$x), ][h_unique_order, ]
-    result_obj$f_posterior <- matrix(rep(result_obj$b_posterior, nrow(result_obj$beta_posterior)), nrow = nrow(result_obj$beta_posterior), byrow = TRUE) + result_obj$beta_posterior
-    result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx, ][h_unique_order, ])
-    result_obj$posterior_log_likelihood <- c(MCMC_output_list$log_lik)
+    result_obj$posterior$theta <- MCMC_output_list$theta
+    result_obj$posterior$rating_curve <- exp(MCMC_output_list$y_true_post_pred[unique_h_idx, ][h_unique_order, ])
+    result_obj$posterior$rating_curve_mean <- exp(MCMC_output_list$mu_post[unique_h_idx, ][h_unique_order, ])
+    result_obj$posterior$beta <- MCMC_output_list$x[3:nrow(MCMC_output_list$x), ][h_unique_order, ]
+    result_obj$posterior$f <- matrix(rep(result_obj$posterior$b, nrow(result_obj$posterior$beta)), nrow = nrow(result_obj$posterior$beta), byrow = TRUE) + result_obj$posterior$beta
+    result_obj$posterior$sigma_eps <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx, ][h_unique_order, ])
 
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior, h = h_unique_sorted)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior, h = h_unique_sorted)
-    result_obj$beta_summary <- get_MCMC_summary(result_obj$beta_posterior, h = h_unique_sorted)
-    result_obj$f_summary <- get_MCMC_summary(result_obj$f_posterior, h = h_unique_sorted)
-    result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior, h = h_unique_sorted)
-    result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1, ], MCMC_output_list$x[2, ], MCMC_output_list$theta))
-    result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
-    result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
-    row.names(result_obj$param_summary) <- param_names
-    result_obj$posterior_log_likelihood_summary <- get_MCMC_summary(MCMC_output_list$log_lik)
+    result_obj$summary$rating_curve <- get_MCMC_summary(result_obj$posterior$rating_curve, h = h_unique_sorted)
+    result_obj$summary$rating_curve_mean <- get_MCMC_summary(result_obj$posterior$rating_curve_mean, h = h_unique_sorted)
+    result_obj$summary$beta <- get_MCMC_summary(result_obj$posterior$beta, h = h_unique_sorted)
+    result_obj$summary$f <- get_MCMC_summary(result_obj$posterior$f, h = h_unique_sorted)
+    result_obj$summary$sigma_eps <- get_MCMC_summary(result_obj$posterior$sigma_eps, h = h_unique_sorted)
+    result_obj$summary$parameters <- get_MCMC_summary(rbind(MCMC_output_list$x[1, ], MCMC_output_list$x[2, ], MCMC_output_list$theta))
+    result_obj$summary$parameters$eff_n_samples <- MCMC_output_list$effective_num_samples
+    result_obj$summary$parameters$r_hat <- MCMC_output_list$r_hat
+    row.names(result_obj$summary$parameters) <- param_names
+    result_obj$summary$log_likelihood <- get_MCMC_summary(MCMC_output_list$log_lik)
 
-    # DIC calculations
-    result_obj$D_hat <- MCMC_output_list$D_hat
-    result_obj$effective_num_param_DIC <- -2 * result_obj$posterior_log_likelihood_summary[, 'median'] - result_obj$D_hat
-    result_obj$DIC <- result_obj$D_hat + 2 * result_obj$effective_num_param_DIC
-
-    #WAIC calculations
-    waic_list <- calc_waic(result_obj, model_dat)
-    result_obj$lppd <- waic_list$lppd
-    result_obj$effective_num_param_WAIC <- waic_list$p_waic
-    result_obj$WAIC <- waic_list$waic
-    result_obj$WAIC_i <- waic_list$waic_i
+    # log_likelihood objects
+    result_obj$log_likelihood$log_likelihood <- c(MCMC_output_list$log_lik)
+    waic_list <- calc_waic(result_obj, model_dat, RC)
+    result_obj$log_likelihood$WAIC <- waic_list$waic
+    result_obj$log_likelihood$WAIC_i <- waic_list$waic_i
+    result_obj$log_likelihood$lppd <- waic_list$lppd
+    result_obj$log_likelihood$effective_num_param_WAIC <- waic_list$p_waic
+    result_obj$log_likelihood$D_hat <- MCMC_output_list$D_hat
+    result_obj$log_likelihood$effective_num_param_DIC <- -2 * result_obj$summary$log_likelihood[, 'median'] - result_obj$log_likelihood$D_hat
+    result_obj$log_likelihood$DIC <- result_obj$log_likelihood$D_hat + 2 * result_obj$log_likelihood$effective_num_param_DIC
 
     #Rhat and autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
     autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
-    result_obj$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
+    result_obj$diagnostics$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
+    result_obj$diagnostics$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
 
     # store other information
-    result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
@@ -318,11 +318,9 @@ gplm.calc_Dhat <- function(theta, RC){
     log_sig_eta <- theta_median[4]
     eta_1 <- theta_median[5]
     z <- theta_median[6:10]
-
-    eta=c(RC$P %*% as.matrix(c(eta_1, exp(log_sig_eta) * z)))
-
-    l=c(log(RC$h - RC$h_min + exp(zeta)))
-    varr=c(RC$epsilon * exp(RC$B %*% eta))
+    eta <- c(RC$P %*% as.matrix(c(eta_1, exp(log_sig_eta) * z)))
+    l <- c(log(RC$h - RC$h_min + exp(zeta)))
+    varr <- c(RC$epsilon * exp(RC$B %*% eta))
     if(any(varr > 10^2)) return(list(p = -1e9)) # to avoid numerical instability
 
     # repeated calculations
@@ -330,17 +328,41 @@ gplm.calc_Dhat <- function(theta, RC){
     var_b <- exp(2 * log_sig_b)
     sqrt_5 <- sqrt(5)
 
-    #Matern covariance
-    Sig_x <- rbind(cbind(RC$Sig_ab, RC$m1), cbind(RC$m2, var_b * ((1 + sqrt_5 * RC$dist / phi_b + 5 * RC$dist^2 / (3 * phi_b^2)) * exp(-sqrt_5 * RC$dist / phi_b) + diag(RC$n_unique) * RC$nugget)))
+    # Matern covariance
+    R_Beta <- var_b * ((1 + sqrt_5 * RC$dist / phi_b + 5 * RC$dist^2 / (3 * phi_b^2)) * exp(-sqrt_5 * RC$dist / phi_b) + diag(RC$n_unique) * RC$nugget)
 
-    X <- rbind(cbind(1, l, matMult(diag(l), RC$A)), RC$Z)
-    L <- compute_L(X, Sig_x, diag(c(varr, 0)), RC$nugget)
+    # Construct Sig_u2
+    Sig_u2 <- diag(varr)
+
+    # Construct Sigma_x correctly
+    Sig_x <- rbind(
+        cbind(RC$Sig_ab, matrix(0, 2, RC$n_unique), matrix(0, 2, RC$n)),
+        cbind(matrix(0, RC$n_unique, 2), R_Beta, matrix(0, RC$n_unique, RC$n)),
+        cbind(matrix(0, RC$n, 2 + RC$n_unique), Sig_u2)
+    )
+
+    # Construct X matrix correctly
+    X <- rbind(
+        cbind(matrix(1, RC$n, 1), l, diag(l) %*% RC$A, diag(RC$n)),
+        RC$Z
+    )
+
+    # Construct Sigma_eps using tau (transformed measurement errors)
+    Sig_eps <- diag(c(RC$tau^2, 0))
+
+    L <- compute_L(X, Sig_x, Sig_eps, RC$nugget)
     w <- compute_w(L, RC$y, X, RC$mu_x)
     x <- RC$mu_x + (Sig_x %*% (t(X) %*% solveArma(t(L), w)))
 
-    yp=(matMult(X, x))[1:RC$n, ]
+    # Extract components from x
+    beta <- x[1:2]  # a_0 and b
+    u1 <- x[3:(2 + RC$n_unique)]  # beta(h)
 
-    Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], yp, sqrt(varr), log = T))
+    # Compute mu
+    mu <- beta[1] + (beta[2] + RC$A %*% u1) * l
+
+    # Compute Dhat using both model error and measurement error
+    Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], mu, sqrt(varr + RC$tau^2), log = TRUE))
 
     return(Dhat)
 }
