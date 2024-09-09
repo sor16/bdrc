@@ -221,12 +221,12 @@ gplm.inference <- function(y, Q_sigma, h, c_param = NULL, h_max = NULL, parallel
         output_list$theta[2, ] <- exp(output_list$theta[2, ])
         output_list$theta[3, ] <- exp(output_list$theta[3, ])
         output_list$theta[4, ] <- exp(output_list$theta[4, ])
-        output_list$theta[5:10, ] <- RC$P%*%output_list$theta[5:10, ]
+        output_list$theta[5:10, ] <- RC$P %*% output_list$theta[5:10, ]
     }else{
         output_list$theta[1, ] <- exp(output_list$theta[1, ])
         output_list$theta[2, ] <- exp(output_list$theta[2, ])
         output_list$theta[3, ] <- exp(output_list$theta[3, ])
-        output_list$theta[4:9, ] <- RC$P%*%output_list$theta[4:9, ]
+        output_list$theta[4:9, ] <- RC$P %*% output_list$theta[4:9, ]
     }
     output_list$x[1, ] <- exp(output_list$x[1, ])
     output_list[['h']] <- c(RC$h, RC$h_u)
@@ -265,6 +265,7 @@ gplm.density_evaluation_known_c <- function(theta, RC) {
                                                 dist = RC$dist,
                                                 A = RC$A,
                                                 y = RC$y,
+                                                tau = RC$tau,
                                                 epsilon = RC$epsilon,
                                                 nugget = RC$nugget,
                                                 n_unique = RC$n_unique,
