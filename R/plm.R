@@ -65,92 +65,117 @@
 #' }
 #' @export
 plm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, num_cores = NULL, forcepoint = rep(FALSE, nrow(data)), verbose = TRUE){
-    #argument checking
-    stopifnot(inherits(formula, 'formula'))
-    stopifnot(inherits(data, 'data.frame'))
-    stopifnot(is.null(c_param) | is.double(c_param))
-    stopifnot(is.null(h_max) | is.double(h_max))
-    stopifnot(is.null(num_cores) | is.numeric(num_cores))
-    stopifnot(length(forcepoint) == dim(data)[1] & is.logical(forcepoint))
-    formula_args <- all.vars(formula)
-    stopifnot(length(formula_args) == 2 & all(formula_args %in% names(data)))
+    # argument checking
+    check_arguments(formula, data, c_param, h_max, parallel, num_cores, forcepoint, verbose)
+
+    # Parse the extended formula
+    parsed_formula <- parse_extended_formula(formula)
+    discharge_var <- parsed_formula$discharge
+    error_var <- parsed_formula$discharge_error
+    stage_var <- parsed_formula$stage
+
+    # Check if variables exist in the data
+    if (!discharge_var %in% names(data)) stop(paste("Discharge variable", discharge_var, "not found in data."))
+    if (!is.null(error_var) && !(error_var %in% names(data))) stop(paste("Discharge measurment error variable", error_var, "not found in data."))
+    if (!stage_var %in% names(data)) stop(paste("Water level (stage) variable", stage_var, "not found in data."))
+
+    # Prepare data
     model_dat <- as.data.frame(data[, all.vars(formula)])
-    forcepoint <- forcepoint[order(model_dat[, 2, drop = TRUE])]
-    model_dat <- model_dat[order(model_dat[, 2, drop = TRUE]), ]
+    forcepoint <- forcepoint[order(model_dat[, stage_var, drop = TRUE])]
+    model_dat <- model_dat[order(model_dat[, stage_var, drop = TRUE]), ]
+    Q <- model_dat[, discharge_var, drop = TRUE]
+    h <- model_dat[, stage_var, drop = TRUE]
+
+    # check data for errors
     if(dim(model_dat)[1] < 2) stop('At least two paired observations of stage and discharge are required to fit a rating curve')
-    Q <- model_dat[, 1, drop = TRUE]
-    h <- model_dat[, 2, drop = TRUE]
     if(!is.null(c_param) && min(h) < c_param) stop('c_param must be lower than the minimum stage value in the data')
     if(any(Q <= 0)) stop('All discharge measurements must be strictly greater than zero. If you know the stage of zero discharge, use c_param.')
-    MCMC_output_list <- plm.inference(y = log(Q), h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
+
+    # check if measurement errors are correct and create Q_me
+    if(!is.null(error_var)){
+        check_Q_me_for_errors(model_dat[, error_var, drop = TRUE])
+        Q_me <- model_dat[, error_var, drop = TRUE]
+    }else{
+        Q_me <- NULL
+    }
+
+    # Bayesian inference
+    MCMC_output_list <- plm.inference(y = log(Q), Q_me = Q_me, h = h, c_param = c_param, h_max = h_max, parallel = parallel, forcepoint = forcepoint, num_cores = num_cores, verbose = verbose)
     param_names <- get_param_names('plm', c_param)
-    result_obj <- list()
+
+    result_obj <- list(posterior = list(), log_likelihood = list(), summary = list(), diagnostics = list())
     attr(result_obj, "class") <- "plm"
-    result_obj$a_posterior <- MCMC_output_list$x[1, ]
-    result_obj$b_posterior <- MCMC_output_list$x[2, ]
+    result_obj$posterior$a <- MCMC_output_list$x[1, ]
+    result_obj$posterior$b <- MCMC_output_list$x[2, ]
     if(is.null(c_param)){
-        result_obj$c_posterior <- MCMC_output_list$theta[1, ]
-        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[2, ]
+        result_obj$posterior$c <- MCMC_output_list$theta[1, ]
+        result_obj$posterior$sigma_eta <- MCMC_output_list$theta[2, ]
         for(i in 3:nrow(MCMC_output_list$theta)){
-          result_obj[[paste0('eta_', i - 2, '_posterior')]] <- MCMC_output_list$theta[i, ]
+            result_obj$posterior[[paste0('eta_', i - 2)]] <- MCMC_output_list$theta[i, ]
         }
     }else{
-        result_obj$c_posterior <- NULL
-        result_obj$sigma_eta_posterior <- MCMC_output_list$theta[1, ]
+        result_obj$posterior$c <- NULL
+        result_obj$posterior$sigma_eta <- MCMC_output_list$theta[1, ]
         for(i in 2:nrow(MCMC_output_list$theta)){
-          result_obj[[paste0('eta_', i - 1, '_posterior')]] <- MCMC_output_list$theta[i, ]
+            result_obj$posterior[[paste0('eta_', i - 1)]] <- MCMC_output_list$theta[i, ]
         }
     }
     unique_h_idx <- !duplicated(MCMC_output_list$h)
     h_unique <- unique(MCMC_output_list$h)
     h_unique_order <- order(h_unique)
     h_unique_sorted <- h_unique[h_unique_order]
-    h_idx_data <- match(h,h_unique_sorted)
-    result_obj$rating_curve_posterior <- exp(MCMC_output_list$y_post_pred[unique_h_idx, ][h_unique_order, ])
-    result_obj$rating_curve_mean_posterior <- exp(MCMC_output_list$y_post[unique_h_idx, ][h_unique_order, ])
-    result_obj$sigma_eps_posterior <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx, ][h_unique_order, ])
-    result_obj$posterior_log_likelihood <- c(MCMC_output_list$log_lik)
+    h_idx_data <- match(h, h_unique_sorted)
+    result_obj$posterior$theta <- MCMC_output_list$theta
+    result_obj$posterior$rating_curve <- exp(MCMC_output_list$y_true_post_pred[unique_h_idx, ][h_unique_order, ])
+    result_obj$posterior$rating_curve_mean <- exp(MCMC_output_list$mu_post[unique_h_idx, ][h_unique_order, ])
+    result_obj$posterior$sigma_eps <- sqrt(MCMC_output_list$sigma_eps[unique_h_idx, ][h_unique_order, ])
+    if(!is.null(Q_me)){
+        result_obj$posterior$Q_true <- exp(MCMC_output_list$y_true)
+    }
     #summary objects
-    result_obj$rating_curve <- get_MCMC_summary(result_obj$rating_curve_posterior, h = h_unique_sorted)
-    result_obj$rating_curve_mean <- get_MCMC_summary(result_obj$rating_curve_mean_posterior, h = h_unique_sorted)
-    result_obj$sigma_eps_summary <- get_MCMC_summary(result_obj$sigma_eps_posterior, h = h_unique_sorted)
-    result_obj$param_summary <- get_MCMC_summary(rbind(MCMC_output_list$x[1, ], MCMC_output_list$x[2, ], MCMC_output_list$theta))
-    result_obj$param_summary$eff_n_samples <- MCMC_output_list$effective_num_samples
-    result_obj$param_summary$r_hat <- MCMC_output_list$r_hat
-    row.names(result_obj$param_summary) <- param_names
-    result_obj$posterior_log_likelihood_summary <- get_MCMC_summary(MCMC_output_list$log_lik)
-    #Deviance calculations
-    result_obj$D_hat <- MCMC_output_list$D_hat
-    result_obj$effective_num_param_DIC <- -2 * result_obj$posterior_log_likelihood_summary[, 'median'] - result_obj$D_hat
-    result_obj$DIC <- result_obj$D_hat + 2 * result_obj$effective_num_param_DIC
-    #WAIC calculations
-    waic_list <- calc_waic(result_obj, model_dat)
-    result_obj$lppd <- waic_list$lppd
-    result_obj$effective_num_param_WAIC <- waic_list$p_waic
-    result_obj$WAIC <- waic_list$waic
-    result_obj$WAIC_i <- waic_list$waic_i
-    #Rhat and autocorrelation
+    result_obj$summary$rating_curve <- get_MCMC_summary(result_obj$posterior$rating_curve, h = h_unique_sorted)
+    result_obj$summary$rating_curve_mean <- get_MCMC_summary(result_obj$posterior$rating_curve_mean, h = h_unique_sorted)
+    result_obj$summary$sigma_eps <- get_MCMC_summary(result_obj$posterior$sigma_eps, h = h_unique_sorted)
+    result_obj$summary$parameters <- get_MCMC_summary(rbind(MCMC_output_list$x[1, ], MCMC_output_list$x[2, ], MCMC_output_list$theta))
+    result_obj$summary$parameters$eff_n_samples <- MCMC_output_list$effective_num_samples
+    result_obj$summary$parameters$r_hat <- MCMC_output_list$r_hat
+    row.names(result_obj$summary$parameters) <- param_names
+    if(!is.null(Q_me)){
+        result_obj$summary$Q_true <- get_MCMC_summary(exp(MCMC_output_list$y_true), h = h)
+    }
+    result_obj$summary$log_likelihood <- get_MCMC_summary(MCMC_output_list$log_lik)
+    # log_likelihood
+    result_obj$log_likelihood$log_likelihood <- c(MCMC_output_list$log_lik)
+    waic_list <- calc_waic(result_obj, model_dat, Q_me)
+    result_obj$log_likelihood$WAIC <- waic_list$waic
+    result_obj$log_likelihood$WAIC_i <- waic_list$waic_i
+    result_obj$log_likelihood$lppd <- waic_list$lppd
+    result_obj$log_likelihood$effective_num_param_WAIC <- waic_list$p_waic
+    result_obj$log_likelihood$D_hat <- MCMC_output_list$D_hat
+    result_obj$log_likelihood$effective_num_param_DIC <- -2 * result_obj$summary$log_likelihood[, 'median'] - result_obj$log_likelihood$D_hat
+    result_obj$log_likelihood$DIC <- result_obj$log_likelihood$D_hat + 2 * result_obj$log_likelihood$effective_num_param_DIC
+    # diagnostics
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
-    autocorrelation_df$lag <- 1:nrow(autocorrelation_df)
-    result_obj$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
+    autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
+    result_obj$diagnostics$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
+    result_obj$diagnostics$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     # store other information
-    result_obj$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
     result_obj$formula <- formula
     result_obj$data <- model_dat
     result_obj$run_info <- MCMC_output_list$run_info
     if(verbose){
         cat("\nMCMC sampling completed!\n")
-        cat(sprintf("\nDiagnostics:\nAcceptance rate: %.2f%%.\n", result_obj$acceptance_rate * 100))
-        convergence_diagnostics_warnings(result_obj$param_summary)
+        cat(sprintf("\nDiagnostics:\nAcceptance rate: %.2f%%.\n", result_obj$diagnostics$acceptance_rate * 100))
+        convergence_diagnostics_warnings(result_obj$summary$parameters)
     }
     return(result_obj)
 }
 
 #' @importFrom stats optim
-plm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, forcepoint = rep(FALSE, length(h)), num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
+plm.inference <- function(y, Q_me, h, c_param = NULL, h_max = NULL, parallel = TRUE, forcepoint = rep(FALSE, length(h)), num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
   if(verbose) cat("Progress:\nInitializing Metropolis MCMC algorithm...\n")
-  RC <- get_model_components('plm', y, h, c_param, h_max, forcepoint, h_min = NULL)
+  RC <- get_model_components('plm', y, Q_me, h, c_param, h_max, forcepoint, h_min = NULL)
   output_list <- get_MCMC_output_list(theta_m = RC$theta_m, RC = RC, density_fun = RC$density_fun,
                                       unobserved_prediction_fun = RC$unobserved_prediction_fun,
                                       parallel = parallel, num_cores = num_cores, num_chains = num_chains, nr_iter = nr_iter,
@@ -171,36 +196,71 @@ plm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, f
 }
 
 plm.density_evaluation_unknown_c <- function(theta, RC) {
-    return(plm_density_evaluation_unknown_c_cpp(theta = theta,
-                                                P = RC$P,
-                                                h = RC$h,
-                                                B = RC$B,
-                                                y = RC$y,
-                                                epsilon = RC$epsilon,
-                                                Sig_x = RC$Sig_x,
-                                                mu_x = RC$mu_x,
-                                                h_min = RC$h_min,
-                                                nugget = RC$nugget,
-                                                lambda_c = RC$lambda_c,
-                                                lambda_eta_1 = RC$lambda_eta_1,
-                                                lambda_seta = RC$lambda_seta
-                                                ))
+    if(is.null(RC$Q_me)){
+        return(plm_density_evaluation_unknown_c_cpp(theta = theta,
+                                                    P = RC$P,
+                                                    h = RC$h,
+                                                    B = RC$B,
+                                                    y = RC$y,
+                                                    epsilon = RC$epsilon,
+                                                    Sig_ab = RC$Sig_ab,
+                                                    mu_x = RC$mu_x,
+                                                    h_min = RC$h_min,
+                                                    nugget = RC$nugget,
+                                                    lambda_c = RC$lambda_c,
+                                                    lambda_eta_1 = RC$lambda_eta_1,
+                                                    lambda_seta = RC$lambda_seta
+        ))
+    } else {
+        return(plm_me_density_evaluation_unknown_c_cpp(theta = theta,
+                                                       P = RC$P,
+                                                       h = RC$h,
+                                                       B = RC$B,
+                                                       y = RC$y,
+                                                       tau = RC$tau,
+                                                       epsilon = RC$epsilon,
+                                                       Sig_ab = RC$Sig_ab,
+                                                       mu_x = RC$mu_x,
+                                                       h_min = RC$h_min,
+                                                       nugget = RC$nugget,
+                                                       lambda_c = RC$lambda_c,
+                                                       lambda_eta_1 = RC$lambda_eta_1,
+                                                       lambda_seta = RC$lambda_seta
+        ))
+    }
 }
 
 plm.density_evaluation_known_c <- function(theta, RC) {
-    return(plm_density_evaluation_known_c_cpp(theta = theta,
-                                              P = RC$P,
-                                              h = RC$h,
-                                              B = RC$B,
-                                              y = RC$y,
-                                              epsilon = RC$epsilon,
-                                              Sig_x = RC$Sig_x,
-                                              mu_x = RC$mu_x,
-                                              c = RC$c,
-                                              nugget = RC$nugget,
-                                              lambda_eta_1 = RC$lambda_eta_1,
-                                              lambda_seta = RC$lambda_seta
-                                              ))
+    if(is.null(RC$Q_me)){
+        return(plm_density_evaluation_known_c_cpp(theta = theta,
+                                                  P = RC$P,
+                                                  h = RC$h,
+                                                  B = RC$B,
+                                                  y = RC$y,
+                                                  epsilon = RC$epsilon,
+                                                  Sig_ab = RC$Sig_ab,
+                                                  mu_x = RC$mu_x,
+                                                  c = RC$c,
+                                                  nugget = RC$nugget,
+                                                  lambda_eta_1 = RC$lambda_eta_1,
+                                                  lambda_seta = RC$lambda_seta
+        ))
+    } else {
+        return(plm_me_density_evaluation_known_c_cpp(theta = theta,
+                                                     P = RC$P,
+                                                     h = RC$h,
+                                                     B = RC$B,
+                                                     y = RC$y,
+                                                     tau = RC$tau,
+                                                     epsilon = RC$epsilon,
+                                                     Sig_ab = RC$Sig_ab,
+                                                     mu_x = RC$mu_x,
+                                                     c = RC$c,
+                                                     nugget = RC$nugget,
+                                                     lambda_eta_1 = RC$lambda_eta_1,
+                                                     lambda_seta = RC$lambda_seta
+        ))
+    }
 }
 
 plm.predict_u_unknown_c <- function(theta, x, RC) {
@@ -211,7 +271,7 @@ plm.predict_u_unknown_c <- function(theta, x, RC) {
                                        h_u = RC$h_u,
                                        h_min = RC$h_min,
                                        n_u = length(RC$h_u)
-                                       ))
+    ))
 }
 
 plm.predict_u_known_c <- function(theta, x, RC) {
@@ -221,7 +281,7 @@ plm.predict_u_known_c <- function(theta, x, RC) {
                                      B_u = RC$B_u,
                                      h_u = RC$h_u,
                                      c = RC$c
-                                     ))
+    ))
 }
 
 #' @importFrom stats dnorm
@@ -239,15 +299,38 @@ plm.calc_Dhat <- function(theta, RC){
     l <- c(log(RC$h - RC$h_min + exp(zeta)))
     varr <- c(RC$epsilon * exp(RC$B %*% lambda))
     if(any(varr > 10^2)) return(list(p = -1e9)) # to avoid numerical instability
-    Sig_eps <- diag(varr)
 
-    X <- cbind(1, l)
-    L <- compute_L(X, RC$Sig_x, Sig_eps, RC$nugget)
+    if (is.null(RC$Q_me)) {
+        # Case without measurement error (original version)
+        Sig_x <- RC$Sig_ab
+        X <- cbind(1, l)
+        Sig_eps <- diag(varr)
+    } else {
+        # Case with measurement error
+        Sig_u2 <- diag(varr)
+        Sig_x <- rbind(
+            cbind(RC$Sig_ab, matrix(0, 2, RC$n)),
+            cbind(matrix(0, RC$n, 2), Sig_u2)
+        )
+        X <- cbind(1, l, diag(RC$n))
+        Sig_eps <- diag(RC$tau^2)
+    }
+
+    L <- compute_L(X, Sig_x, Sig_eps, RC$nugget)
     w <- compute_w(L, RC$y, X, RC$mu_x)
-    x <- RC$mu_x + (RC$Sig_x %*% (t(X) %*% solveArma(t(L), w)))
+    x <- RC$mu_x + (Sig_x %*% (t(X) %*% solveArma(t(L), w)))
 
-    yp <- (X %*% x)[1:RC$n, ]
-    Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], yp, sqrt(varr), log = T))
+    if (is.null(RC$Q_me)) {
+        # Original calculation for non-ME case
+        mu_post <- (X %*% x)[1:RC$n, ]
+        Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], mu_post, sqrt(varr), log = TRUE))
+    } else {
+        # Calculation for ME case
+        beta <- x[1:2]  # a_0 and b
+        mu_post <- beta[1] + beta[2] * l
+        Dhat <- -2 * sum(dnorm(RC$y[1:RC$n, ], mu_post, sqrt(varr + RC$tau^2), log = TRUE))
+    }
+
     return(Dhat)
 }
 

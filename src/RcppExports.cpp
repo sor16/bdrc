@@ -471,9 +471,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// plm_density_evaluation_unknown_c_cpp
-Rcpp::List plm_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_x, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
-RcppExport SEXP _bdrc_plm_density_evaluation_unknown_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP epsilonSEXP, SEXP Sig_xSEXP, SEXP mu_xSEXP, SEXP h_minSEXP, SEXP nuggetSEXP, SEXP lambda_cSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
+// plm_me_density_evaluation_unknown_c_cpp
+Rcpp::List plm_me_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
+RcppExport SEXP _bdrc_plm_me_density_evaluation_unknown_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP tauSEXP, SEXP epsilonSEXP, SEXP Sig_abSEXP, SEXP mu_xSEXP, SEXP h_minSEXP, SEXP nuggetSEXP, SEXP lambda_cSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -482,21 +482,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec& >::type h(hSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type B(BSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type tau(tauSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_x(Sig_xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_ab(Sig_abSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mu_x(mu_xSEXP);
     Rcpp::traits::input_parameter< double >::type h_min(h_minSEXP);
     Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_c(lambda_cSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_eta_1(lambda_eta_1SEXP);
     Rcpp::traits::input_parameter< double >::type lambda_seta(lambda_setaSEXP);
-    rcpp_result_gen = Rcpp::wrap(plm_density_evaluation_unknown_c_cpp(theta, P, h, B, y, epsilon, Sig_x, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta));
+    rcpp_result_gen = Rcpp::wrap(plm_me_density_evaluation_unknown_c_cpp(theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta));
     return rcpp_result_gen;
 END_RCPP
 }
-// plm_density_evaluation_known_c_cpp
-Rcpp::List plm_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_x, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
-RcppExport SEXP _bdrc_plm_density_evaluation_known_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP epsilonSEXP, SEXP Sig_xSEXP, SEXP mu_xSEXP, SEXP cSEXP, SEXP nuggetSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
+// plm_density_evaluation_unknown_c_cpp
+Rcpp::List plm_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
+RcppExport SEXP _bdrc_plm_density_evaluation_unknown_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP epsilonSEXP, SEXP Sig_abSEXP, SEXP mu_xSEXP, SEXP h_minSEXP, SEXP nuggetSEXP, SEXP lambda_cSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -506,13 +507,59 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::mat& >::type B(BSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_x(Sig_xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_ab(Sig_abSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu_x(mu_xSEXP);
+    Rcpp::traits::input_parameter< double >::type h_min(h_minSEXP);
+    Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_c(lambda_cSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_eta_1(lambda_eta_1SEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_seta(lambda_setaSEXP);
+    rcpp_result_gen = Rcpp::wrap(plm_density_evaluation_unknown_c_cpp(theta, P, h, B, y, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// plm_me_density_evaluation_known_c_cpp
+Rcpp::List plm_me_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
+RcppExport SEXP _bdrc_plm_me_density_evaluation_known_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP tauSEXP, SEXP epsilonSEXP, SEXP Sig_abSEXP, SEXP mu_xSEXP, SEXP cSEXP, SEXP nuggetSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type P(PSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type B(BSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_ab(Sig_abSEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type mu_x(mu_xSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
     Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_eta_1(lambda_eta_1SEXP);
     Rcpp::traits::input_parameter< double >::type lambda_seta(lambda_setaSEXP);
-    rcpp_result_gen = Rcpp::wrap(plm_density_evaluation_known_c_cpp(theta, P, h, B, y, epsilon, Sig_x, mu_x, c, nugget, lambda_eta_1, lambda_seta));
+    rcpp_result_gen = Rcpp::wrap(plm_me_density_evaluation_known_c_cpp(theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// plm_density_evaluation_known_c_cpp
+Rcpp::List plm_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
+RcppExport SEXP _bdrc_plm_density_evaluation_known_c_cpp(SEXP thetaSEXP, SEXP PSEXP, SEXP hSEXP, SEXP BSEXP, SEXP ySEXP, SEXP epsilonSEXP, SEXP Sig_abSEXP, SEXP mu_xSEXP, SEXP cSEXP, SEXP nuggetSEXP, SEXP lambda_eta_1SEXP, SEXP lambda_setaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type P(PSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type B(BSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type epsilon(epsilonSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Sig_ab(Sig_abSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mu_x(mu_xSEXP);
+    Rcpp::traits::input_parameter< double >::type c(cSEXP);
+    Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_eta_1(lambda_eta_1SEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_seta(lambda_setaSEXP);
+    rcpp_result_gen = Rcpp::wrap(plm_density_evaluation_known_c_cpp(theta, P, h, B, y, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -643,7 +690,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bdrc_create_A_cpp", (DL_FUNC) &_bdrc_create_A_cpp, 1},
     {"_bdrc_pri", (DL_FUNC) &_bdrc_pri, 2},
     {"_bdrc_chain_statistics_cpp", (DL_FUNC) &_bdrc_chain_statistics_cpp, 1},
+    {"_bdrc_plm_me_density_evaluation_unknown_c_cpp", (DL_FUNC) &_bdrc_plm_me_density_evaluation_unknown_c_cpp, 14},
     {"_bdrc_plm_density_evaluation_unknown_c_cpp", (DL_FUNC) &_bdrc_plm_density_evaluation_unknown_c_cpp, 13},
+    {"_bdrc_plm_me_density_evaluation_known_c_cpp", (DL_FUNC) &_bdrc_plm_me_density_evaluation_known_c_cpp, 13},
     {"_bdrc_plm_density_evaluation_known_c_cpp", (DL_FUNC) &_bdrc_plm_density_evaluation_known_c_cpp, 12},
     {"_bdrc_plm_predict_u_unknown_c_cpp", (DL_FUNC) &_bdrc_plm_predict_u_unknown_c_cpp, 7},
     {"_bdrc_plm_predict_u_known_c_cpp", (DL_FUNC) &_bdrc_plm_predict_u_known_c_cpp, 6},

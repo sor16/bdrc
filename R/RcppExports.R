@@ -101,12 +101,20 @@ chain_statistics_cpp <- function(chains) {
     .Call(`_bdrc_chain_statistics_cpp`, chains)
 }
 
-plm_density_evaluation_unknown_c_cpp <- function(theta, P, h, B, y, epsilon, Sig_x, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta) {
-    .Call(`_bdrc_plm_density_evaluation_unknown_c_cpp`, theta, P, h, B, y, epsilon, Sig_x, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta)
+plm_me_density_evaluation_unknown_c_cpp <- function(theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta) {
+    .Call(`_bdrc_plm_me_density_evaluation_unknown_c_cpp`, theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta)
 }
 
-plm_density_evaluation_known_c_cpp <- function(theta, P, h, B, y, epsilon, Sig_x, mu_x, c, nugget, lambda_eta_1, lambda_seta) {
-    .Call(`_bdrc_plm_density_evaluation_known_c_cpp`, theta, P, h, B, y, epsilon, Sig_x, mu_x, c, nugget, lambda_eta_1, lambda_seta)
+plm_density_evaluation_unknown_c_cpp <- function(theta, P, h, B, y, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta) {
+    .Call(`_bdrc_plm_density_evaluation_unknown_c_cpp`, theta, P, h, B, y, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_eta_1, lambda_seta)
+}
+
+plm_me_density_evaluation_known_c_cpp <- function(theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta) {
+    .Call(`_bdrc_plm_me_density_evaluation_known_c_cpp`, theta, P, h, B, y, tau, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta)
+}
+
+plm_density_evaluation_known_c_cpp <- function(theta, P, h, B, y, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta) {
+    .Call(`_bdrc_plm_density_evaluation_known_c_cpp`, theta, P, h, B, y, epsilon, Sig_ab, mu_x, c, nugget, lambda_eta_1, lambda_seta)
 }
 
 plm_predict_u_unknown_c_cpp <- function(theta, x, P, B_u, h_u, h_min, n_u) {

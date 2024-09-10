@@ -39,8 +39,10 @@ Rcpp::List gplm0_predict_u_unknown_c_cpp(const arma::vec& theta, const arma::vec
 Rcpp::List gplm0_predict_u_known_c_cpp(const arma::vec& theta, const arma::vec& x, const arma::vec& h_unique, const arma::vec& h_u, const arma::mat& dist_all, double c, double nugget, int n_unique, int n_u);
 
 // PLM function declarations
-Rcpp::List plm_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_x, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
-Rcpp::List plm_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_x, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
+Rcpp::List plm_me_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
+Rcpp::List plm_me_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
+Rcpp::List plm_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_eta_1, double lambda_seta);
+Rcpp::List plm_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::mat& P, const arma::vec& h, const arma::mat& B, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_eta_1, double lambda_seta);
 Rcpp::List plm_predict_u_unknown_c_cpp(const arma::vec& theta, const arma::vec& x, const arma::mat& P, const arma::mat& B_u, const arma::vec& h_u, double h_min, int n_u);
 Rcpp::List plm_predict_u_known_c_cpp(const arma::vec& theta, const arma::vec& x, const arma::mat& P, const arma::mat& B_u, const arma::vec& h_u, double c);
 

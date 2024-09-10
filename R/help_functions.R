@@ -79,6 +79,10 @@ get_model_components <- function(model, y, Q_me, h, c_param, h_max, forcepoint, 
         }
         RC$m1 <- matrix(0, nrow = 2, ncol = RC$n_unique)
         RC$m2 <- matrix(0, nrow = RC$n_unique, ncol = 2)
+    }else{
+        if(!is.null(Q_me)){
+            RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n)))
+        }
     }
     if(!is.null(RC$c)){
         density_fun_name <- paste0(model, '.density_evaluation_known_c')
