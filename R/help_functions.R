@@ -34,21 +34,35 @@ priors <- function(model, c_param = NULL) {
     return(RC)
 }
 
-get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoint, h_min){
+get_model_components <- function(model, y, Q_me, h, c_param, h_max, forcepoint, h_min){
     RC <- priors(model, c_param)
     RC$y <- as.matrix(y)
-    RC$Q_sigma <- Q_sigma
-    RC$tau <- if(is.null(Q_sigma)) NULL else sqrt(log(1 + (Q_sigma/exp(y))^2))
     RC$h <- h
     RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
     RC$h_max <- max(RC$h)
     RC$n <- length(h)
+    # covert measurement error to SD of a normal on the log-scale (tau_i) with mean (log(Q_i))
+    RC$Q_me <- Q_me
+    if(is.null(Q_me)){
+        RC$tau <- NULL
+    }else if(all(is.numeric(Q_me))){
+        RC$tau <- sqrt(log(1 + (Q_me/exp(y))^2))
+    }else if(all(is.character(Q_me))){
+        RC$tau <- sapply(1:RC$n, function(i) quality_to_tau(Q_me[i], exp(y[i])))
+    }
     RC$epsilon <- rep(1, RC$n)
     RC$epsilon[forcepoint] <- 1 / RC$n
     if(model %in% c('plm', 'gplm')){
         RC$P <- lower.tri(matrix(1, 6, 6), diag = TRUE) * 1
         h_tilde <- RC$h - min(RC$h)
         RC$B <- B_splines(t(h_tilde) / h_tilde[RC$n])
+        if(!is.null(Q_me)){
+            RC$lambda_eta_1 <- 30
+        }
+    }else{
+        if(!is.null(Q_me)){
+            RC$lambda_se <- 30
+        }
     }
     if(model %in% c('gplm0', 'gplm')){
         RC$y <- rbind(RC$y, RC$mu_b)
@@ -56,7 +70,7 @@ get_model_components <- function(model, y, Q_sigma, h, c_param, h_max, forcepoin
         RC$n_unique <- length(RC$h_unique)
         RC$A <- create_A_cpp(RC$h)
         RC$dist <- distance_matrix(RC$h_unique)
-        if(is.null(Q_sigma)){
+        if(is.null(Q_me)){
             RC$mu_x <- as.matrix(c(RC$mu_a, RC$mu_b, rep(0, RC$n_unique)))
             RC$Z <- cbind(t(c(0, 1)), t(rep(0, RC$n_unique)))
         }else{
@@ -237,7 +251,7 @@ get_desired_output <- function(model, RC){
     desired_output <- list('mu_post' = list('observed' = RC$n, 'unobserved' = RC$n_u),
                            'y_true_post_pred' = list('observed' = RC$n, 'unobserved' = RC$n_u),
                            'log_lik' = list('observed' = 1, 'unobserved' = 0))
-    if(!is.null(RC$Q_sigma)){
+    if(!is.null(RC$Q_me)){
         desired_output$y_true <- list('observed' = RC$n, 'unobserved' = 0)
     }
     if(!const_var){
@@ -360,7 +374,7 @@ get_transformed_param <- function(v, param_name, mod, ...){
         names(out_v) <- rep('eta_1', length(v))
     }else if(param_name %in% paste0('eta_', 2:6)){
         eta_nr <- as.numeric(unlist(strsplit(param_name,split = '_'))[2])
-        out_v <- v - mod[[paste0('eta_', eta_nr - 1, '_posterior')]]
+        out_v <- v - mod$posterior[[paste0('eta_', eta_nr - 1)]]
         names(out_v) <- rep(paste0('z_', eta_nr - 1), length(v))
     }else{
         stop('param not found')
@@ -475,13 +489,20 @@ predict_wider <- function(p_dat){
 
 #' @importFrom stats median
 get_residuals_dat <- function(m){
-    h_min <- min(m$data[[all.vars(m$formula)[2]]])
-    rc_dat <- merge(m$rating_curve_mean[, c('h', 'median', 'lower', 'upper')], m$rating_curve[, c('h', 'median', 'lower', 'upper')], by.x = 'h', by.y = 'h')
-    resid_dat <- merge(rc_dat[rc_dat$h >= h_min, ], m$data, by.x = 'h', by.y = all.vars(m$formula)[2], all.x = TRUE)
-    colnames(resid_dat) <- c('h', 'rcm_median', 'rcm_lower', 'rcm_upper', 'rc_median', 'rc_lower', 'rc_upper', 'Q')
-    c_hat <- if(is.null(m$run_info$c_param)) median(m$c_posterior) else m$run_info$c_param
+    if(is.null(m$summary$Q_true)){
+        Q_true_df <- data.frame("h" = m$data[ncol(m$data)][[1]], "median" = m$data[1][[1]])
+    }else{
+        Q_true_df <- data.frame("h" = m$summary$Q_true$h, "median" = m$summary$Q_true$median)
+    }
+    dat <- cbind(m$data[,c(1,ncol(m$data))], Q_true_df$median)
+    h_min <- min(m$data[[all.vars(m$formula)[ncol(m$data)]]])
+    rc_dat <- merge(m$summary$rating_curve_mean[, c('h', 'median', 'lower', 'upper')], m$summary$rating_curve[, c('h', 'median', 'lower', 'upper')], by.x = 'h', by.y = 'h')
+    resid_dat <- merge(rc_dat[rc_dat$h >= h_min, ], dat, by.x = 'h', by.y = all.vars(m$formula)[ncol(m$data)], all.x = TRUE)
+    colnames(resid_dat) <- c('h', 'rcm_median', 'rcm_lower', 'rcm_upper', 'rc_median', 'rc_lower', 'rc_upper', 'Q', 'Q_true')
+    c_hat <- if(is.null(m$run_info$c_param)) median(m$posterior$c) else m$run_info$c_param
     resid_dat[, 'log(h-c_hat)'] <- log(resid_dat$h - c_hat)
     resid_dat$r_median <- log(resid_dat$Q) - log(resid_dat$rc_median)
+    resid_dat$r_true_median <- log(resid_dat$Q_true) - log(resid_dat$rc_median)
     resid_dat$m_lower <- log(resid_dat$rcm_lower) - log(resid_dat$rcm_median)
     resid_dat$m_upper <- log(resid_dat$rcm_upper) - log(resid_dat$rcm_median)
     resid_dat$r_lower <- log(resid_dat$rc_lower) - log(resid_dat$rc_median)
@@ -531,29 +552,33 @@ log_mean_LSE <- function(lx){
 }
 
 #' @importFrom stats dnorm var
-log_lik_i <- function(m, d, RC){
+log_lik_i <- function(m, d, Q_me){
     # get the mean and sd posterior samples
     sigma_eps <- m$posterior$sigma_eps
-    yp <- m$posterior$rating_curve_mean
+    mu <- m$posterior$rating_curve_mean
 
     # code to find the rows (stage values) in rating curve mean (yp) and SD (sigma_eps) corresponding to the observations (d)
     rc <- m$summary$rating_curve
     idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = colnames(d)[ncol(d)], all.y = T)$rowname)
 
-    # compute pointwise log-likelihood
-    if(is.null(RC$Q_sigma)){
-        tau <- rep(0,RC$n)
-    }else{
-        tau <- RC$tau
+    # compute tau
+    if(is.null(Q_me)){
+        tau <- rep(0, nrow(d))
+    }else if(all(is.numeric(Q_me))){
+        tau <- sqrt(log(1 + (Q_me/d[, 1])^2))
+    }else if(all(is.character(Q_me))){
+        tau <- sapply(1:nrow(d), function(i) quality_to_tau(Q_me[i], d[i, 1]))
     }
+
+    # compute pointwise log-likelihood
     return(sapply(1:dim(d)[1], function(n){
-        dnorm( log(d[n, 1]), log(yp[idx[n], ]), if(grepl("0", class(m))) sqrt(sigma_eps^2 + tau[n]^2) else sqrt(sigma_eps[idx[n], ]^2 + tau[n]^2), log = T)
+        dnorm( log(d[n, 1]), log(mu[idx[n], ]), if(grepl("0", class(m))) sqrt(sigma_eps^2 + tau[n]^2) else sqrt(sigma_eps[idx[n], ]^2 + tau[n]^2), log = T)
     }))
 }
 
-calc_waic <- function(m, d, RC) {
+calc_waic <- function(m, d, Q_me = NULL) {
     # Calculate pointwise log likelihood
-    llp_i <- log_lik_i(m, d, RC)
+    llp_i <- log_lik_i(m, d, Q_me)
 
     # Compute log pointwise predictive density (lppd)
     lppd_i <- sapply( 1:dim(d)[1], function(n) {
@@ -574,9 +599,9 @@ calc_waic <- function(m, d, RC) {
     ))
 }
 
-log_ml_harmonic_mean_est <- function(m, d, RC) {
+log_ml_harmonic_mean_est <- function(m, d, Q_me = NULL) {
     # Compute the log likelihood for each posterior sample
-    llp_i <- log_lik_i(m, d, RC)
+    llp_i <- log_lik_i(m, d, Q_me)
 
     llp <- matMult(llp_i, matrix(rep(1, dim(d)[1]), ncol = 1))
 
@@ -637,7 +662,6 @@ convergence_diagnostics_warnings <- function(param_summary){
 
 }
 
-
 parse_extended_formula <- function(formula) {
     forbidden_operators <- "[+:\\*/^\\-]"
     error_msg <- "Invalid formula. Use 'discharge ~ stage' for models without measurement error, or 'discharge | discharge_error ~ stage' for models with measurement error. Replace with your variable names."
@@ -662,4 +686,82 @@ parse_extended_formula <- function(formula) {
     list(discharge = discharge, discharge_error = discharge_error, stage = stage)
 }
 
+check_arguments <- function(formula, data, c_param, h_max, parallel, num_cores, forcepoint, verbose){
+    stopifnot(inherits(formula, 'formula'))
+    stopifnot(inherits(data, 'data.frame'))
+    stopifnot(is.null(c_param) | is.double(c_param))
+    stopifnot(is.null(h_max) | is.double(h_max))
+    stopifnot(is.null(num_cores) | is.numeric(num_cores))
+    stopifnot(length(forcepoint) == dim(data)[1] & is.logical(forcepoint))
+    formula_args <- all.vars(formula)
+    stopifnot(length(formula_args) %in% 2:3 & all(formula_args %in% names(data)))
+    stopifnot(is.logical(verbose))
+}
+
+check_Q_me_for_errors <- function(Q_me){
+    if (all(is.character(Q_me))) {
+        if (!all(Q_me %in% c("E", "e", "excellent", "Excellent", "EXCELLENT",
+                                                            "G", "g", "good", "Good", "GOOD",
+                                                            "F", "f", "fair", "Fair", "FAIR",
+                                                            "P", "p", "poor", "Poor", "POOR"))) {
+            stop(paste("Invalid quality ratings in column '", error_var, "'. ",
+                       "Allowed values are E/e/excellent/Excellent/EXCELLENT, ",
+                       "G/g/good/Good/GOOD, F/f/fair/Fair/FAIR, or P/p/poor/Poor/POOR. ",
+                       "Please check your input data."))
+        }
+    } else if (all(is.numeric(Q_me))) {
+        if (any(Q_me < 0)) {
+            stop(paste("Invalid measurement errors in column '", error_var, "'. ",
+                       "Numeric measurement error values must be non-negative. ",
+                       "Please check your input data."))
+        }
+    } else {
+        stop(paste("Invalid measurement error data in column '", error_var, "'. ",
+                   "All values must be either character (quality ratings, e.g., 'Excellent') or numeric (standard deviations). ",
+                   "Mixed types are not allowed. Please check your input data."))
+    }
+}
+
+percentage_to_tau <- function(Q, percentage) {
+    lower <- Q * (1 - percentage/100)
+    upper <- Q * (1 + percentage/100)
+
+    tau <- (log(upper) - log(lower)) / (2 * qnorm(0.975))
+
+    return(tau)
+}
+
+quality_to_tau <- function(quality, Q){
+    percentage <- switch(quality,
+                         "E" = ,
+                         "e" = ,
+                         "excellent" = ,
+                         "Excellent" = ,
+                         "EXCELLENT" = 2,   # 2% for Excellent
+
+                         "G" = ,
+                         "g" = ,
+                         "good" = ,
+                         "Good" = ,
+                         "GOOD" = 5,   # 5% for Good
+
+                         "F" = ,
+                         "f" = ,
+                         "fair" = ,
+                         "Fair" = ,
+                         "FAIR" = 8,   # 8% for Fair
+
+                         "P" = ,
+                         "p" = ,
+                         "poor" = ,
+                         "Poor" = ,
+                         "POOR" = 12,  # 12% for Poor
+
+                         NA)        # Return NA for any other input
+    if (is.na(percentage)) {
+        return(NA)
+    } else {
+        return(percentage_to_tau(Q, percentage))
+    }
+}
 

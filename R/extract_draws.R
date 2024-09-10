@@ -84,12 +84,12 @@ gather_draws <- function(mod, ..., transformed = F){
     if(f_not_generalized){
         args_rollout[grepl('^f$', args_rollout)] <- 'b'
     }
-    if(all(args_rollout %in% gsub('_posterior', '', names(mod)))){
-        stage_dependent <- any(sapply(args_rollout, function(x) !is.null(dim(mod[[paste0(x, '_posterior')]]))))
+    if(all(args_rollout %in% names(mod$posterior))){
+        stage_dependent <- any(sapply(args_rollout, function(x) !is.null(dim(mod$posterior[[x]]))))
         if(stage_dependent){
             baseline_dat <- expand.grid(iter = seq_len((mod$run_info$nr_iter - mod$run_info$burnin) / mod$run_info$thin + 1),
                                         chain = 1:mod$run_info$num_chains,
-                                        h = mod$rating_curve$h, stringsAsFactors = F)
+                                        h = mod$summary$rating_curve$h, stringsAsFactors = F)
             baseline_dat <- baseline_dat[, c('chain', 'iter', 'h')]
         }else{
             baseline_dat <- expand.grid(iter = seq_len((mod$run_info$nr_iter - mod$run_info$burnin) / mod$run_info$thin + 1),
@@ -106,7 +106,7 @@ gather_draws <- function(mod, ..., transformed = F){
         })
         out_dat <- do.call('rbind', out_dat_list)
     }else{
-        not_recognized <- which(!(args %in% c(paste0(names(mod), '_posterior'), 'latent_parameters', 'hyperparameters')))
+        not_recognized <- which(!(args %in% c(names(mod), 'latent_parameters', 'hyperparameters')))
         stop(paste0('Does not recognize the following input arguments in the model object:\n', paste('\t-', args[not_recognized], collapse = '\n')))
     }
     if(f_not_generalized){
@@ -116,12 +116,11 @@ gather_draws <- function(mod, ..., transformed = F){
 }
 ######## help functions
 gather_draws_param <- function(mod, param, transformed, baseline_dat){
-    post_param_name <- paste0(param, '_posterior')
-    MCMC_output <- mod[[post_param_name]]
+    MCMC_output <- mod$posterior[[param]]
     param_name <- param
     if(transformed){
         if(param == 'c'){
-            h_min <- min(mod$data[[all.vars(mod$formula)[2]]])
+            h_min <- min(mod$data[[all.vars(mod$formula)[ncol(mod$data)]]])
             MCMC_output <- get_transformed_param(MCMC_output, param, mod, h_min = h_min)
         }else{
             MCMC_output <- get_transformed_param(MCMC_output, param, mod)
@@ -130,7 +129,7 @@ gather_draws_param <- function(mod, param, transformed, baseline_dat){
     }
     out_dat <- baseline_dat
     if('h' %in% names(baseline_dat)){
-        param_dat <- expand.grid(name = param_name, value = MCMC_output, h = mod$rating_curve$h, stringsAsFactors = F)
+        param_dat <- expand.grid(name = param_name, value = MCMC_output, h = mod$summary$rating_curve$h, stringsAsFactors = F)
         out_dat <- cbind(out_dat,param_dat[, c('name', 'value')])
     }else{
         out_dat$name <- param_name
@@ -140,8 +139,7 @@ gather_draws_param <- function(mod, param, transformed, baseline_dat){
 }
 
 gather_draws_stage_dependent <- function(mod, name, baseline_dat){
-    post_name <- paste0(name, '_posterior')
-    MCMC_output <- mod[[post_name]]
+    MCMC_output <- mod$posterior[[name]]
     out_dat_list <- lapply(1:nrow(MCMC_output),
                            function(i){
                                out_dat <- data.frame(name = name, value = MCMC_output[i, , drop = TRUE])

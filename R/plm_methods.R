@@ -4,7 +4,7 @@ print_fun <- function(x){
 }
 
 summary_fun <- function(x){
-    param_summary <- x$param_summary[, c('lower', 'median', 'upper')]
+    param_summary <- x$summary$parameters[, c('lower', 'median', 'upper')]
     names(param_summary) <- paste0(names(param_summary), c('-2.5%', '-50%', '-97.5%'))
     cat("\nFormula: \n",
         paste(deparse(x$formula), sep = "\n", collapse = "\n"))
@@ -12,7 +12,7 @@ summary_fun <- function(x){
     print(param_summary[1:2, ], row.names = TRUE, digits=3, right = FALSE)
     cat("\nHyperparameters:\n")
     print(param_summary[3:nrow(param_summary), ], row.names = TRUE, digits = 3, right = FALSE)
-    cat("\nWAIC:", x$WAIC)
+    cat("\nWAIC:", x$log_likelihood$WAIC)
 }
 
 #' Custom bdrc theme
@@ -98,7 +98,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
     }else{
         param <- get_args_rollout(param, mod_params)
     }
-    if(type=='trace'){
+    if(type == 'trace'){
         plot_dat <- gather_draws(x, param, transformed = transformed)
         if('h' %in% names(plot_dat)){
             stop('Plots of type "trace" can only be of stage-independent parameters')
@@ -150,12 +150,17 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                   strip.placement = "outside",
                   plot.margin =  ggplot2::margin(t = 10, r = 10, b = -10, l = 0, unit = "pt"))
     }else if(type == 'rating_curve' | type == 'rating_curve_mean'){
+        if(is.null(x$summary$Q_true)){
+            Q_true_df <- data.frame("h" = x$data[ncol(x$data)][[1]], "median" = x$data[1][[1]])
+        }else{
+            Q_true_df <- data.frame("h" = x$summary$Q_true$h, "median" = x$summary$Q_true$median)
+        }
         if(transformed){
             x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
             y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
-            c_hat <- if(is.null(x$run_info$c_param)) median(x$c_posterior) else x$run_info$c_param
-            h_min <- min(x$data[[all.vars(x$formula)[2]]])
-            plot_dat <- merge(x[[type]][x[[type]]$h >= h_min, ], x$data, by.x = 'h', by.y = all.vars(x$formula)[2], all.x = TRUE)
+            c_hat <- if(is.null(x$run_info$c_param)) median(x$posterior$c) else x$run_info$c_param
+            h_min <- min(x$data[[all.vars(x$formula)[ncol(x$data)]]])
+            plot_dat <- merge(x$summary[[type]][x$summary[[type]]$h >= h_min, ], x$data, by.x = 'h', by.y = all.vars(x$formula)[ncol(x$data)], all.x = TRUE)
             plot_dat[, 'log(h-c_hat)'] <- log(plot_dat$h - c_hat)
             plot_dat$log_Q <- log(plot_dat[, all.vars(x$formula)[1]])
 
@@ -166,7 +171,16 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                 geom_path(aes(x = .data$`log(h-c_hat)`, y = .data$log_median), alpha = 0.95) +
                 geom_path(aes(x = .data$`log(h-c_hat)`, y = .data$log_lower), linetype = 'dashed', alpha = 0.95) +
                 geom_path(aes(x = .data$`log(h-c_hat)`, y = .data$log_upper), linetype = 'dashed', alpha = 0.95) +
-                geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ], aes(x = .data$`log(h-c_hat)`, y = .data$log_Q), size = .9, shape = 21, fill = "gray60", color = "black", alpha = 0.95) +
+                geom_segment(data = plot_dat[!is.na(plot_dat$log_Q), ],
+                             aes(x = .data$`log(h-c_hat)`, xend = .data$`log(h-c_hat)`,
+                                 y = .data$log_Q, yend = log(Q_true_df$median)),
+                             linetype = "dashed", color = "gray30", linewidth = .5)+
+                geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ],
+                           aes(x = .data$`log(h-c_hat)`, y = .data$log_Q),
+                           size = 2, color = "steelblue3", alpha = 0.95) +
+                geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ],
+                           aes(x = .data$`log(h-c_hat)`, y = log(Q_true_df$median)),
+                           size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
                 scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = c(0.01, 0)) +
                 scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = c(0.01, 0)) +
                 xlab(parse(text = x_lab)) +
@@ -177,11 +191,19 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         }else{
             x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
             y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-            p <- ggplot(data=x[[type]]) +
+            p <- ggplot(data=x$summary[[type]]) +
                 geom_path(aes(x = .data$median, y = .data$h), alpha = 0.95) +
                 geom_path(aes(x = .data$lower, y = .data$h), linetype = 'dashed', alpha = 0.95) +
                 geom_path(aes(x = .data$upper, y = .data$h), linetype = 'dashed', alpha = 0.95) +
-                geom_point(data = x$data, aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[2]]]), size = .9, shape = 21, fill = "gray60", color = "black", alpha = 0.95) +
+                geom_segment(data = x$data,
+                             aes(x = .data[[all.vars(x$formula)[1]]], xend = Q_true_df$median,y = .data[[all.vars(x$formula)[ncol(x$data)]]], yend = Q_true_df$h),
+                             linetype = "dashed", color = "gray30", linewidth = .5) +
+                geom_point(data = x$data,
+                           aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[ncol(x$data)]]]),
+                           size = 2, color = "steelblue3", alpha = 0.95) +
+                geom_point(data = Q_true_df,
+                           aes(median, h),
+                           size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
                 scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = 0.01)) +
                 #scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(0, max(x$rating_curve$upper, x$data$Q)), expand = c(0.01, 0)) +
                 scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = c(0.01, 0)) +
@@ -193,16 +215,16 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         }
     }else if(type == 'sigma_eps'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[, all.vars(x$formula)[2], drop = TRUE]
-        if('sigma_eps_summary' %in% names(x)){
+        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        if('sigma_eps' %in% names(x$summary)){
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'(','',italic(paste('h')),')','','')"
-            plot_dat <- x$sigma_eps_summary[x$sigma_eps_summary$h >= min(h_in_data) & x$sigma_eps_summary$h <= max(h_in_data), ]
+            plot_dat <- x$summary$sigma_eps[x$summary$sigma_eps$h >= min(h_in_data) & x$summary$sigma_eps$h <= max(h_in_data), ]
         }else{
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'')"
-            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[2], drop = TRUE],
-                                   lower = x$param_summary['sigma_eps', 'lower'],
-                                   median = x$param_summary['sigma_eps', 'median'],
-                                   upper = x$param_summary['sigma_eps', 'upper'])
+            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE],
+                                   lower = x$summary$parameters['sigma_eps', 'lower'],
+                                   median = x$summary$parameters['sigma_eps', 'median'],
+                                   upper = x$summary$parameters['sigma_eps', 'upper'])
         }
         p <- ggplot(data = plot_dat) +
             geom_path(aes(x = .data$h, y = .data$median)) +
@@ -216,35 +238,35 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
             theme_bdrc() +
             theme(plot.title = element_text(vjust = 2))
     }else if(type == 'beta'){
-        if(!('beta_summary' %in% names(x))){
+        if(!('beta' %in% names(x$summary))){
             stop('Plots of type "beta" are only for models with stage dependent power law exponent, s.a. "gplm0" and "gplm"')
         }
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         y_lab <- "paste('','',beta,,,,'(','',italic(paste('h')),')','','')"
-        h_in_data <- x$data[, all.vars(x$formula)[2], drop = TRUE]
-        p <- ggplot(data = x$beta_summary[x$beta_summary$h >= min(h_in_data) & x$beta_summary$h <= max(h_in_data), ]) +
+        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        p <- ggplot(data = x$summary$beta[x$summary$beta$h >= min(h_in_data) & x$summary$beta$h <= max(h_in_data), ]) +
             geom_path(aes( .data$h, .data$median)) +
             geom_path(aes( .data$h, .data$lower), linetype = 'dashed') +
             geom_path(aes( .data$h, .data$upper), linetype = 'dashed') +
-            xlab(parse(text = x_lab)) +
-            ylab(parse(text = y_lab)) +
-            scale_x_continuous(if(!is.null(xlim)) xlim else c(NA, NA), expand = c(0, 0)) +
-            scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = rep(.05, 2))) +
+            scale_x_continuous(if(!is.null(xlim)) xlim else c(NA, NA), expand = c(0, 0),
+                               name = parse(text = x_lab)) +
+            scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = rep(.05, 2)),
+                               name = parse(text = y_lab)) +
             ggtitle(if(!is.null(title)) title else "Power-law exponent deviations") +
             theme_bdrc() +
             theme(plot.title = element_text(vjust = 2))
-    }else if(type=='f'){
+    }else if(type == 'f'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[, all.vars(x$formula)[2], drop = TRUE]
-        if('f_summary' %in% names(x)){
+        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        if('f' %in% names(x$summary)){
             y_lab <- "paste('','',italic(paste('b+',beta,,,,'(','h',')','')),'')"
-            plot_dat <- x$f_summary[x$f_summary$h >= min(h_in_data) & x$f_summary$h <= max(h_in_data), ]
+            plot_dat <- x$summary$f[x$summary$f$h >= min(h_in_data) & x$summary$f$h <= max(h_in_data), ]
         }else{
             y_lab <- "paste('','',italic(paste('b')),'')"
-            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[2], drop = TRUE],
-                                   lower = x$param_summary['b', 'lower'],
-                                   median = x$param_summary['b', 'median'],
-                                   upper = x$param_summary['b', 'upper'])
+            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE],
+                                   lower =  x$summary$parameters['b', 'lower'],
+                                   median = x$summary$parameters['b', 'median'],
+                                   upper =  x$summary$parameters['b', 'upper'])
         }
         p <- ggplot(data = plot_dat) +
             geom_path(aes(.data$h, .data$median)) +
@@ -265,8 +287,13 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         span <- 0.3
         p <- ggplot(data = resid_dat) +
             geom_hline(yintercept = 0, linewidth = 0.8, alpha = .95) +
-            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_median), size = .9, shape = 21, fill = "gray60", color = "black", alpha = 0.95) +
+            geom_segment(data = resid_dat[!is.na(resid_dat$Q), ],
+                         aes(x = .data$`log(h-c_hat)`, xend = .data$`log(h-c_hat)`, y = .data$r_median, yend = .data$r_true_median),
+                         linetype = "dashed", color = "gray40", linewidth = .5) +
+            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_median), size = 2, color = "steelblue3", alpha = 0.95) +
+            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_true_median), size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
             geom_blank(aes(y = -.data$r_median)) +
+            geom_blank(aes(y = -.data$r_true_median)) +
             geom_blank(aes(y = -.data$r_upper)) +
             geom_blank(aes(y = -.data$r_lower)) +
             geom_blank(aes(y = -.data$m_upper)) +
@@ -289,36 +316,36 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         param_expr <- parse(text = get_param_expression(param))
         y_lab <- "paste('','',italic(paste('',hat(paste('R')))),'')"
         p <- ggplot(data = rhat_dat, aes(x = .data$iterations, y = .data$Rhat, color = .data$parameters)) +
-             geom_hline(yintercept = 1.1, linetype = 'dashed') +
-             geom_line(na.rm = TRUE) +
-             scale_x_continuous(limits = c(4 * x$run_info$thin + x$run_info$burnin, x$run_info$nr_iter), breaks = c(5000, 10000, 15000), expand = c(0, 0)) +
-             scale_y_continuous(limits = c(1, 2), breaks = c(1, 1.1, 1.2, 1.4, 1.6, 1.8, 2), expand = c(0, 0)) +
-             scale_color_manual(values = color_palette, name = class(x), labels = param_expr) +
-             xlab('Iteration') +
-             ylab(parse(text = y_lab)) +
-             ggtitle(if(!is.null(title)) title else "Gelman-Rubin statistic") +
-             theme_bdrc() +
-             theme(plot.title = element_text(vjust = 2),
-                   axis.title.y = element_text(vjust = 3),
-                   plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
-    }else if(type=='autocorrelation'){
-        auto_dat <- do.call('rbind', lapply(param, function(p) data.frame(lag = x$autocorrelation$lag, param = p, corr = x$autocorrelation[, p])))
+         geom_hline(yintercept = 1.1, linetype = 'dashed') +
+         geom_line(na.rm = TRUE) +
+         scale_x_continuous(limits = c(4 * x$run_info$thin + x$run_info$burnin, x$run_info$nr_iter), breaks = c(5000, 10000, 15000), expand = c(0, 0)) +
+         scale_y_continuous(limits = c(1, 2), breaks = c(1, 1.1, 1.2, 1.4, 1.6, 1.8, 2), expand = c(0, 0)) +
+         scale_color_manual(values = color_palette, name = class(x), labels = param_expr) +
+         xlab('Iteration') +
+         ylab(parse(text = y_lab)) +
+         ggtitle(if(!is.null(title)) title else "Gelman-Rubin statistic") +
+         theme_bdrc() +
+         theme(plot.title = element_text(vjust = 2),
+               axis.title.y = element_text(vjust = 3),
+               plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
+    }else if(type == 'autocorrelation'){
+        auto_dat <- do.call('rbind', lapply(param, function(p) data.frame(lag = x$diagnostics$autocorrelation$lag, param = p, corr = x$diagnostics$autocorrelation[, p])))
         param_expr <- parse(text = get_param_expression(param))
-        max_lag <- dim(x$autocorrelation)[1]
+        max_lag <- dim(x$diagnostics$autocorrelation)[1]
         p <- ggplot(data = auto_dat, aes(x = .data$lag, y = .data$corr, color = .data$param)) +
-             geom_hline(yintercept = 0) +
-             geom_line() +
-             geom_point(size = 1) +
-             scale_x_continuous(limits = c(1, max_lag), labels = c(1, seq(5, max_lag, 5)), breaks = c(1, seq(5, max_lag, 5)), expand = c(0, 1)) +
-             scale_y_continuous(limits = c(min(auto_dat$corr, -1 / 11), 1), expand = c(0, 0)) +
-             scale_color_manual(values = color_palette, name = class(x), labels = param_expr) +
-             xlab('Lag') +
-             ylab('Sample autocorrelation') +
-             ggtitle(if(!is.null(title)) title else "Autocorrelation in posterior draws") +
-             theme_bdrc() +
-             theme(plot.title = element_text(vjust = 2),
-                   axis.title.y = element_text(vjust = 3),
-                   plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
+         geom_hline(yintercept = 0) +
+         geom_line() +
+         geom_point(size = 1) +
+         scale_x_continuous(limits = c(1, max_lag), labels = c(1, seq(5, max_lag, 5)), breaks = c(1, seq(5, max_lag, 5)), expand = c(0, 1)) +
+         scale_y_continuous(limits = c(min(auto_dat$corr, -1 / 11), 1), expand = c(0, 0)) +
+         scale_color_manual(values = color_palette, name = class(x), labels = param_expr) +
+         xlab('Lag') +
+         ylab('Sample autocorrelation') +
+         ggtitle(if(!is.null(title)) title else "Autocorrelation in posterior draws") +
+         theme_bdrc() +
+         theme(plot.title = element_text(vjust = 2),
+               axis.title.y = element_text(vjust = 3),
+               plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
     }
     return(p)
 }
@@ -367,11 +394,11 @@ predict_fun <- function(object, newdata = NULL, wide = FALSE){
         if(!is.null(newdata)){
             stop('newdata must be NULL when wide is TRUE.')
         }else{
-            newdata <- seq(ceiling(min(object$rating_curve$h) * 100) / 100, floor(max(object$rating_curve$h) * 100) / 100, by = 0.01)
+            newdata <- seq(ceiling(min(object$summary$rating_curve$h) * 100) / 100, floor(max(object$summary$rating_curve$h) * 100) / 100, by = 0.01)
         }
     }else{
         if(is.null(newdata)){
-            newdata <- object$rating_curve$h
+            newdata <- object$summary$rating_curve$h
         }
     }
     if(!inherits(newdata,'numeric')){
@@ -380,12 +407,12 @@ predict_fun <- function(object, newdata = NULL, wide = FALSE){
     if(any(is.na(newdata))){
         stop('newdata must not include NA')
     }
-    if(any(newdata>max(object$rating_curve$h))){
+    if(any(newdata>max(object$summary$rating_curve$h))){
         stop('newdata must contain values within the range of stage values used to fit the rating curve. See "h_max" option to extrapolate the rating curve to higher stages')
     }
-    lower_pred <- approx(object$rating_curve$h, object$rating_curve$lower, xout = newdata)$y
-    median_pred <- approx(object$rating_curve$h, object$rating_curve$median, xout = newdata)$y
-    upper_pred <- approx(object$rating_curve$h, object$rating_curve$upper, xout = newdata)$y
+    lower_pred <- approx(object$summary$rating_curve$h, object$summary$rating_curve$lower, xout = newdata)$y
+    median_pred <- approx(object$summary$rating_curve$h, object$summary$rating_curve$median, xout = newdata)$y
+    upper_pred <- approx(object$summary$rating_curve$h, object$summary$rating_curve$upper, xout = newdata)$y
     pred_dat <- data.frame(h = newdata, lower = lower_pred, median = median_pred, upper = upper_pred)
     pred_dat[is.na(pred_dat)] <- 0
     if(wide){

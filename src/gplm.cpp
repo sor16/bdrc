@@ -12,26 +12,26 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
-                                                 const arma::mat& P,
-                                                 const arma::vec& h,
-                                                 const arma::mat& B,
-                                                 const arma::mat& dist,
-                                                 const arma::mat& A,
-                                                 const arma::vec& y,
-                                                 const arma::vec& tau,
-                                                 const arma::vec& epsilon,
-                                                 double h_min,
-                                                 double nugget,
-                                                 int n_unique,
-                                                 const arma::vec& mu_x,
-                                                 const arma::mat& Sig_ab,
-                                                 const arma::mat& Z,
-                                                 double lambda_c,
-                                                 double lambda_sb,
-                                                 double lambda_pb,
-                                                 double lambda_eta_1,
-                                                 double lambda_seta) {
+Rcpp::List gplm_me_density_evaluation_unknown_c_cpp(const arma::vec& theta,
+                                                    const arma::mat& P,
+                                                    const arma::vec& h,
+                                                    const arma::mat& B,
+                                                    const arma::mat& dist,
+                                                    const arma::mat& A,
+                                                    const arma::vec& y,
+                                                    const arma::vec& tau,
+                                                    const arma::vec& epsilon,
+                                                    double h_min,
+                                                    double nugget,
+                                                    int n_unique,
+                                                    const arma::vec& mu_x,
+                                                    const arma::mat& Sig_ab,
+                                                    const arma::mat& Z,
+                                                    double lambda_c,
+                                                    double lambda_sb,
+                                                    double lambda_pb,
+                                                    double lambda_eta_1,
+                                                    double lambda_seta) {
     double zeta = theta(0);
     double log_sig_b = theta(1);
     double log_phi_b = theta(2);
@@ -135,25 +135,123 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
 }
 
 // [[Rcpp::export]]
-Rcpp::List gplm_density_evaluation_known_c_cpp(const arma::vec& theta,
-                                               const arma::mat& P,
-                                               const arma::vec& h,
-                                               const arma::mat& B,
-                                               const arma::mat& dist,
-                                               const arma::mat& A,
-                                               const arma::vec& y,
-                                               const arma::vec& tau,
-                                               const arma::vec& epsilon,
-                                               double nugget,
-                                               int n_unique,
-                                               const arma::vec& mu_x,
-                                               const arma::mat& Sig_ab,
-                                               const arma::mat& Z,
-                                               double lambda_sb,
-                                               double lambda_pb,
-                                               double lambda_eta_1,
-                                               double lambda_seta,
-                                               double c) {
+Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
+                                                 const arma::mat& P,
+                                                 const arma::vec& h,
+                                                 const arma::mat& B,
+                                                 const arma::mat& dist,
+                                                 const arma::mat& A,
+                                                 const arma::vec& y,
+                                                 const arma::vec& epsilon,
+                                                 double h_min,
+                                                 double nugget,
+                                                 int n_unique,
+                                                 const arma::vec& mu_x,
+                                                 const arma::mat& Sig_ab,
+                                                 const arma::mat& Z,
+                                                 double lambda_c,
+                                                 double lambda_sb,
+                                                 double lambda_pb,
+                                                 double lambda_eta_1,
+                                                 double lambda_seta) {
+    double zeta = theta(0);
+    double log_sig_b = theta(1);
+    double log_phi_b = theta(2);
+    double log_sig_eta = theta(3);
+    double eta_1 = theta(4);
+    arma::vec z = theta.subvec(5, 9);
+    int n = h.n_elem;
+
+    arma::vec eta = P * arma::join_vert(arma::vec({eta_1}), std::exp(log_sig_eta) * z);
+    arma::vec l = arma::log(h - h_min + std::exp(zeta));
+    arma::vec log_varr = B * eta;
+    arma::vec varr = epsilon % arma::exp(log_varr);
+    if (arma::any(varr > 100)) {
+        return Rcpp::List::create(Rcpp::Named("p") = -1e9);
+    }
+
+    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({0.0})));
+
+    // Matern covariance
+    arma::mat R_Beta = (1.0 + std::sqrt(5.0) * dist / std::exp(log_phi_b) +
+        5.0 * arma::square(dist) / (3.0 * std::pow(std::exp(log_phi_b), 2))) %
+        arma::exp(-std::sqrt(5.0) * dist / std::exp(log_phi_b));
+    R_Beta.diag() += nugget;
+
+    arma::mat Sig_x = arma::join_cols(
+        arma::join_rows(Sig_ab, arma::zeros(2, n_unique)),
+        arma::join_rows(arma::zeros(n_unique, 2), std::exp(2 * log_sig_b) * R_Beta)
+    );
+
+    arma::mat X = arma::join_cols(
+        arma::join_rows(arma::ones(n, 1), l, arma::diagmat(l) * A),
+        Z
+    );
+
+    // Compute L using Cholesky decomposition
+    arma::mat M = X * Sig_x * X.t() + Sig_eps;
+    M.diag() += nugget;
+    arma::mat L = arma::chol(M, "lower");
+    arma::vec w = arma::solve(L, y - X * mu_x, arma::solve_opts::fast);
+
+    double p = -0.5 * arma::dot(w, w) - arma::sum(arma::log(L.diag())) +
+        pri("c", arma::vec({zeta, lambda_c})) +
+        pri("sigma_b", arma::vec({log_sig_b, lambda_sb})) +
+        pri("phi_b", arma::vec({log_phi_b, lambda_pb})) +
+        pri("eta_1", arma::vec({eta_1, lambda_eta_1})) +
+        pri("eta_minus1", z) +
+        pri("sigma_eta", arma::vec({log_sig_eta, lambda_seta}));
+
+    // Compute posterior samples
+    arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
+    arma::mat chol_Sig_x = arma::chol(Sig_x);
+    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(n_unique + 2);
+    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({0.0}));
+    arma::mat Wt_L_inv = W.t() * arma::inv(L);
+    arma::mat x = x_u - Wt_L_inv * sss;
+    arma::vec mu_post = arma::vec(X * x).subvec(0, n-1);
+    arma::vec y_true_post_pred = mu_post + arma::randn(n) % arma::sqrt(varr);
+
+    // Replace NaN with -inf in mu_post and y_true_post_pred
+    mu_post.elem(arma::find_nonfinite(mu_post)).fill(-arma::datum::inf);
+    y_true_post_pred.elem(arma::find_nonfinite(y_true_post_pred)).fill(-arma::datum::inf);
+
+    // Compute log_lik
+    double log_lik = 0.0;
+    for(size_t i = 0; i < n; ++i) {
+        log_lik += log_of_normal_pdf(y(i), mu_post(i), std::sqrt(varr(i)));
+    }
+
+    return Rcpp::List::create(
+        Rcpp::Named("p") = p,
+        Rcpp::Named("x") = x,
+        Rcpp::Named("mu_post") = mu_post,
+        Rcpp::Named("y_true_post_pred") = y_true_post_pred,
+        Rcpp::Named("sigma_eps") = varr,
+        Rcpp::Named("log_lik") = log_lik
+    );
+}
+
+// [[Rcpp::export]]
+Rcpp::List gplm_me_density_evaluation_known_c_cpp(const arma::vec& theta,
+                                                  const arma::mat& P,
+                                                  const arma::vec& h,
+                                                  const arma::mat& B,
+                                                  const arma::mat& dist,
+                                                  const arma::mat& A,
+                                                  const arma::vec& y,
+                                                  const arma::vec& tau,
+                                                  const arma::vec& epsilon,
+                                                  double nugget,
+                                                  int n_unique,
+                                                  const arma::vec& mu_x,
+                                                  const arma::mat& Sig_ab,
+                                                  const arma::mat& Z,
+                                                  double lambda_sb,
+                                                  double lambda_pb,
+                                                  double lambda_eta_1,
+                                                  double lambda_seta,
+                                                  double c) {
     double log_sig_b = theta(0);
     double log_phi_b = theta(1);
     double log_sig_eta = theta(2);
@@ -249,6 +347,90 @@ Rcpp::List gplm_density_evaluation_known_c_cpp(const arma::vec& theta,
         Rcpp::Named("x") = x_subset,
         Rcpp::Named("mu_post") = mu,
         Rcpp::Named("y_true") = y_true,
+        Rcpp::Named("y_true_post_pred") = y_true_post_pred,
+        Rcpp::Named("sigma_eps") = varr,
+        Rcpp::Named("log_lik") = log_lik
+    );
+}
+
+// [[Rcpp::export]]
+Rcpp::List gplm_density_evaluation_known_c_cpp(const arma::vec& theta,
+                                               const arma::mat& P,
+                                               const arma::vec& h,
+                                               const arma::mat& B,
+                                               const arma::mat& dist,
+                                               const arma::mat& A,
+                                               const arma::vec& y,
+                                               const arma::vec& epsilon,
+                                               double nugget,
+                                               int n_unique,
+                                               const arma::vec& mu_x,
+                                               const arma::mat& Sig_ab,
+                                               const arma::mat& Z,
+                                               double lambda_sb,
+                                               double lambda_pb,
+                                               double lambda_eta_1,
+                                               double lambda_seta,
+                                               double c) {
+    double log_sig_b = theta(0);
+    double log_phi_b = theta(1);
+    double log_sig_eta = theta(2);
+    double eta_1 = theta(3);
+    arma::vec z = theta.subvec(4, 8);
+    int n = h.n_elem;
+    arma::vec eta = P * arma::join_vert(arma::vec({eta_1}), std::exp(log_sig_eta) * z);
+    arma::vec l = arma::log(h - c);
+    arma::vec log_varr = B * eta;
+    arma::vec varr = epsilon % arma::exp(log_varr);
+    if (arma::any(varr > 100)) {
+        return Rcpp::List::create(Rcpp::Named("p") = -1e9);
+    }
+    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({0.0})));
+    // Matern covariance
+    arma::mat R_Beta = (1.0 + std::sqrt(5.0) * dist / std::exp(log_phi_b) +
+        5.0 * arma::square(dist) / (3.0 * std::pow(std::exp(log_phi_b), 2))) %
+        arma::exp(-std::sqrt(5.0) * dist / std::exp(log_phi_b));
+    R_Beta.diag() += nugget;
+    arma::mat Sig_x = arma::join_cols(
+        arma::join_rows(Sig_ab, arma::zeros(2, n_unique)),
+        arma::join_rows(arma::zeros(n_unique, 2), std::exp(2 * log_sig_b) * R_Beta)
+    );
+    arma::mat X = arma::join_cols(
+        arma::join_rows(arma::ones(n, 1), l, arma::diagmat(l) * A),
+        Z
+    );
+    // Compute L using Cholesky decomposition
+    arma::mat M = X * Sig_x * X.t() + Sig_eps;
+    M.diag() += nugget;
+    arma::mat L = arma::chol(M, "lower");
+    arma::vec w = arma::solve(L, y - X * mu_x, arma::solve_opts::fast);
+    double p = -0.5 * arma::dot(w, w) - arma::sum(arma::log(L.diag())) +
+        pri("sigma_b", arma::vec({log_sig_b, lambda_sb})) +
+        pri("phi_b", arma::vec({log_phi_b, lambda_pb})) +
+        pri("eta_1", arma::vec({eta_1, lambda_eta_1})) +
+        pri("eta_minus1", z) +
+        pri("sigma_eta", arma::vec({log_sig_eta, lambda_seta}));
+    // Compute posterior samples
+    arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
+    arma::mat chol_Sig_x = arma::chol(Sig_x);
+    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(n_unique + 2);
+    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({0.0}));
+    arma::mat Wt_L_inv = W.t() * arma::inv(L);
+    arma::vec x = x_u - Wt_L_inv * sss;
+    arma::vec mu_post = arma::vec(X * x).subvec(0, n-1);
+    arma::vec y_true_post_pred = mu_post + arma::randn(n) % arma::sqrt(varr);
+    // Replace NaN with -inf in mu_post and y_true_post_pred
+    mu_post.elem(arma::find_nonfinite(mu_post)).fill(-arma::datum::inf);
+    y_true_post_pred.elem(arma::find_nonfinite(y_true_post_pred)).fill(-arma::datum::inf);
+    // Compute log_lik
+    double log_lik = 0.0;
+    for(size_t i = 0; i < n; ++i) {
+        log_lik += log_of_normal_pdf(y(i), mu_post(i), std::sqrt(varr(i)));
+    }
+    return Rcpp::List::create(
+        Rcpp::Named("p") = p,
+        Rcpp::Named("x") = x,
+        Rcpp::Named("mu_post") = mu_post,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred,
         Rcpp::Named("sigma_eps") = varr,
         Rcpp::Named("log_lik") = log_lik
