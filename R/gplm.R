@@ -137,7 +137,7 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     h_unique <- unique(MCMC_output_list$h)
     h_unique_order <- order(h_unique)
     h_unique_sorted <- h_unique[h_unique_order]
-    h_idx_data <- match(h,h_unique_sorted)
+    h_idx_data <- match(h, h_unique_sorted)
     result_obj$posterior$theta <- MCMC_output_list$theta
     result_obj$posterior$rating_curve <- exp(MCMC_output_list$y_true_post_pred[unique_h_idx, ][h_unique_order, ])
     result_obj$posterior$rating_curve_mean <- exp(MCMC_output_list$mu_post[unique_h_idx, ][h_unique_order, ])
@@ -360,10 +360,12 @@ gplm.calc_Dhat <- function(theta, RC){
     log_sig_eta <- theta_median[4]
     eta_1 <- theta_median[5]
     z <- theta_median[6:10]
+
     eta <- c(RC$P %*% as.matrix(c(eta_1, exp(log_sig_eta) * z)))
     l <- c(log(RC$h - RC$h_min + exp(zeta)))
     varr <- c(RC$epsilon * exp(RC$B %*% eta))
     if(any(varr > 10^2)) return(list(p = -1e9)) # to avoid numerical instability
+
     # repeated calculations
     phi_b <- exp(log_phi_b)
     var_b <- exp(2 * log_sig_b)

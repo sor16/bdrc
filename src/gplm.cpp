@@ -89,11 +89,9 @@ Rcpp::List gplm_me_density_evaluation_unknown_c_cpp(const arma::vec& theta,
 
     // Compute posterior samples
     arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
-    arma::mat chol_Sig_x = arma::chol(Sig_x);
-    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(mu_x.n_elem);
+    arma::vec x_u = mu_x + arma::chol(Sig_x).t() * arma::randn(mu_x.n_elem);
     arma::vec sss = X * x_u - y + arma::join_vert(tau % arma::randn(n), arma::vec({0.0}));
-    arma::mat Wt_L_inv = W.t() * arma::inv(L);
-    arma::vec x = x_u - Wt_L_inv * sss;
+    arma::vec x = x_u - W.t() * arma::solve(L, sss, arma::solve_opts::fast);
 
     // Extract subset of x (excluding delta values)
     arma::vec x_subset = x.subvec(0, 1 + n_unique);
@@ -103,30 +101,30 @@ Rcpp::List gplm_me_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     arma::vec u1 = x.subvec(2, 1 + n_unique);  // beta(h)
     arma::vec u2 = x.subvec(2 + n_unique, x.n_elem - 1);  // delta
 
-    // Compute mu
-    arma::vec mu = beta(0) + (beta(1) + A * u1) % l;
+    // Compute mu_post
+    arma::vec mu_post = beta(0) + (beta(1) + A * u1) % l;
 
     // Compute y_true (which includes model error)
-    arma::vec y_true = mu + u2;
+    arma::vec y_true = mu_post + u2;
 
     // Compute y_true_post_pred (which includes only model error, not measurement error)
-    arma::vec y_true_post_pred = mu + arma::randn(n) % arma::sqrt(varr); // Write  ( mu + arma::randn(n) % arma::sqrt(varr + arma::square(tau)); ) to compute y_post_pred;
+    arma::vec y_true_post_pred = mu_post + arma::randn(n) % arma::sqrt(varr); // Write  ( mu_post + arma::randn(n) % arma::sqrt(varr + arma::square(tau)); ) to compute y_post_pred;
 
-    // Replace NaN with -inf in mu, y_true and y_true_post_pred
-    mu.elem(arma::find_nonfinite(mu)).fill(-arma::datum::inf);
+    // Replace NaN with -inf in mu_post, y_true and y_true_post_pred
+    mu_post.elem(arma::find_nonfinite(mu_post)).fill(-arma::datum::inf);
     y_true.elem(arma::find_nonfinite(y_true)).fill(-arma::datum::inf);
     y_true_post_pred.elem(arma::find_nonfinite(y_true_post_pred)).fill(-arma::datum::inf);
 
     // Compute log_lik
     double log_lik = 0.0;
     for(size_t i = 0; i < n; ++i) {
-        log_lik += log_of_normal_pdf(y(i), mu(i), std::sqrt(varr(i) + std::pow(tau(i), 2)));
+        log_lik += log_of_normal_pdf(y(i), mu_post(i), std::sqrt(varr(i) + std::pow(tau(i), 2)));
     }
 
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
         Rcpp::Named("x") = x_subset,
-        Rcpp::Named("mu_post") = mu,
+        Rcpp::Named("mu_post") = mu_post,
         Rcpp::Named("y_true") = y_true,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred,
         Rcpp::Named("sigma_eps") = varr,
@@ -307,11 +305,9 @@ Rcpp::List gplm_me_density_evaluation_known_c_cpp(const arma::vec& theta,
 
     // Compute posterior samples
     arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
-    arma::mat chol_Sig_x = arma::chol(Sig_x);
-    arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(mu_x.n_elem);
+    arma::vec x_u = mu_x + arma::chol(Sig_x).t() * arma::randn(mu_x.n_elem);
     arma::vec sss = X * x_u - y + arma::join_vert(tau % arma::randn(n), arma::vec({0.0}));
-    arma::mat Wt_L_inv = W.t() * arma::inv(L);
-    arma::vec x = x_u - Wt_L_inv * sss;
+    arma::vec x = x_u - W.t() * arma::solve(L, sss, arma::solve_opts::fast);
 
     // Extract subset of x (excluding delta values)
     arma::vec x_subset = x.subvec(0, 1 + n_unique);
@@ -321,31 +317,31 @@ Rcpp::List gplm_me_density_evaluation_known_c_cpp(const arma::vec& theta,
     arma::vec u1 = x.subvec(2, 1 + n_unique);  // beta(h)
     arma::vec u2 = x.subvec(2 + n_unique, x.n_elem - 1);  // delta
 
-    // Compute mu
-    arma::vec mu = beta(0) + (beta(1) + A * u1) % l;
+    // Compute mu_post
+    arma::vec mu_post = beta(0) + (beta(1) + A * u1) % l;
 
     // Compute y_true (which includes model error)
-    arma::vec y_true = mu + u2;
+    arma::vec y_true = mu_post + u2;
 
     // Compute y_true_post_pred (which includes only model error, not measurement error)
-    arma::vec y_true_post_pred = mu + arma::randn(n) % arma::sqrt(varr);
+    arma::vec y_true_post_pred = mu_post + arma::randn(n) % arma::sqrt(varr);
 
-    // Replace NaN with -inf in mu, y_true and y_true_post_pred
-    mu.elem(arma::find_nonfinite(mu)).fill(-arma::datum::inf);
+    // Replace NaN with -inf in mu_post, y_true and y_true_post_pred
+    mu_post.elem(arma::find_nonfinite(mu_post)).fill(-arma::datum::inf);
     y_true.elem(arma::find_nonfinite(y_true)).fill(-arma::datum::inf);
     y_true_post_pred.elem(arma::find_nonfinite(y_true_post_pred)).fill(-arma::datum::inf);
 
     // Compute log_lik including both model and measurement error
     double log_lik = 0.0;
     for(size_t i = 0; i < n; ++i) {
-        log_lik += log_of_normal_pdf(y(i), mu(i), std::sqrt(varr(i) + std::pow(tau(i), 2)));
+        log_lik += log_of_normal_pdf(y(i), mu_post(i), std::sqrt(varr(i) + std::pow(tau(i), 2)));
     }
 
     // Return updated list with new components
     return Rcpp::List::create(
         Rcpp::Named("p") = p,
         Rcpp::Named("x") = x_subset,
-        Rcpp::Named("mu_post") = mu,
+        Rcpp::Named("mu_post") = mu_post,
         Rcpp::Named("y_true") = y_true,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred,
         Rcpp::Named("sigma_eps") = varr,
@@ -453,7 +449,7 @@ Rcpp::List gplm_predict_u_unknown_c_cpp(const arma::vec& theta,
     int m = n_u;
 
     arma::vec beta_u(m);
-    arma::vec mu_u(m, arma::fill::value(-arma::datum::inf));
+    arma::vec mu_post_u(m, arma::fill::value(-arma::datum::inf));
     arma::vec y_true_post_pred_u(m, arma::fill::value(-arma::datum::inf));
     arma::vec varr_u(m);
 
@@ -495,21 +491,21 @@ Rcpp::List gplm_predict_u_unknown_c_cpp(const arma::vec& theta,
         for (int j = 0; j < m_above_c; ++j) {
             x_u(j+2) = beta_u(above_c(j));
         }
-        arma::vec mu_u_temp = X * x_u;
+        arma::vec mu_post_u_temp = X * x_u;
         for (int j = 0; j < m_above_c; ++j) {
-            mu_u(above_c(j)) = mu_u_temp(j);
-            y_true_post_pred_u(above_c(j)) = mu_u_temp(j) + arma::randn() * std::sqrt(varr_u(above_c(j)));
+            mu_post_u(above_c(j)) = mu_post_u_temp(j);
+            y_true_post_pred_u(above_c(j)) = mu_post_u_temp(j) + arma::randn() * std::sqrt(varr_u(above_c(j)));
         }
     }
 
-    // Replace NaN with -inf in mu_u and y_true_post_pred_u
-    mu_u.elem(arma::find_nonfinite(mu_u)).fill(-arma::datum::inf);
+    // Replace NaN with -inf in mu_post_u and y_true_post_pred_u
+    mu_post_u.elem(arma::find_nonfinite(mu_post_u)).fill(-arma::datum::inf);
     y_true_post_pred_u.elem(arma::find_nonfinite(y_true_post_pred_u)).fill(-arma::datum::inf);
 
     return Rcpp::List::create(
         Rcpp::Named("x") = arma::trans(beta_u),
         Rcpp::Named("sigma_eps") = varr_u,
-        Rcpp::Named("mu_post") = mu_u,
+        Rcpp::Named("mu_post") = mu_post_u,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred_u
     );
 }
@@ -530,7 +526,7 @@ Rcpp::List gplm_predict_u_known_c_cpp(const arma::vec& theta,
     int m = n_u;
 
     arma::vec beta_u(m);
-    arma::vec mu_u(m, arma::fill::value(-arma::datum::inf));  // ADDED
+    arma::vec mu_post_u(m, arma::fill::value(-arma::datum::inf));  // ADDED
     arma::vec y_true_post_pred_u(m, arma::fill::value(-arma::datum::inf));  // ADDED
     arma::vec varr_u(m);
 
@@ -569,17 +565,17 @@ Rcpp::List gplm_predict_u_known_c_cpp(const arma::vec& theta,
     x_u(0) = x(0);
     x_u(1) = x(1);
     x_u.subvec(2, m+1) = beta_u;
-    mu_u = X * x_u;
-    y_true_post_pred_u = mu_u + arma::randn(m) % arma::sqrt(varr_u);
+    mu_post_u = X * x_u;
+    y_true_post_pred_u = mu_post_u + arma::randn(m) % arma::sqrt(varr_u);
 
-    // Replace NaN with -inf in mu_u and y_true_post_pred_u
-    mu_u.elem(arma::find_nonfinite(mu_u)).fill(-arma::datum::inf);
+    // Replace NaN with -inf in mu_post_u and y_true_post_pred_u
+    mu_post_u.elem(arma::find_nonfinite(mu_post_u)).fill(-arma::datum::inf);
     y_true_post_pred_u.elem(arma::find_nonfinite(y_true_post_pred_u)).fill(-arma::datum::inf);
 
     return Rcpp::List::create(
         Rcpp::Named("x") = arma::trans(beta_u),
         Rcpp::Named("sigma_eps") = varr_u,
-        Rcpp::Named("mu_post") = mu_u,
+        Rcpp::Named("mu_post") = mu_post_u,
         Rcpp::Named("y_true_post_pred") = y_true_post_pred_u
     );
 }

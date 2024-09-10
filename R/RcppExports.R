@@ -25,8 +25,16 @@ gplm_predict_u_known_c_cpp <- function(theta, x, P, B_u, h_unique, h_u, dist_all
     .Call(`_bdrc_gplm_predict_u_known_c_cpp`, theta, x, P, B_u, h_unique, h_u, dist_all, c, nugget, n_unique, n_u)
 }
 
+gplm0_me_density_evaluation_unknown_c_cpp <- function(theta, h, y, A, dist, epsilon, tau, h_min, nugget, n_unique, mu_x, Sig_ab, Z, lambda_c, lambda_se, lambda_sb, lambda_pb) {
+    .Call(`_bdrc_gplm0_me_density_evaluation_unknown_c_cpp`, theta, h, y, A, dist, epsilon, tau, h_min, nugget, n_unique, mu_x, Sig_ab, Z, lambda_c, lambda_se, lambda_sb, lambda_pb)
+}
+
 gplm0_density_evaluation_unknown_c_cpp <- function(theta, h, y, A, dist, epsilon, h_min, nugget, n_unique, mu_x, Sig_ab, Z, lambda_c, lambda_se, lambda_sb, lambda_pb) {
     .Call(`_bdrc_gplm0_density_evaluation_unknown_c_cpp`, theta, h, y, A, dist, epsilon, h_min, nugget, n_unique, mu_x, Sig_ab, Z, lambda_c, lambda_se, lambda_sb, lambda_pb)
+}
+
+gplm0_me_density_evaluation_known_c_cpp <- function(theta, h, y, A, dist, epsilon, tau, c, nugget, n_unique, mu_x, Sig_ab, Z, lambda_se, lambda_sb, lambda_pb) {
+    .Call(`_bdrc_gplm0_me_density_evaluation_known_c_cpp`, theta, h, y, A, dist, epsilon, tau, c, nugget, n_unique, mu_x, Sig_ab, Z, lambda_se, lambda_sb, lambda_pb)
 }
 
 gplm0_density_evaluation_known_c_cpp <- function(theta, h, y, A, dist, epsilon, c, nugget, n_unique, mu_x, Sig_ab, Z, lambda_se, lambda_sb, lambda_pb) {
