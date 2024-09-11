@@ -125,8 +125,16 @@ plm_predict_u_known_c_cpp <- function(theta, x, P, B_u, h_u, c) {
     .Call(`_bdrc_plm_predict_u_known_c_cpp`, theta, x, P, B_u, h_u, c)
 }
 
+plm0_me_density_evaluation_unknown_c_cpp <- function(theta, h, y, tau, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_se) {
+    .Call(`_bdrc_plm0_me_density_evaluation_unknown_c_cpp`, theta, h, y, tau, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_se)
+}
+
 plm0_density_evaluation_unknown_c_cpp <- function(theta, h, y, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_se) {
     .Call(`_bdrc_plm0_density_evaluation_unknown_c_cpp`, theta, h, y, epsilon, Sig_ab, mu_x, h_min, nugget, lambda_c, lambda_se)
+}
+
+plm0_me_density_evaluation_known_c_cpp <- function(theta, h, y, tau, epsilon, Sig_ab, mu_x, c, nugget, lambda_se) {
+    .Call(`_bdrc_plm0_me_density_evaluation_known_c_cpp`, theta, h, y, tau, epsilon, Sig_ab, mu_x, c, nugget, lambda_se)
 }
 
 plm0_density_evaluation_known_c_cpp <- function(theta, h, y, epsilon, Sig_ab, mu_x, c, nugget, lambda_se) {

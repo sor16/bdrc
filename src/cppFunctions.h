@@ -47,6 +47,8 @@ Rcpp::List plm_predict_u_unknown_c_cpp(const arma::vec& theta, const arma::vec& 
 Rcpp::List plm_predict_u_known_c_cpp(const arma::vec& theta, const arma::vec& x, const arma::mat& P, const arma::mat& B_u, const arma::vec& h_u, double c);
 
 // PLM0 function declarations
+Rcpp::List plm0_me_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::vec& h, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_se);
+Rcpp::List plm0_me_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::vec& h, const arma::vec& y, const arma::vec& tau, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_se);
 Rcpp::List plm0_density_evaluation_unknown_c_cpp(const arma::vec& theta, const arma::vec& h, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double h_min, double nugget, double lambda_c, double lambda_se);
 Rcpp::List plm0_density_evaluation_known_c_cpp(const arma::vec& theta, const arma::vec& h, const arma::vec& y, const arma::vec& epsilon, const arma::mat& Sig_ab, const arma::vec& mu_x, double c, double nugget, double lambda_se);
 Rcpp::List plm0_predict_u_unknown_c_cpp(const arma::vec& theta, const arma::vec& x, const arma::vec& h_u, double h_min);
