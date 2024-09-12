@@ -539,7 +539,7 @@ plot_grob <- function(x, type, transformed = FALSE){
         p <- do.call(arrangeGrob, c(grob_list, ncol = round(sqrt(length(panel_types)))))
 
     }else if(type == 'meas_error'){
-        panel_types <- c('data', 'residuals', 'Q_true', 'shrinkage')
+        panel_types <- c('data', 'Q_true', 'shrinkage', 'residuals')
         grob_list <- lapply(panel_types, function(ty){
             ggplotGrob(plot_fun(x, type = ty, transformed = transformed))
         })
