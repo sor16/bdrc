@@ -82,15 +82,18 @@ histogram_breaks <-function(x){
 #' @param xlim A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
 #' @param ylim A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".
 #' @return Returns an object of class ggplot2.
-#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin element_text theme
+#' @importFrom ggplot2 ggplot aes geom_point geom_path geom_histogram geom_abline geom_hline geom_smooth facet_wrap scale_color_manual scale_x_continuous scale_y_continuous expansion label_parsed ggtitle xlab ylab geom_blank margin element_text theme geom_errorbar
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @keywords internal
 plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE, title = NULL, xlim = NULL, ylim = NULL, ...){
     color_palette <- c("green", "red", "slateblue1", "hotpink", "#56B4E9", "#E69F00", "#000000", "#999999", "#CC79A7", "#D55E00", "#0072B2", "#009E73")
-    legal_types <- c('rating_curve', 'rating_curve_mean', 'f', 'beta', 'sigma_eps', 'residuals', 'trace', 'histogram', 'r_hat', 'autocorrelation')
+    legal_types <- c('rating_curve', 'rating_curve_mean', 'f', 'beta', 'sigma_eps', 'residuals', 'trace', 'histogram', 'r_hat', 'autocorrelation', 'data', "shrinkage", "Q_true")
     if(!(type %in% legal_types)){
         stop(paste('Type argument not recognized. Possible types are:\n -', paste(legal_types, collapse = '\n - ')))
+    }
+    if(type %in% c("data", "shrinkage", "Q_true") & is.null(x$summary$Q_true)){
+        stop(paste0("Plot type '", type, "' unavailable: No measurement-error data in model object."))
     }
     mod_params <- get_param_names(class(x), c_param = x$run_info$c_param)
     if(is.null(param)){
@@ -177,7 +180,10 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                              linetype = "dashed", color = "gray30", linewidth = .5)+
                 geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ],
                            aes(x = .data$`log(h-c_hat)`, y = .data$log_Q),
-                           size = 2, color = "steelblue3", alpha = 0.95) +
+                           size = 2, color = "white") +
+                geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ],
+                           aes(x = .data$`log(h-c_hat)`, y = .data$log_Q),
+                           size = 2, color = "steelblue3", alpha = 0.8) +
                 geom_point(data = plot_dat[!is.na(plot_dat$log_Q), ],
                            aes(x = .data$`log(h-c_hat)`, y = log(Q_true_df$median)),
                            size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
@@ -200,12 +206,14 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                              linetype = "dashed", color = "gray30", linewidth = .5) +
                 geom_point(data = x$data,
                            aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[ncol(x$data)]]]),
-                           size = 2, color = "steelblue3", alpha = 0.95) +
+                           size = 2, color = "white") +
+                geom_point(data = x$data,
+                           aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[ncol(x$data)]]]),
+                           size = 2, color = "steelblue3", alpha = 0.8) +
                 geom_point(data = Q_true_df,
                            aes(median, h),
                            size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
                 scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = 0.01)) +
-                #scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(0, max(x$rating_curve$upper, x$data$Q)), expand = c(0.01, 0)) +
                 scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = c(0.01, 0)) +
                 xlab(parse(text = x_lab)) +
                 ylab(parse(text = y_lab)) +
@@ -290,7 +298,8 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
             geom_segment(data = resid_dat[!is.na(resid_dat$Q), ],
                          aes(x = .data$`log(h-c_hat)`, xend = .data$`log(h-c_hat)`, y = .data$r_median, yend = .data$r_true_median),
                          linetype = "dashed", color = "gray40", linewidth = .5) +
-            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_median), size = 2, color = "steelblue3", alpha = 0.95) +
+            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_median), size = 2, color = "white") +
+            geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_median), size = 2, color = "steelblue3", alpha = 0.8) +
             geom_point(data = resid_dat[!is.na(resid_dat$Q), ], aes(.data$`log(h-c_hat)`, .data$r_true_median), size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
             geom_blank(aes(y = -.data$r_median)) +
             geom_blank(aes(y = -.data$r_true_median)) +
@@ -346,6 +355,165 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
          theme(plot.title = element_text(vjust = 2),
                axis.title.y = element_text(vjust = 3),
                plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
+
+    }else if(type %in% c("data", "shrinkage", "Q_true")){
+        if(!is.null(x$summary$Q_true)){
+            Q <- x$data[, 1]
+            Q_se <- x$data[, 2]
+            W <- x$data[, 3]
+            is_catagorical <- all(is.character(Q_se))
+            if(is_catagorical){
+                tau <- sapply(1:nrow(x$data), function(i) quality_to_tau(Q_se[i]))
+            }else if(!is_catagorical){
+                tau <- sqrt(log(1 + (Q_se/Q)^2))
+            }
+            plot_dat <- data.frame(Q, Q_se, W, tau)
+            plot_dat$Q_se_lwr <- qlnorm(0.025, log(Q),tau)
+            plot_dat$Q_se_upr <- qlnorm(0.975, log(Q),tau)
+            plot_dat$Q_true_lwr <- x$summary$Q_true$lower
+            plot_dat$Q_true_upr <- x$summary$Q_true$upper
+            plot_dat$Q_true <- x$summary$Q_true$median
+        }else{
+            Q <- x$data[, 1]
+            Q_se <- rep(0, nrow(x$data))
+            W <- x$data[, 2]
+            plot_dat <- data.frame(Q, Q_se, W, tau)
+            plot_dat$Q_se_lwr <- Q
+            plot_dat$Q_se_upr <- Q
+            plot_dat$Q_true_lwr <- Q
+            plot_dat$Q_true_upr <- Q
+            plot_dat$Q_true <- Q
+        }
+        if(type == "data"){
+            if(!is.null(x$summary$Q_true)){
+                if(transformed){
+                    data_plot_title <- expression(log(italic(Q)[OBS])*" \u00B1 "*2*tau)
+                }else{
+                    data_plot_title <- expression(italic(Q)[OBS]*" \u00B1 "*2*italic(Q)[SE])
+                }
+            }else{
+                if(transformed){
+                    data_plot_title <- "Transformed observations"
+                }else{
+                    data_plot_title <- "Observations"
+                }
+            }
+            if(transformed){
+                x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
+                y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
+                c_hat <- if(is.null(x$run_info$c_param)) median(x$posterior$c) else x$run_info$c_param
+                p <- ggplot(plot_dat) +
+                    geom_errorbar(aes(x = log(W - c_hat), ymin = log(Q_se_lwr), ymax = log(Q_se_upr)), width = 0) +
+                    geom_point(aes(y = log(.data$Q), x = log(.data$W - c_hat)),
+                               size = 2, color = "white") +
+                    geom_point(aes(y = log(.data$Q), x = log(.data$W - c_hat)),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(y = log(.data$Q), x = log(.data$W - c_hat)),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    xlab(parse(text = x_lab)) +
+                    ylab(parse(text = y_lab)) +
+                    ggtitle(if(!is.null(title)) title else data_plot_title) +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }else{
+                x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
+                y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
+                p <- ggplot(plot_dat) +
+                    geom_errorbar(aes(y = W, xmin = Q_se_lwr, xmax = Q_se_upr), width = 0) +
+                    geom_point(aes(x = .data$Q, y = .data$W),
+                               size = 2, color = "white") +
+                    geom_point(aes(x = .data$Q, y = .data$W),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(x = .data$Q, y = .data$W),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    xlab(parse(text = x_lab)) +
+                    ylab(parse(text = y_lab)) +
+                    ggtitle(if(!is.null(title)) title else data_plot_title) +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }
+        }else if(type == "shrinkage"){
+            if(is_catagorical){
+                p <- ggplot(plot_dat) +
+                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = c(0, quality_to_tau("p") + 0.005),
+                                       breaks = sapply(c("e", "g", "f", "p"), function(x) quality_to_tau(x)),
+                                       labels = sapply(c("Excellent", "Good", "Fair", "Poor"), function(x) paste0(round(quality_to_tau(x), 3), "\n(", x, ")")),
+                                       expand = expansion(mult = c(0.005, 0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA),
+                                       expand = expansion(mult = c(0.005, 0.02))) +
+                    xlab(expression(tau)) +
+                    ylab(expression("| " * log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) * " |")) +
+                    ggtitle(if(!is.null(title)) title else "Shrinkage") +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }else{
+                p <- ggplot(plot_dat) +
+                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(0, NA),
+                                       expand = expansion(mult = c(0.005,0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA),
+                                       expand = expansion(mult = c(0.005, 0.02))) +
+                    xlab(expression(tau)) +
+                    ylab(expression("| " * log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) * " |")) +
+                    ggtitle(if(!is.null(title)) title else "Shrinkage") +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }
+        }else if(type == "Q_true"){
+            if(transformed){
+                x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
+                y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
+                c_hat <- if(is.null(x$run_info$c_param)) median(x$posterior$c) else x$run_info$c_param
+                p <- ggplot(plot_dat) +
+                    geom_errorbar(aes(x = log(W-c_hat), ymin = log(Q_true_lwr), ymax = log(Q_true_upr)), width = 0) +
+                    geom_point(aes(y = log(.data$Q), x = log(.data$W - c_hat)),
+                               size = 2, color = "white") +
+                    geom_point(aes(y = log(.data$Q_true), x = log(.data$W - c_hat)),
+                               size = 2.2, shape = 21, stroke = .6, fill = "white") +
+                    geom_point(aes(y = log(.data$Q), x = log(.data$W - c_hat)),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(y = log(.data$Q_true), x = log(.data$W - c_hat)),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    xlab(parse(text = x_lab)) +
+                    ylab(parse(text = y_lab)) +
+                    ggtitle(if(!is.null(title)) title else expression(paste(log(italic(Q)["TRUE"])," posterior"))) +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }else{
+                x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
+                y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
+                p <- ggplot(plot_dat) +
+                    geom_errorbar(aes(y = W, xmin = Q_true_lwr, xmax = Q_true_upr), width = 0) +
+                    geom_point(aes(x = .data$Q, y = .data$W),
+                               size = 2,color = "white") +
+                    geom_point(aes(x = .data$Q_true, y = .data$W),
+                               size = 2.2, shape = 21, stroke = .6, fill = "white") +
+                    geom_point(aes(x = .data$Q, y = .data$W),
+                               size = 2, color = "steelblue3", alpha = 0.8) +
+                    geom_point(aes(x = .data$Q_true, y = .data$W),
+                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA), expand = expansion(mult = c(0.02, 0.02))) +
+                    xlab(parse(text = x_lab)) +
+                    ylab(parse(text = y_lab)) +
+                    ggtitle(if(!is.null(title)) title else expression(paste(italic(Q)["TRUE"]," posterior"))) +
+                    theme_bdrc() +
+                    theme(plot.title = element_text(vjust = 2))
+            }
+        }
     }
     return(p)
 }
@@ -357,6 +525,21 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
 plot_grob <- function(x, type, transformed = FALSE){
     if(type == 'panel'){
         panel_types <- c('rating_curve', 'residuals', 'f', 'sigma_eps')
+        grob_list <- lapply(panel_types, function(ty){
+            ggplotGrob(plot_fun(x, type = ty, transformed = transformed))
+        })
+        maxHeight <-  unit.pmax(grob_list[[1]]$heights[2:9], grob_list[[2]]$heights[2:9],
+                                grob_list[[3]]$heights[2:9], grob_list[[4]]$heights[2:9])
+        maxWidth <-  unit.pmax(grob_list[[1]]$widths[2:5], grob_list[[2]]$widths[2:5],
+                               grob_list[[3]]$widths[2:5], grob_list[[4]]$widths[2:5])
+        for(j in 1:4){
+            grob_list[[j]]$heights[2:9] <- as.list(maxHeight)
+            grob_list[[j]]$widths[2:5] <- as.list(maxWidth)
+        }
+        p <- do.call(arrangeGrob, c(grob_list, ncol = round(sqrt(length(panel_types)))))
+
+    }else if(type == 'meas_error'){
+        panel_types <- c('data', 'residuals', 'Q_true', 'shrinkage')
         grob_list <- lapply(panel_types, function(ty){
             ggplotGrob(plot_fun(x, type = ty, transformed = transformed))
         })
@@ -545,7 +728,7 @@ autoplot.plm0 <- function(object, ..., type = 'rating_curve', param = NULL, tran
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm0 <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE, title = NULL, xlim = NULL, ylim = NULL, ...){
-    grob_types <- c('panel', 'convergence_diagnostics')
+    grob_types <- c('panel', 'meas_error', 'convergence_diagnostics')
     if(is.null(type) || !(type %in% grob_types)){
         p <- autoplot(x, type = type, param = param, transformed = transformed, title = title, xlim = xlim, ylim = ylim)
         print(p)
@@ -609,7 +792,7 @@ autoplot.plm <- function(object, type = 'rating_curve', param = NULL, transforme
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.plm <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE, title = NULL, xlim = NULL, ylim = NULL, ...){
-    grob_types <- c('panel', 'convergence_diagnostics')
+    grob_types <- c('panel', 'meas_error', 'convergence_diagnostics')
     if(is.null(type) || !(type %in% grob_types)){
         p <- autoplot(x, type = type, param = param, transformed = transformed, title = title, xlim = xlim, ylim = ylim)
         print(p)
@@ -648,7 +831,7 @@ autoplot.gplm0 <- function(object, type = 'rating_curve', param = NULL, transfor
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm0 <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE, title = NULL, xlim = NULL, ylim = NULL, ...){
-    grob_types <- c('panel', 'convergence_diagnostics')
+    grob_types <- c('panel', 'meas_error', 'convergence_diagnostics')
     if(is.null(type) || !(type %in% grob_types)){
         p <- autoplot(x, type = type, param = param, transformed = transformed, title = title, xlim = xlim, ylim = ylim)
         print(p)
@@ -687,7 +870,7 @@ autoplot.gplm <- function(object, type = 'rating_curve', param = NULL, transform
 #' @importFrom grid grid.draw
 #' @importFrom ggplot2 autoplot
 plot.gplm <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE, title = NULL, xlim = NULL, ylim = NULL, ...){
-    grob_types <- c('panel', 'convergence_diagnostics')
+    grob_types <- c('panel', 'meas_error', 'convergence_diagnostics')
     if(is.null(type) || !(type %in% grob_types)){
         p <- autoplot(x, type = type, param = param, transformed = transformed, title = title, xlim = xlim, ylim = ylim)
         print(p)

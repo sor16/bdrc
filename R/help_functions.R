@@ -48,7 +48,7 @@ get_model_components <- function(model, y, Q_me, h, c_param, h_max, forcepoint, 
     }else if(all(is.numeric(Q_me))){
         RC$tau <- sqrt(log(1 + (Q_me/exp(y))^2))
     }else if(all(is.character(Q_me))){
-        RC$tau <- sapply(1:RC$n, function(i) quality_to_tau(Q_me[i], exp(y[i])))
+        RC$tau <- sapply(1:RC$n, function(i) quality_to_tau(Q_me[i]))
     }
     RC$epsilon <- rep(1, RC$n)
     RC$epsilon[forcepoint] <- 1 / RC$n
@@ -571,7 +571,7 @@ log_lik_i <- function(m, d, Q_me){
     }else if(all(is.numeric(Q_me))){
         tau <- sqrt(log(1 + (Q_me/d[, 1])^2))
     }else if(all(is.character(Q_me))){
-        tau <- sapply(1:nrow(d), function(i) quality_to_tau(Q_me[i], d[i, 1]))
+        tau <- sapply(1:nrow(d), function(i) quality_to_tau(Q_me[i]))
     }
 
     # compute pointwise log-likelihood
@@ -726,16 +726,17 @@ check_Q_me_for_errors <- function(Q_me){
     }
 }
 
-percentage_to_tau <- function(Q, percentage) {
-    lower <- Q * (1 - percentage/100)
-    upper <- Q * (1 + percentage/100)
+percentage_to_tau <- function(percentage, quantile = 0.95) {
+    lower <- 1 - percentage/100
+    upper <- 1 + percentage/100
+    alpha <- 1 - quantile
 
-    tau <- (log(upper) - log(lower)) / (2 * qnorm(0.975))
+    tau <- (log(upper) - log(lower)) / (2 * qnorm(quantile + alpha / 2))
 
     return(tau)
 }
 
-quality_to_tau <- function(quality, Q){
+quality_to_tau <- function(quality){
     percentage <- switch(quality,
                          "E" = ,
                          "e" = ,
@@ -765,7 +766,7 @@ quality_to_tau <- function(quality, Q){
     if (is.na(percentage)) {
         return(NA)
     } else {
-        return(percentage_to_tau(Q, percentage))
+        return(percentage_to_tau(percentage))
     }
 }
 

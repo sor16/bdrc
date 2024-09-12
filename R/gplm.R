@@ -18,14 +18,14 @@
 #' \deqn{\log(Q_i) = \mu_i + \varepsilon_i\hspace{20mm}}
 #' \deqn{\hspace{24mm}\mu_i = \log(a) + (b + \beta(h_i)) \log(h_i - c)}
 #' for \eqn{i = 1,...,n}, where \eqn{\varepsilon_i} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon(h_i)^2} that varies with stage. The stochastic process \eqn{\beta(h)} is assumed a priori to be a Gaussian process governed by a Matern covariance function with smoothness parameter \eqn{\nu = 2.5}. The error variance, \eqn{\sigma_\varepsilon^2(h)}, of the log-discharge data  is modeled as an exponential of a B-spline curve, that is, a linear combination of six B-spline basis functions that are defined over the range of the stage observations.\cr\cr
-#' When measurement error is included, the model accounts for the uncertainty in the discharge measurements, and \eqn{\sigma_\varepsilon(h_i)^2} captures the remaining structural uncertainty. The measurement-error datum \eqn{\sigma_{Q,i}} corresponding to an observed discharge \eqn{Q_{\text{OBS},i}} is assumed to be the standard deviation of a log-normal distribution with median value at the true observations, \eqn{Q_{\text{TRUE},i}}. Then the model can be summarized as
+#' When measurement error is included, the model accounts for the uncertainty in the discharge measurements, and \eqn{\sigma_\varepsilon(h_i)^2} captures the remaining structural uncertainty. The measurement-error datum \eqn{Q_{\text{SE},i}} corresponding to an observed discharge \eqn{Q_{\text{OBS},i}} is assumed to be the standard deviation of a log-normal distribution with median value at the true observations, \eqn{Q_{\text{TRUE},i}}. Then the model can be summarized as
 #' \deqn{\log(Q_{\text{OBS},i})\sim \mathcal{N}(\log(Q_{\text{TRUE},i}),\tau^2_i),}
 #' \deqn{\log(Q_{\text{TRUE},i})\sim \mathcal{N}(\mu_i,\sigma_\varepsilon(h_i)^2),\hspace{10mm}}
-#' where \eqn{\tau_i} is the standard deviation of the normal distribution corresponding to the measurement-error datum \eqn{\sigma_{Q,i}}.
+#' where \eqn{\tau^2_i} is the variance of the normal distribution corresponding to the measurement-error datum \eqn{Q_{\text{SE},i}}, which can be estimated as \eqn{\hat{\tau}^2_i=\log(1+(Q_{\text{SE},i}/Q_{\text{OBS},i})^2)}.
 #' Both numerical and categorical measurement-error data are supported:\cr
 #' \itemize{
-#'   \item Numerical data: Direct standard deviation values of the measurement error, \eqn{\sigma_{Q}}.
-#'   \item Categorical data: USGS discharge measurement quality codes, which are automatically transformed into numerical \eqn{\sigma_{Q}} values as follows:
+#'   \item Numerical data: Direct standard deviation values of the measurement error, \eqn{Q_{\text{SE}}}.
+#'   \item Categorical data: USGS discharge measurement quality codes, which are automatically transformed into numerical \eqn{Q_{\text{SE}}} values as follows:
 #'     \itemize{
 #'       \item E (Excellent): Within 2\% of the actual flow
 #'       \item G (Good): Within 5\% of the actual flow
@@ -64,8 +64,8 @@
 #' summary(gplm.fit)
 #'
 #' # With numerical measurement error data
-#' gplm_me_num.fit <- gplm(formula = Q | Q_sigma ~ W, data = provo, num_cores = 2)
-#' summary(gplm_me_num.fit)
+#' gplm_me.fit <- gplm(formula = Q | Q_sigma ~ W, data = provo, num_cores = 2)
+#' summary(gplm_me.fit)
 #'
 #' # With categorical measurement error data
 #' gplm_me_cat.fit <- gplm(formula = Q | Q_quality ~ W, data = mokelumne, num_cores = 2)
