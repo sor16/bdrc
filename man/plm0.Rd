@@ -2,7 +2,7 @@
 % Please edit documentation in R/plm0.R
 \name{plm0}
 \alias{plm0}
-\title{Power-law model with a constant variance}
+\title{Power-law model with constant log-error variance.}
 \usage{
 plm0(
   formula,
@@ -16,13 +16,13 @@ plm0(
 )
 }
 \arguments{
-\item{formula}{An object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y}~\code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (it is very important that the data is in the correct units).}
+\item{formula}{An object of class "formula", with discharge column name as response and stage column name as a covariate, i.e. of the form \code{y} ~ \code{x} where \code{y} is discharge in m\eqn{^3/}s and \code{x} is stage in m (the data must be in the correct units). To include discharge measurement-error data, use the form \code{y | y_error ~ x}, where \code{y_error} is the column name for discharge measurement errors.}
 
 \item{data}{A data.frame containing the variables specified in formula.}
 
-\item{c_param}{The largest stage value for which there is zero discharge. If NULL, it is treated as unknown in the model and inferred from the data.}
+\item{c_param}{The largest stage value for which there is zero discharge. If NULL (default), it is treated as unknown in the model and inferred from the data.}
 
-\item{h_max}{The maximum stage to which the rating curve should extrapolate to. If NULL, the maximum stage value in the data is selected as an upper bound.}
+\item{h_max}{The maximum stage to which the rating curve should extrapolate to. If NULL (default), the maximum stage value in the data is selected as an upper bound.}
 
 \item{parallel}{A logical value indicating whether to run the MCMC in parallel or not. Defaults to TRUE.}
 
@@ -35,49 +35,63 @@ plm0(
 \value{
 plm0 returns an object of class "plm0". An object of class "plm0" is a list containing the following components:
 \describe{
-  \item{\code{rating_curve}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior predictive distribution of the rating curve.}
-  \item{\code{rating_curve_mean}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of the mean of the rating curve.}
-  \item{\code{param_summary}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior distribution of latent- and hyperparameters. Additionally contains columns with r_hat and the effective number of samples for each parameter as defined in Gelman et al. (2013).}
-  \item{\code{posterior_log_likelihood_summary}}{A data frame with 2.5\%, 50\% and 97.5\% percentiles of the posterior log-likelihood values.}
-  \item{\code{rating_curve_posterior}}{A matrix containing the full thinned posterior samples of the posterior predictive distribution of the rating curve (excluding burn-in).}
-  \item{\code{rating_curve_mean_posterior}}{A matrix containing the full thinned posterior samples of the posterior distribution of the mean of the rating curve (excluding burn-in).}
-  \item{\code{a_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{a}.}
-  \item{\code{b_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{b}.}
-  \item{\code{c_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{c}.}
-  \item{\code{sigma_eps_posterior}}{A numeric vector containing the full thinned posterior samples of the posterior distribution of \eqn{\sigma_{\varepsilon}}.}
-  \item{\code{posterior_log_likelihood}}{A numeric vector containing the full thinned posterior log-likelihood values, excluding burn-in samples.}
-  \item{\code{D_hat}}{A statistic defined as -2 times the log-likelihood evaluated at the median value of the parameters.}
-  \item{\code{effective_num_param_DIC}}{The effective number of parameters, which is calculated as median(-2*posterior_log_likelihood) minus D_hat.}
-  \item{\code{DIC}}{The Deviance Information Criterion for the model, calculated as D_hat plus 2*effective_num_parameters_DIC.}
-  \item{\code{lppd}}{The log pointwise predictive density of the observed data under the model.}
-  \item{\code{WAIC}}{The Widely Applicable Information Criterion for the model, defined as -2*( lppd - effective_num_param_WAIC ).}
-  \item{\code{WAIC_i}}{The pointwise WAIC values, where WAIC := sum(WAIC_i).}
-  \item{\code{effective_num_param_WAIC}}{The effective number of parameters, which is calculated by summing up the posterior variance of the log predictive density for each data point.}
-  \item{\code{autocorrelation}}{A data frame with the autocorrelation of each parameter for different lags.}
-  \item{\code{acceptance_rate}}{The proportion of accepted samples in the thinned MCMC chain (excluding burn-in).}
-  \item{\code{formula}}{An object of type "formula" provided by the user.}
+  \item{\code{posterior}}{A list containing the full posterior samples for various parameters and derived quantities.}
+  \item{\code{summary}}{A list containing summary statistics (2.5\%, 50\%, 97.5\% percentiles) for various parameters and derived quantities.}
+  \item{\code{log_likelihood}}{A list containing log-likelihood related quantities including WAIC and DIC.}
+  \item{\code{diagnostics}}{A list containing MCMC diagnostics including autocorrelation and acceptance rate.}
+  \item{\code{formula}}{The formula provided by the user.}
   \item{\code{data}}{The data provided by the user, ordered by stage.}
-  \item{\code{run_info}}{The information about the input arguments and the specific parameters used in the MCMC chain.}
+  \item{\code{run_info}}{Information about the input arguments and specific parameters used in the MCMC chain.}
 }
+When discharge measurement-error data is included, the posterior and summary components also include Q_true (the estimated true discharge observations).
 }
 \description{
-plm0 is used to fit a discharge rating curve for paired measurements of stage and discharge using a power-law model with a constant variance as described in Hrafnkelsson et al. (2022). See "Details" for a more elaborate description of the model.
+plm0 is used to fit a discharge rating curve for paired measurements of stage and discharge using a power-law model with constant log-error variance as described in Hrafnkelsson et al. (2022). It also supports discharge measurement-error data. See "Details" for a more in depth description of the model.
 }
 \details{
 The power-law model, which is commonly used in hydraulic practice, is of the form
 \deqn{Q=a(h-c)^{b}}
 where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants.\cr\cr
 The power-law model is here inferred by using a Bayesian hierarchical model. The model is on a logarithmic scale
-\deqn{\log(Q_i) = \log(a) + b \log(h_i - c) + \varepsilon,     i = 1,...,n}
-where \eqn{\varepsilon} follows a normal distribution with mean zero and variance \eqn{\sigma_\varepsilon^2}, independent of stage. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
+\deqn{\log(Q_i) = \mu_i + \varepsilon_i\hspace{20mm}}
+\deqn{\hspace{24mm}\mu_i = \log(a) + b \log(h_i - c)}
+for \eqn{i = 1,...,n}, where \eqn{\varepsilon_i} follows a normal distribution with mean zero and constant variance \eqn{\sigma_\varepsilon^2}.\cr\cr
+When measurement error is included, the model accounts for the uncertainty in the discharge measurements, and \eqn{\sigma_\varepsilon^2} captures the remaining structural uncertainty. The measurement-error datum \eqn{Q_{\text{SE},i}} corresponding to an observed discharge \eqn{Q_{\text{OBS},i}} is assumed to be the standard deviation of a log-normal distribution with median value at the true observations, \eqn{Q_{\text{TRUE},i}}. Then the model can be summarized as
+\deqn{\log(Q_{\text{OBS},i})\sim \mathcal{N}(\log(Q_{\text{TRUE},i}),\tau^2_i),}
+\deqn{\log(Q_{\text{TRUE},i})\sim \mathcal{N}(\mu_i,\sigma_\varepsilon^2),\hspace{10mm}}
+where \eqn{\tau^2_i} is the variance of the normal distribution corresponding to the measurement-error datum \eqn{Q_{\text{SE},i}}, which can be estimated as \eqn{\hat{\tau}^2_i=\log(1+(Q_{\text{SE},i}/Q_{\text{OBS},i})^2)}.
+Both numerical and categorical measurement-error data are supported:\cr
+\itemize{
+  \item Numerical data: Direct standard deviation values of the measurement error, \eqn{Q_{\text{SE}}}.
+  \item Categorical data: USGS discharge measurement quality codes, which are automatically transformed into numerical \eqn{Q_{\text{SE}}} values as follows:
+    \itemize{
+      \item E (Excellent): Within 2\% of the actual flow
+      \item G (Good): Within 5\% of the actual flow
+      \item F (Fair): Within 8\% of the actual flow
+      \item P (Poor): Greater than 8\% of the actual flow
+    }
+}
+An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
 Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
 }
 \examples{
 \donttest{
 data(skogsliden)
+data(provo)
+data(mokelumne)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=skogsliden,num_cores=2)
+
+# Without measurement error data
+plm0.fit <- plm0(formula = Q ~ W, data = skogsliden, num_cores = 2)
 summary(plm0.fit)
+
+# With numerical measurement error data
+plm0_me.fit <- plm0(formula = Q | Q_sigma ~ W, data = provo, num_cores = 2)
+summary(plm0_me.fit)
+
+# With categorical measurement error data
+plm0_me_cat.fit <- plm0(formula = Q | Q_quality ~ W, data = mokelumne, num_cores = 2)
+summary(plm0_me_cat.fit)
 }
 }
 \references{
@@ -90,5 +104,5 @@ Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian meas
 Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
 }
 \seealso{
-\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction. It is also useful to look at \code{\link{spread_draws}} and \code{\link{plot.plm0}} to help visualize the full posterior distributions.
+\code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction and \code{\link{plot.plm0}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
 }
