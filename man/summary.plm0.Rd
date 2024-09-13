@@ -38,7 +38,7 @@ Summarize a discharge rating curve model object
 \donttest{
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
+plm0.fit <- plm0(formula = Q ~ W, data = krokfors, num_cores = 2)
 summary(plm0.fit)
 }
 }

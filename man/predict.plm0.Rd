@@ -32,7 +32,9 @@ An object of class "data.frame" with four columns:
     \item{\code{median}}{The 50\% posterior predictive quantile.}
     \item{\code{upper}}{The 97.5\% posterior predictive quantile.}
   }
-  If wide=TRUE, a matrix as described above (see wide parameter) is returned.
+  If \code{wide = TRUE}, a matrix as described above (see wide parameter) is returned.
+
+  Note: When measurement error data is included in the model, the prediction interval (lower and upper) represents the uncertainty for a new discharge observation without measurement error.
 }
 \description{
 Predict the discharge for given stage values based on a discharge rating curve model object.
@@ -52,9 +54,9 @@ Predict the discharge for given stage values based on a discharge rating curve m
 \donttest{
 data(krokfors)
 set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors,h_max=10,num_cores=2)
+plm0.fit <- plm0(formula = Q ~ W, data = krokfors, h_max = 10, num_cores = 2)
 #predict rating curve on a equally 10 cm spaced grid from 9 to 10 meters
-predict(plm0.fit,newdata=seq(9,10,by=0.1))
+predict(plm0.fit, newdata = seq(9, 10, by = 0.1))
 }
 }
 \seealso{

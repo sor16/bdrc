@@ -56,15 +56,20 @@
 
 \item{type}{A character denoting what type of plot should be drawn. Defaults to "rating_curve". Possible types are:
 \describe{
-  \item{\code{rating_curve}}{Plots the rating curve.}
-  \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
-  \item{\code{f}}{Plots the power-law exponent.}
-  \item{\code{beta}}{Plots the random effect in the power-law exponent.}
-  \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
-  \item{\code{residuals}}{Plots the log residuals.}
+  \item{\code{rating_curve}}{Plots the rating curve with its posterior median (solid line) and 95\% posterior predictive interval (dashed lines). When measurement data is included, observed discharge (\eqn{Q_{\text{OBS}}}) is shown as blue dots, the estimated true discharge observation (\eqn{\hat{Q}_{\text{TRUE}}}) is shown as hollow circles, and the 95\% posterior predictive interval predicts a new discharge observation without measurement error, \eqn{\tilde{Q}_{\text{TRUE}}}. When \code{transformed=FALSE} (default), \eqn{h} is plotted against \eqn{Q}. When \code{transformed=TRUE}, \eqn{\log(Q)} is plotted against \eqn{\log(h-\hat{c})}, where \eqn{\hat{c}} is the estimated stage of zero flow. Vertical dashed lines connecting \eqn{Q_{\text{OBS}}} to its corresponding \eqn{\hat{Q}_{\text{TRUE}}} show the shrinkage resulting from modeling the measurement error.}
+  \item{\code{rating_curve_mean}}{Plots the rating curve mean with its posterior median (solid line) and 95\% credible interval (dashed lines). When measurement data is included, observed discharge (\eqn{Q_{\text{OBS}}}) is shown as blue dots, the estimated true discharge observation (\eqn{\hat{Q}_{\text{TRUE}}}) is shown as hollow circles. When \code{transformed=FALSE} (default), \eqn{h} is plotted against \eqn{Q}. When \code{transformed=TRUE}, \eqn{\log(Q)} is plotted against \eqn{\log(h-\hat{c})}, where \eqn{\hat{c}} is the estimated stage of zero flow. Vertical dashed lines connecting \eqn{Q_{\text{OBS}}} to its corresponding \eqn{\hat{Q}_{\text{TRUE}}} show the shrinkage resulting from modeling the measurement error.}
+  \item{\code{f}}{Plots the stage-dependent power-law exponent \eqn{f(h)}. For 'gplm' and 'gplm0' models, \eqn{f(h) = b + \beta(h)}, where \eqn{b} is a Gaussian random variable with mean 1.835 and very small standard deviation (0.01), and \eqn{\beta(h)} is a mean-zero Gaussian Process. For 'plm' and 'plm0' models, \eqn{f(h) = b}, where \eqn{b} is a Gaussian random variable with mean 1.835 and standard deviation 0.426. The plot shows the posterior median (solid line) and 95\% credible interval (dashed lines) of \eqn{f(h)} as a function of stage, \eqn{h}.}
+  \item{\code{beta}}{Plots the stage-dependent random effects \eqn{\beta(h)} in the power-law exponent, applicable only for 'gplm' and 'gplm0' models. This mean-zero Gaussian Process captures deviations from the base power-law exponent. The plot shows the posterior median (solid line) and 95\% credible interval (dashed lines) of \eqn{\beta(h)} as a function of stage, \eqn{h}.}
+  \item{\code{sigma_eps}}{Plots the posterior distribution of \eqn{\sigma_\epsilon}, the log-error standard deviation. This captures total uncertainty (measurement and structural) when measurement-error data is not included, or only structural uncertainty when it is. The plot shows the posterior median (solid line) and 95\% credible interval (dashed lines) as functions of stage, \eqn{h}.}
+  \item{\code{residuals}}{Plots the log-residuals. The x-axis shows \eqn{\log(h - \hat{c})}, where \eqn{\hat{c}} is the estimated stage of zero flow. The y-axis shows \eqn{\log(Q) - \log(\hat{Q})}, where \eqn{\hat{Q}} is the median of the rating curve posterior distribution. Includes 95\% credible intervals for the rating curve mean posterior distribution (solid-line interval) and the posterior predictive distribution (dashed-line interval). If measurement error data is included, both observed and estimated true discharge log-residuals are shown, and the 95\% posterior predictive interval predicts a new discharge observation without measurement error, \eqn{\tilde{Q}_{\text{TRUE}}}.}
   \item{\code{trace}}{Plots trace plots of parameters given in param.}
   \item{\code{histogram}}{Plots histograms of parameters given in param.}
-  \item{\code{panel}}{Plots a 2x2 panel of plots: "rating curve", "residuals", "f" and "sigma_eps".}
+  \item{\code{data}}{Plots the observed data (\eqn{Q_{\text{OBS}}}, h). If measurement error data (\eqn{Q_{\text{SE}}}) is included, error bars show \eqn{Q_{\text{OBS}} \pm 2Q_{\text{SE}}}. When \code{transformed=TRUE}, logarithmic scale is used: \eqn{\log(Q_{\text{OBS}})\pm 2\hat{\tau}}, where \eqn{\hat{\tau}_i=\sqrt{\log(1 + (Q_{\text{SE},i}/Q_i)^2)}}. Note: \eqn{Q_{\text{SE},i}} represents uncertainty in \eqn{Q_{\text{TRUE},i}}, not \eqn{Q_{\text{OBS},i}}; error bars indicate assigned measurement error but can not be interpreted directly. See ?gplm for details.}
+  \item{\code{shrinkage}}{Plots the shrinkage of log-discharge observations to the estimated true observations, \eqn{|\log(Q_{\text{OBS}}) - \log(\hat{Q}_{\text{TRUE}})|}, as a function of measurement error on the logarithmic scale, \eqn{\tau}. The true measurement error is estimated as \eqn{\hat{\tau}_i=\sqrt{\log(1 + (Q_{\text{SE},i}/Q_i)^2)}}.}
+  \item{\code{Q_true}}{Plots the posterior distribution of the true discharge values (\eqn{\hat{Q}_{\text{TRUE}}}) with their 95\% credible intervals (error bars). Observed discharge (\eqn{Q_{\text{OBS}}}) is shown as blue dots, and the posterior median of \eqn{\hat{Q}_{\text{TRUE}}} is shown as hollow circles. When \code{transformed=FALSE} (default), \eqn{h} is plotted against \eqn{Q}. When \code{transformed=TRUE}, \eqn{\log(Q)} is plotted against \eqn{\log(h-\hat{c})}, where \eqn{\hat{c}} is the estimated stage of zero flow. The distance between \eqn{Q_{\text{OBS}}} and its corresponding \eqn{\hat{Q}_{\text{TRUE}}} illustrate the shrinkage resulting from modeling the measurement error.}
+  \item{\code{panel}}{Plots a 2x2 panel of model results: "rating curve", "residuals", "f" and "sigma_eps".}
+  \item{\code{meas_error}}{Plots a 2x2 panel of figures related to measurement error: "data", "Q_true", "shrinkage", and "residuals".}
+  \item{\code{convergence_diagnostics}}{Plots convergence diagnostics \eqn{\hat{R}} and autocorrelation for the model parameters.}
 }}
 
 \item{param}{A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.}
@@ -73,9 +78,9 @@
 
 \item{title}{A character denoting the title of the plot.}
 
-\item{xlim}{A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
+\item{xlim}{A numeric vector of length 2, denoting the limits on the x axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals", "data", "shrinkage", and "Q_true".}
 
-\item{ylim}{A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals".}
+\item{ylim}{A numeric vector of length 2, denoting the limits on the y axis of the plot. Applicable for types "rating_curve", "rating_curve_mean", "f", "beta", "sigma_eps", "residuals", "data", "shrinkage", and "Q_true".}
 
 \item{...}{Not used in this function}
 }
@@ -99,18 +104,30 @@ Visualize discharge rating curve model objects
 \examples{
 \donttest{
 data(krokfors)
-set.seed(1)
-plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
+data(mokelumne)
 
+# Without measurement-error data
+set.seed(1)
+plm0.fit <- plm0(Q ~ W, krokfors, num_cores = 2)
 plot(plm0.fit)
-plot(plm0.fit,transformed=TRUE)
-plot(plm0.fit,type='histogram',param='c')
-plot(plm0.fit,type='histogram',param='c',transformed=TRUE)
-plot(plm0.fit,type='histogram',param='hyperparameters')
-plot(plm0.fit,type='histogram',param='latent_parameters')
-plot(plm0.fit,type='residuals')
-plot(plm0.fit,type='f')
-plot(plm0.fit,type='sigma_eps')
+plot(plm0.fit, transformed = TRUE)
+plot(plm0.fit, type = 'histogram', param = 'c')
+plot(plm0.fit, type = 'histogram', param = 'c', transformed = TRUE)
+plot(plm0.fit, type = 'histogram', param = 'hyperparameters')
+plot(plm0.fit, type = 'histogram', param = 'latent_parameters')
+plot(plm0.fit, type = 'residuals')
+plot(plm0.fit, type = 'f')
+plot(plm0.fit, type = 'sigma_eps')
+plot(plm0.fit, type = 'data')
+plot(plm0.fit, type = 'panel')
+plot(plm0.fit, type = 'convergence_diagnostics')
+
+# With measurement-error data
+set.seed(1)
+plm0_me.fit <- plm0(Q | Q_quality ~ W, mokelumne, num_cores = 2)
+plot(plm0_me.fit, type = 'shrinkage')
+plot(plm0_me.fit, type = 'Q_true')
+plot(plm0_me.fit, type = 'meas_error')
 }
 }
 \seealso{
