@@ -1,4 +1,4 @@
-context('Tournament')
+context('Model comparison')
 
 test_that("tournament handles errors correctly", {
     mod_list <- list(plm0.fit, plm0.fit, gplm0.fit, gplm.fit)
