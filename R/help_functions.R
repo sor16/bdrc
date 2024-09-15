@@ -493,15 +493,17 @@ predict_wider <- function(p_dat){
 
 #' @importFrom stats median
 get_residuals_dat <- function(m){
+    Q_var <- parse_extended_formula(mod$formula)$discharge
+    W_var <- parse_extended_formula(mod$formula)$stage
     if(is.null(m$summary$Q_true)){
-        Q_true_df <- data.frame("h" = m$data[ncol(m$data)][[1]], "median" = m$data[1][[1]])
+        Q_true_df <- data.frame("h" = m$data[W_var][[1]], "median" = m$data[Q_var][[1]])
     }else{
         Q_true_df <- data.frame("h" = m$summary$Q_true$h, "median" = m$summary$Q_true$median)
     }
-    dat <- cbind(m$data[,c(1,ncol(m$data))], Q_true_df$median)
-    h_min <- min(m$data[[all.vars(m$formula)[ncol(m$data)]]])
+    dat <- cbind(m$data[, c(Q_var, W_var)], Q_true_df$median)
+    h_min <- min(m$data[[W_var]])
     rc_dat <- merge(m$summary$rating_curve_mean[, c('h', 'median', 'lower', 'upper')], m$summary$rating_curve[, c('h', 'median', 'lower', 'upper')], by.x = 'h', by.y = 'h')
-    resid_dat <- merge(rc_dat[rc_dat$h >= h_min, ], dat, by.x = 'h', by.y = all.vars(m$formula)[ncol(m$data)], all.x = TRUE)
+    resid_dat <- merge(rc_dat[rc_dat$h >= h_min, ], dat, by.x = 'h', by.y = W_var, all.x = TRUE)
     colnames(resid_dat) <- c('h', 'rcm_median', 'rcm_lower', 'rcm_upper', 'rc_median', 'rc_lower', 'rc_upper', 'Q', 'Q_true')
     c_hat <- if(is.null(m$run_info$c_param)) median(m$posterior$c) else m$run_info$c_param
     resid_dat[, 'log(h-c_hat)'] <- log(resid_dat$h - c_hat)
@@ -557,26 +559,28 @@ log_mean_LSE <- function(lx){
 
 #' @importFrom stats dnorm var
 log_lik_i <- function(m, d, Q_me){
+    Q_var <- parse_extended_formula(m$formula)$discharge
+    W_var <- parse_extended_formula(m$formula)$stage
     # get the mean and sd posterior samples
     sigma_eps <- m$posterior$sigma_eps
     mu <- m$posterior$rating_curve_mean
 
     # code to find the rows (stage values) in rating curve mean (yp) and SD (sigma_eps) corresponding to the observations (d)
     rc <- m$summary$rating_curve
-    idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = colnames(d)[ncol(d)], all.y = T)$rowname)
+    idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = W_var, all.y = T)$rowname)
 
     # compute tau
     if(is.null(Q_me)){
         tau <- rep(0, nrow(d))
     }else if(all(is.numeric(Q_me))){
-        tau <- sqrt(log(1 + (Q_me/d[, 1])^2))
+        tau <- sqrt(log(1 + (Q_me/d[, Q_var])^2))
     }else if(all(is.character(Q_me))){
         tau <- sapply(1:nrow(d), function(i) quality_to_tau(Q_me[i]))
     }
 
     # compute pointwise log-likelihood
     return(sapply(1:dim(d)[1], function(n){
-        dnorm( log(d[n, 1]), log(mu[idx[n], ]), if(grepl("0", class(m))) sqrt(sigma_eps^2 + tau[n]^2) else sqrt(sigma_eps[idx[n], ]^2 + tau[n]^2), log = T)
+        dnorm( log(d[n, Q_var]), log(mu[idx[n], ]), if(grepl("0", class(m))) sqrt(sigma_eps^2 + tau[n]^2) else sqrt(sigma_eps[idx[n], ]^2 + tau[n]^2), log = T)
     }))
 }
 
@@ -621,10 +625,14 @@ post_model_prob_m1 <- function(m0, m1, d) {
     return(1 / (1 + exp(- log_BF)))
 }
 
-SE_Delta_WAIC <- function(m0, m1){
-    waic0 <- calc_waic(m0, m0$data)$waic_i
-    waic1 <- calc_waic(m1, m1$data)$waic_i
 
+SE_Delta_WAIC <- function(m0, m1){
+    m0_Q_me_var <- parse_extended_formula(m0$formula)$discharge_error
+    m1_Q_me_var <- parse_extended_formula(m1$formula)$discharge_error
+    Q_me0 <- if (!is.null(m0_Q_me_var)) m0$data[,m0_Q_me_var] else NULL
+    Q_me1 <- if (!is.null(m1_Q_me_var)) m1$data[,m1_Q_me_var] else NULL
+    waic0 <- calc_waic(m0, m0$data, Q_me0)$waic_i
+    waic1 <- calc_waic(m1, m1$data, Q_me1)$waic_i
     return(sqrt(length(waic1) * var(waic0 - waic1)))
 }
 

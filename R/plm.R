@@ -152,6 +152,10 @@ plm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, nu
         result_obj$summary$Q_true <- get_MCMC_summary(exp(MCMC_output_list$y_true), h = h)
     }
     result_obj$summary$log_likelihood <- get_MCMC_summary(MCMC_output_list$log_lik)
+    # store other information
+    result_obj$formula <- formula
+    result_obj$data <- model_dat
+    result_obj$run_info <- MCMC_output_list$run_info
     # log_likelihood
     result_obj$log_likelihood$log_likelihood <- c(MCMC_output_list$log_lik)
     waic_list <- calc_waic(result_obj, model_dat, Q_me)
@@ -168,10 +172,6 @@ plm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, nu
     autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
     result_obj$diagnostics$autocorrelation <- autocorrelation_df[, c('lag', param_names)]
     result_obj$diagnostics$acceptance_rate <- MCMC_output_list[['acceptance_rate']]
-    # store other information
-    result_obj$formula <- formula
-    result_obj$data <- model_dat
-    result_obj$run_info <- MCMC_output_list$run_info
     if(verbose){
         cat("\nMCMC sampling completed!\n")
         cat(sprintf("\nDiagnostics:\nAcceptance rate: %.2f%%.\n", result_obj$diagnostics$acceptance_rate * 100))

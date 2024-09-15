@@ -116,11 +116,12 @@ gather_draws <- function(mod, ..., transformed = F){
 }
 ######## help functions
 gather_draws_param <- function(mod, param, transformed, baseline_dat){
+    W_var <- parse_extended_formula(mod$formula)$stage
     MCMC_output <- mod$posterior[[param]]
     param_name <- param
     if(transformed){
         if(param == 'c'){
-            h_min <- min(mod$data[[all.vars(mod$formula)[ncol(mod$data)]]])
+            h_min <- min(mod$data[[W_var]])
             MCMC_output <- get_transformed_param(MCMC_output, param, mod, h_min = h_min)
         }else{
             MCMC_output <- get_transformed_param(MCMC_output, param, mod)

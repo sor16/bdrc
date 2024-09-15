@@ -1,3 +1,107 @@
+#' Print Method for compare Objects
+#'
+#' This function prints a formatted table of model comparison results based on WAIC.
+#'
+#' @param x An object of class "compare".
+#' @param ... Additional arguments passed to print (not used).
+#'
+#' @return Invisibly returns the input object.
+#'
+#' @seealso \code{\link{compare}} to run a model comparison, \code{\link{plot.compare}} for visualizing the model comparison.
+#'
+#' @export
+print.compare <- function(x, ...) {
+    cat("Model Comparison (WAIC)\n\n")
+
+    # Round numeric columns
+    formatted_df <- x$comparison
+    formatted_df$WAIC <- round(formatted_df$WAIC, 1)
+    formatted_df[, c("SE", "dWAIC", "dSE", "pWAIC")] <-
+        round(formatted_df[, c("SE", "dWAIC", "dSE", "pWAIC")], 1)
+    formatted_df$weight <- round(formatted_df$weight, 2)
+
+    print(formatted_df, row.names = FALSE)
+
+    invisible(x)
+}
+
+#' Plot Method for compare Objects
+#'
+#' This function creates a forest plot of model comparison results based on WAIC (Widely Applicable Information Criterion).
+#'
+#' @param x An object of class "compare", typically created by the compare() function.
+#' @param ... Additional arguments passed to plot (not used).
+#'
+#' @return A ggplot2 object representing the forest plot with the following elements:
+#'   \itemize{
+#'     \item White circles showing the WAIC estimate for each model.
+#'     \item Black dots showing the within-sample prediction error ( WAIC - 2 * pWAIC ).
+#'     \item Black error bars showing ±1 standard error of the WAIC estimate (SE).
+#'     \item Gray error bars and triangles showing ±1 standard error (dSE) of the WAIC difference (dWAIC) between the best model and the model directly below.
+#'     \item A vertical dashed line highlighting the WAIC of the best model.
+#'   }
+#'
+#' @details
+#' The plot visualizes model comparison based on WAIC. Models are ordered from best (lowest WAIC)
+#' at the top to worst at the bottom. The x-axis represents the deviance scale, where lower values
+#' indicate better predictive accuracy.
+#'
+#' The gray error bars around the triangles allow for quick visual of the uncertainty in the estimated differences in WAIC between each model and the model with the lowest WAIC.
+#'
+#' See ?compare for details on WAIC calculation and interpretation.
+#'
+#' @importFrom ggplot2 ggplot geom_vline geom_hline geom_errorbarh geom_point scale_x_continuous scale_y_discrete theme_minimal theme ggtitle
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' set.seed(1)
+#' data(krokfors)
+#' plm0.fit <- plm0(Q ~ W, krokfors, num_cores = 2)
+#' gplm.fit <- gplm(Q ~ W, krokfors, num_cores = 2)
+#' compare_results <- compare(plm0.fit, gplm.fit)
+#' plot(comparison_result)
+#' }
+plot.compare <- function(x, ...) {
+    # Prepare the data
+    plot_data <- x$comparison
+    plot_data$within_sample_error <- plot_data$WAIC - 2 * plot_data$pWAIC
+    # Order the models by WAIC (lowest on top)
+    plot_data$name <- factor(plot_data$name, levels = rev(plot_data$name[order(plot_data$WAIC)]))
+    # Get the WAIC of the best model
+    best_waic <- min(plot_data$WAIC)
+    # Define a base font size
+    base_size <- 12
+
+    # Create the plot
+    p <- ggplot(plot_data, aes(y = name)) +
+        geom_vline(xintercept = best_waic, linetype = "dashed", color = "gray") +
+        geom_hline(aes(yintercept = name), linetype = "dotted", color = "gray") +
+        geom_errorbarh(aes(xmin = WAIC - SE, xmax = WAIC + SE), height = 0) +
+        geom_point(aes(x = WAIC), shape = 21, size = 2, fill = "white") +
+        geom_point(aes(x = within_sample_error), size = 1.5) +
+        geom_point(data = plot_data[-1,], aes(x = WAIC), shape = 24, size = 2, fill = "white", color = "gray50",
+                   position = position_nudge(y = 0.5)) +
+        geom_errorbarh(data = plot_data[-1,], aes(xmin = WAIC - dSE, xmax = WAIC + dSE), height = 0, color = "gray50",
+                       position = position_nudge(y = 0.5)) +
+        scale_x_continuous(name = "Deviance") +
+        scale_y_discrete(name = NULL) +
+        theme_minimal(base_size = base_size) +
+        theme(
+            text = element_text(size = base_size),
+            axis.title = element_text(size = base_size),
+            axis.text = element_text(size = base_size),
+            plot.title = element_text(size = base_size),
+            panel.grid.minor = element_blank(),
+            panel.grid.major.y = element_blank(),
+            axis.text.y = element_text(hjust = 0)
+        ) +
+        theme_bdrc() +
+        ggtitle("WAIC")
+
+    return(p)
+}
+
 #' @importFrom ggplot2 ggplot geom_boxplot stat_boxplot geom_line geom_point labs
 plot_tournament_fun <- function(x, type = 'boxplot'){
     if(type == 'boxplot'){

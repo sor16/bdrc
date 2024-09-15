@@ -103,6 +103,9 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
     }else{
         param <- get_args_rollout(param, mod_params)
     }
+    Q_var <- parse_extended_formula(x$formula)$discharge
+    Q_me_var <- parse_extended_formula(x$formula)$discharge_error
+    W_var <- parse_extended_formula(x$formula)$stage
     if(type == 'trace'){
         plot_dat <- gather_draws(x, param, transformed = transformed)
         if('h' %in% names(plot_dat)){
@@ -156,7 +159,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                   plot.margin =  ggplot2::margin(t = 10, r = 10, b = -10, l = 0, unit = "pt"))
     }else if(type == 'rating_curve' | type == 'rating_curve_mean'){
         if(is.null(x$summary$Q_true)){
-            Q_true_df <- data.frame("h" = x$data[ncol(x$data)][[1]], "median" = x$data[1][[1]])
+            Q_true_df <- data.frame("h" = x$data[W_var][[1]], "median" = x$data[Q_var][[1]])
         }else{
             Q_true_df <- data.frame("h" = x$summary$Q_true$h, "median" = x$summary$Q_true$median)
         }
@@ -164,10 +167,10 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
             x_lab <- "paste('','',log,,,,'(','',italic(paste('h-',hat(paste('c')))),')','','')"
             y_lab <- "paste('','',log,,,,'(','',italic(paste('Q')),')','','')"
             c_hat <- if(is.null(x$run_info$c_param)) median(x$posterior$c) else x$run_info$c_param
-            h_min <- min(x$data[[all.vars(x$formula)[ncol(x$data)]]])
-            plot_dat <- merge(x$summary[[type]][x$summary[[type]]$h >= h_min, ], x$data, by.x = 'h', by.y = all.vars(x$formula)[ncol(x$data)], all.x = TRUE)
+            h_min <- min(x$data[[W_var]])
+            plot_dat <- merge(x$summary[[type]][x$summary[[type]]$h >= h_min, ], x$data, by.x = 'h', by.y = W_var, all.x = TRUE)
             plot_dat[, 'log(h-c_hat)'] <- log(plot_dat$h - c_hat)
-            plot_dat$log_Q <- log(plot_dat[, all.vars(x$formula)[1]])
+            plot_dat$log_Q <- log(plot_dat[, Q_var])
 
             plot_dat$log_lower <- log(plot_dat$lower)
             plot_dat$log_median <- log(plot_dat$median)
@@ -204,13 +207,13 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                 geom_path(aes(x = .data$lower, y = .data$h), linetype = 'dashed', alpha = 0.95) +
                 geom_path(aes(x = .data$upper, y = .data$h), linetype = 'dashed', alpha = 0.95) +
                 geom_segment(data = x$data,
-                             aes(x = .data[[all.vars(x$formula)[1]]], xend = Q_true_df$median,y = .data[[all.vars(x$formula)[ncol(x$data)]]], yend = Q_true_df$h),
+                             aes(x = .data[[Q_var]], xend = Q_true_df$median,y = .data[[W_var]], yend = Q_true_df$h),
                              linetype = "dashed", color = "gray30", linewidth = .5) +
                 geom_point(data = x$data,
-                           aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[ncol(x$data)]]]),
+                           aes(.data[[Q_var]], .data[[W_var]]),
                            size = 2, color = "white") +
                 geom_point(data = x$data,
-                           aes(.data[[all.vars(x$formula)[1]]], .data[[all.vars(x$formula)[ncol(x$data)]]]),
+                           aes(.data[[Q_var]], .data[[W_var]]),
                            size = 2, color = "steelblue3", alpha = 0.8) +
                 geom_point(data = Q_true_df,
                            aes(median, h),
@@ -225,13 +228,13 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         }
     }else if(type == 'sigma_eps'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        h_in_data <- x$data[, W_var, drop = TRUE]
         if('sigma_eps' %in% names(x$summary)){
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'(','',italic(paste('h')),')','','')"
             plot_dat <- x$summary$sigma_eps[x$summary$sigma_eps$h >= min(h_in_data) & x$summary$sigma_eps$h <= max(h_in_data), ]
         }else{
             y_lab <- "paste('','',sigma,,,,phantom() [ {paste('',epsilon,,,)} ],'')"
-            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE],
+            plot_dat <- data.frame(h = x$data[, W_var, drop = TRUE],
                                    lower = x$summary$parameters['sigma_eps', 'lower'],
                                    median = x$summary$parameters['sigma_eps', 'median'],
                                    upper = x$summary$parameters['sigma_eps', 'upper'])
@@ -253,7 +256,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         }
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
         y_lab <- "paste('','',beta,,,,'(','',italic(paste('h')),')','','')"
-        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        h_in_data <- x$data[, W_var, drop = TRUE]
         p <- ggplot(data = x$summary$beta[x$summary$beta$h >= min(h_in_data) & x$summary$beta$h <= max(h_in_data), ]) +
             geom_path(aes( .data$h, .data$median)) +
             geom_path(aes( .data$h, .data$lower), linetype = 'dashed') +
@@ -267,13 +270,13 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
             theme(plot.title = element_text(vjust = 2))
     }else if(type == 'f'){
         x_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
-        h_in_data <- x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE]
+        h_in_data <- x$data[, W_var, drop = TRUE]
         if('f' %in% names(x$summary)){
             y_lab <- "paste('','',italic(paste('b+',beta,,,,'(','h',')','')),'')"
             plot_dat <- x$summary$f[x$summary$f$h >= min(h_in_data) & x$summary$f$h <= max(h_in_data), ]
         }else{
             y_lab <- "paste('','',italic(paste('b')),'')"
-            plot_dat <- data.frame(h = x$data[, all.vars(x$formula)[ncol(x$data)], drop = TRUE],
+            plot_dat <- data.frame(h = x$data[, W_var, drop = TRUE],
                                    lower =  x$summary$parameters['b', 'lower'],
                                    median = x$summary$parameters['b', 'median'],
                                    upper =  x$summary$parameters['b', 'upper'])
@@ -360,29 +363,29 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
 
     }else if(type %in% c("data", "shrinkage", "Q_true")){
         if(!is.null(x$summary$Q_true)){
-            Q <- x$data[, 1]
-            Q_se <- x$data[, 2]
-            W <- x$data[, 3]
-            is_catagorical <- all(is.character(Q_se))
+            Q <- x$data[, Q_var]
+            Q_me <- x$data[, Q_me_var]
+            W <- x$data[, W_var]
+            is_catagorical <- all(is.character(Q_me))
             if(is_catagorical){
-                tau <- sapply(1:nrow(x$data), function(i) quality_to_tau(Q_se[i]))
+                tau <- sapply(1:nrow(x$data), function(i) quality_to_tau(Q_me[i]))
             }else if(!is_catagorical){
-                tau <- sqrt(log(1 + (Q_se/Q)^2))
+                tau <- sqrt(log(1 + (Q_me/Q)^2))
             }
-            plot_dat <- data.frame(Q, Q_se, W, tau)
-            plot_dat$Q_se_lwr <- qlnorm(0.025, log(Q),tau)
-            plot_dat$Q_se_upr <- qlnorm(0.975, log(Q),tau)
+            plot_dat <- data.frame(Q, Q_me, W, tau)
+            plot_dat$Q_me_lwr <- qlnorm(0.025, log(Q),tau)
+            plot_dat$Q_me_upr <- qlnorm(0.975, log(Q),tau)
             plot_dat$Q_true_lwr <- x$summary$Q_true$lower
             plot_dat$Q_true_upr <- x$summary$Q_true$upper
             plot_dat$Q_true <- x$summary$Q_true$median
         }else{
-            Q <- x$data[, 1]
-            Q_se <- rep(0, nrow(x$data))
+            Q <- x$data[, Q_var]
+            Q_me <- rep(0, nrow(x$data))
             tau <- rep(0, nrow(x$data))
-            W <- x$data[, 2]
-            plot_dat <- data.frame(Q, Q_se, W, tau)
-            plot_dat$Q_se_lwr <- Q
-            plot_dat$Q_se_upr <- Q
+            W <- x$data[, W_var]
+            plot_dat <- data.frame(Q, Q_me, W, tau)
+            plot_dat$Q_me_lwr <- Q
+            plot_dat$Q_me_upr <- Q
             plot_dat$Q_true_lwr <- Q
             plot_dat$Q_true_upr <- Q
             plot_dat$Q_true <- Q
@@ -424,7 +427,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                 x_lab <- "paste('','',italic(paste('Q')),paste('['),italic(paste('m',phantom() ^ {paste('3')},'/s')),paste(']'),'')"
                 y_lab <- "paste('','',italic(paste('h')),paste('['),italic(paste('m')),paste(']'),'')"
                 p <- ggplot(plot_dat) +
-                    geom_errorbar(aes(y = W, xmin = Q_se_lwr, xmax = Q_se_upr), width = 0) +
+                    geom_errorbar(aes(y = W, xmin = Q_me_lwr, xmax = Q_me_upr), width = 0) +
                     geom_point(aes(x = .data$Q, y = .data$W),
                                size = 2, color = "white") +
                     geom_point(aes(x = .data$Q, y = .data$W),
