@@ -44,7 +44,7 @@ test_that("the gplm object with unknown c is in tact", {
                  tolerance = tol)
     # rating curve and stage dependent parameters
     test_stage_dep_component(gplm.fit, 'rating_curve')
-    test_stage_dep_component(gplm.fit, 'rating_curve_mean')
+    test_stage_dep_component(gplm.fit, 'rating_curve_median')
     test_stage_dep_component(gplm.fit, 'beta')
     test_stage_dep_component(gplm.fit, 'f')
     test_stage_dep_component(gplm.fit, 'sigma_eps')
@@ -82,7 +82,7 @@ test_that("the gplm object with known c with a maximum stage value is in tact", 
                  tolerance = tol)
     # rating curve and stage dependent parameters
     test_stage_dep_component(gplm.fit, 'rating_curve')
-    test_stage_dep_component(gplm.fit, 'rating_curve_mean')
+    test_stage_dep_component(gplm.fit, 'rating_curve_median')
     test_stage_dep_component(gplm.fit, 'beta')
     test_stage_dep_component(gplm.fit, 'f')
     test_stage_dep_component(gplm.fit, 'sigma_eps')

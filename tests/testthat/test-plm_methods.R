@@ -51,19 +51,19 @@ test_that("rating_curve has known output", {
     vdiffr::expect_doppelganger('gplm_rating_curve_transformed', autoplot(gplm.fit, type = 'rating_curve', transformed = TRUE))
 })
 
-test_that("rating_curve_mean has known output", {
+test_that("rating_curve_median has known output", {
     skip_on_cran()
-    vdiffr::expect_doppelganger('plm0_rating_curve_mean', autoplot(plm0.fit, type = 'rating_curve_mean'))
-    vdiffr::expect_doppelganger('plm0_rating_curve_mean_transformed', autoplot(plm0.fit, type = 'rating_curve_mean', transformed = TRUE))
+    vdiffr::expect_doppelganger('plm0_rating_curve_median', autoplot(plm0.fit, type = 'rating_curve_median'))
+    vdiffr::expect_doppelganger('plm0_rating_curve_median_transformed', autoplot(plm0.fit, type = 'rating_curve_median', transformed = TRUE))
 
-    vdiffr::expect_doppelganger('plm_rating_curve_mean', autoplot(plm.fit, type = 'rating_curve_mean'))
-    vdiffr::expect_doppelganger('plm_rating_curve_mean_transformed', autoplot(plm.fit, type = 'rating_curve_mean', transformed = TRUE))
+    vdiffr::expect_doppelganger('plm_rating_curve_median', autoplot(plm.fit, type = 'rating_curve_median'))
+    vdiffr::expect_doppelganger('plm_rating_curve_median_transformed', autoplot(plm.fit, type = 'rating_curve_median', transformed = TRUE))
 
-    vdiffr::expect_doppelganger('gplm0_rating_curve_mean', autoplot(gplm0.fit, type = 'rating_curve_mean'))
-    vdiffr::expect_doppelganger('gplm0_rating_curve_mean_transformed', autoplot(gplm0.fit, type = 'rating_curve_mean', transformed = TRUE))
+    vdiffr::expect_doppelganger('gplm0_rating_curve_median', autoplot(gplm0.fit, type = 'rating_curve_median'))
+    vdiffr::expect_doppelganger('gplm0_rating_curve_median_transformed', autoplot(gplm0.fit, type = 'rating_curve_median', transformed = TRUE))
 
-    vdiffr::expect_doppelganger('gplm_rating_curve_mean', autoplot(gplm.fit, type = 'rating_curve_mean'))
-    vdiffr::expect_doppelganger('gplm_rating_curve_mean_transformed', autoplot(gplm.fit, type = 'rating_curve_mean', transformed = TRUE))
+    vdiffr::expect_doppelganger('gplm_rating_curve_median', autoplot(gplm.fit, type = 'rating_curve_median'))
+    vdiffr::expect_doppelganger('gplm_rating_curve_median_transformed', autoplot(gplm.fit, type = 'rating_curve_median', transformed = TRUE))
 })
 
 
@@ -118,7 +118,7 @@ test_that("summary methods work for all model types", {
 
 test_that("autoplot methods work for all model types and plot types", {
     models <- list(plm0 = plm0.fit, plm = plm.fit, gplm0 = gplm0.fit, gplm = gplm.fit)
-    plot_types <- c("rating_curve", "rating_curve_mean", "f", "sigma_eps", "residuals")
+    plot_types <- c("rating_curve", "rating_curve_median", "f", "sigma_eps", "residuals")
 
     for (model_name in names(models)) {
         for (plot_type in plot_types) {
@@ -204,7 +204,7 @@ test_that("error handling works for all model types", {
 
 test_that("plot methods work silently for all model types", {
     models <- list(plm0 = plm0.fit, plm = plm.fit, gplm0 = gplm0.fit, gplm = gplm.fit)
-    plot_types <- c('rating_curve', 'rating_curve_mean', 'f', 'sigma_eps', 'residuals',
+    plot_types <- c('rating_curve', 'rating_curve_median', 'f', 'sigma_eps', 'residuals',
                     'trace', 'histogram', 'panel', 'convergence_diagnostics')
 
     for (model_name in names(models)) {
@@ -218,7 +218,7 @@ test_that("plot methods work silently for all model types", {
             }
 
             # Test transformed parameter for applicable plot types
-            if (plot_type %in% c('rating_curve', 'rating_curve_mean', 'f', 'sigma_eps', 'residuals')) {
+            if (plot_type %in% c('rating_curve', 'rating_curve_median', 'f', 'sigma_eps', 'residuals')) {
                 expect_silent(plot(model, type = plot_type, transformed = TRUE))
             }
         }

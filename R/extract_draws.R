@@ -3,7 +3,7 @@
 #' Useful to convert MCMC chain draws of particular parameters or output from the model object to a wide format for further data wrangling
 #'
 #' @param mod An object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param ... Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".
+#' @param ... Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_median". Also accepts "latent_parameters" and "hyperparameters".
 #' @param transformed A boolean value determining whether the output is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.
 #' @return A data frame with columns:
 #' \describe{
@@ -21,7 +21,7 @@
 #'  plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
 #'  hyp_samples <- spread_draws(plm0.fit,'hyperparameters')
 #'  head(hyp_samples)
-#'  rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_mean')
+#'  rating_curve_samples <- spread_draws(plm0.fit,'rating_curve','rating_curve_median')
 #'  head(rating_curve_samples)
 #' }
 #' @export
@@ -51,7 +51,7 @@ spread_draws <- function(mod, ..., transformed = FALSE){
 #' Useful to convert MCMC chain draws of particular parameters or output from the model object to a long format for further data wrangling
 #'
 #' @param mod An object of class "plm0", "plm", "gplm0" or "gplm".
-#' @param ... Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_mean". Also accepts "latent_parameters" and "hyperparameters".
+#' @param ... Any number of character vectors containing valid names of parameters in the model or "rating_curve" and "rating_curve_median". Also accepts "latent_parameters" and "hyperparameters".
 #' @param transformed A boolean value determining whether the parameter is to be represented on the transformed scale used for sampling in the MCMC chain or the original scale. Defaults to FALSE.
 #' @return A data frame with columns:
 #' \describe{
@@ -69,7 +69,7 @@ spread_draws <- function(mod, ..., transformed = FALSE){
 #'  plm0.fit <- plm0(formula=Q~W,data=krokfors,num_cores=2)
 #'  hyp_samples <- gather_draws(plm0.fit,'hyperparameters')
 #'  head(hyp_samples)
-#'  rating_curve_samples <- gather_draws(plm0.fit,'rating_curve','rating_curve_mean')
+#'  rating_curve_samples <- gather_draws(plm0.fit,'rating_curve','rating_curve_median')
 #'  head(rating_curve_samples)
 #' }
 #' @export

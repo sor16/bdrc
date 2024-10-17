@@ -13,7 +13,7 @@
 \describe{
   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values, on the deviance scale.}
   \item{\code{rating_curve}}{Plots the rating curve.}
-  \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+  \item{\code{rating_curve_median}}{Plots the rating curve median.}
   \item{\code{f}}{Plots the power-law exponent.}
   \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
   \item{\code{residuals}}{Plots the log residuals.}

@@ -493,8 +493,8 @@ predict_wider <- function(p_dat){
 
 #' @importFrom stats median
 get_residuals_dat <- function(m){
-    Q_var <- parse_extended_formula(mod$formula)$discharge
-    W_var <- parse_extended_formula(mod$formula)$stage
+    Q_var <- parse_extended_formula(m$formula)$discharge
+    W_var <- parse_extended_formula(m$formula)$stage
     if(is.null(m$summary$Q_true)){
         Q_true_df <- data.frame("h" = m$data[W_var][[1]], "median" = m$data[Q_var][[1]])
     }else{
@@ -710,7 +710,7 @@ check_arguments <- function(formula, data, c_param, h_max, parallel, num_cores, 
     stopifnot(is.logical(verbose))
 }
 
-check_Q_me_for_errors <- function(Q_me){
+check_Q_me_for_errors <- function(Q_me, error_var){
     if (all(is.character(Q_me))) {
         if (!all(Q_me %in% c("E", "e", "excellent", "Excellent", "EXCELLENT",
                                                             "G", "g", "good", "Good", "GOOD",

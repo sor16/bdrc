@@ -36,7 +36,7 @@ test_that("the plm0 object with unknown c is in tact", {
                  tolerance = tol)
     # rating curve
     test_stage_dep_component(plm0.fit, 'rating_curve')
-    test_stage_dep_component(plm0.fit, 'rating_curve_mean')
+    test_stage_dep_component(plm0.fit, 'rating_curve_median')
     # Other information
     expect_equal(plm0.fit$formula, Q ~ W)
     expect_equal(plm0.fit$data, krokfors[order(krokfors$W), c('Q', 'W')])
@@ -63,7 +63,7 @@ test_that("the plm0 object with known c with a maximum stage value is in tact", 
                  tolerance = tol)
     # rating curve
     test_stage_dep_component(plm0.fit_known_c, 'rating_curve')
-    test_stage_dep_component(plm0.fit_known_c, 'rating_curve_mean')
+    test_stage_dep_component(plm0.fit_known_c, 'rating_curve_median')
     # check if maxmimum stage was in line with output
     expect_equal(max(plm0.fit_known_c$rating_curve$h), h_extrap, tolerance = tol)
     expect_true(max(diff(plm0.fit_known_c$rating_curve$h)) <= (0.05 + tol)) # added tolerance

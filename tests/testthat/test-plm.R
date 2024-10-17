@@ -42,7 +42,7 @@ test_that("the plm object with unknown c is in tact", {
                  tolerance = tol)
     # rating curve and stage dependent parameters
     test_stage_dep_component(plm.fit,'rating_curve')
-    test_stage_dep_component(plm.fit,'rating_curve_mean')
+    test_stage_dep_component(plm.fit,'rating_curve_median')
     test_stage_dep_component(plm.fit,'sigma_eps')
     # Other information
     expect_equal(plm.fit$formula, Q ~ W)
@@ -76,7 +76,7 @@ test_that("the plm object with known c with a maximum stage value is in tact", {
                  tolerance = tol)
     # rating curve and stage dependent parameters
     test_stage_dep_component(plm.fit, 'rating_curve')
-    test_stage_dep_component(plm.fit, 'rating_curve_mean')
+    test_stage_dep_component(plm.fit, 'rating_curve_median')
     test_stage_dep_component(plm.fit, 'sigma_eps')
     # check if maxmimum stage was in line with output
     expect_equal(max(plm.fit_known_c$rating_curve$h), h_extrap)

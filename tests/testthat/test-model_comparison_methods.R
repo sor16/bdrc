@@ -57,7 +57,7 @@ test_that("plot_tournament_fun handles boxplot type", {
 })
 
 test_that("plot_tournament_grob handles different types", {
-    types <- c("residuals", "sigma_eps", "f", "rating_curve", "rating_curve_mean",
+    types <- c("residuals", "sigma_eps", "f", "rating_curve", "rating_curve_median",
                "convergence_diagnostics", "panel", "tournament_results")
 
     for(type in types) {

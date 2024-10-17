@@ -50,7 +50,7 @@ print.compare <- function(x, ...) {
 #'
 #' See ?compare for details on WAIC calculation and interpretation.
 #'
-#' @importFrom ggplot2 ggplot geom_vline geom_hline geom_errorbarh geom_point scale_x_continuous scale_y_discrete theme_minimal theme ggtitle
+#' @importFrom ggplot2 ggplot geom_vline geom_hline geom_errorbarh geom_point scale_x_continuous scale_y_discrete theme_minimal theme ggtitle position_nudge
 #' @export
 #'
 #' @examples
@@ -168,7 +168,7 @@ plot_tournament_grob <- function(x, type = 'panel', transformed = FALSE){
             autoplot(m, type = type, title = class(m), ylim = ylim_dat[c('f_min', 'f_max')])
         })
         p <- do.call(arrangeGrob, c(plot_list, ncol = 2))
-    }else if(type %in% c("rating_curve", "rating_curve_mean")){
+    }else if(type %in% c("rating_curve", "rating_curve_median")){
         plot_list <- lapply(x$contestants, function(m){
             autoplot(m, type = type, transformed = transformed, title = class(m))
         })
@@ -327,7 +327,7 @@ autoplot.tournament <- function(object, type = 'boxplot', ...){
 #' \describe{
 #'   \item{\code{boxplot}}{Creates a boxplot of the posterior log-likelihood values, on the deviance scale.}
 #'   \item{\code{rating_curve}}{Plots the rating curve.}
-#'   \item{\code{rating_curve_mean}}{Plots the posterior mean of the rating curve.}
+#'   \item{\code{rating_curve_median}}{Plots the rating curve median.}
 #'   \item{\code{f}}{Plots the power-law exponent.}
 #'   \item{\code{sigma_eps}}{Plots the standard deviation on the data level.}
 #'   \item{\code{residuals}}{Plots the log residuals.}
@@ -354,7 +354,7 @@ autoplot.tournament <- function(object, type = 'boxplot', ...){
 #' @importFrom gridExtra grid.arrange
 #' @export
 plot.tournament <- function(x, type = 'tournament_results', transformed = FALSE, ...){
-    legal_types <- c("boxplot", "tournament_results", "rating_curve", "rating_curve_mean", "sigma_eps", "f", "residuals", "convergence_diagnostics", "panel", "tournament_results")
+    legal_types <- c("boxplot", "tournament_results", "rating_curve", "rating_curve_median", "sigma_eps", "f", "residuals", "convergence_diagnostics", "panel", "tournament_results")
     error_msg <- paste0('Type not recognized. Possible types are:', paste(legal_types, collapse = '\n - '))
     if( is.null(type) ){
         stop(error_msg)

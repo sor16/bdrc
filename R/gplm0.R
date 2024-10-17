@@ -101,7 +101,7 @@ gplm0 <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, 
 
     # check if measurement errors are correct and create Q_me
     if(!is.null(error_var)){
-        check_Q_me_for_errors(model_dat[, error_var, drop = TRUE])
+        check_Q_me_for_errors(model_dat[, error_var, drop = TRUE], error_var)
         Q_me <- model_dat[, error_var, drop = TRUE]
     }else{
         Q_me <- NULL
@@ -134,7 +134,7 @@ gplm0 <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, 
     h_idx_data <- match(h, h_unique_sorted)
     result_obj$posterior$theta <- MCMC_output_list$theta
     result_obj$posterior$rating_curve <- exp(MCMC_output_list$y_true_post_pred[unique_h_idx, ][h_unique_order, ])
-    result_obj$posterior$rating_curve_mean <- exp(MCMC_output_list$mu_post[unique_h_idx, ][h_unique_order, ])
+    result_obj$posterior$rating_curve_median <- exp(MCMC_output_list$mu_post[unique_h_idx, ][h_unique_order, ])
     result_obj$posterior$beta <- MCMC_output_list$x[3:nrow(MCMC_output_list$x), ][h_unique_order, ]
     result_obj$posterior$f <- matrix(rep(result_obj$posterior$b, nrow(result_obj$posterior$beta)), nrow = nrow(result_obj$posterior$beta), byrow = TRUE) + result_obj$posterior$beta
     if(!is.null(Q_me)){
@@ -142,7 +142,7 @@ gplm0 <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, 
     }
     #summary objects
     result_obj$summary$rating_curve <- get_MCMC_summary(result_obj$posterior$rating_curve, h = h_unique_sorted)
-    result_obj$summary$rating_curve_mean <- get_MCMC_summary(result_obj$posterior$rating_curve_mean, h = h_unique_sorted)
+    result_obj$summary$rating_curve_median <- get_MCMC_summary(result_obj$posterior$rating_curve_median, h = h_unique_sorted)
     result_obj$summary$beta <- get_MCMC_summary(result_obj$posterior$beta, h = h_unique_sorted)
     result_obj$summary$f <- get_MCMC_summary(result_obj$posterior$f, h = h_unique_sorted)
     result_obj$summary$parameters <- get_MCMC_summary(rbind(MCMC_output_list$x[1, ], MCMC_output_list$x[2, ], MCMC_output_list$theta))
