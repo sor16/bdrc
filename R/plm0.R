@@ -16,16 +16,17 @@
 #' where \eqn{Q} is discharge, \eqn{h} is stage and \eqn{a}, \eqn{b} and \eqn{c} are unknown constants.\cr\cr
 #' The power-law model is here inferred by using a Bayesian hierarchical model. The model is on a logarithmic scale
 #' \deqn{\log(Q_i) = \mu_i + \varepsilon_i\hspace{20mm}}
-#' \deqn{\hspace{24mm}\mu_i = \log(a) + b \log(h_i - c)}
+#' \deqn{\hspace{10mm}\mu_i = \log(a) + b \log(h_i - c)}
 #' for \eqn{i = 1,...,n}, where \eqn{\varepsilon_i} follows a normal distribution with mean zero and constant variance \eqn{\sigma_\varepsilon^2}.\cr\cr
-#' When measurement error is included, the model accounts for the uncertainty in the discharge measurements, and \eqn{\sigma_\varepsilon^2} captures the remaining structural uncertainty. The measurement-error datum \eqn{Q_{\text{SE},i}} corresponding to an observed discharge \eqn{Q_{\text{OBS},i}} is assumed to be the standard deviation of a log-normal distribution with median value at the true observations, \eqn{Q_{\text{TRUE},i}}. Then the model can be summarized as
+#' When measurement-uncertainty data is included, the model accounts for the uncertainty in the discharge measurements, and \eqn{\sigma_\varepsilon^2} captures the remaining structural uncertainty. The measurement-uncertainty datum \eqn{Q_{\text{SE},i}} corresponding to an observed discharge \eqn{Q_{\text{OBS},i}} is assumed to be the standard deviation of a lognormal distribution with median value at the true observations, \eqn{Q_{\text{TRUE},i}}. Then the model can be summarized as
 #' \deqn{\log(Q_{\text{OBS},i})\sim \mathcal{N}(\log(Q_{\text{TRUE},i}),\tau^2_i),}
-#' \deqn{\log(Q_{\text{TRUE},i})\sim \mathcal{N}(\mu_i,\sigma_\varepsilon^2),\hspace{10mm}}
-#' where \eqn{\tau^2_i} is the variance of the normal distribution corresponding to the measurement-error datum \eqn{Q_{\text{SE},i}}, which can be estimated as \eqn{\hat{\tau}^2_i=\log(1+(Q_{\text{SE},i}/Q_{\text{OBS},i})^2)}.
-#' Both numerical and categorical measurement-error data are supported:\cr
+#' \deqn{\log(Q_{\text{TRUE},i})\sim \mathcal{N}(\mu_i,\sigma_\varepsilon^2),\hspace{17mm}}
+#' where \eqn{\tau^2_i} is the variance of the Gaussian measurement-error density. An estimate for \eqn{\tau_i^2} is computed with \eqn{\hat{\tau}^2_i=\log(1+(Q_{\text{SE},i}/\mu_{Q,i})^2)}, where \eqn{\mu_{Q,i}} is the mean of the lognormal density with median value \eqn{Q_{\text{OBS},i}} and standard deviation \eqn{Q_{\text{SE},i}}, and is computed as
+#' \deqn{\mu_{Q,i}=\sqrt{\frac{Q_{\text{OBS},i}^2 + Q_{\text{OBS},i}\sqrt{Q_{\text{OBS},i}^2+4Q_{\text{SE},i}^2}}{2}}.}
+#' Both numerical and categorical measurement-uncertainty data are supported:\cr
 #' \itemize{
-#'   \item Numerical data: Direct standard deviation values of the measurement error, \eqn{Q_{\text{SE}}}.
-#'   \item Categorical data: USGS discharge measurement quality codes, which are automatically transformed into numerical \eqn{Q_{\text{SE}}} values as follows:
+#'   \item Numerical data: Standard deviations of the lognormal measurment-error densities.
+#'   \item Categorical data: USGS discharge measurement quality codes, which are automatically transformed into numerical values as follows:
 #'     \itemize{
 #'       \item E (Excellent): Within 2\% of the actual flow
 #'       \item G (Good): Within 5\% of the actual flow
@@ -33,8 +34,7 @@
 #'       \item P (Poor): Greater than 8\% of the actual flow
 #'     }
 #' }
-#' An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters.\cr\cr
-#' Bayesian inference is based on the posterior density and summary statistics such as the posterior mean and 95\% posterior intervals are based on the posterior density. Analytical formulas for these summary statistics are intractable in most cases and thus they are computed by generating samples from the posterior density using a Markov chain Monte Carlo simulation.
+#' An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the density of the latent parameters conditional on the hyperparameters (Hrafnkelsson et al., 2022).\cr\cr
 #' @return plm0 returns an object of class "plm0". An object of class "plm0" is a list containing the following components:
 #' \describe{
 #'   \item{\code{posterior}}{A list containing the full posterior samples for various parameters and derived quantities.}
@@ -50,7 +50,7 @@
 #' @references Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö., Vias, R. D., and Gardarsson, S. M. (2022). Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling, Environmetrics, 33(2):e2711. doi: https://doi.org/10.1002/env.2711
 #' @references Spiegelhalter, D., Best, N., Carlin, B., Van Der Linde, A. (2002). Bayesian measures of model complexity and fit. Journal of the Royal Statistical Society: Series B (Statistical Methodology) 64(4), 583–639. doi: https://doi.org/10.1111/1467-9868.00353
 #' @references Watanabe, S. (2010). Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory. J. Mach. Learn. Res. 11, 3571–3594.
-#' @seealso \code{\link{summary.plm0}} for summaries, \code{\link{predict.plm0}} for prediction and \code{\link{plot.plm0}} for plots. \code{\link{spread_draws}} and \code{\link{gather_draws}} are also useful to aid further visualization of the full posterior distributions.
+#' @seealso \code{\link{summary.plm0}}, \code{\link{predict.plm0}}, \code{\link{plot.plm0}}, \code{\link{spread_draws}}, \code{\link{gather_draws}}.
 #'
 #' @examples
 #' \donttest{

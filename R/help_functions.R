@@ -41,12 +41,13 @@ get_model_components <- function(model, y, Q_me, h, c_param, h_max, forcepoint, 
     RC$h_min <- if(is.null(h_min)) min(RC$h) else h_min
     RC$h_max <- max(RC$h)
     RC$n <- length(h)
-    # covert measurement error to SD of a normal on the log-scale (tau_i) with mean (log(Q_i))
+    # covert measurement error to the SD of a normal density on the log-scale (tau_i) with mean (log(Q_i))
     RC$Q_me <- Q_me
     if(is.null(Q_me)){
         RC$tau <- NULL
     }else if(all(is.numeric(Q_me))){
-        RC$tau <- sqrt(log(1 + (Q_me/exp(y))^2))
+        Q_mean <- convert_ln_median_to_ln_mean(ln_median = exp(y), ln_sd = Q_me)
+        RC$tau <- sqrt(log(1 + (Q_me / Q_mean)^2))
     }else if(all(is.character(Q_me))){
         RC$tau <- sapply(1:RC$n, function(i) quality_to_tau(Q_me[i]))
     }
@@ -502,7 +503,7 @@ get_residuals_dat <- function(m){
     }
     dat <- cbind(m$data[, c(Q_var, W_var)], Q_true_df$median)
     h_min <- min(m$data[[W_var]])
-    rc_dat <- merge(m$summary$rating_curve_mean[, c('h', 'median', 'lower', 'upper')], m$summary$rating_curve[, c('h', 'median', 'lower', 'upper')], by.x = 'h', by.y = 'h')
+    rc_dat <- merge(m$summary$rating_curve_median[, c('h', 'median', 'lower', 'upper')], m$summary$rating_curve[, c('h', 'median', 'lower', 'upper')], by.x = 'h', by.y = 'h')
     resid_dat <- merge(rc_dat[rc_dat$h >= h_min, ], dat, by.x = 'h', by.y = W_var, all.x = TRUE)
     colnames(resid_dat) <- c('h', 'rcm_median', 'rcm_lower', 'rcm_upper', 'rc_median', 'rc_lower', 'rc_upper', 'Q', 'Q_true')
     c_hat <- if(is.null(m$run_info$c_param)) median(m$posterior$c) else m$run_info$c_param
@@ -563,9 +564,9 @@ log_lik_i <- function(m, d, Q_me){
     W_var <- parse_extended_formula(m$formula)$stage
     # get the mean and sd posterior samples
     sigma_eps <- m$posterior$sigma_eps
-    mu <- m$posterior$rating_curve_mean
+    mu <- m$posterior$rating_curve_median
 
-    # code to find the rows (stage values) in rating curve mean (yp) and SD (sigma_eps) corresponding to the observations (d)
+    # code to find the rows (stage values) in rating curve median (yp) and SD (sigma_eps) corresponding to the observations (d)
     rc <- m$summary$rating_curve
     idx <- as.numeric(merge(cbind("rowname" = rownames(rc), rc), d, by.x = "h", by.y = W_var, all.y = T)$rowname)
 
@@ -573,7 +574,8 @@ log_lik_i <- function(m, d, Q_me){
     if(is.null(Q_me)){
         tau <- rep(0, nrow(d))
     }else if(all(is.numeric(Q_me))){
-        tau <- sqrt(log(1 + (Q_me/d[, Q_var])^2))
+        Q_mean <- convert_ln_median_to_ln_mean(ln_median = d[, Q_var], ln_sd = Q_me)
+        tau <- sqrt(log(1 + (Q_me/Q_mean)^2))
     }else if(all(is.character(Q_me))){
         tau <- sapply(1:nrow(d), function(i) quality_to_tau(Q_me[i]))
     }
@@ -710,6 +712,10 @@ check_arguments <- function(formula, data, c_param, h_max, parallel, num_cores, 
     stopifnot(is.logical(verbose))
 }
 
+convert_ln_median_to_ln_mean <- function(ln_median, ln_sd){
+    return( sqrt( (ln_median^2 + ln_median * sqrt(ln_median^2 + 4 * ln_sd^2)) / 2 ) )
+}
+
 check_Q_me_for_errors <- function(Q_me, error_var){
     if (all(is.character(Q_me))) {
         if (!all(Q_me %in% c("E", "e", "excellent", "Excellent", "EXCELLENT",
@@ -777,4 +783,5 @@ quality_to_tau <- function(quality){
         return(percentage_to_tau(percentage))
     }
 }
+
 
