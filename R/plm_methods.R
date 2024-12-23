@@ -325,6 +325,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
             theme(plot.title = element_text(vjust = 2))
     }else if(type == 'r_hat'){
         rhat_dat <- get_rhat_dat(x, param)
+        rhat_dat$parameters <- factor(rhat_dat$parameters, levels = unique(rhat_dat$parameters))
         rhat_dat$Rhat[rhat_dat$Rhat < 1] <- 1
         rhat_dat$Rhat[rhat_dat$Rhat > 2] <- 2
         param_expr <- parse(text = get_param_expression(param))
@@ -344,6 +345,7 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
                plot.margin = ggplot2::margin(t = 7, r = 7, b = 7, l = 12, unit = "pt"))
     }else if(type == 'autocorrelation'){
         auto_dat <- do.call('rbind', lapply(param, function(p) data.frame(lag = x$diagnostics$autocorrelation$lag, param = p, corr = x$diagnostics$autocorrelation[, p])))
+        auto_dat$param <- factor(auto_dat$param, levels = unique(auto_dat$param))
         param_expr <- parse(text = get_param_expression(param))
         max_lag <- dim(x$diagnostics$autocorrelation)[1]
         p <- ggplot(data = auto_dat, aes(x = .data$lag, y = .data$corr, color = .data$param)) +

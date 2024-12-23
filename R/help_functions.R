@@ -774,7 +774,7 @@ quality_to_tau <- function(quality){
                          "p" = ,
                          "poor" = ,
                          "Poor" = ,
-                         "POOR" = 12,  # 12% for Poor
+                         "POOR" = 15,  # 15% for Poor
 
                          NA)        # Return NA for any other input
     if (is.na(percentage)) {
