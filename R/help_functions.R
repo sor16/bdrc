@@ -522,9 +522,9 @@ chain_statistics <- function(chains) {
 }
 
 R_hat <- function(chains){
-    staistics <- chain_statistics(chains)
-    W <- staistics$W
-    var_hat <- staistics$var_hat
+    statistics <- chain_statistics(chains)
+    W <- statistics$W
+    var_hat <- statistics$var_hat
     return(sqrt(var_hat / W))
 }
 
