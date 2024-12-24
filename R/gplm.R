@@ -175,7 +175,7 @@ gplm <- function(formula, data, c_param = NULL, h_max = NULL, parallel = TRUE, n
     result_obj$log_likelihood$D_hat <- MCMC_output_list$D_hat
     result_obj$log_likelihood$effective_num_param_DIC <- -2 * result_obj$summary$log_likelihood[, 'median'] - result_obj$log_likelihood$D_hat
     result_obj$log_likelihood$DIC <- result_obj$log_likelihood$D_hat + 2 * result_obj$log_likelihood$effective_num_param_DIC
-    #Rhat and autocorrelation
+    # autocorrelation
     autocorrelation_df <- as.data.frame(t(MCMC_output_list$autocorrelation))
     names(autocorrelation_df) <- param_names
     autocorrelation_df$lag <- 1:dim(autocorrelation_df)[1]
