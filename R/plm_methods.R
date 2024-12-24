@@ -75,7 +75,7 @@ histogram_breaks <-function(x){
 #'     \item{\code{trace}}{Plots trace plots of parameters given in param.}
 #'     \item{\code{histogram}}{Plots histograms of parameters given in param.}
 #'     \item{\code{data}}{Plots the observed data (\eqn{Q_{\text{OBS}}}, h). If measurement error data (\eqn{Q_{\text{SE}}}) is included, error bars show \eqn{Q_{\text{OBS}} \pm 2Q_{\text{SE}}}. When \code{transformed=TRUE}, logarithmic scale is used: \eqn{\log(Q_{\text{OBS}})\pm 2\hat{\tau}}, where \eqn{\hat{\tau}_i=\sqrt{\log(1 + (Q_{\text{SE},i}/Q_i)^2)}}. Note: \eqn{Q_{\text{SE},i}} represents uncertainty in \eqn{Q_{\text{TRUE},i}}, not \eqn{Q_{\text{OBS},i}}; error bars indicate assigned measurement error but can not be interpreted directly. See ?gplm for details.}
-#'     \item{\code{shrinkage}}{Plots the shrinkage of log-discharge observations to the estimated true observations, \eqn{|\log(Q_{\text{OBS}}) - \log(\hat{Q}_{\text{TRUE}})|}, as a function of measurement error on the logarithmic scale, \eqn{\tau}. The true measurement error is estimated as \eqn{\hat{\tau}_i=\sqrt{\log(1 + (Q_{\text{SE},i}/Q_i)^2)}}.}
+#'     \item{\code{shrinkage}}{Plots the shrinkage of log-discharge observations to the estimated true observations, \eqn{\log(Q_{\text{OBS}}) - \log(\hat{Q}_{\text{TRUE}})}, as a function of measurement error on the logarithmic scale, \eqn{\tau}. The true measurement error is estimated as \eqn{\hat{\tau}_i=\sqrt{\log(1 + (Q_{\text{SE},i}/Q_i)^2)}}.}
 #'     \item{\code{Q_true}}{Plots the posterior distribution of the true discharge values (\eqn{\hat{Q}_{\text{TRUE}}}) with their 95\% credible intervals (error bars). Observed discharge (\eqn{Q_{\text{OBS}}}) is shown as blue dots, and the posterior median of \eqn{\hat{Q}_{\text{TRUE}}} is shown as hollow circles. When \code{transformed=FALSE} (default), \eqn{h} is plotted against \eqn{Q}. When \code{transformed=TRUE}, \eqn{\log(Q)} is plotted against \eqn{\log(h-\hat{c})}, where \eqn{\hat{c}} is the estimated stage of zero flow. The distance between \eqn{Q_{\text{OBS}}} and its corresponding \eqn{\hat{Q}_{\text{TRUE}}} illustrate the shrinkage resulting from modeling the measurement error.}
 #'   }
 #' @param param A character vector with the parameters to plot. Defaults to NULL and is only used if type is "trace" or "histogram". Allowed values are the parameters given in the model summary of x as well as "hyperparameters" or "latent_parameters" for specific groups of parameters.
@@ -448,33 +448,37 @@ plot_fun <- function(x, type = 'rating_curve', param = NULL, transformed = FALSE
         }else if(type == "shrinkage"){
             if(is_catagorical){
                 p <- ggplot(plot_dat) +
-                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                    geom_hline(yintercept = 0, linetype = "dashed") +
+                    geom_point(aes(x = .data$tau, y = log(.data$Q) - log(.data$Q_true)),
                                size = 2, color = "steelblue3", alpha = 0.8) +
-                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
-                               size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    geom_point(aes(x = .data$tau, y = log(.data$Q) - log(.data$Q_true)),
+                               size = 2.2, shape = 21, alpha = 0.8, stroke = .6) +
+                    geom_blank(aes(x = .data$tau, y = -(log(.data$Q) - log(.data$Q_true)))) +
                     scale_x_continuous(limits = c(0, quality_to_tau("p") + 0.005),
                                        breaks = sapply(c("e", "g", "f", "p"), function(x) quality_to_tau(x)),
                                        labels = sapply(c("Excellent", "Good", "Fair", "Poor"), function(x) paste0(round(quality_to_tau(x), 3), "\n(", x, ")")),
                                        expand = expansion(mult = c(0.005, 0.02))) +
                     scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA),
-                                       expand = expansion(mult = c(0.005, 0.02))) +
+                                       expand = expansion(mult = c(0.02, 0.02))) +
                     xlab(expression(tau)) +
-                    ylab(expression("| " * log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) * " |")) +
+                    ylab(expression( log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) )) +
                     ggtitle(if(!is.null(title)) title else "Shrinkage") +
                     theme_bdrc() +
                     theme(plot.title = element_text(vjust = 2))
             }else{
                 p <- ggplot(plot_dat) +
-                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                    geom_hline(yintercept = 0, linetype = "dashed") +
+                    geom_point(aes(x = .data$tau, y = log(.data$Q) - log(.data$Q_true)),
                                size = 2, color = "steelblue3", alpha = 0.8) +
-                    geom_point(aes(x = .data$tau, y = abs(log(.data$Q) - log(.data$Q_true))),
+                    geom_point(aes(x = .data$tau, y = log(.data$Q) - log(.data$Q_true)),
                                size = 2.2, shape = 21, alpha = 0.9, stroke = .6) +
+                    geom_blank(aes(x = .data$tau, y = -(log(.data$Q) - log(.data$Q_true)))) +
                     scale_x_continuous(limits = if(!is.null(xlim)) xlim else c(0, NA),
                                        expand = expansion(mult = c(0.005,0.02))) +
                     scale_y_continuous(limits = if(!is.null(ylim)) ylim else c(NA, NA),
-                                       expand = expansion(mult = c(0.005, 0.02))) +
+                                       expand = expansion(mult = c(0.02, 0.02))) +
                     xlab(expression(tau)) +
-                    ylab(expression("| " * log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) * " |")) +
+                    ylab(expression( log(italic(Q)[OBS]) - log(italic(Q)["TRUE"]) )) +
                     ggtitle(if(!is.null(title)) title else "Shrinkage") +
                     theme_bdrc() +
                     theme(plot.title = element_text(vjust = 2))
