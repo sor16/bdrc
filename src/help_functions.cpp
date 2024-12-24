@@ -171,36 +171,37 @@ double log_of_normal_pdf(double x, double mu, double sigma) {
 // [[Rcpp::export]]
 Rcpp::List chain_statistics_cpp(const arma::mat& chains) {
     int chains_length = chains.n_rows;
-    int split_idx = chains_length / 2;
+    int n = chains_length / 2;  // Floor division ensures correctness for odd lengths
 
-    // Adjust split_idx for odd lengths
-    bool is_odd = chains_length % 2 != 0;
-    if (is_odd) {
-        split_idx += 1;
-    }
+    // Ensure the split is done correctly for odd lengths
+    arma::mat chains1 = chains.rows(0, n - 1);
+    arma::mat chains2 = chains.rows(n, chains_length - 1);
 
-    arma::mat chains1 = chains.rows(0, split_idx - 1);
-    arma::mat chains2 = chains.rows(split_idx - (is_odd ? 1 : 0), chains_length - 1);
-
+    // Compute means and variances for each half
     arma::rowvec means1 = arma::mean(chains1, 0);
     arma::rowvec means2 = arma::mean(chains2, 0);
     arma::rowvec vars1 = arma::var(chains1, 0);
     arma::rowvec vars2 = arma::var(chains2, 0);
 
+    // Calculate within-chain variance
     double within_chain_var = (arma::mean(vars1) + arma::mean(vars2)) / 2;
 
-    arma::rowvec mean_diff = means1 - means2;
-    double between_chain_var = split_idx * arma::var(mean_diff);
+    // Calculate between-chain variance
+    arma::rowvec chain_means = arma::mean(chains, 0); // Mean of each chain
+    double overall_mean = arma::mean(chain_means);   // Mean of all chain means
+    arma::rowvec mean_diffs = chain_means - overall_mean;
+    double between_chain_var = n * arma::mean(mean_diffs % mean_diffs);
 
     // Adjust n for var_hat calculation
-    int n = is_odd ? split_idx - 1 : split_idx;
     double var_hat = ((n - 1) * within_chain_var + between_chain_var) / n;
 
+    // Return results
     return Rcpp::List::create(
         Rcpp::Named("W") = within_chain_var,
         Rcpp::Named("var_hat") = var_hat
     );
 }
+
 
 
 
