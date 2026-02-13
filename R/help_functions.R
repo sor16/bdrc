@@ -151,7 +151,7 @@ run_MCMC <- function(theta_m, RC, density_fun, unobserved_prediction_fun, nr_ite
     return(output_list)
 }
 
-#' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterExport parLapply stopCluster
+#' @importFrom parallel detectCores makeCluster clusterSetRNGStream clusterEvalQ clusterExport parLapply stopCluster
 get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction_fun, parallel, num_cores = NULL, num_chains = 4, nr_iter = 20000, burnin = 2000, thin = 5, verbose){
     T_max <- 50
 
@@ -181,6 +181,7 @@ get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction
         }
         cl <- makeCluster(num_cores, setup_strategy = 'sequential')
         clusterSetRNGStream(cl = cl) #set RNG to type L'Ecuyer
+        clusterEvalQ(cl, library(bdrc))
         clusterExport(cl,c('run_MCMC', 'initiate_output_list', 'pri', 'variogram_chain',
                            'theta_m', 'RC', 'density_fun', 'unobserved_prediction_fun',
                            'parallel', 'nr_iter', 'burnin', 'thin', 'T_max'), envir = environment())

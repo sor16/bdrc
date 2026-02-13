@@ -49,7 +49,7 @@ Rcpp::List plm0_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     arma::vec ypo = yp + arma::randn(n) % arma::sqrt(varr);
     // Compute log_lik
     double log_lik = 0.0;
-    for(size_t i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
         log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
     return Rcpp::List::create(
@@ -97,7 +97,7 @@ Rcpp::List plm0_density_evaluation_known_c_cpp(const arma::vec& theta,
     arma::vec ypo = yp + arma::randn(n) % arma::sqrt(varr);
     // Compute log_lik
     double log_lik = 0.0;
-    for(size_t i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
         log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
     return Rcpp::List::create(

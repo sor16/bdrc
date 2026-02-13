@@ -59,7 +59,7 @@ Rcpp::List plm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     ypo.elem(arma::find_nonfinite(ypo)).fill(-arma::datum::inf);
     // Compute log_lik
     double log_lik = 0.0;
-    for(size_t i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
         log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
     return Rcpp::List::create(
@@ -117,7 +117,7 @@ Rcpp::List plm_density_evaluation_known_c_cpp(const arma::vec& theta,
     ypo.elem(arma::find_nonfinite(ypo)).fill(-arma::datum::inf);
     // Compute log_lik
     double log_lik = 0.0;
-    for(size_t i = 0; i < n; ++i) {
+    for(int i = 0; i < n; ++i) {
         log_lik += log_of_normal_pdf(y(i), yp(i), std::sqrt(varr(i)));
     }
     return Rcpp::List::create(

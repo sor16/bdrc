@@ -11,3 +11,5 @@ vignettes/tournament_cache
 doc
 /doc/
 /Meta/
+*.tar.gz
+.claude/
