@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path='figs-introduction/',
+  fig.path='figs-background/',
   fig.align='center',
   prompt=T
 )
@@ -23,7 +23,7 @@ Most methods for directly measuring the discharge of a water stream are time-con
 
 ## Bayesian Generalized Power-Law Rating Curves
 
-The power-law model is commonly assumed in hydraulic practice to fit rating curves, and as mention above, its form is
+The power-law model is commonly assumed in hydraulic practice to fit rating curves, and as mentioned above, its form is
 
 $$Q(h) = a(h-c)^{b}$$ (1)
 
@@ -54,8 +54,6 @@ $$\log (Q_i) = \log (a) + (b + \beta(h_i)) \log(h_i -c) + \varepsilon_i, \quad i
 
 where $\epsilon_i$ follows a normal distribution with mean zero and variance $\sigma_{\epsilon}^2(h_i)$ that can vary with water elevation. Here the parameters $a$, $b$ and $c$ play a similar role as in the Bayesian power-law model. The stochastic process $\beta(h)$ is assumed a priori to be a Gaussian process governed by a Matérn covariance function with smoothness parameter $\nu = 2.5$, see Matérn (1960). This model is constrained by setting $b=1.835$. An efficient posterior simulation is achieved by sampling from the joint posterior density of the hyperparameters of the model, and then sampling from the conditional density of the latent parameters given the hyperparameters.
 
-
-\vspace{12pt}
 
 ## References
 

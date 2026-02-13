@@ -6,16 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Tournament - Model comparison • bdrc</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Tournament - Model comparison">
 </head>
 <body>
@@ -130,12 +129,12 @@ complexity, making it the preferred model.</p>
 </ol>
 <p>In each comparison, we calculate the WAIC difference of the less and
 more complex model,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext><mo>=</mo><msub><mtext mathvariant="normal">WAIC</mtext><mtext mathvariant="normal">less</mtext></msub><mo>−</mo><msub><mtext mathvariant="normal">WAIC</mtext><mtext mathvariant="normal">more</mtext></msub></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC} = \text{WAIC}_{\text{less}} - \text{WAIC}_{\text{more}}</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext><mo>=</mo><msub><mtext mathvariant="normal">WAIC</mtext><mtext mathvariant="normal">less</mtext></msub><mo>−</mo><msub><mtext mathvariant="normal">WAIC</mtext><mtext mathvariant="normal">more</mtext></msub></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC} = \text{WAIC}_{\text{less}} - \text{WAIC}_{\text{more}}</annotation></semantics></math>.
 A positive
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
 suggests the more complex model is more appropriate. However, to advance
 to the next round,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
 must exceed a pre-specified “winning criteria” (default value = 2). This
 threshold helps ensure that we only choose a more complex model if it
 offers a substantial improvement.</p>
@@ -452,10 +451,10 @@ relative performance of all compared models.</p>
 <p>The first round of the tournament favors <code>gplm0</code> over
 <code>gplm</code>, and <code>plm0</code> over <code>plm</code>, based on
 their respective
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
 values. In the final round, <code>gplm0</code> emerges as the overall
 winner, with a substantial positive
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
 of ~24 when compared to <code>plm0</code>. This indicates that
 <code>gplm0</code> provides the best balance between model complexity
 and fit to the data.</p>
@@ -464,7 +463,7 @@ and fit to the data.</p>
 uncertainty in the magnitude of this difference. However, it’s important
 to note that despite the small sample size, the
 <code>SE_Delta_WAIC</code> is less than half the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mtext mathvariant="normal">WAIC</mtext></mrow><annotation encoding="application/x-tex">\Delta\text{WAIC}</annotation></semantics></math>
 estimate. This provides some confidence in the preference for
 <code>gplm0</code>, as the difference in WAIC is more than two standard
 errors away from zero. Lets further investigate this comparison.</p>
@@ -478,7 +477,7 @@ various visualization tools:</p>
 <h4 id="tournament-results-diagram">1. Tournament results diagram:<a class="anchor" aria-label="anchor" href="#tournament-results-diagram"></a>
 </h4>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj) <span class="co">#default plot type is type='tournament_results'</span></span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-7-1.png" alt="&lt;em&gt;A diagram showing the results of the power-law tournament. The diagram progresses from bottom (four initial models) to top (single winner). Each model's residual plot is shown at the bottom, with corresponding WAIC values above. Green WAIC values indicate the more parsimonious models in each comparison for these data. The first round selects gplm0 and plm0, which advance to the final comparison. gplm0 emerges as the tournament winner, indicated by its green WAIC value and the name at the top of the diagram.&lt;/em&gt;" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-7-1.png" alt="&lt;em&gt;A diagram showing the results of the power-law tournament. The diagram progresses from bottom (four initial models) to top (single winner). Each model's residual plot is shown at the bottom, with corresponding WAIC values above. Green WAIC values indicate the more parsimonious models in each comparison for these data. The first round selects gplm0 and plm0, which advance to the final comparison. gplm0 emerges as the tournament winner, indicated by its green WAIC value and the name at the top of the diagram.&lt;/em&gt;" width="768" style="display: block; margin: auto;"></p>
 <p>This diagram illustrates the tournament progression from the initial
 four models to the final winner. It shows each model’s residual plot at
 the bottom, with corresponding WAIC values above. Green WAIC values
@@ -488,7 +487,7 @@ indicate the selected model for each comparison.</p>
 <h4 id="log-likelihood-comparison">2. Log-likelihood comparison:<a class="anchor" aria-label="anchor" href="#log-likelihood-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'boxplot'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-8-1.png" alt="A comparative boxplot displaying posterior log-likelihood values for the models, with corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale for direct comparison with WAIC. Each boxplot represents the distribution of log-likelihood values computed with the samples from the posterior distribution of the corresponding model. This visualization allows for easy comparison of model performance and fit across the four models." width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-8-1.png" alt="A comparative boxplot displaying posterior log-likelihood values for the models, with corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale for direct comparison with WAIC. Each boxplot represents the distribution of log-likelihood values computed with the samples from the posterior distribution of the corresponding model. This visualization allows for easy comparison of model performance and fit across the four models." width="768" style="display: block; margin: auto;"></p>
 <p>This boxplot compares the posterior log-likelihood values for each
 model, with the corresponding WAIC values shown as red diamonds. The
 log-likelihood values are presented on the deviance scale (-2 *
@@ -499,7 +498,7 @@ better fit.</p>
 <h4 id="rating-curve-comparison">3. Rating curve comparison:<a class="anchor" aria-label="anchor" href="#rating-curve-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'rating_curve'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-9-1.png" alt="A plot comparing the rating curves estimated by four models. The graph shows water level (stage) on the y-axis and discharge on the x-axis. Each model's estimated rating curve is represented by a solid line, with dotted lines showing the 95% prediction interval. This visualization enables assessment of model fit across the range of water levels, highlighting differences in predictive capabilities. Optimal performance is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval." width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-9-1.png" alt="A plot comparing the rating curves estimated by four models. The graph shows water level (stage) on the y-axis and discharge on the x-axis. Each model's estimated rating curve is represented by a solid line, with dotted lines showing the 95% prediction interval. This visualization enables assessment of model fit across the range of water levels, highlighting differences in predictive capabilities. Optimal performance is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval." width="768" style="display: block; margin: auto;"></p>
 <p>This plot compares the estimated rating curves from all four models.
 It shows water level (stage) vs. discharge, with solid lines
 representing the estimated curves and dotted lines showing 95%
@@ -512,7 +511,7 @@ within the prediction interval.</p>
 <h4 id="residual-plot-comparison">4. Residual plot comparison:<a class="anchor" aria-label="anchor" href="#residual-plot-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'residuals'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The residual plots also help assess how well each model fits the data
 by showing differences between observed and predicted values across
 water levels. This can reveal patterns in model performance and
@@ -526,9 +525,9 @@ the mean of the observations, and 95% of observations falling within the
 </h4>
 <p>The differences between the four models lie in the treatment of the
 power-law exponent,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(h)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(h)</annotation></semantics></math>,
 and the log-error standard deviation,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>ε</mi><mn>2</mn></msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\sigma^2_{\varepsilon}(h)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>ε</mi><mn>2</mn></msubsup><mo stretchy="false" form="prefix">(</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sigma^2_{\varepsilon}(h)</annotation></semantics></math>,
 as either constants or stage-dependent functions. Therefore, it is
 insightful to examine the posterior distributions of these elements
 across the different models to determine whether stage dependence exists
@@ -537,7 +536,7 @@ or if the assumption of constancy is appropriate.</p>
 <h5 id="power-law-exponent-comparison">Power-law exponent comparison:<a class="anchor" aria-label="anchor" href="#power-law-exponent-comparison"></a>
 </h5>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'f'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>The plots show that the exponent is clearly not constant over the
 water elevations. This observation supports the use of the generalized
 power-law models (<code>gplm</code> and <code>gplm0</code>) over the
@@ -548,7 +547,7 @@ they allow for this non-constant behavior of the power-law exponent.</p>
 <h5 id="log-error-standard-deviation-comparison">Log-error standard deviation comparison:<a class="anchor" aria-label="anchor" href="#log-error-standard-deviation-comparison"></a>
 </h5>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'sigma_eps'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>In contrast to the exponent, the log-error standard deviation does
 not show a clear non-constant trend over the water elevations. This
 observation suggests that models with constant error variance
@@ -564,7 +563,7 @@ dataset, aligning with the tournament results that selected
 all different model components of the winning model, which in this case
 is <code>gplm0</code>:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'panel'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-13-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>This panel plot provides a comprehensive view of the winning model’s
 components, including the rating curve, residuals, power-law exponent,
 and the log-error standard deviation. This visualization is particularly
@@ -695,7 +694,7 @@ posterior draws.</p>
 <span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; Comparison 1 Results:</span></span>
 <span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------------------------- </span></span>
 <span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; complexity   model  winner D_hat      eff_num_param  DIC        Delta_DIC </span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; more         gplm          -42.7732   6.0631         -30.6471   0.8498    </span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; more         gplm          -42.7732   6.0631         -30.6470   0.8498    </span></span>
 <span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt; less         gplm0  &lt;---   -42.4880   6.3454         -29.7972             </span></span>
 <span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; Comparison 2 Results:</span></span>
@@ -807,7 +806,7 @@ learning theory</em>. Journal of Machine Learning Research, 11,
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
