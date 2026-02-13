@@ -181,6 +181,10 @@ get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction
         }
         cl <- makeCluster(num_cores)
         clusterSetRNGStream(cl = cl) #set RNG to type L'Ecuyer
+        # Pass parent lib paths to workers so they can find bdrc during staged installs
+        lib_paths <- .libPaths()
+        clusterExport(cl, 'lib_paths', envir = environment())
+        clusterEvalQ(cl, .libPaths(lib_paths))
         clusterEvalQ(cl, loadNamespace("bdrc"))
         clusterExport(cl,c('run_MCMC', 'initiate_output_list', 'pri', 'variogram_chain',
                            'theta_m', 'RC', 'density_fun', 'unobserved_prediction_fun',
