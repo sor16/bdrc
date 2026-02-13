@@ -19,3 +19,5 @@
 ^vignettes/figs-tournament
 ^vignettes/introduction_cache
 ^vignettes/tournament_cache
+^\.claude$
+\.DS_Store$
