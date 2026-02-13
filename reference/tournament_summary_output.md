@@ -1,0 +1,41 @@
+# Internal function to generate a summary output for a discharge rating curve tournament
+
+This function takes the summary results of a tournament object and
+produces a formatted console output displaying the results of model
+comparisons. It supports different model selection criteria: WAIC, DIC,
+and PMP.
+
+## Usage
+
+``` r
+tournament_summary_output(results, method, winning_criteria)
+```
+
+## Arguments
+
+- results:
+
+  A data.frame containing the summary results of a tournament. The
+  structure of this data.frame determines which model-selection
+  criterion was used (WAIC, DIC, or PMP).
+
+- method:
+
+  A string indicating the method used for model comparison ("WAIC",
+  "DIC", or "PMP").
+
+- winning_criteria:
+
+  The criteria used to determine the winning model.
+
+## Value
+
+This function does not return a value; it prints the formatted summary
+to the console.
+
+## Details
+
+The function automatically detects the model-selection criterion used
+based on the columns present in the input data frame. It then formats
+and prints a summary of the tournament results, including the overall
+winner and detailed results for each comparison.

@@ -1,0 +1,127 @@
+# Background
+
+Most methods for directly measuring the discharge of a water stream are
+time-consuming and expensive. Therefore, indirect methods for measuring
+the discharge are usually applied. A popular method for inferring
+discharge is to fit a model that describes the relationship between the
+discharge and the water level, also referred to as water elevation. Such
+a model is called a discharge rating curve, and one widely used in
+hydrology is the power-law rating curve, given by $Q(h) = a(h - c)^{b}$,
+where $Q(h)$ is the discharge, $h$ is the water elevation, and $a$, $b$
+and $c$ are constants. However, the power-law rating curve is not always
+able to adequately describe the relationship between discharge and water
+elevation. Hrafnkelsson et al. (2022) proposed a novel extension to the
+power-law rating curve referred to as the generalized power-law rating
+curve. Its form is $Q(h) = a(h - c)^{f{(h)}}$, where the power-law
+exponent, $f(h)$, is a function of water elevation. This generalization
+allows the water stream’s cross-sectional geometry to affect the
+power-law exponent, lending more flexibility to the rating curve to
+adequately describe the relationship between discharge and water
+elevation.
+
+## Bayesian Generalized Power-Law Rating Curves
+
+The power-law model is commonly assumed in hydraulic practice to fit
+rating curves, and as mention above, its form is
+
+$$Q(h) = a(h - c)^{b}$$ (1)
+
+where $Q$, $h$, $a$, $b$ and $c$ are as before, see e.g., Venetis
+(1970), Clarke (1999) and Clarke et al. (2000). The second type of
+rating curve is the generalized power-law rating curve. Its construction
+is based on the hydraulics of open channel flow given by the formulas of
+Chézy and Manning which are of the form
+
+$$Q = KR^{x}AS^{1/2}$$ (2)
+
+where $K$ and $x$ are constants; $A$ is the area of the cross section;
+$S$ is the slope of the channel; and $R$ is the hydraulic radius, given
+by $R = A/P$, where $P$ is the wetted perimeter. According to Chézy
+$x = 1/2$, while Manning claimed that $x = 2/3$ (Chow, 1959). The form
+of the generalized power-law rating curve is
+
+$$Q = a(h - c)^{f{(h)}}$$ (3)
+
+where $a$ and $c$ are constants; and $f(h)$ is a function of $h$,
+referred to as the power-law exponent. The relationship between (2) and
+(3) can be found by equating these two equations. In particular, the
+form of $f(h)$ can be derived, namely,
+
+$$f(h) = \frac{(x + 1)\{\log A(h) - \log A(1)\} - x\{\log P(h) - \log P(1)\}}{\log h}$$
+(4)
+
+Thus, $f(h)$ is a function of the constant $x$, the cross-sectional area
+$A$, and the wetted perimeter $P$. A Bayesian approach is proposed for
+estimating the parameters of the power-law model and the generalized
+power-law model. Bayesian inference requires specification of prior
+densities for unknown parameters and unknown quantities, along with a
+full probabilistic specification of the observed data. The goal of
+Bayesian inference is to obtain the posterior density of the model
+parameters, and then interrogate the posterior by calculating summary
+statistics, such as the posterior mean and the 95% posterior intervals.
+Analytical formulas for these summary statistics are intractable in most
+cases and thus they are computed by generating samples from the
+posterior density using Markov chain Monte Carlo simulation. The
+Bayesian power-law model is presented on a logarithmic scale as,
+
+$$\log\left( Q_{i} \right) = \log(a) + b\log\left( h_{i} - c \right) + \epsilon_{i},\quad i = 1,...,n,$$
+(5)
+
+where $\epsilon_{i}$ follows a normal distribution with mean zero and
+variance $\sigma_{\epsilon}^{2}$, $n$ is the number of paired
+observations, and $a$, $b$ and $c$ are as before. The Bayesian inference
+scheme implemented for the power-law model is standard, however, for
+efficient posterior simulation, first, samples are obtained from the
+joint marginal posterior density of
+$\left( c,\sigma_{\epsilon}^{2} \right)$, then samples are obtained from
+the conditional posterior density of $\left( \log(a),b \right)$
+conditional on $\left( c,\sigma_{\epsilon}^{2} \right)$. The Bayesian
+generalized power-law model is presented as a Bayesian hierarchical
+model. The function $f(h)$ is modeled at the latent level as $b$ plus a
+mean zero continuous stochastic process $\beta(h)$, which is assumed to
+be twice mean-square differentiable. The model is presented on a
+logarithmic scale as,
+
+$$\log\left( Q_{i} \right) = \log(a) + \left( b + \beta\left( h_{i} \right) \right)\log\left( h_{i} - c \right) + \varepsilon_{i},\quad i = 1,...,n,$$
+(6)
+
+where $\epsilon_{i}$ follows a normal distribution with mean zero and
+variance $\sigma_{\epsilon}^{2}\left( h_{i} \right)$ that can vary with
+water elevation. Here the parameters $a$, $b$ and $c$ play a similar
+role as in the Bayesian power-law model. The stochastic process
+$\beta(h)$ is assumed a priori to be a Gaussian process governed by a
+Matérn covariance function with smoothness parameter $\nu = 2.5$, see
+Matérn (1960). This model is constrained by setting $b = 1.835$. An
+efficient posterior simulation is achieved by sampling from the joint
+posterior density of the hyperparameters of the model, and then sampling
+from the conditional density of the latent parameters given the
+hyperparameters.
+
+## References
+
+Chow, V. (1959). *Open-Channel Hydraulics*. McGraw-Hill. New York.
+
+Clarke, R. (1999). *Uncertainty in the estimation of mean annual flood
+due to rating-curve indefinition.* Journal of Hydrology 222(1-4).
+185–190. doi: <https://doi.org/10.1016/s0022-1694(99)00097-9>
+
+Clarke, R., Mendiondo, E., Brusa L. (2000). *Uncertainties in mean
+discharges from two large South American rivers due to rating curve
+variability.* Hydrological Sciences 45(2). 221–236. doi:
+<https://doi.org/10.1080/02626660009492321>
+
+Hrafnkelsson, B., Sigurdarson, H., Rögnvaldsson, S., Jansson, A. Ö.,
+Vias, R. D., and Gardarsson, S. M. (2022). *Generalization of the
+power-law rating curve using hydrodynamic theory and Bayesian
+hierarchical modeling*, Environmetrics, 33(2):e2711. doi:
+<https://doi.org/10.1002/env.2711>
+
+Matérn, B. (1960). *Spatial variation. Stochastic models and their
+application to some problems in forest surveys and other sampling
+investigations.* Meddelanden från statens Skogsforskningsinstitut.
+49(5).
+
+Venetis, C. (1970). *A note on the estimation of the parameters in
+logarithmic stage-discharge relationships with estimates of their
+error.* International Association of Scientific Hydrology. Bulletin XV
+2(6). 105–111. doi: <https://doi.org/10.1080/02626667009493957>
