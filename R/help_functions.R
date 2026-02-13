@@ -179,7 +179,7 @@ get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction
                 cat(sprintf("Multiprocess sampling (4 chains in %d jobs) ...\n", num_cores ))
             }
         }
-        cl <- makeCluster(num_cores, setup_strategy = 'sequential')
+        cl <- makeCluster(num_cores)
         clusterSetRNGStream(cl = cl) #set RNG to type L'Ecuyer
         clusterEvalQ(cl, loadNamespace("bdrc"))
         clusterExport(cl,c('run_MCMC', 'initiate_output_list', 'pri', 'variogram_chain',
