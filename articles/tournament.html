@@ -477,7 +477,7 @@ various visualization tools:</p>
 <h4 id="tournament-results-diagram">1. Tournament results diagram:<a class="anchor" aria-label="anchor" href="#tournament-results-diagram"></a>
 </h4>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj) <span class="co">#default plot type is type='tournament_results'</span></span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="&lt;em&gt;A diagram showing the results of the power-law tournament. The diagram progresses from bottom (four initial models) to top (single winner). Each model's residual plot is shown at the bottom, with corresponding WAIC values above. Green WAIC values indicate the more parsimonious models in each comparison for these data. The first round selects gplm0 and plm0, which advance to the final comparison. gplm0 emerges as the tournament winner, indicated by its green WAIC value and the name at the top of the diagram.&lt;/em&gt;" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-7-1.png" class="r-plt" alt="&lt;em&gt;A diagram showing the results of the power-law tournament. The diagram progresses from bottom (four initial models) to top (single winner). Each model's residual plot is shown at the bottom, with corresponding WAIC values above. Green WAIC values indicate the more parsimonious models in each comparison for these data. The first round selects gplm0 and plm0, which advance to the final comparison. gplm0 emerges as the tournament winner, indicated by its green WAIC value and the name at the top of the diagram.&lt;/em&gt;" width="768" style="display: block; margin: auto;"></p>
 <p>This diagram illustrates the tournament progression from the initial
 four models to the final winner. It shows each model’s residual plot at
 the bottom, with corresponding WAIC values above. Green WAIC values
@@ -487,7 +487,7 @@ indicate the selected model for each comparison.</p>
 <h4 id="log-likelihood-comparison">2. Log-likelihood comparison:<a class="anchor" aria-label="anchor" href="#log-likelihood-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'boxplot'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="A comparative boxplot displaying posterior log-likelihood values for the models, with corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale for direct comparison with WAIC. Each boxplot represents the distribution of log-likelihood values computed with the samples from the posterior distribution of the corresponding model. This visualization allows for easy comparison of model performance and fit across the four models." width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-8-1.png" class="r-plt" alt="A comparative boxplot displaying posterior log-likelihood values for the models, with corresponding WAIC values shown as red diamonds. The log-likelihood values are presented on the deviance scale for direct comparison with WAIC. Each boxplot represents the distribution of log-likelihood values computed with the samples from the posterior distribution of the corresponding model. This visualization allows for easy comparison of model performance and fit across the four models." width="768" style="display: block; margin: auto;"></p>
 <p>This boxplot compares the posterior log-likelihood values for each
 model, with the corresponding WAIC values shown as red diamonds. The
 log-likelihood values are presented on the deviance scale (-2 *
@@ -498,7 +498,7 @@ better fit.</p>
 <h4 id="rating-curve-comparison">3. Rating curve comparison:<a class="anchor" aria-label="anchor" href="#rating-curve-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'rating_curve'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="A plot comparing the rating curves estimated by four models. The graph shows water level (stage) on the y-axis and discharge on the x-axis. Each model's estimated rating curve is represented by a solid line, with dotted lines showing the 95% prediction interval. This visualization enables assessment of model fit across the range of water levels, highlighting differences in predictive capabilities. Optimal performance is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval." width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-9-1.png" class="r-plt" alt="A plot comparing the rating curves estimated by four models. The graph shows water level (stage) on the y-axis and discharge on the x-axis. Each model's estimated rating curve is represented by a solid line, with dotted lines showing the 95% prediction interval. This visualization enables assessment of model fit across the range of water levels, highlighting differences in predictive capabilities. Optimal performance is indicated by the solid line following the mean of observations and 95% of observations falling within the prediction interval." width="768" style="display: block; margin: auto;"></p>
 <p>This plot compares the estimated rating curves from all four models.
 It shows water level (stage) vs. discharge, with solid lines
 representing the estimated curves and dotted lines showing 95%
@@ -511,7 +511,7 @@ within the prediction interval.</p>
 <h4 id="residual-plot-comparison">4. Residual plot comparison:<a class="anchor" aria-label="anchor" href="#residual-plot-comparison"></a>
 </h4>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'residuals'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-10-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>The residual plots also help assess how well each model fits the data
 by showing differences between observed and predicted values across
 water levels. This can reveal patterns in model performance and
@@ -536,7 +536,7 @@ or if the assumption of constancy is appropriate.</p>
 <h5 id="power-law-exponent-comparison">Power-law exponent comparison:<a class="anchor" aria-label="anchor" href="#power-law-exponent-comparison"></a>
 </h5>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'f'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-11-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>The plots show that the exponent is clearly not constant over the
 water elevations. This observation supports the use of the generalized
 power-law models (<code>gplm</code> and <code>gplm0</code>) over the
@@ -547,7 +547,7 @@ they allow for this non-constant behavior of the power-law exponent.</p>
 <h5 id="log-error-standard-deviation-comparison">Log-error standard deviation comparison:<a class="anchor" aria-label="anchor" href="#log-error-standard-deviation-comparison"></a>
 </h5>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'sigma_eps'</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-12-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>In contrast to the exponent, the log-error standard deviation does
 not show a clear non-constant trend over the water elevations. This
 observation suggests that models with constant error variance
@@ -563,7 +563,7 @@ dataset, aligning with the tournament results that selected
 all different model components of the winning model, which in this case
 is <code>gplm0</code>:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">plot</span>(t_obj, <span class="at">type =</span> <span class="st">'panel'</span>, <span class="at">transformed =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="tournament_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
+<p><img src="figs-tournament/unnamed-chunk-13-1.png" class="r-plt" alt="" width="768" style="display: block; margin: auto;"></p>
 <p>This panel plot provides a comprehensive view of the winning model’s
 components, including the rating curve, residuals, power-law exponent,
 and the log-error standard deviation. This visualization is particularly

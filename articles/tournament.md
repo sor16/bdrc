@@ -383,7 +383,7 @@ parsimonious models in each comparison for these data. The first round
 selects gplm0 and plm0, which advance to the final comparison. gplm0
 emerges as the tournament winner, indicated by its green WAIC value and
 the name at the top of the
-diagram.\</em\>](tournament_files/figure-html/unnamed-chunk-7-1.png)
+diagram.\</em\>](figs-tournament/unnamed-chunk-7-1.png)
 
 This diagram illustrates the tournament progression from the initial
 four models to the final winner. It shows each model’s residual plot at
@@ -403,7 +403,7 @@ comparison with WAIC. Each boxplot represents the distribution of
 log-likelihood values computed with the samples from the posterior
 distribution of the corresponding model. This visualization allows for
 easy comparison of model performance and fit across the four
-models.](tournament_files/figure-html/unnamed-chunk-8-1.png)
+models.](figs-tournament/unnamed-chunk-8-1.png)
 
 This boxplot compares the posterior log-likelihood values for each
 model, with the corresponding WAIC values shown as red diamonds. The
@@ -425,7 +425,7 @@ enables assessment of model fit across the range of water levels,
 highlighting differences in predictive capabilities. Optimal performance
 is indicated by the solid line following the mean of observations and
 95% of observations falling within the prediction
-interval.](tournament_files/figure-html/unnamed-chunk-9-1.png)
+interval.](figs-tournament/unnamed-chunk-9-1.png)
 
 This plot compares the estimated rating curves from all four models. It
 shows water level (stage) vs. discharge, with solid lines representing
@@ -441,7 +441,7 @@ interval.
 > plot(t_obj, type = 'residuals')
 ```
 
-![](tournament_files/figure-html/unnamed-chunk-10-1.png)
+![](figs-tournament/unnamed-chunk-10-1.png)
 
 The residual plots also help assess how well each model fits the data by
 showing differences between observed and predicted values across water
@@ -467,7 +467,7 @@ appropriate.
 > plot(t_obj, type = 'f')
 ```
 
-![](tournament_files/figure-html/unnamed-chunk-11-1.png)
+![](figs-tournament/unnamed-chunk-11-1.png)
 
 The plots show that the exponent is clearly not constant over the water
 elevations. This observation supports the use of the generalized
@@ -481,7 +481,7 @@ of the power-law exponent.
 > plot(t_obj, type = 'sigma_eps')
 ```
 
-![](tournament_files/figure-html/unnamed-chunk-12-1.png)
+![](figs-tournament/unnamed-chunk-12-1.png)
 
 In contrast to the exponent, the log-error standard deviation does not
 show a clear non-constant trend over the water elevations. This
@@ -498,7 +498,7 @@ model components of the winning model, which in this case is `gplm0`:
 > plot(t_obj, type = 'panel', transformed = TRUE)
 ```
 
-![](tournament_files/figure-html/unnamed-chunk-13-1.png)
+![](figs-tournament/unnamed-chunk-13-1.png)
 
 This panel plot provides a comprehensive view of the winning model’s
 components, including the rating curve, residuals, power-law exponent,

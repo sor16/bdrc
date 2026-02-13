@@ -22,7 +22,7 @@ elevation.
 ## Bayesian Generalized Power-Law Rating Curves
 
 The power-law model is commonly assumed in hydraulic practice to fit
-rating curves, and as mention above, its form is
+rating curves, and as mentioned above, its form is
 
 $$Q(h) = a(h - c)^{b}$$ (1)
 
