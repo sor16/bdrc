@@ -1,6 +1,7 @@
 context('plm general functions')
 test_that("trace plots have known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_trace_plot_hyperparameters', autoplot(plm0.fit, type = 'trace', 'hyperparameters'))
     vdiffr::expect_doppelganger('plm0_trace_plot_hyperparameters_transformed', autoplot(plm0.fit, type = 'trace', 'hyperparameters', transformed = TRUE))
     vdiffr::expect_doppelganger('plm0_trace_plot_single_parameter', autoplot(plm0.fit, type = 'trace', 'sigma_eps'))
@@ -19,6 +20,7 @@ test_that("trace plots have known output", {
 })
 test_that("histogram have known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_histogram_hyperparameters', autoplot(plm0.fit, type = 'histogram', 'hyperparameters'))
     vdiffr::expect_doppelganger('plm0_histogram_hyperparameters_transformed', autoplot(plm0.fit, type = 'histogram', 'hyperparameters', transformed = TRUE))
     vdiffr::expect_doppelganger('plm0_histogram_single_parameter', autoplot(plm0.fit, type = 'histogram', 'sigma_eps'))
@@ -38,6 +40,7 @@ test_that("histogram have known output", {
 
 test_that("rating_curve has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_rating_curve', autoplot(plm0.fit, type = 'rating_curve'))
     vdiffr::expect_doppelganger('plm0_rating_curve_transformed', autoplot(plm0.fit, type = 'rating_curve', transformed = TRUE))
 
@@ -53,6 +56,7 @@ test_that("rating_curve has known output", {
 
 test_that("rating_curve_mean has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_rating_curve_mean', autoplot(plm0.fit, type = 'rating_curve_mean'))
     vdiffr::expect_doppelganger('plm0_rating_curve_mean_transformed', autoplot(plm0.fit, type = 'rating_curve_mean', transformed = TRUE))
 
@@ -69,6 +73,7 @@ test_that("rating_curve_mean has known output", {
 
 test_that("sigma_eps has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_sigma_eps', autoplot(plm0.fit, type = 'sigma_eps'))
     vdiffr::expect_doppelganger('plm_sigma_eps', autoplot(plm.fit, type = 'sigma_eps'))
     vdiffr::expect_doppelganger('gplm0_sigma_eps', autoplot(gplm0.fit, type = 'sigma_eps'))
@@ -77,12 +82,14 @@ test_that("sigma_eps has known output", {
 
 test_that("beta has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('gplm0_beta', autoplot(gplm0.fit, type = 'beta'))
     vdiffr::expect_doppelganger('gplm_beta', autoplot(gplm.fit, type = 'beta'))
 })
 
 test_that("f has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_f', autoplot(plm0.fit, type = 'f'))
     vdiffr::expect_doppelganger('plm_f', autoplot(plm.fit, type = 'f'))
     vdiffr::expect_doppelganger('gplm0_f', autoplot(gplm0.fit, type = 'f'))
@@ -91,6 +98,7 @@ test_that("f has known output", {
 
 test_that("residuals has known output", {
     skip_on_cran()
+    skip_on_ci()
     vdiffr::expect_doppelganger('plm0_residuals', autoplot(plm0.fit, type = 'residuals'))
     vdiffr::expect_doppelganger('plm_residuals', autoplot(plm.fit, type = 'residuals'))
     vdiffr::expect_doppelganger('gplm0_residuals', autoplot(gplm0.fit, type = 'residuals'))

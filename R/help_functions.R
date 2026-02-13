@@ -156,6 +156,7 @@ get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction
     T_max <- 50
 
     run_MCMC_wrapper <- function(i){
+        requireNamespace("bdrc", quietly = TRUE)
         run_MCMC(theta_m = theta_m, RC = RC, density_fun = density_fun,
                  unobserved_prediction_fun = unobserved_prediction_fun,
                  nr_iter = nr_iter, burnin = burnin, thin = thin, T_max = T_max)
@@ -181,7 +182,6 @@ get_MCMC_output_list <- function(theta_m, RC, density_fun, unobserved_prediction
         }
         cl <- makeCluster(num_cores, setup_strategy = 'sequential')
         clusterSetRNGStream(cl = cl) #set RNG to type L'Ecuyer
-        clusterEvalQ(cl, library(bdrc))
         clusterExport(cl,c('run_MCMC', 'initiate_output_list', 'pri', 'variogram_chain',
                            'theta_m', 'RC', 'density_fun', 'unobserved_prediction_fun',
                            'parallel', 'nr_iter', 'burnin', 'thin', 'T_max'), envir = environment())
