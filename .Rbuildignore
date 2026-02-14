@@ -21,3 +21,4 @@
 ^vignettes/tournament_cache
 ^\.claude$
 \.DS_Store$
+^CRAN-SUBMISSION$
