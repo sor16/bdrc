@@ -78,6 +78,7 @@ test_that("tournament handles different input types", {
 })
 
 test_that("tournament handles verbose input correctly", {
+    skip_on_cran()
     t_obj_output <- paste(capture.output(tournament(Q ~ W, krokfors, num_cores = 2)), collapse = "")
     expect_true( grepl("Running tournament", t_obj_output))
     expect_true( grepl("gplm finished", t_obj_output))
@@ -111,6 +112,7 @@ test_that("tournament handles unexpected arguments", {
 })
 
 test_that("tournament checks for consistent data in model_list", {
+    skip_on_cran()
     # Create a new gplm model with different data
     different_data_plm0 <- plm0(Q ~ W, data = krokfors[1:4, ], num_cores = 2)
 
@@ -124,6 +126,7 @@ test_that("tournament checks for consistent data in model_list", {
 })
 
 test_that("tournament handles invalid winning criteria", {
+    skip_on_cran()
     expect_error(tournament(Q ~ W, krokfors, winning_criteria = "invalid = expression"),
                  "For method 'WAIC', when a string, winning_criteria must be a valid R expression")
     expect_error(tournament(Q ~ W, krokfors, winning_criteria = "Delta_WAIC = 2"),  # wrong use of "=="

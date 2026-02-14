@@ -78,6 +78,7 @@ test_that("the gplm0 object with known c with a maximum stage value is in tact",
 })
 
 test_that("gplm0 sends a warning about the estimated c_upper parameter", {
+    skip_on_cran()
     W_grid <- seq(2.1,10,0.5)
     data_far_from_c <- data.frame("W" = W_grid,
                                   "Q" = 5 + exp(rnorm(length(W_grid), 0, 0.05)) * (W_grid ^ 2.5))
