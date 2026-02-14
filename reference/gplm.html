@@ -34,7 +34,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Generalized power-law model with variance that varies with stage.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/master/R/gplm.R" class="external-link"><code>R/gplm.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/sor16/bdrc/blob/HEAD/R/gplm.R" class="external-link"><code>R/gplm.R</code></a></small>
       <div class="d-none name"><code>gplm.Rd</code></div>
     </div>
 
@@ -242,32 +242,34 @@ Bayesian inference is based on the posterior density and summary statistics such
 <span class="r-out co"><span class="r-pr">#&gt;</span> MCMC sampling completed!</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Diagnostics:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 22.81%.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ✔ All chains have mixed well (Rhat &lt; 1.1).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Acceptance rate: 23.22%.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ⚠ Warning: Some chains are not mixing well. Parameters with Rhat &gt; 1.1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   - sigma_eta: Rhat = 1.105</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ✔ Effective sample sizes sufficient (eff_n_samples &gt; 400).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ℹ Try re-running the model after inspecting the trace plots, convergence diagnostics plots, and reviewing the data for potential issues.</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gplm.fit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Q ~ W</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Latent parameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> a 13.40      24.55      32.51      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> b  1.83       1.84       1.84      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> a 13.04      24.24      32.34      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> b  1.83       1.83       1.84      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Hyperparameters:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            lower-2.5% median-50% upper-97.5%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> c          396.421    396.669    396.812    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_beta   0.165      0.338      0.806    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> phi_beta     1.343      2.987      6.894    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta    0.048      0.436      0.897    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1       -6.128     -5.395     -4.399    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2       -7.692     -5.974     -4.521    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3       -9.093     -7.048     -5.072    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -10.429     -8.051     -5.135    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5      -11.473     -8.717     -5.092    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6      -12.436     -9.279     -5.095    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c          396.4111   396.663    396.807    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_beta   0.1672     0.345      0.790    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> phi_beta     1.3395     2.966      6.865    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sigma_eta    0.0381     0.416      0.831    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_1       -6.1390    -5.368     -4.381    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_2       -7.6735    -5.997     -4.487    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_3       -9.1877    -7.132     -5.193    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_4      -10.6072    -8.200     -5.637    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_5      -11.6837    -8.899     -5.725    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta_6      -12.6336    -9.392     -5.629    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -141.1422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> WAIC: -141.4589</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
@@ -280,7 +282,7 @@ Bayesian inference is based on the posterior density and summary statistics such
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer></div>
