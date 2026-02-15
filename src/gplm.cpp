@@ -45,7 +45,9 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     if (arma::any(varr > 100)) {
         return Rcpp::List::create(Rcpp::Named("p") = -1e9);
     }
-    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({0.0})));
+    // Phantom observation variance: use sig_b^2 from Sig_ab(1,1) instead of 0
+    double sig_b_sq = Sig_ab(1, 1);
+    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({sig_b_sq})));
     // Matern covariance
     arma::mat R_Beta = (1.0 + std::sqrt(5.0) * dist / std::exp(log_phi_b) +
         5.0 * arma::square(dist) / (3.0 * std::pow(std::exp(log_phi_b), 2))) %
@@ -75,7 +77,7 @@ Rcpp::List gplm_density_evaluation_unknown_c_cpp(const arma::vec& theta,
     arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
     arma::mat chol_Sig_x = arma::chol(Sig_x);
     arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(n_unique + 2);
-    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({0.0}));
+    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({std::sqrt(sig_b_sq)}) % arma::randn(1));
     arma::mat Wt_L_inv = W.t() * arma::inv(L);
     arma::mat x = x_u - Wt_L_inv * sss;
     arma::vec yp = arma::vec(X * x).subvec(0, n-1);
@@ -130,7 +132,9 @@ Rcpp::List gplm_density_evaluation_known_c_cpp(const arma::vec& theta,
     if (arma::any(varr > 100)) {
         return Rcpp::List::create(Rcpp::Named("p") = -1e9);
     }
-    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({0.0})));
+    // Phantom observation variance: use sig_b^2 from Sig_ab(1,1) instead of 0
+    double sig_b_sq = Sig_ab(1, 1);
+    arma::mat Sig_eps = arma::diagmat(arma::join_vert(varr, arma::vec({sig_b_sq})));
     // Matern covariance
     arma::mat R_Beta = (1.0 + std::sqrt(5.0) * dist / std::exp(log_phi_b) +
         5.0 * arma::square(dist) / (3.0 * std::pow(std::exp(log_phi_b), 2))) %
@@ -159,7 +163,7 @@ Rcpp::List gplm_density_evaluation_known_c_cpp(const arma::vec& theta,
     arma::mat W = arma::solve(arma::trimatl(L), X * Sig_x, arma::solve_opts::fast);
     arma::mat chol_Sig_x = arma::chol(Sig_x);
     arma::vec x_u = mu_x + chol_Sig_x.t() * arma::randn(n_unique + 2);
-    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({0.0}));
+    arma::vec sss = X * x_u - y + arma::join_vert(arma::sqrt(varr) % arma::randn(n), arma::vec({std::sqrt(sig_b_sq)}) % arma::randn(1));
     arma::mat Wt_L_inv = W.t() * arma::inv(L);
     arma::mat x = x_u - Wt_L_inv * sss;
     arma::vec yp = arma::vec(X * x).subvec(0, n-1);
