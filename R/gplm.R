@@ -191,11 +191,13 @@ gplm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, 
         output_list$theta[2, ] <- exp(output_list$theta[2, ])
         output_list$theta[3, ] <- exp(output_list$theta[3, ])
         output_list$theta[4, ] <- exp(output_list$theta[4, ])
+        output_list$theta[6:10, ] <- output_list$theta[6:10, ] * rep(output_list$theta[4, ], each = 5)
         output_list$theta[5:10, ] <- RC$P%*%output_list$theta[5:10, ]
     }else{
         output_list$theta[1, ] <- exp(output_list$theta[1, ])
         output_list$theta[2, ] <- exp(output_list$theta[2, ])
         output_list$theta[3, ] <- exp(output_list$theta[3, ])
+        output_list$theta[5:9, ] <- output_list$theta[5:9, ] * rep(output_list$theta[3, ], each = 5)
         output_list$theta[4:9, ] <- RC$P%*%output_list$theta[4:9, ]
     }
     output_list$x[1, ] <- exp(output_list$x[1, ])

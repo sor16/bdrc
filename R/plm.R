@@ -159,9 +159,11 @@ plm.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE, f
   if(is.null(RC$c)){
     output_list$theta[1, ] <- RC$h_min - exp(output_list$theta[1, ])
     output_list$theta[2, ] <- exp(output_list$theta[2, ])
+    output_list$theta[4:8, ] <- output_list$theta[4:8, ] * rep(output_list$theta[2, ], each = 5)
     output_list$theta[3:8, ] <- RC$P %*% output_list$theta[3:8, ]
   }else{
     output_list$theta[1,] <- exp(output_list$theta[1, ])
+    output_list$theta[3:7,] <- output_list$theta[3:7, ] * rep(output_list$theta[1, ], each = 5)
     output_list$theta[2:7,] <- RC$P %*% output_list$theta[2:7, ]
   }
   output_list$x[1, ] <- exp(output_list$x[1, ])
