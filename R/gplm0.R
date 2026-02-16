@@ -168,12 +168,12 @@ gplm0.inference <- function(y, h, c_param = NULL, h_max = NULL, parallel = TRUE,
     #refinement of list elements
     if(is.null(RC$c)){
         output_list$theta[1, ] <- RC$h_min - exp(output_list$theta[1, ])
-        output_list$theta[2, ] <- sqrt(exp(output_list$theta[2, ]))
-        output_list$theta[3, ] <- sqrt(exp(output_list$theta[3, ]))
+        output_list$theta[2, ] <- sqrt(exp(output_list$theta[2, ]))  # log(sigma_eps^2) -> sigma_eps
+        output_list$theta[3, ] <- exp(output_list$theta[3, ])        # log(sigma_beta)  -> sigma_beta
         output_list$theta[4, ] <- exp(output_list$theta[4, ])
     }else{
-        output_list$theta[1, ] <- sqrt(exp(output_list$theta[1, ]))
-        output_list$theta[2, ] <- sqrt(exp(output_list$theta[2, ]))
+        output_list$theta[1, ] <- sqrt(exp(output_list$theta[1, ]))  # log(sigma_eps^2) -> sigma_eps
+        output_list$theta[2, ] <- exp(output_list$theta[2, ])        # log(sigma_beta)  -> sigma_beta
         output_list$theta[3, ] <- exp(output_list$theta[3, ])
     }
     output_list$x[1,] <- exp(output_list$x[1, ])
