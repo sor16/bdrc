@@ -1,4 +1,9 @@
-# bdrc (development version)
+# bdrc 2.0.1
+
+* Fixed phantom observation variance bug in gplm0 and gplm: the phantom observation that centers the GP used zero variance, acting as an infinitely precise constraint that collapsed the posterior of b. Fixed by using the prior variance sig_b^2.
+* Fixed eta posterior scaling bug in plm and gplm: the standardized eta coefficients were not scaled by sigma_eta before applying the basis transformation P, resulting in incorrect B-spline coefficient posteriors.
+* Fixed sigma_beta back-transform bug in gplm0: stored values were sqrt(sigma_beta) instead of sigma_beta due to an incorrect sqrt(exp()) transform. This affected posterior summaries and plots for the sigma_beta parameter in the gplm0 model.
+* Updated reference in DESCRIPTION from arXiv preprint to the published Environmetrics paper (doi:10.1002/env.2711).
 
 # bdrc 2.0.0
 
